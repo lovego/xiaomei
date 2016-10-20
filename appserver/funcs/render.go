@@ -1,43 +1,43 @@
 package funcs
 
 import (
-	"encoding/json"
 	"html/template"
 	"io/ioutil"
 	"os"
 	"path"
+
 	"github.com/bughou-go/xiaomei/config"
+	"gopkg.in/yaml.v2"
 )
 
 var assets map[string]string
-var root = config.Root
 
 func init() {
-	data, err := ioutil.ReadFile(path.Join(root, `config/assets.json`))
+	data, err := ioutil.ReadFile(path.Join(config.Root, `config/assets.yml`))
 	if err != nil {
 		panic(err)
 	}
-	err = json.Unmarshal(data, &assets)
+	err = yaml.Unmarshal(data, &assets)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func AddModificationTimeFunc(cache bool) func(string) string {
+func AssetFunc(dev bool) func(string) string {
 	return func(src string) string {
-		if cache {
-			mt, ok := assets[src[7:]]
-			if !ok {
-				return src
-			}
-			return src + `?` + mt
+		if dev {
+			return src + `?` + modificationTime(src)
 		}
-		return src + `?` + getModificationTime(src)
+		if mt, ok := assets[src[7:]]; ok {
+			return src + `?` + mt
+		} else {
+			return src
+		}
 	}
 }
 
-func getModificationTime(src string) string {
-	info, err := os.Stat(path.Join(root, `public/reports`, src[7:])) // remove "/static" prefix
+func modificationTime(src string) string {
+	info, err := os.Stat(path.Join(config.Root, `public`, src[7:])) // remove "/static" prefix
 	if err != nil {
 		panic(err)
 	}

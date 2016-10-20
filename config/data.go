@@ -1,7 +1,6 @@
 package config
 
 import (
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"path"
@@ -10,6 +9,7 @@ import (
 	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/fatih/color"
+	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
@@ -22,6 +22,8 @@ type Config struct {
 	TimeZoneOffset int          `yaml:"timeZoneOffset"`
 	Mailer         MailerConfig `yaml:"mailer"`
 	AlarmReceivers []string     `yaml:"alarmReceivers"`
+	Mysql          string       `yaml:"mysql"`
+	Redis          string       `yaml:"redis"`
 
 	DeployUser    string         `yaml:"deployUser"`
 	DeployRoot    string         `yaml:"deployRoot"`
@@ -48,8 +50,10 @@ func parseConfigData() *Config {
 	data := &Config{}
 	loadConfig(data, `config/config.yml`)
 	loadConfig(data, envConfigPath())
-	utils.PrintJson(data)
 	setupData(data)
+	if Debug(`config`) {
+		utils.PrintJson(data)
+	}
 	return data
 }
 
@@ -85,13 +89,12 @@ func envConfigPath() string {
 func setupData(data *Config) {
 	data.DeployName = data.AppName + `_` + data.Env
 	data.DeployPath = path.Join(data.DeployRoot, data.DeployName)
-	if data.GitBranch != `` {
-		return
+	if data.GitBranch == `` {
+		branch, err := cmd.Run(cmd.O{Output: true, Panic: true},
+			`git`, `rev-parse`, `--abbrev-ref`, `HEAD`)
+		if err != nil {
+			panic(err)
+		}
+		data.GitBranch = branch
 	}
-	branch, err := cmd.Run(cmd.O{Output: true, Panic: true},
-		`git`, `rev-parse`, `--abbrev-ref`, `HEAD`)
-	if err != nil {
-		panic(err)
-	}
-	data.GitBranch = branch
 }

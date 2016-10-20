@@ -1,9 +1,9 @@
 package setup
 
 import (
+	"github.com/bughou-go/xiaomei/config"
 	"net"
 	"regexp"
-	"github.com/bughou-go/xiaomei/config"
 	"strings"
 )
 
@@ -16,7 +16,7 @@ func Setup(tasks string) {
 		case `setup-hosts`:
 			SetupHosts()
 		case `setup-mysql`:
-			SetupMysql()
+			// SetupMysql()
 		case `setup-appserver`:
 			SetupAppServer()
 		case `setup-cron`:

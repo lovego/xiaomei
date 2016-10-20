@@ -11,9 +11,9 @@ import (
 )
 
 func getRenderer() *xm.Renderer {
-	var cache = config.Data.Env != `dev`
-	var renderer_funcs = map[string]interface{}{
-		`mt`:           funcs.AddModificationTimeFunc(cache),
+	var dev = config.Data.Env == `dev`
+	var funcs = map[string]interface{}{
+		`asset`:        funcs.AssetFunc(dev),
 		`html_safe`:    funcs.HtmlSafe,
 		`dict`:         funcs.MakeDict,
 		`keys`:         funcs.MapKeys,
@@ -25,5 +25,5 @@ func getRenderer() *xm.Renderer {
 		`thousand_sep`: utils.ThousandSep,
 		`contains`:     strings.Contains,
 	}
-	return xm.NewRenderer(path.Join(config.Root, `views`), `layout/default`, cache, renderer_funcs)
+	return xm.NewRenderer(path.Join(config.Root, `views`), `layout/default`, !dev, funcs)
 }

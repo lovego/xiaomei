@@ -3,46 +3,47 @@ package assets
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
-	"github.com/bughou-go/xiaomei/config"
 	"strings"
+
+	"github.com/bughou-go/xiaomei/config"
+	"gopkg.in/yaml.v2"
 )
 
 func Assets(args []string) {
 	root := config.Root
 	if len(args) == 0 {
-		args = []string{`release/public/reports/js`, `release/public/reports/css`}
+		args = []string{`release/public/js`, `release/public/css`}
 	}
 	paths := getFilesPath(root, args)
 
-	assets_path := path.Join(root, `config/assets.json`)
-	assets := getAssets(assets_path)
+	assetsPath := path.Join(root, `config/assets.yml`)
+	assets := getAssets(assetsPath)
 	changed := checkAndAddMd5(assets, paths)
 	if changed == 0 {
 		return
 	}
-	updateAssets(assets_path, assets)
+	updateAssets(assetsPath, assets)
 	fmt.Printf("assets %d files changed.\n", changed)
 }
 
 func getFilesPath(root string, args []string) []string {
 	paths := []string{}
 	for _, arg := range args {
-		file_path := path.Join(root, `..`, arg)
-		file, err := os.Stat(file_path)
+		filePath := path.Join(root, `..`, arg)
+		file, err := os.Stat(filePath)
 		if err != nil {
 			panic(err)
 		}
 		if file.IsDir() {
-			if path.Base(file_path) != `font` {
-				paths = append(paths, getDirFiles(file_path)...)
+			if path.Base(filePath) != `font` {
+				paths = append(paths, getDirFiles(filePath)...)
 			}
 		} else {
-			paths = append(paths, file_path)
+			paths = append(paths, filePath)
 		}
 	}
 	return paths
@@ -55,59 +56,59 @@ func getDirFiles(dir string) (paths []string) {
 	}
 	for _, file := range files {
 		filename := file.Name()
-		child_file := path.Join(dir, filename)
+		child := path.Join(dir, filename)
 		if file.IsDir() {
-			if path.Base(child_file) != `font` {
-				paths = append(paths, getDirFiles(child_file)...)
+			if path.Base(child) != `font` {
+				paths = append(paths, getDirFiles(child)...)
 			}
 		} else {
-			paths = append(paths, child_file)
+			paths = append(paths, child)
 		}
 	}
 	return paths
 }
 
-func getAssets(assets_path string) (assets map[string]string) {
-	data, err := ioutil.ReadFile(assets_path)
+func getAssets(assetsPath string) (assets map[string]string) {
+	data, err := ioutil.ReadFile(assetsPath)
 	if err != nil {
 		panic(err)
 	}
-	err = json.Unmarshal(data, &assets)
+	err = yaml.Unmarshal(data, &assets)
 	if err != nil {
 		panic(err)
 	}
 	return
 }
 
-func updateAssets(assets_path string, assets map[string]string) {
-	content, err := json.MarshalIndent(assets, ``, `  `)
+func updateAssets(assetsPath string, assets map[string]string) {
+	content, err := yaml.Marshal(assets)
 	if err != nil {
 		panic(err)
 	}
-	err = ioutil.WriteFile(assets_path, content, os.ModeDir)
+	err = ioutil.WriteFile(assetsPath, content, os.ModeDir)
 	if err != nil {
 		panic(err)
 	}
 }
 
 func checkAndAddMd5(assets map[string]string, paths []string) (changed int) {
-	public_dir := path.Join(config.Root, `public/reports`)
-	for _, file_path := range paths {
-		asset_path := strings.Replace(file_path, public_dir, ``, -1)
-		if ext := path.Ext(asset_path); ext != `.css` && ext != `.js` {
+	publicDir := path.Join(config.Root, `public/reports`)
+	for _, filePath := range paths {
+		assetPath := strings.Replace(filePath, publicDir, ``, -1)
+		if ext := path.Ext(assetPath); ext != `.css` && ext != `.js` {
 			continue
 		}
-		file_md5 := getMd5(file_path)
-		if assets[asset_path] != file_md5 {
-			assets[asset_path] = file_md5
+		nowMd5 := getMd5(filePath)
+		if assets[assetPath] != nowMd5 {
+			assets[assetPath] = nowMd5
 			changed++
 		}
 	}
 	return
 }
 
-func getMd5(file_path string) string {
-	data, err := ioutil.ReadFile(file_path)
+func getMd5(filePath string) string {
+	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		panic(err)
 	}

@@ -16,21 +16,18 @@ func PrintUsage() {
   shell             进入服务器的bash
   run <cmd>         在服务器运行<cmd>
 
-  setup           设置mysql、appserver、cron、nginx
-  setup-appserver 设置应用服务器
-  setup-nginx     设置nginx
-  setup-mysql     在mysql中建库建表，导入初始数据
-  setup-cron      设置定时任务(/etc/cron.d)
-  setup-hosts     设置hosts文件(/etc/hosts)
+  setup             设置mysql、appserver、cron、nginx
+  setup-appserver   设置应用服务器
+  setup-nginx       设置nginx
+  setup-cron        设置定时任务(/etc/cron.d)
+  setup-hosts       设置hosts文件(/etc/hosts)
 
-  mysql 进入mysql命令客户端
-  mysqldump 执行mysqldump命令导出mysql数据
-
-  assets [args...] 添加至assets.json
-
-  sync-orgs 同步采销Tree组织
-  plan-users 获取当天plan使用的用户
-  baidu-weather 获取并更新当天及后三天的天气数据
+  assets [args...]  静态文件签名
 `, os.Args[0])
+
+	// setup-mysql     在mysql中建库建表，导入初始数据
+	// mysql           进入mysql命令客户端
+	// mysqldump       执行mysqldump命令导出mysql数据
+
 	os.Exit(1)
 }
