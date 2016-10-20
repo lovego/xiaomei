@@ -1,5 +1,6 @@
 #!/bin/bash
 shopt -s extglob
 
-fgrep reports !(vendor) -r --exclude-dir=log --exclude='*.json' --exclude=hardcode |
-  fgrep -v retail-tek.com/reports | fgrep reports --color
+fgrep xiaomei !(vendor) -r --exclude-dir=log --exclude=hardcode |
+  fgrep -v github.com/bughou-go/xiaomei/ |
+  fgrep xiaomei --color

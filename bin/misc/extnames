@@ -1,0 +1,4 @@
+#!/bin/bash
+
+dir="$(dirname $0)"
+find "$@" -type f -exec "$dir"/extname {} \; | sort  | uniq -c | sort -nrk1

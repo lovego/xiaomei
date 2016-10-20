@@ -1,0 +1,10 @@
+#!/bin/bash
+
+filename="${1##*/}"
+extname="${filename##*.}"
+
+if test "$filename" = "$extname"; then
+  echo ''
+else
+  echo ".$extname"
+fi

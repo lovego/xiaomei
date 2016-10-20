@@ -1,9 +1,0 @@
-#!/bin/bash
-
-# 实体机hbase集群21个节点：10.249.6.9~29
-ssh -t wumart_dm@10.249.6.9 hbase shell
-
-# 云主机hbase集群 5个节点：10.254.100.28~32
-# ssh -t wumart@10.254.100.28 hbase shell
-
-
