@@ -1,0 +1,5 @@
+.*.swp
+*.test
+*.pyc
+tmp
+!.gitkeep

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+go list -f '{{join .Deps "\n" }}' | fgrep .
+

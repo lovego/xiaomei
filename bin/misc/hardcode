@@ -1,0 +1,5 @@
+#!/bin/bash
+shopt -s extglob
+
+fgrep reports !(vendor) -r --exclude-dir=log --exclude='*.json' --exclude=hardcode |
+  fgrep -v retail-tek.com/reports | fgrep reports --color

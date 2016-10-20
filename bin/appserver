@@ -1,0 +1,14 @@
+#!/bin/bash
+cd $(dirname $0)/..
+
+bin=$(pwd)/release/bin
+GOBIN=$bin go install ./appserver || exit 1 #-gcflags "-N -l" 
+
+./bin/spec || exit 1
+
+if [[ $1 = debug ]]; then
+  dlv exec release/bin/appserver
+else 
+  release/bin/appserver
+fi
+

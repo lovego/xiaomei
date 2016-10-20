@@ -1,0 +1,11 @@
+#!/bin/bash
+cd $(dirname $0)/..
+
+targetDirs='appserver/ config/ helpers/ models/ routes/ services/ tools/ utils/'
+files=$(git diff --name-only --diff-filter=AMR -- $targetDirs)
+
+test -z "$files" && exit 0
+
+which gospec >/dev/null || go get -u github.com/bughou-go/spec/gospec
+
+gospec $files

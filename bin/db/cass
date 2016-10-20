@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# 实体机数据中心Cassandra 19个节点：10.249.6.11~29
+cqlsh 10.249.6.11 -k compass
+
+# 青云数据中心Solr 3个节点：10.249.6.28~30
+# cqlsh 10.249.6.28 -k compass
+
+
