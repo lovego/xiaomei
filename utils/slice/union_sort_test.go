@@ -8,9 +8,9 @@ import (
 type susCase [2][][2]interface{}
 
 func TestUnionSort(t *testing.T) {
-	var nil_result [][2]interface{}
+	var nilResult [][2]interface{}
 	var cases = []susCase{
-		susCase{nil_result, nil_result},
+		susCase{nilResult, nilResult},
 		susCase{
 			[][2]interface{}{
 				[2]interface{}{s{`3`, 3}},
@@ -141,10 +141,10 @@ func TestUnionSort(t *testing.T) {
 			},
 		},
 	}
-	for _, test_case := range cases {
-		got := test_case[0]
+	for _, testCase := range cases {
+		got := testCase[0]
 		UnionSort(got, `V`)
-		expect := test_case[1]
+		expect := testCase[1]
 
 		if !reflect.DeepEqual(got, expect) {
 			t.Errorf("expect: %v, got: %v\n", expect, got)

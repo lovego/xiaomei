@@ -8,7 +8,7 @@ import (
 )
 
 func Status() {
-	for _, addr := range tools.GetMatchedServerAddrs() {
+	for _, addr := range tools.MatchedServerAddrs() {
 		address := config.Data.DeployUser + `@` + addr
 		color.Cyan(address)
 		cmd.Run(cmd.O{}, `ssh`, address, `status `+config.Data.DeployName+`; ps -FC appserver`)

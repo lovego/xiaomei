@@ -15,12 +15,12 @@ type s struct {
 type m map[string]interface{}
 
 func TestUnion(t *testing.T) {
-	var nil_result [][2]interface{}
+	var nilResult [][2]interface{}
 	var cases = []suCase{
-		suCase{nil, nil, nil_result},
-		suCase{[]int{}, nil, nil_result},
-		suCase{nil, []bool{}, nil_result},
-		suCase{[]int{}, []bool{}, nil_result},
+		suCase{nil, nil, nilResult},
+		suCase{[]int{}, nil, nilResult},
+		suCase{nil, []bool{}, nilResult},
+		suCase{[]int{}, []bool{}, nilResult},
 		suCase{
 			[]s{s{`1`, 1}, s{`2`, 2}, s{`3`, 3}},
 			[]s{},
@@ -96,7 +96,8 @@ func TestUnion(t *testing.T) {
 			},
 		},
 		suCase{
-			[]m{m{`Name`: `1`, `V`: 1}, m{`Name`: `2`, `V`: 2}, m{`Name`: `3`, `V`: 3}, m{`Name`: `4`, `V`: 4}},
+			[]m{m{`Name`: `1`, `V`: 1}, m{`Name`: `2`, `V`: 2}, m{`Name`: `3`, `V`: 3},
+				m{`Name`: `4`, `V`: 4}},
 			[]m{m{`Name`: `1`, `V`: 1}, m{`Name`: `2`, `V`: 2}, m{`Name`: `3`, `V`: 3}},
 			[][2]interface{}{
 				[2]interface{}{m{`Name`: `1`, `V`: 1}, m{`Name`: `1`, `V`: 1}},
@@ -107,7 +108,8 @@ func TestUnion(t *testing.T) {
 		},
 		suCase{
 			[]m{m{`Name`: `1`, `V`: 1}, m{`Name`: `2`, `V`: 2}, m{`Name`: `3`, `V`: 3}},
-			[]m{m{`Name`: `1`, `V`: 1}, m{`Name`: `2`, `V`: 2}, m{`Name`: `3`, `V`: 3}, m{`Name`: `4`, `V`: 4}},
+			[]m{m{`Name`: `1`, `V`: 1}, m{`Name`: `2`, `V`: 2}, m{`Name`: `3`, `V`: 3},
+				m{`Name`: `4`, `V`: 4}},
 			[][2]interface{}{
 				[2]interface{}{m{`Name`: `1`, `V`: 1}, m{`Name`: `1`, `V`: 1}},
 				[2]interface{}{m{`Name`: `2`, `V`: 2}, m{`Name`: `2`, `V`: 2}},
@@ -116,12 +118,12 @@ func TestUnion(t *testing.T) {
 			},
 		},
 	}
-	for _, test_case := range cases {
-		got := Union(test_case[0], test_case[1], `Name`)
-		expect := test_case[2].([][2]interface{})
+	for _, testCase := range cases {
+		got := Union(testCase[0], testCase[1], `Name`)
+		expect := testCase[2].([][2]interface{})
 
 		if !reflect.DeepEqual(got, expect) {
-			t.Errorf("input: %v, %v, expect: %v, got: %v\n", test_case[0], test_case[1], expect, got)
+			t.Errorf("input: %v, %v, expect: %v, got: %v\n", testCase[0], testCase[1], expect, got)
 		}
 	}
 }

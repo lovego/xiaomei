@@ -24,7 +24,7 @@ func UpdateDoc(branch, commit string) {
 	}
 
 	gitHost := getGitHost(config.Data.GitAddr)
-	servers := tools.GetMatchedServers()
+	servers := tools.MatchedServers()
 	for _, server := range servers {
 		if server.Misc != `doc-server` {
 			continue

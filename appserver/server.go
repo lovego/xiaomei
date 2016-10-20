@@ -19,9 +19,9 @@ func main() {
 	fmt.Printf("%s listen at %s\n", time.Now().Format(`2006-01-02 15:04:05 -0700`), addr)
 
 	if err := http.ListenAndServe(addr, http.HandlerFunc(
-		func(response_writer http.ResponseWriter, request *http.Request) {
+		func(response http.ResponseWriter, request *http.Request) {
 			req := xm.NewRequest(request)
-			res := xm.NewResponse(response_writer, req, renderer, layoutData)
+			res := xm.NewResponse(response, req, renderer, layoutData)
 
 			defer errorHandler(time.Now(), req, res)
 

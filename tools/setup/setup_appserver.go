@@ -3,11 +3,11 @@ package setup
 import (
 	"bytes"
 	"fmt"
+	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/utils/cmd"
 	"os"
 	"os/user"
 	"path"
-	"github.com/bughou-go/xiaomei/config"
-	"github.com/bughou-go/xiaomei/utils/cmd"
 	"strings"
 	"text/template"
 )
@@ -22,24 +22,24 @@ func SetupAppServer() {
 		path.Join(config.Root, `config/conf/upstart.tmpl.conf`),
 	))
 
-	current_user, err := user.Current()
+	curUser, err := user.Current()
 	if err != nil {
 		panic(err)
 	}
 
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, upstartConfData{
-		config.Data, current_user.Username, config.Root, config.CurrentAppServer().AppStartOn,
+		config.Data, curUser.Username, config.Root, config.CurrentAppServer().AppStartOn,
 	}); err != nil {
 		panic(err)
 	}
 
-	deploy_name := config.Data.AppName + `_` + config.Data.Env
+	deployName := config.Data.AppName + `_` + config.Data.Env
 
-	cmd.SudoWriteFile(`/etc/init/`+deploy_name+`.conf`, &buf)
+	cmd.SudoWriteFile(`/etc/init/`+deployName+`.conf`, &buf)
 
-	cmd.Run(cmd.O{}, `sudo`, `stop`, deploy_name)
-	output, _ := cmd.Run(cmd.O{Panic: true, Output: true}, `sudo`, `start`, deploy_name)
+	cmd.Run(cmd.O{}, `sudo`, `stop`, deployName)
+	output, _ := cmd.Run(cmd.O{Panic: true, Output: true}, `sudo`, `start`, deployName)
 	fmt.Println(output)
 	if !strings.Contains(output, `start/running,`) {
 		os.Exit(1)

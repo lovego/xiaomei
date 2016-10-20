@@ -4,52 +4,79 @@ import (
 	"reflect"
 )
 
-func Union(a, b interface{}, key_name string) (result [][2]interface{}) {
+func Union(a, b interface{}, keyName string) [][2]interface{} {
+	aV, bV, swapped := makeABValue(a, b)
+	bM := makeBMap(bV, keyName)
+	result := unionAB(aV, bM, keyName, swapped)
+	if len(bM) > 0 {
+		result = addBvRemainder(result, bV, bM, keyName, swapped)
+	}
+	return result
+}
+
+func unionAB(
+	aV reflect.Value, bM map[string]interface{}, keyName string, swapped bool,
+) [][2]interface{} {
+	var result [][2]interface{}
+	length := aV.Len()
+	for i := 0; i < length; i++ {
+		av := aV.Index(i)
+		key := getKey(av, keyName)
+		bv, ok := bM[key]
+		if ok {
+			delete(bM, key)
+		}
+		if swapped {
+			result = append(result, [2]interface{}{bv, av.Interface()})
+		} else {
+			result = append(result, [2]interface{}{av.Interface(), bv})
+		}
+	}
+	return result
+}
+
+func addBvRemainder(result [][2]interface{},
+	bV reflect.Value, bM map[string]interface{}, keyName string, swapped bool,
+) [][2]interface{} {
+	length := bV.Len()
+	for i := 0; i < length; i++ {
+		bv := bV.Index(i)
+		key := getKey(bv, keyName)
+		if _, ok := bM[key]; ok {
+			if swapped {
+				result = append(result, [2]interface{}{bv.Interface(), nil})
+			} else {
+				result = append(result, [2]interface{}{nil, bv.Interface()})
+			}
+		}
+	}
+	return result
+}
+
+func makeABValue(a, b interface{}) (reflect.Value, reflect.Value, bool) {
 	if a == nil {
 		a = []struct{}{}
 	}
 	if b == nil {
 		b = []struct{}{}
 	}
-	av := reflect.ValueOf(a)
-	bv := reflect.ValueOf(b)
-	swapped := false
-	if bv.Len() > av.Len() {
-		av, bv = bv, av
-		swapped = true
+	aV := reflect.ValueOf(a)
+	bV := reflect.ValueOf(b)
+	if bV.Len() > aV.Len() {
+		return aV, bV, false
+	} else {
+		return bV, aV, true
 	}
+}
 
-	bm := make(map[string]interface{})
-	length := bv.Len()
+func makeBMap(bV reflect.Value, keyName string) map[string]interface{} {
+	bM := make(map[string]interface{})
+	length := bV.Len()
 	for i := 0; i < length; i++ {
-		v := bv.Index(i)
-		bm[getKey(v, key_name)] = v.Interface()
+		v := bV.Index(i)
+		bM[getKey(v, keyName)] = v.Interface()
 	}
-
-	length = av.Len()
-	for i := 0; i < length; i++ {
-		a_v := av.Index(i)
-		key := getKey(a_v, key_name)
-		b_v, ok := bm[key]
-		if ok {
-			delete(bm, key)
-		}
-		if swapped {
-			result = append(result, [2]interface{}{b_v, a_v.Interface()})
-		} else {
-			result = append(result, [2]interface{}{a_v.Interface(), b_v})
-		}
-	}
-
-	for _, b_v := range bm {
-		if swapped {
-			result = append(result, [2]interface{}{b_v, nil})
-		} else {
-			result = append(result, [2]interface{}{nil, b_v})
-		}
-	}
-
-	return
+	return bM
 }
 
 func getKey(v reflect.Value, name string) string {

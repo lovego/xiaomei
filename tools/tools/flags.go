@@ -18,20 +18,22 @@ func Flags() []string {
 	return flag.Args()
 }
 
-func GetMatchedServers() []config.ServerConfig {
-	matched_servers := []config.ServerConfig{}
+func MatchedServers() []config.ServerConfig {
+	matched := []config.ServerConfig{}
 	for _, server := range config.Data.DeployServers {
-		if strings.Contains(server.Tasks, options.Server) || strings.Contains(server.Addr, options.Server) {
-			matched_servers = append(matched_servers, server)
+		if strings.Contains(server.Tasks, options.Server) ||
+			strings.Contains(server.Addr, options.Server) {
+			matched = append(matched, server)
 		}
 	}
-	return matched_servers
+	return matched
 }
 
-func GetMatchedServerAddrs() []string {
+func MatchedServerAddrs() []string {
 	addrs := []string{}
 	for _, server := range config.Data.DeployServers {
-		if strings.Contains(server.Tasks, options.Server) || strings.Contains(server.Addr, options.Server) {
+		if strings.Contains(server.Tasks, options.Server) ||
+			strings.Contains(server.Addr, options.Server) {
 			if !contains(addrs, server.Addr) {
 				addrs = append(addrs, server.Addr)
 			}

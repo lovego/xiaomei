@@ -12,7 +12,7 @@ func Run(args []string) {
 	if len(args) == 0 {
 		tools.PrintUsage()
 	}
-	for _, addr := range tools.GetMatchedServerAddrs() {
+	for _, addr := range tools.MatchedServerAddrs() {
 		address := config.Data.DeployUser + `@` + addr
 		color.Cyan(address)
 		cmd.Run(cmd.O{}, `ssh`, address, `cd `+config.Data.DeployPath+`; `+strings.Join(args, ` `))

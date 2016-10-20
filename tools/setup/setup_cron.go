@@ -3,10 +3,10 @@ package setup
 import (
 	"bytes"
 	"fmt"
-	"os/user"
-	"path"
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"os/user"
+	"path"
 	"text/template"
 )
 
@@ -19,20 +19,20 @@ func SetupCron() {
 		path.Join(config.Root, `config/conf/cron.tmpl`),
 	))
 
-	current_user, err := user.Current()
+	curUser, err := user.Current()
 	if err != nil {
 		panic(err)
 	}
 
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, cronConfData{
-		current_user.Username, config.Root, config.Data.Env,
+		curUser.Username, config.Root, config.Data.Env,
 	}); err != nil {
 		panic(err)
 	}
 
-	deploy_name := config.Data.AppName + `_` + config.Data.Env
+	deployName := config.Data.AppName + `_` + config.Data.Env
 
-	cmd.SudoWriteFile(`/etc/cron.d/`+deploy_name, &buf)
+	cmd.SudoWriteFile(`/etc/cron.d/`+deployName, &buf)
 	fmt.Println(`setup cron ok.`)
 }

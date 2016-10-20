@@ -11,7 +11,7 @@ import (
 )
 
 func Restart() {
-	addrs := tools.GetMatchedServerAddrs()
+	addrs := tools.MatchedServerAddrs()
 	for _, addr := range addrs {
 		restartAppServer(config.Data.DeployUser + `@` + addr)
 	}

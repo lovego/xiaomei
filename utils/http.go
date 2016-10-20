@@ -44,13 +44,13 @@ func HttpPost(url, typ string, body []byte, data interface{}) []byte {
 		panic(`HTTP POST: ` + url + "\n" + resp.Status)
 	}
 
-	res_body, err := ioutil.ReadAll(resp.Body)
+	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		panic(`HTTP POST: ` + url + "\n" + err.Error())
 	}
 
-	if err := json.Unmarshal(res_body, &data); err != nil {
+	if err := json.Unmarshal(resBody, &data); err != nil {
 		panic(err)
 	}
-	return body
+	return resbody
 }

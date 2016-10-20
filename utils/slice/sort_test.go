@@ -8,9 +8,9 @@ import (
 type ssCase [2][]interface{}
 
 func TestSort(t *testing.T) {
-	var nil_result = []interface{}{}
+	var nilResult = []interface{}{}
 	var cases = []ssCase{
-		ssCase{nil_result, nil_result},
+		ssCase{nilResult, nilResult},
 		ssCase{
 			[]interface{}{
 				s{`3`, 3},
@@ -37,10 +37,10 @@ func TestSort(t *testing.T) {
 			},
 		},
 	}
-	for _, test_case := range cases {
-		got := test_case[0]
+	for _, testCase := range cases {
+		got := testCase[0]
 		Sort(got, `V`)
-		expect := test_case[1]
+		expect := testCase[1]
 
 		if !reflect.DeepEqual(got, expect) {
 			t.Errorf("expect: %v, got: %v\n", expect, got)

@@ -4,8 +4,8 @@ import (
 	"reflect"
 )
 
-func StructOrMapField(st_or_map interface{}, field string) interface{} {
-	value := reflect.ValueOf(st_or_map)
+func StructOrMapField(obj interface{}, field string) interface{} {
+	value := reflect.ValueOf(obj)
 	if value.Kind() == reflect.Ptr {
 		if value.IsNil() {
 			return nil
