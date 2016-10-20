@@ -15,6 +15,7 @@ func PrintUsage() {
   status            查看应用服务器状态
   shell             进入服务器的bash
   run <cmd>         在服务器运行<cmd>
+  update-doc        更新文档服务器上的文档
 
   setup             设置mysql、appserver、cron、nginx
   setup-appserver   设置应用服务器
@@ -22,7 +23,7 @@ func PrintUsage() {
   setup-cron        设置定时任务(/etc/cron.d)
   setup-hosts       设置hosts文件(/etc/hosts)
 
-  assets [args...]  静态文件签名
+  assets [args...]  对静态文件签名
 `, os.Args[0])
 
 	// setup-mysql     在mysql中建库建表，导入初始数据

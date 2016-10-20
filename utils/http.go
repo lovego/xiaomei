@@ -52,5 +52,5 @@ func HttpPost(url, typ string, body []byte, data interface{}) []byte {
 	if err := json.Unmarshal(resBody, &data); err != nil {
 		panic(err)
 	}
-	return resbody
+	return resBody
 }
