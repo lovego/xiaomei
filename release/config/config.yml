@@ -1,32 +1,18 @@
-appName:  reports
-appPort:  '3000'
+appName:  xiaomei
+appPort:  3000
 
 timeZoneName:  China
 timeZoneOffset: 28800
-
-deployUser: ubuntu
-deployRoot: /apps
-gitAddr: git@gitlab.retail-tek.com:go/reports.git
-
 mailer:
   host: imap.exmail.qq.com
   port: 25
   sender: data-system<data-system@retail-tek.com>
   passwd: RetailBigdata1234
 
-env:    dev
-domain: xiaomei-dev.org
+# alarmReceivers: [ 'name<email@example.com>' ] 
 
-mysql: root:root@tcp(127.0.0.1:3306)/reports
-redis: redis://:@localhost:6379/0
-
-deployServers: 
-  - addr: 127.0.0.1
-    appAddr: 127.0.0.1
-    tasks: setup-nginx setup-appserver
-    appStartOn: (started mysql and started redis-server) 
-
+deployUser: ubuntu
+deployRoot: /apps
+gitAddr: git@gitlab.retail-tek.com:go/reports.git
 gitBranch: 
-
-alarmReceivers: [ 'name<email@example.com>' ] 
 

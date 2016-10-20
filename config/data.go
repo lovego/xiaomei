@@ -47,7 +47,7 @@ type MailerConfig struct {
 func parseConfigData() *Config {
 	data := &Config{}
 	loadConfig(data, `config/config.yml`)
-	// loadConfig(data, envConfigPath())
+	loadConfig(data, envConfigPath())
 	utils.PrintJson(data)
 	setupData(data)
 	return data
