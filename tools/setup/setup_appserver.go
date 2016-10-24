@@ -23,9 +23,9 @@ func SetupAppServer() {
 	// stop current
 	cmd.Run(cmd.O{}, `sudo`, `stop`, config.Data.DeployName)
 
-	tail, _ := cmd.Start(cmd.O{Panic: true}, `tail`, `-n0`, `-f`,
-		path.Join(config.Root, `log/app.err`),
-	)
+	errLog := path.Join(config.Root, `log/app.err`)
+	cmd.Run(cmd.O{Panic: true}, `touch`, `-a`, errLog)
+	tail, _ := cmd.Start(cmd.O{Panic: true}, `tail`, `-n0`, `-f`, errLog)
 	// start new
 	output, _ := cmd.Run(cmd.O{Panic: true, Output: true}, `sudo`, `start`, config.Data.DeployName)
 	tail.Process.Kill()
@@ -38,7 +38,7 @@ func SetupAppServer() {
 
 func writeUpstartConfig() {
 	tmpl := template.Must(template.ParseFiles(
-		path.Join(config.Root, `config/conf/upstart.tmpl.conf`),
+		path.Join(config.Root, `deploy/conf/upstart.tmpl.conf`),
 	))
 
 	curUser, err := user.Current()

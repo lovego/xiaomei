@@ -1,5 +1,5 @@
 appName:  example
-appPort:  3000
+appPort:  3001
 
 timeZoneName:  China
 timeZoneOffset: 28800
