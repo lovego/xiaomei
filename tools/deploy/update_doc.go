@@ -55,5 +55,5 @@ func updateDocServer(server docServerConfig) {
 	if err != nil {
 		panic(err)
 	}
-	cmd.Run(cmd.O{Panic: true}, `ssh`, server.Addr, buf.String())
+	cmd.Run(cmd.O{Panic: true}, `ssh`, `-t`, server.Addr, buf.String())
 }

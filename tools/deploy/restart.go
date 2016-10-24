@@ -25,7 +25,7 @@ func restartAppServer(address string) {
 		`sudo stop %s; sudo start %s`,
 		config.Data.DeployName, config.Data.DeployName,
 	)
-	output, _ := cmd.Run(cmd.O{Panic: true, Output: true}, `ssh`, address, command)
+	output, _ := cmd.Run(cmd.O{Panic: true, Output: true}, `ssh`, `-t`, address, command)
 
 	if strings.Contains(output, `start/running,`) {
 		fmt.Printf("restart %s ok.\n", config.Data.DeployName)

@@ -18,6 +18,25 @@ type upstartConfData struct {
 }
 
 func SetupAppServer() {
+	writeUpstartConfig()
+
+	// stop current
+	cmd.Run(cmd.O{}, `sudo`, `stop`, config.Data.DeployName)
+
+	tail, _ := cmd.Start(cmd.O{Panic: true}, `tail`, `-n0`, `-f`,
+		path.Join(config.Root, `log/app.err`),
+	)
+	// start new
+	output, _ := cmd.Run(cmd.O{Panic: true, Output: true}, `sudo`, `start`, config.Data.DeployName)
+	tail.Process.Kill()
+
+	fmt.Println(output)
+	if !strings.Contains(output, `start/running,`) {
+		os.Exit(1)
+	}
+}
+
+func writeUpstartConfig() {
 	tmpl := template.Must(template.ParseFiles(
 		path.Join(config.Root, `config/conf/upstart.tmpl.conf`),
 	))
@@ -34,14 +53,5 @@ func SetupAppServer() {
 		panic(err)
 	}
 
-	deployName := config.Data.AppName + `_` + config.Data.Env
-
-	cmd.SudoWriteFile(`/etc/init/`+deployName+`.conf`, &buf)
-
-	cmd.Run(cmd.O{}, `sudo`, `stop`, deployName)
-	output, _ := cmd.Run(cmd.O{Panic: true, Output: true}, `sudo`, `start`, deployName)
-	fmt.Println(output)
-	if !strings.Contains(output, `start/running,`) {
-		os.Exit(1)
-	}
+	cmd.SudoWriteFile(`/etc/init/`+config.Data.DeployName+`.conf`, &buf)
 }

@@ -38,6 +38,23 @@ func Run(o O, name string, args ...string) (output string, err error) {
 	return
 }
 
+func Start(o O, name string, args ...string) (cmd *exec.Cmd, err error) {
+	if o.Print {
+		fmt.Println(name, strings.Join(args, ` `))
+	}
+
+	cmd = exec.Command(name, args...)
+	setupStdIO(cmd, o)
+
+	err = cmd.Start()
+
+	if o.Panic && err != nil {
+		panic(err)
+	}
+
+	return cmd, err
+}
+
 func setupStdIO(cmd *exec.Cmd, o O) {
 	if o.Stdin != nil {
 		cmd.Stdin = o.Stdin

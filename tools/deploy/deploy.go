@@ -53,7 +53,7 @@ func deployToServer(server DeployConfig) {
 	if err != nil {
 		panic(err)
 	}
-	cmd.Run(cmd.O{Panic: true}, `ssh`, server.Addr, buf.String())
+	cmd.Run(cmd.O{Panic: true}, `ssh`, `-t`, server.Addr, buf.String())
 }
 
 func getGitHost(gitAddr string) string {
