@@ -1,56 +1,39 @@
 package utils
 
 import (
-	"bytes"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"net/http"
 )
 
-func HttpGet(url string, data interface{}) []byte {
-	resp, err := http.Get(url)
+func Http(method, url string, headers map[string]string, body io.Reader, data interface{}) []byte {
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		panic(err)
+	}
+	for k, v := range headers {
+		req.Header.Set(k, v)
+	}
+	resp, err := http.DefaultClient.Do(req)
 	if resp != nil {
 		defer resp.Body.Close()
 	}
 	if err != nil {
 		panic(err)
 	}
-	defer resp.Body.Close()
+
 	if resp.StatusCode != http.StatusOK {
-		panic(`HTTP GET: ` + url + "\n" + resp.Status)
+		panic(`HTTP ` + method + `: ` + url + "\n" + `Response Status: ` + resp.Status)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		panic(`HTTP GET: ` + url + "\n" + err.Error())
-	}
-
-	if err := json.Unmarshal(body, data); err != nil {
-		panic(err)
-	}
-	return body
-}
-
-func HttpPost(url, typ string, body []byte, data interface{}) []byte {
-	resp, err := http.Post(url, typ, bytes.NewBuffer(body))
-	if resp != nil {
-		defer resp.Body.Close()
-	}
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		panic(`HTTP POST: ` + url + "\n" + resp.Status)
-	}
-
-	resBody, err := ioutil.ReadAll(resp.Body)
+	content, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		panic(`HTTP POST: ` + url + "\n" + err.Error())
 	}
 
-	if err := json.Unmarshal(resBody, &data); err != nil {
+	if err := json.Unmarshal(content, &data); err != nil {
 		panic(err)
 	}
-	return resBody
+	return content
 }
