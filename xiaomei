@@ -1,0 +1,18 @@
+#!/bin/bash
+
+test $# == 1 || {
+  echo "usage: $0 <project-name>"
+  exit 1;
+}
+
+test "$GOPATH" != '' || {
+  echo "GOPATH is empty."
+  exit 1;
+}
+
+git clone --depth 1 -o xiaomei "$GOPATH"/src/github.com/bughou-go/xiaomei "$1"
+cd "$1"
+git remote set-url xiaomei git@github.com:bughou-go/xiaomei.git
+
+sed -i'' "s/github.com\/bughou-go\/xiaomei/"
+
