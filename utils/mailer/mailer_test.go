@@ -9,18 +9,23 @@ var mailer = New(
 )
 
 func TestSend(t *testing.T) {
-	mailer.Send(
-		[]string{`侯志良<houzhiliang@retail-tek.com>`}, `test 标题`, `test 内容`,
-	)
+	mailer.Send(&Message{
+		Receivers: []string{`侯志良<houzhiliang@retail-tek.com>`},
+		Title:     `test 标题`,
+		Body:      `test 内容`,
+	})
 }
 
 func TestSendWithAttaches(t *testing.T) {
 	files := map[string]string{
 		`test1.txt`: `test1`,
 		`test2.txt`: `test2`,
-		`测试3.txt`:   `test3`,
+		`测试3.txt`:   `测试3`,
 	}
-	mailer.SendWithAttaches(
-		[]string{`侯志良<houzhiliang@retail-tek.com>`}, `test 标题`, `test 内容`, files,
-	)
+	mailer.Send(&Message{
+		Receivers: []string{`侯志良<houzhiliang@retail-tek.com>`},
+		Title:     `test 标题`,
+		Body:      `test 内容`,
+		Attaches:  files,
+	})
 }

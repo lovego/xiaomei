@@ -22,7 +22,7 @@ func setupMailer() {
 
 func AlarmMail(title, body string) {
 	title = Data.DeployName + ` ` + title
-	Mailer.Send(Data.AlarmReceivers, title, body)
+	Mailer.Send(&mailer.Message{Receivers: Data.AlarmReceivers, Title: title, Body: body})
 }
 
 func Debug(name string) bool {

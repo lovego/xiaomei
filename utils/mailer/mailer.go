@@ -3,9 +3,6 @@ package mailer
 import (
 	"bytes"
 	"encoding/base64"
-	"errors"
-	// "fmt"
-	"github.com/bughou-go/xm"
 	"mime"
 	"net/smtp"
 	"path/filepath"
@@ -15,13 +12,14 @@ import (
 
 type Mailer struct {
 	smtp.Auth
-	Addr, Sender, From string
+	HostPort, SenderNameAddr, SenderAddr string
 }
 
-type mailMessage struct {
-	headers       string
-	receivers, to []string
-	title, body   string
+type Message struct {
+	Receivers   []string // [name1<address1@example.com>, name2<address2@example.com>]
+	ContentType string
+	Title, Body string
+	Attaches    map[string]string // { `filename.ext`: `content`, ... }
 }
 
 // sender: name<address@example.com>
@@ -30,76 +28,64 @@ func New(host, port, sender, password string) *Mailer {
 		panic(`empty sender`)
 	}
 
-	mailer := Mailer{Addr: host + `:` + port}
-	mailer.Sender, mailer.From = parseNameAddr(sender)
-	mailer.Auth = smtp.PlainAuth(``, mailer.From, password, host)
+	mailer := Mailer{HostPort: host + `:` + port}
+	mailer.SenderNameAddr, mailer.SenderAddr = parseNameAddr(sender)
+	mailer.Auth = smtp.PlainAuth(``, mailer.SenderAddr, password, host)
 
 	return &mailer
 }
 
-// receivers: [name1<address1@example.com>, name2<address2@example.com>]
-func (m *Mailer) Send(receivers []string, title, body string) (err error) {
-	if m == nil {
+func (m *Mailer) Send(msg *Message) error {
+	if m == nil || msg == nil || len(msg.Receivers) == 0 {
 		return nil
 	}
-	return m.SendWithAttaches(receivers, title, body, nil)
-}
-
-// receivers: [ name1<address1@example.com>, ... ],
-// attaches: { `filename.ext`: `content`, ... }
-func (m *Mailer) SendWithAttaches(
-	receivers []string, title, body string, attaches map[string]string,
-) (err error) {
-	if m == nil {
-		return nil
+	if msg.ContentType == `` {
+		msg.ContentType = `text/plain; charset=UTF-8`
 	}
-	if len(receivers) == 0 {
-		return errors.New(`empty receivers`)
-	}
-	encRcvs, to := parseReceivers(receivers)
-	message := makeMessage(m.Sender, encRcvs, title, body, attaches)
+	rcvrNameAddrs, rcvrAddrs := parseNameAddrSlice(msg.Receivers)
+	message := m.makeMessage(rcvrNameAddrs, msg)
 
-	xm.Protect(func() {
-		err = smtp.SendMail(m.Addr, m.Auth, m.From, to, message)
-	})
-	return
+	return smtp.SendMail(m.HostPort, m.Auth, m.SenderAddr, rcvrAddrs, message)
 }
 
 const boundary = `f46d043c813270fc6b04c2d223da`
 
-func makeMessage(sender, receivers, title, body string, attaches map[string]string) []byte {
+func (m *Mailer) makeMessage(rcvrNameAddrs string, msg *Message) []byte {
 	var buf bytes.Buffer
-	multipart := len(attaches) > 0
-	buf.WriteString(makeHeaders(sender, receivers, title, multipart))
-	if multipart {
-		buf.WriteString(makeMultipartBody(body, attaches))
-	} else {
-		buf.WriteString("\r\n" + body + "\r\n")
-	}
+	multipart := len(msg.Attaches) > 0
+	buf.WriteString(m.makeHeaders(rcvrNameAddrs, msg, multipart))
+	buf.WriteString(m.makeBody(msg, multipart))
 	return buf.Bytes()
 }
 
-func makeHeaders(sender, receivers, title string, multipart bool) string {
-	headers := "From: " + sender + "\r\n" +
-		"To: " + receivers + "\r\n" +
+func (m *Mailer) makeHeaders(rcvrNameAddrs string, msg *Message, multipart bool) string {
+	headers := "From: " + m.SenderNameAddr + "\r\n" +
+		"To: " + rcvrNameAddrs + "\r\n" +
 		"Date: " + time.Now().Format(time.RFC1123Z) + "\r\n" +
-		"Subject: " + mime.BEncoding.Encode(`utf-8`, title) + "\r\n" +
+		"Subject: " + mime.BEncoding.Encode(`utf-8`, msg.Title) + "\r\n" +
 		"MIME-Version: 1.0\r\n"
 
 	if multipart {
 		headers += "Content-Type: multipart/mixed; boundary=\"" + boundary + "\"\r\n"
 	} else {
-		headers += "Content-Type: text/plain; charset=UTF-8\r\n"
+		headers += "Content-Type: " + msg.ContentType + "\r\n"
 	}
 	return headers
 }
 
-func makeMultipartBody(body string, attaches map[string]string) string {
-	result := "\r\n--" + boundary + "\r\n" +
-		"Content-Type: text/plain; charset=utf-8\r\n" +
-		"\r\n" + body + "\r\n"
+func (m *Mailer) makeBody(msg *Message, multipart bool) string {
+	if !multipart {
+		return "\r\n" + msg.Body + "\r\n"
+	}
+	return makeMultipartBody(msg)
+}
 
-	for name, content := range attaches {
+func makeMultipartBody(msg *Message) string {
+	result := "\r\n--" + boundary + "\r\n" +
+		"Content-Type: " + msg.ContentType + "\r\n" +
+		"\r\n" + msg.Body + "\r\n"
+
+	for name, content := range msg.Attaches {
 		result += makeAttach(name, content)
 	}
 	result += "\r\n--" + boundary + "--\r\n"
@@ -129,20 +115,20 @@ func base64Encode(content string) string {
 	return result.String()
 }
 
-func parseReceivers(receivers []string) (encoded string, addrs []string) {
-	var nameAddrs []string
-	for _, receiver := range receivers {
-		nameAddr, addr := parseNameAddr(receiver)
-		nameAddrs = append(nameAddrs, nameAddr)
+func parseNameAddrSlice(strs []string) (nameAddrs string, addrs []string) {
+	var slice []string
+	for _, s := range strs {
+		nameAddr, addr := parseNameAddr(s)
+		slice = append(slice, nameAddr)
 		addrs = append(addrs, addr)
 	}
-	encoded = strings.Join(nameAddrs, `,`)
+	nameAddrs = strings.Join(slice, `,`)
 	return
 }
 
-func parseNameAddr(nameAddr string) (encoded, addr string) {
-	arr := strings.Split(nameAddr, `<`)
-	encoded = mime.BEncoding.Encode(`utf-8`, arr[0]) + `<` + arr[1]
+func parseNameAddr(s string) (nameAddr, addr string) {
+	arr := strings.Split(s, `<`)
+	nameAddr = mime.BEncoding.Encode(`utf-8`, arr[0]) + `<` + arr[1]
 	addr = strings.TrimRight(arr[1], `>`)
 	return
 }
