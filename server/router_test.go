@@ -1,4 +1,4 @@
-package xm
+package xiaomei
 
 // go test -c -gcflags "-N -l"
 

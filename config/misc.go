@@ -6,8 +6,8 @@ import (
 	"os"
 	"regexp"
 
+	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/mailer"
-	"github.com/bughou-go/xm"
 )
 
 var Mailer *mailer.Mailer
@@ -34,7 +34,7 @@ func Protect(fn func()) {
 	defer func() {
 		err := recover()
 		if err != nil {
-			errMsg := fmt.Sprintf("PANIC: %s\n%s", err, xm.Stack(4))
+			errMsg := fmt.Sprintf("PANIC: %s\n%s", err, utils.Stack(4))
 			AlarmMail(`Protect错误`, errMsg)
 			log.Printf(errMsg)
 		}

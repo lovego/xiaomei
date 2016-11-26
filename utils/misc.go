@@ -1,7 +1,8 @@
-package xm
+package utils
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"log"
 	"runtime"
@@ -27,4 +28,9 @@ func Protect(fn func()) {
 		}
 	}()
 	fn()
+}
+
+func PrintJson(v interface{}) {
+	data, err := json.MarshalIndent(v, ``, `  `)
+	fmt.Println(string(data), err)
 }

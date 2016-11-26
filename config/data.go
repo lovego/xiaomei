@@ -18,12 +18,8 @@ type Config struct {
 	Env     string `yaml:"env"`
 	Domain  string `yaml:"domain"`
 
-	TimeZoneName   string       `yaml:"timeZoneName"`
-	TimeZoneOffset int          `yaml:"timeZoneOffset"`
 	Mailer         MailerConfig `yaml:"mailer"`
 	AlarmReceivers []string     `yaml:"alarmReceivers"`
-	Mysql          string       `yaml:"mysql"`
-	Redis          string       `yaml:"redis"`
 
 	DeployUser    string         `yaml:"deployUser"`
 	DeployRoot    string         `yaml:"deployRoot"`
@@ -32,6 +28,11 @@ type Config struct {
 	DeployPath    string         `yaml:"deployPath"`
 	GitAddr       string         `yaml:"gitAddr"`
 	GitBranch     string         `yaml:"gitBranch"`
+
+	TimeZoneName   string `yaml:"timeZoneName"`
+	TimeZoneOffset int    `yaml:"timeZoneOffset"`
+	Mysql          string `yaml:"mysql"`
+	Redis          string `yaml:"redis"`
 }
 
 type ServerConfig struct {

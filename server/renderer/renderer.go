@@ -1,4 +1,4 @@
-package xm
+package renderer
 
 import (
 	// "fmt"
@@ -17,10 +17,10 @@ type Tmpl struct {
 type Renderer struct {
 	Root, Layout string
 	Tmpls        map[string]*Tmpl
-	funcs        template.FuncMap
+	Funcs        template.FuncMap
 }
 
-func NewRenderer(root, layout string, cache bool, funcs template.FuncMap) *Renderer {
+func New(root, layout string, cache bool, funcs template.FuncMap) *Renderer {
 	var tmpls map[string]*Tmpl
 	if cache {
 		tmpls = make(map[string]*Tmpl)
@@ -60,8 +60,8 @@ func (r *Renderer) getTemplate(name, layout string, funcs template.FuncMap) *Tmp
 	tmpl := r.Tmpls[name]
 	if tmpl == nil {
 		tmpl = &Tmpl{template.New(``), make(map[string]bool)}
-		if r.funcs != nil {
-			tmpl.Funcs(r.funcs)
+		if r.Funcs != nil {
+			tmpl.Funcs(r.Funcs)
 		}
 		if funcs != nil {
 			tmpl.Funcs(funcs)

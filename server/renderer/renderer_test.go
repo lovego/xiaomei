@@ -1,4 +1,4 @@
-package xm
+package renderer
 
 import (
 	"bytes"
@@ -11,7 +11,7 @@ type testData struct {
 	Title, Content string
 }
 
-var r = NewRenderer(
+var r = New(
 	path.Join(path.Dir(sourcePath()), `renderer_test`), `layout`, false, nil,
 )
 

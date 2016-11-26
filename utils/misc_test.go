@@ -1,4 +1,4 @@
-package xm
+package utils
 
 import (
 	"fmt"

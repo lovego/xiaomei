@@ -1,0 +1,9 @@
+.*.swp
+*.test
+*.pyc
+tmp
+release/config/env.yml
+release/bin/*
+release/log/*
+*.exe
+!.gitkeep

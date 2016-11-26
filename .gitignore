@@ -1,9 +1,4 @@
 .*.swp
 *.test
-*.pyc
 tmp
-/release/config/env.json
-/release/bin/*
-/release/log/*
-/appserver/appserver.exe
 !.gitkeep

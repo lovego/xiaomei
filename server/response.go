@@ -1,4 +1,4 @@
-package xm
+package xiaomei
 
 import (
 	"bufio"
@@ -8,12 +8,14 @@ import (
 	"net"
 	"net/http"
 	"reflect"
+
+	"github.com/bughou-go/xiaomei/server/renderer"
 )
 
 type Response struct {
 	http.ResponseWriter
 	*Request
-	*Renderer
+	*renderer.Renderer
 	LayoutDataFunc
 	rwValue reflect.Value
 }
@@ -21,12 +23,12 @@ type Response struct {
 type LayoutDataFunc func(layout string, data interface{}, req *Request, res *Response) interface{}
 
 func NewResponse(
-	resWriter http.ResponseWriter, req *Request, renderer *Renderer, fun LayoutDataFunc,
+	resWriter http.ResponseWriter, req *Request, render *renderer.Renderer, fun LayoutDataFunc,
 ) *Response {
 	return &Response{
 		ResponseWriter: resWriter,
 		Request:        req,
-		Renderer:       renderer,
+		Renderer:       render,
 		LayoutDataFunc: fun,
 		rwValue:        reflect.Indirect(reflect.ValueOf(resWriter)),
 	}
