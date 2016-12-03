@@ -6,7 +6,6 @@ import (
 	"time"
 )
 
-var Root = rootDir()
 var Data = parseConfigData()
 var TimeZone = time.FixedZone(Data.TimeZoneName, Data.TimeZoneOffset)
 

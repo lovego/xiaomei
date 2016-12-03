@@ -13,7 +13,7 @@ import (
 var assets map[string]string
 
 func init() {
-	data, err := ioutil.ReadFile(path.Join(config.Root, `config/assets.yml`))
+	data, err := ioutil.ReadFile(path.Join(config.Root(), `config/assets.yml`))
 	if err != nil {
 		panic(err)
 	}
@@ -37,7 +37,7 @@ func AssetFunc(dev bool) func(string) string {
 }
 
 func modificationTime(src string) string {
-	info, err := os.Stat(path.Join(config.Root, `public`, src[7:])) // remove "/static" prefix
+	info, err := os.Stat(path.Join(config.Root(), `public`, src[7:])) // remove "/static" prefix
 	if err != nil {
 		panic(err)
 	}

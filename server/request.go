@@ -1,4 +1,4 @@
-package xiaomei
+package server
 
 import (
 	"net/http"

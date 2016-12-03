@@ -1,13 +1,13 @@
 package routes
 
 import (
-	"github.com/bughou-go/xm"
+	"github.com/bughou-go/xiaomei/server"
 )
 
-func Get() *xm.Router {
-	var router = xm.NewRouter()
+func Get() *server.Router {
+	router := server.NewRouter()
 
-	router.Get(`/`, func(req *xm.Request, res *xm.Response) {
+	router.Get(`/`, func(req *server.Request, res *server.Response) {
 		res.Json(map[string]string{`hello`: `world`})
 	})
 

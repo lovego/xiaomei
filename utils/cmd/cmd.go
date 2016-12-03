@@ -10,18 +10,17 @@ import (
 
 // option
 type O struct {
-	Stdin                io.Reader
-	Stdout, Stderr       io.Writer
-	Print, Panic, Output bool
+	Stdin                       io.Reader
+	Stdout, Stderr              io.Writer
+	NoStdin, NoStdout, NoStderr bool
+	Env                         []string
+	Print                       bool
+	Panic                       bool // only for Run And Start
+	Output                      bool // only for Run
 }
 
 func Run(o O, name string, args ...string) (output string, err error) {
-	if o.Print {
-		fmt.Println(name, strings.Join(args, ` `))
-	}
-
-	cmd := exec.Command(name, args...)
-	setupStdIO(cmd, o)
+	cmd := makeCmd(o, name, args)
 
 	if o.Output {
 		var bytes []byte
@@ -39,15 +38,9 @@ func Run(o O, name string, args ...string) (output string, err error) {
 }
 
 func Start(o O, name string, args ...string) (cmd *exec.Cmd, err error) {
-	if o.Print {
-		fmt.Println(name, strings.Join(args, ` `))
-	}
-
-	cmd = exec.Command(name, args...)
-	setupStdIO(cmd, o)
+	cmd = makeCmd(o, name, args)
 
 	err = cmd.Start()
-
 	if o.Panic && err != nil {
 		panic(err)
 	}
@@ -55,21 +48,50 @@ func Start(o O, name string, args ...string) (cmd *exec.Cmd, err error) {
 	return cmd, err
 }
 
+func State(o O, name string, args ...string) *os.ProcessState {
+	cmd := makeCmd(o, name, args)
+	cmd.Run()
+	return cmd.ProcessState
+}
+
+func Ok(o O, name string, args ...string) bool {
+	return State(o, name, args...).Success()
+}
+
+func makeCmd(o O, name string, args []string) *exec.Cmd {
+	if o.Print {
+		fmt.Println(name, strings.Join(args, ` `))
+	}
+
+	cmd := exec.Command(name, args...)
+	if o.Env != nil {
+		cmd.Env = o.Env
+	}
+	setupStdIO(cmd, o)
+	return cmd
+}
+
 func setupStdIO(cmd *exec.Cmd, o O) {
-	if o.Stdin != nil {
-		cmd.Stdin = o.Stdin
-	} else {
-		cmd.Stdin = os.Stdin
+	if !o.NoStdin {
+		if o.Stdin != nil {
+			cmd.Stdin = o.Stdin
+		} else {
+			cmd.Stdin = os.Stdin
+		}
 	}
-	if o.Stdout != nil {
-		cmd.Stdout = o.Stdout
-	} else if !o.Output {
-		cmd.Stdout = os.Stdout
+	if !o.NoStdout {
+		if o.Stdout != nil {
+			cmd.Stdout = o.Stdout
+		} else if !o.Output {
+			cmd.Stdout = os.Stdout
+		}
 	}
-	if o.Stderr != nil {
-		cmd.Stderr = o.Stderr
-	} else {
-		cmd.Stderr = os.Stderr
+	if !o.NoStderr {
+		if o.Stderr != nil {
+			cmd.Stderr = o.Stderr
+		} else {
+			cmd.Stderr = os.Stderr
+		}
 	}
 }
 

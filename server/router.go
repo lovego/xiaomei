@@ -15,7 +15,7 @@ xm 小而美的go语言web开发包。
 
 小美一定会尊敬我,崇拜我,爱上我,对我欲罢不能。
 */
-package xiaomei
+package server
 
 import (
 	// "github.com/googollee/go-socket.io"

@@ -1,4 +1,5 @@
 .*.swp
 *.test
 tmp
+/xiaomei
 !.gitkeep

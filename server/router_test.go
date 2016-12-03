@@ -1,4 +1,4 @@
-package xiaomei
+package server
 
 // go test -c -gcflags "-N -l"
 

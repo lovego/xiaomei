@@ -1,6 +1,25 @@
 package main
 
-func layoutData(layout string, data interface{}, req *Request, res *Response) interface{} {
+import (
+	"os"
+	"strings"
+
+	"github.com/bughou-go/xiaomei/cli"
+	"github.com/bughou-go/xiaomei/demo/routes"
+	"github.com/bughou-go/xiaomei/server"
+)
+
+func main() {
+	if len(os.Args) > 1 {
+		cli.Run()
+	} else {
+		svr := server.New(routes.Get())
+		svr.ListenAndServe()
+	}
+}
+
+func layoutData(layout string, data interface{},
+	req *server.Request, res *server.Response) interface{} {
 	if strings.HasPrefix(layout, `layout/`) {
 		return struct {
 			Data interface{}

@@ -2,35 +2,74 @@ package config
 
 import (
 	"os"
+	"os/exec"
 	"path"
+	"path/filepath"
+	"reflect"
 	"strings"
 )
 
-func rootDir() string {
+var projectRootDir, fmwkRootDir string
+
+func Root() string {
+	if projectRootDir != `` {
+		return projectRootDir
+	}
+	program, cwd := absProgramPath()
+	fmwkBin := path.Base(path.Dir(reflect.TypeOf(struct{}{}).PkgPath()))
+	if program == filepath.Join(os.Getenv(`GOPATH`), `bin`, fmwkBin) /* fmwkBin ... */ ||
+		strings.HasSuffix(program, `.test`) /* go test ... */ ||
+		strings.HasPrefix(program, `/tmp/`) /* go run ... */ {
+		projectRootDir = filepath.Join(detectRoot(cwd, `release/config/config.yml`), `release`)
+	} else {
+		// binary under project/release/ dir
+		projectRootDir = detectRoot(filepath.Dir(program), `config/config.yml`)
+	}
+	return projectRootDir
+}
+
+func FmwkRoot() string {
+	if fmwkRootDir != `` {
+		return fmwkRootDir
+	}
+	fmwk := path.Dir(reflect.TypeOf(struct{}{}).PkgPath())
+	if vendorPkg := filepath.Join(Root(), `vendor`, fmwk); dirExists(vendorPkg) {
+		fmwkRootDir = vendorPkg
+	} else if globalPkg := filepath.Join(os.Getenv(`GOPATH`), `src`, fmwk); dirExists(globalPkg) {
+		fmwkRootDir = globalPkg
+	} else {
+		panic(`framework not found.`)
+	}
+	return fmwkRootDir
+}
+
+func absProgramPath() (string, string) {
 	program := os.Args[0]
-	if !path.IsAbs(program) {
-		cwd, err := os.Getwd()
-		if err != nil {
+	cwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	switch i := strings.IndexByte(program, filepath.Separator); {
+	case i < 0: // path search
+		if program, err = exec.LookPath(program); err != nil {
 			panic(err)
 		}
-		program = path.Join(cwd, program)
+	case i > 0: // relative path
+		program = filepath.Join(cwd, program)
 	}
-	if strings.HasPrefix(program, `/tmp/`) || strings.HasSuffix(program, `.test`) {
-		// only for development
-		gopath := os.Getenv(`GOPATH`)
-		if gopath != `` {
-			return path.Join(gopath, `src/github.com/bughou-go/xiaomei/release/`)
-		} else {
-			panic(`detect root dir failed.`)
+	return program, cwd
+}
+
+func detectRoot(dir, feature string) string {
+	for ; dir != `/`; dir = filepath.Dir(dir) {
+		if dirExists(filepath.Join(dir, feature)) {
+			return dir
 		}
-	} else {
-		feature := `config/config.yml`
-		dir := path.Dir(program)
-		for ; dir != `/`; dir = path.Dir(dir) {
-			if _, err := os.Stat(path.Join(dir, feature)); err == nil {
-				return dir
-			}
-		}
-		panic(`detect root dir failed.`)
 	}
+	panic(`project not found.`)
+}
+
+func dirExists(p string) bool {
+	_, err := os.Stat(p)
+	return err == nil
 }

@@ -59,7 +59,7 @@ func parseConfigData() *Config {
 }
 
 func loadConfig(data *Config, p string) {
-	content, err := ioutil.ReadFile(path.Join(Root, p))
+	content, err := ioutil.ReadFile(path.Join(Root(), p))
 	if err != nil {
 		panic(err)
 	}

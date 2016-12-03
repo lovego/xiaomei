@@ -1,4 +1,4 @@
-package xiaomei
+package server
 
 import (
 	"fmt"
@@ -20,11 +20,11 @@ type Server struct {
 	) interface{}
 }
 
-func New() *Server {
+func New(router *Router) *Server {
 	return &Server{
-		Router: NewRouter(),
+		Router: router,
 		Renderer: renderer.New(
-			path.Join(config.Root, `views`), `layout/default`,
+			path.Join(config.Root(), `views`), `layout/default`,
 			config.Data.Env != `dev`, funcs.Map(),
 		),
 	}
