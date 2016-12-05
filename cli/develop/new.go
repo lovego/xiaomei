@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/config/fmwk"
 	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
@@ -14,7 +14,7 @@ import (
 func New(dir string) {
 	proPath := projectPath(dir)
 
-	example := filepath.Join(config.FmwkRoot(), `example`)
+	example := filepath.Join(fmwk.Root(), `example`)
 	if !cmd.Ok(cmd.O{}, `cp`, `-r`, example, dir) {
 		return
 	}
@@ -25,7 +25,7 @@ func New(dir string) {
 	sed -i'' 's/%s/%s/g' main.go
 	sed -i'' 's/example/%s/g' .gitignore $(fgrep -rl example release/config)
 	`, dir,
-		strings.Replace(`/`, `\/`, filepath.Join(config.FmwkPath(), `example`), -1),
+		strings.Replace(`/`, `\/`, filepath.Join(fmwk.Path(), `example`), -1),
 		strings.Replace(`/`, `\/`, proPath, -1),
 		strings.Replace(`/`, `\/`, appName, -1),
 	)

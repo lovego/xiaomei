@@ -26,12 +26,12 @@ func SetupCron() {
 
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, cronConfData{
-		curUser.Username, config.Root(), config.Data.Env,
+		curUser.Username, config.Root(), config.Data().Env,
 	}); err != nil {
 		panic(err)
 	}
 
-	deployName := config.Data.AppName + `_` + config.Data.Env
+	deployName := config.Data().AppName + `_` + config.Data().Env
 
 	cmd.SudoWriteFile(`/etc/cron.d/`+deployName, &buf)
 	fmt.Println(`setup cron ok.`)

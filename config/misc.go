@@ -5,24 +5,32 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"sync"
 
 	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/mailer"
 )
 
-var Mailer *mailer.Mailer
+var _mailer *mailer.Mailer
+var mailerSet bool
+var mailerMutex sync.Mutex
 
-func setupMailer() {
-	m := Data.Mailer
-	if m.Host == `` || m.Port == `` || m.Sender == `` {
-		return
+func Mailer() *mailer.Mailer {
+	mailerMutex.Lock()
+	defer mailerMutex.Unlock()
+	if !mailerSet {
+		m := Data().Mailer
+		if m.Host != `` || m.Port != `` || m.Sender != `` {
+			_mailer = mailer.New(m.Host, m.Port, m.Sender, m.Passwd)
+		}
+		mailerSet = true
 	}
-	Mailer = mailer.New(m.Host, m.Port, m.Sender, m.Passwd)
+	return _mailer
 }
 
 func AlarmMail(title, body string) {
-	title = Data.DeployName + ` ` + title
-	Mailer.Send(&mailer.Message{Receivers: Data.AlarmReceivers, Title: title, Body: body})
+	title = Data().DeployName + ` ` + title
+	Mailer().Send(&mailer.Message{Receivers: Data().AlarmReceivers, Title: title, Body: body})
 }
 
 func Debug(name string) bool {

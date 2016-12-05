@@ -14,7 +14,7 @@ var mysqlConfig MysqlConfig
 func GetMysqlConfig() MysqlConfig {
 	if mysqlConfig.User == `` {
 		m := regexp.MustCompile(`^(\w+):(\w+)@\w+\(([^()]+):(\d+)\)/(\w+)$`).
-			FindStringSubmatch(config.Data.Mysql)
+			FindStringSubmatch(config.Data().Mysql)
 		if len(m) == 0 {
 			panic(`mysql addr match faild.`)
 		}

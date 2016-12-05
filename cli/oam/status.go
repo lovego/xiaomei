@@ -9,8 +9,8 @@ import (
 
 func Status() {
 	for _, addr := range cli.MatchedServerAddrs() {
-		address := config.Data.DeployUser + `@` + addr
+		address := config.Data().DeployUser + `@` + addr
 		color.Cyan(address)
-		cmd.Run(cmd.O{}, `ssh`, `-t`, address, `status `+config.Data.DeployName+`; ps -FC appserver`)
+		cmd.Run(cmd.O{}, `ssh`, `-t`, address, `status `+config.Data().DeployName+`; ps -FC appserver`)
 	}
 }

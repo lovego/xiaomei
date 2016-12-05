@@ -5,48 +5,29 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
-	"reflect"
 	"strings"
 
+	"github.com/bughou-go/xiaomei/config/fmwk"
 	"github.com/bughou-go/xiaomei/utils"
 )
 
-var projectRootDir, fmwkRootDir string
+var rootDir string
 
 func Root() string {
-	if projectRootDir != `` {
-		return projectRootDir
+	if rootDir != `` {
+		return rootDir
 	}
 	program, cwd := absProgramPath()
-	fmwkBin := path.Base(FmwkPath())
-	if program == filepath.Join(os.Getenv(`GOPATH`), `bin`, fmwkBin) /* fmwkBin ... */ ||
+	fmwkBin := filepath.Join(os.Getenv(`GOPATH`), `bin`, path.Base(fmwk.Path()))
+	if program == fmwkBin /* fmwkBin ... */ ||
 		strings.HasSuffix(program, `.test`) /* go test ... */ ||
 		strings.HasPrefix(program, `/tmp/`) /* go run ... */ {
-		projectRootDir = filepath.Join(detectRoot(cwd, `release/config/config.yml`), `release`)
+		rootDir = filepath.Join(detectRoot(cwd, `release/config/config.yml`), `release`)
 	} else {
 		// binary under project/release/ dir
-		projectRootDir = detectRoot(filepath.Dir(program), `config/config.yml`)
+		rootDir = detectRoot(filepath.Dir(program), `config/config.yml`)
 	}
-	return projectRootDir
-}
-
-func FmwkPath() string {
-	return path.Dir(reflect.TypeOf(struct{}{}).PkgPath())
-}
-
-func FmwkRoot() string {
-	if fmwkRootDir != `` {
-		return fmwkRootDir
-	}
-	fmwk := FmwkPath()
-	if vendorPkg := filepath.Join(Root(), `vendor`, fmwk); utils.Exist(vendorPkg) {
-		fmwkRootDir = vendorPkg
-	} else if globalPkg := filepath.Join(os.Getenv(`GOPATH`), `src`, fmwk); utils.Exist(globalPkg) {
-		fmwkRootDir = globalPkg
-	} else {
-		panic(`framework not found.`)
-	}
-	return fmwkRootDir
+	return rootDir
 }
 
 func absProgramPath() (string, string) {

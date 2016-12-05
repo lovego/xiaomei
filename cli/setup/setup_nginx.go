@@ -11,7 +11,7 @@ import (
 )
 
 type nginxConfData struct {
-	*config.Config
+	config.Config
 	AppRoot     string
 	CurrentAddr string
 	Nfs         bool
@@ -36,14 +36,14 @@ func writeNginxConfig(data nginxConfData) {
 		panic(err)
 	}
 
-	cmd.SudoWriteFile(path.Join(`/etc/nginx/sites-enabled/`, config.Data.DeployName), &buf)
+	cmd.SudoWriteFile(path.Join(`/etc/nginx/sites-enabled/`, config.Data().DeployName), &buf)
 }
 
 func getNginxConfData() nginxConfData {
 	fs, _ := cmd.Run(cmd.O{Panic: true, Output: true},
 		`stat`, `--file-system`, `--format`, `%T`, config.Root())
 	return nginxConfData{
-		Config:      config.Data,
+		Config:      config.Data(),
 		AppRoot:     config.Root(),
 		CurrentAddr: config.CurrentAppServer().Addr,
 		Nfs:         fs == `nfs`,

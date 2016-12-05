@@ -12,7 +12,7 @@ func Run() {
 	if !build() {
 		return
 	}
-	cmd.Run(cmd.O{}, filepath.Join(config.Root(), config.Data.AppName))
+	cmd.Run(cmd.O{}, filepath.Join(config.Root(), config.Data().AppName))
 }
 
 func build() bool {

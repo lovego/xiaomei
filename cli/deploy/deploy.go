@@ -8,14 +8,14 @@ import (
 	"regexp"
 	"text/template"
 
-	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/cli/cli"
+	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/fatih/color"
 )
 
 type DeployConfig struct {
-	*config.Config
+	config.Config
 	Tasks, Addr     string
 	GitTag, GitHost string
 }
@@ -25,12 +25,12 @@ func Deploy(tag string) {
 		panic(err)
 	}
 
-	gitHost := getGitHost(config.Data.GitAddr)
+	gitHost := getGitHost(config.Data().GitAddr)
 	servers := cli.MatchedServers()
 	for _, server := range servers {
 		deployToServer(DeployConfig{
-			Config: config.Data, Tasks: server.Tasks,
-			Addr:   config.Data.DeployUser + `@` + server.Addr,
+			Config: config.Data(), Tasks: server.Tasks,
+			Addr:   config.Data().DeployUser + `@` + server.Addr,
 			GitTag: tag, GitHost: gitHost,
 		})
 	}

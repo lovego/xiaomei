@@ -34,7 +34,7 @@ func currentServerTasks() (tasks string) {
 	if err != nil {
 		panic(err)
 	}
-	for _, server := range config.Data.DeployServers {
+	for _, server := range config.Data().DeployServers {
 	loop:
 		for _, ifcAddr := range ifcAddrs {
 			if strings.HasPrefix(ifcAddr.String(), server.Addr+`/`) {

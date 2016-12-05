@@ -23,18 +23,18 @@ func UpdateDoc(branch, commit string) {
 		panic(err)
 	}
 
-	gitHost := getGitHost(config.Data.GitAddr)
+	gitHost := getGitHost(config.Data().GitAddr)
 	servers := cli.MatchedServers()
 	for _, server := range servers {
 		if server.Misc != `doc-server` {
 			continue
 		}
-		gopath := path.Join(config.Data.DeployRoot, `godoc`)
+		gopath := path.Join(config.Data().DeployRoot, `godoc`)
 		updateDocServer(docServerConfig{
-			Addr:       config.Data.DeployUser + `@` + server.Addr,
+			Addr:       config.Data().DeployUser + `@` + server.Addr,
 			GOPATH:     gopath,
-			DeployPath: path.Join(gopath, `src`, config.Data.AppName),
-			GitAddr:    config.Data.GitAddr,
+			DeployPath: path.Join(gopath, `src`, config.Data().AppName),
+			GitAddr:    config.Data().GitAddr,
 			GitHost:    gitHost,
 			GitBranch:  branch,
 			GitCommit:  commit,

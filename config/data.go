@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"sync"
 	"time"
 
 	"github.com/bughou-go/xiaomei/utils"
@@ -47,18 +48,31 @@ type MailerConfig struct {
 	Host, Port, Sender, Passwd string
 }
 
-func parseConfigData() *Config {
-	data := &Config{}
+var data *Config
+var dataMutex sync.Mutex
+
+func Data() Config {
+	dataMutex.Lock()
+	defer dataMutex.Unlock()
+	if data == nil {
+		Parse(data)
+	}
+	return *data
+}
+
+func Parse(data interface{}) {
 	loadConfig(data, `config/config.yml`)
 	loadConfig(data, envConfigPath())
-	setupData(data)
+	if d, ok := data.(*Config); ok {
+		setupData(d)
+	} else {
+	}
 	if Debug(`config`) {
 		utils.PrintJson(data)
 	}
-	return data
 }
 
-func loadConfig(data *Config, p string) {
+func loadConfig(data interface{}, p string) {
 	content, err := ioutil.ReadFile(path.Join(Root(), p))
 	if err != nil {
 		panic(err)

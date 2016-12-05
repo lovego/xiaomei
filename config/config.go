@@ -6,11 +6,13 @@ import (
 	"time"
 )
 
-var Data = parseConfigData()
-var TimeZone = time.FixedZone(Data.TimeZoneName, Data.TimeZoneOffset)
+var timeZone *time.Location
 
-func init() {
-	setupMailer()
+func TimeZone() *time.Location {
+	if timeZone == nil {
+		time.FixedZone(Data().TimeZoneName, Data().TimeZoneOffset)
+	}
+	return timeZone
 }
 
 func CurrentAppServer() ServerConfig {
@@ -18,7 +20,7 @@ func CurrentAppServer() ServerConfig {
 	if err != nil {
 		panic(err)
 	}
-	for _, server := range Data.DeployServers {
+	for _, server := range Data().DeployServers {
 		if server.AppAddr != `` {
 			for _, ifcAddr := range ifcAddrs {
 				if strings.HasPrefix(ifcAddr.String(), server.Addr+`/`) {

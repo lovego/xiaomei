@@ -20,7 +20,7 @@ func Flags() []string {
 
 func MatchedServers() []config.ServerConfig {
 	matched := []config.ServerConfig{}
-	for _, server := range config.Data.DeployServers {
+	for _, server := range config.Data().DeployServers {
 		if strings.Contains(server.Tasks, options.Server) ||
 			strings.Contains(server.Addr, options.Server) {
 			matched = append(matched, server)
@@ -31,7 +31,7 @@ func MatchedServers() []config.ServerConfig {
 
 func MatchedServerAddrs() []string {
 	addrs := []string{}
-	for _, server := range config.Data.DeployServers {
+	for _, server := range config.Data().DeployServers {
 		if strings.Contains(server.Tasks, options.Server) ||
 			strings.Contains(server.Addr, options.Server) {
 			if !contains(addrs, server.Addr) {
