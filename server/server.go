@@ -25,13 +25,13 @@ func New(router *Router) *Server {
 		Router: router,
 		Renderer: renderer.New(
 			path.Join(config.Root(), `views`), `layout/default`,
-			config.Data.Env != `dev`, funcs.Map(),
+			config.Data().Env != `dev`, funcs.Map(),
 		),
 	}
 }
 
 func (s *Server) ListenAndServe() {
-	addr := config.CurrentAppServer().AppAddr + `:` + config.Data.AppPort
+	addr := config.CurrentAppServer().AppAddr + `:` + config.Data().AppPort
 
 	fmt.Printf("%s listen at %s\n", time.Now().Format(`2006-01-02 15:04:05 -0700`), addr)
 

@@ -44,7 +44,7 @@ func checkPkgDir(dir string) {
 				os.Exit(0)
 			}
 		} else {
-			fmt.Println(dir, `is not a dir.`)
+			fmt.Println(dir, `exist and is not a dir.`)
 			os.Exit(0)
 		}
 	case os.IsNotExist(err):
@@ -81,7 +81,7 @@ func projectPath(dir string) string {
 		panic(err)
 	}
 	if rel[0] == '.' {
-		fmt.Printf("project dir must be under %s.\n", gopath)
+		fmt.Printf("project dir must be under GOPATH(%s).\n", gopath)
 		os.Exit(0)
 	}
 	return rel

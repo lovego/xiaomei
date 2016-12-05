@@ -5,11 +5,9 @@ import (
 	"os"
 	"path"
 	"sync"
-	"time"
 
 	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
-	"github.com/fatih/color"
 	"gopkg.in/yaml.v2"
 )
 
@@ -32,8 +30,6 @@ type Config struct {
 
 	TimeZoneName   string `yaml:"timeZoneName"`
 	TimeZoneOffset int    `yaml:"timeZoneOffset"`
-	Mysql          string `yaml:"mysql"`
-	Redis          string `yaml:"redis"`
 }
 
 type ServerConfig struct {
@@ -48,16 +44,19 @@ type MailerConfig struct {
 	Host, Port, Sender, Passwd string
 }
 
-var data *Config
-var dataMutex sync.Mutex
+var data struct {
+	sync.Mutex
+	*Config
+}
 
 func Data() Config {
-	dataMutex.Lock()
-	defer dataMutex.Unlock()
-	if data == nil {
-		Parse(data)
+	data.Lock()
+	defer data.Unlock()
+	if data.Config == nil {
+		data.Config = &Config{}
+		Parse(data.Config)
 	}
-	return *data
+	return *data.Config
 }
 
 func Parse(data interface{}) {
@@ -96,7 +95,6 @@ func envConfigPath() string {
 		}
 	}
 	configPath := `config/` + env + `.yml`
-	color.Yellow("%s %s\n", time.Now().Format(`2006-01-02 15:04:05 -0700`), configPath)
 
 	return configPath
 }
