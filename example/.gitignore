@@ -2,7 +2,7 @@
 *.test
 *.pyc
 tmp
-release/demo
+release/example
 release/config/env.yml
 release/log/*
 *.exe

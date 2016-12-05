@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/bughou-go/xiaomei/cli"
-	"github.com/bughou-go/xiaomei/demo/routes"
+	"github.com/bughou-go/xiaomei/example/routes"
 	"github.com/bughou-go/xiaomei/server"
 )
 

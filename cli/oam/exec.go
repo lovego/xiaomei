@@ -1,4 +1,4 @@
-package deploy
+package oam
 
 import (
 	"github.com/bughou-go/xiaomei/cli/cli"

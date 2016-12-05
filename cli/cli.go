@@ -24,11 +24,12 @@ var CmdMaps = map[string]CmdFunc{
 	`assets`: CmdFunc{Func: develop.Assets},
 
 	`deploy`:     CmdFunc{Func: deploy.Deploy},
-	`restart`:    CmdFunc{Func: deploy.Restart},
-	`status`:     CmdFunc{Func: deploy.Status},
-	`shell`:      CmdFunc{Func: deploy.Shell},
-	`exec`:       CmdFunc{Func: deploy.Exec},
 	`update-doc`: CmdFunc{Func: deploy.UpdateDoc, ArgsRequired: 2},
+
+	`restart`: CmdFunc{Func: oam.Restart},
+	`status`:  CmdFunc{Func: oam.Status},
+	`shell`:   CmdFunc{Func: oam.Shell},
+	`exec`:    CmdFunc{Func: oam.Exec},
 
 	`setup`:           CmdFunc{Func: setup.Setup},
 	`setup-appserver`: CmdFunc{Func: setup.SetupAppServer},

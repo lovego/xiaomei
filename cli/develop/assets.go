@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/bughou-go/xiaomei/config"
@@ -14,13 +14,12 @@ import (
 )
 
 func Assets(args []string) {
-	root := config.Root()
 	if len(args) == 0 {
 		args = []string{`release/public/js`, `release/public/css`}
 	}
-	paths := getFilesPath(root, args)
+	paths := getFilesPath(args)
 
-	assetsPath := path.Join(root, `config/assets.yml`)
+	assetsPath := filepath.Join(config.Root(), `config/assets.yml`)
 	assets := getAssets(assetsPath)
 	changed := checkAndAddMd5(assets, paths)
 	if changed == 0 {
@@ -30,18 +29,16 @@ func Assets(args []string) {
 	fmt.Printf("assets %d files changed.\n", changed)
 }
 
-func getFilesPath(root string, args []string) []string {
+func getFilesPath(args []string) []string {
 	paths := []string{}
 	for _, arg := range args {
-		filePath := path.Join(root, `..`, arg)
-		file, err := os.Stat(filePath)
+		filePath := filepath.Join(config.Root(), `..`, arg)
+		fi, err := os.Stat(filePath)
 		if err != nil {
 			panic(err)
 		}
-		if file.IsDir() {
-			if path.Base(filePath) != `font` {
-				paths = append(paths, getDirFiles(filePath)...)
-			}
+		if fi.IsDir() {
+			paths = append(paths, getDirFiles(filePath)...)
 		} else {
 			paths = append(paths, filePath)
 		}
@@ -56,9 +53,9 @@ func getDirFiles(dir string) (paths []string) {
 	}
 	for _, file := range files {
 		filename := file.Name()
-		child := path.Join(dir, filename)
+		child := filepath.Join(dir, filename)
 		if file.IsDir() {
-			if path.Base(child) != `font` {
+			if filepath.Base(child) != `font` {
 				paths = append(paths, getDirFiles(child)...)
 			}
 		} else {
@@ -92,10 +89,10 @@ func updateAssets(assetsPath string, assets map[string]string) {
 }
 
 func checkAndAddMd5(assets map[string]string, paths []string) (changed int) {
-	publicDir := path.Join(config.Root(), `public/reports`)
+	publicDir := filepath.Join(config.Root(), `public/reports`)
 	for _, filePath := range paths {
 		assetPath := strings.Replace(filePath, publicDir, ``, -1)
-		if ext := path.Ext(assetPath); ext != `.css` && ext != `.js` {
+		if ext := filepath.Ext(assetPath); ext != `.css` && ext != `.js` {
 			continue
 		}
 		nowMd5 := getMd5(filePath)
