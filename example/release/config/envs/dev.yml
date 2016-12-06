@@ -2,8 +2,10 @@ env:    dev
 domain: example-dev.org
 
 alarmReceivers: [ ]
-mysql: root:root@tcp(127.0.0.1:3306)/reports
-redis: redis://:@localhost:6379/0
+mysql:
+  default: root:root@tcp(127.0.0.1:3306)/reports
+redis:
+  default: redis://:@localhost:6379/0
 
 deployServers:
   - addr: 127.0.0.1

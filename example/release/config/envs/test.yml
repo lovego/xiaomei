@@ -2,5 +2,7 @@ env:    test
 domain: example-test.org
 
 alarmReceivers: [ ]
-mysql: root:root@tcp(127.0.0.1:3306)/reports_test
-redis: redis://:@localhost:6379/1
+mysql:
+  default: root:root@tcp(127.0.0.1:3306)/reports
+redis:
+  default: redis://:@localhost:6379/0
