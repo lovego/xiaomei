@@ -9,14 +9,14 @@ import (
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
-func Mysql() {
-	options := cli.GetMysqlOptions()
+func Mysql(name string) {
+	options := cli.GetMysqlOptions(name)
 	options = append([]string{`--pager=less -SX`}, options...)
 	cmd.Run(cmd.O{Panic: true}, `mysql`, options...)
 }
 
-func Mysqldump() {
-	options := cli.GetMysqlOptions()
+func Mysqldump(name string) {
+	options := cli.GetMysqlOptions(name)
 	options = append([]string{`-t`}, options...)
 	sqls, _ := cmd.Run(cmd.O{Panic: true, Output: true}, `mysqldump`, options...)
 	f, err := os.Create(path.Join(config.Root(), `config/data/data.mysql`))
