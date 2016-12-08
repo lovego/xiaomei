@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/bughou-go/xiaomei/cli"
+	"github.com/bughou-go/xiaomei/example/filter"
 	"github.com/bughou-go/xiaomei/example/routes"
 	"github.com/bughou-go/xiaomei/server"
 )
@@ -14,6 +15,7 @@ func main() {
 		cli.Run()
 	} else {
 		svr := server.New(routes.Get())
+		svr.FilterFunc = filter.Process
 		svr.ListenAndServe()
 	}
 }
