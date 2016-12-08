@@ -20,9 +20,13 @@ type DeployConfig struct {
 	GitTag, GitHost string
 }
 
-func Deploy(tag string) {
+func Deploy(commit string) error {
 	if err := os.Chdir(config.Root()); err != nil {
-		panic(err)
+		return err
+	}
+	tag, err := setupDeployTag(commit)
+	if err != nil {
+		return err
 	}
 
 	gitHost := getGitHost(config.Data().GitAddr)
@@ -35,6 +39,7 @@ func Deploy(tag string) {
 		})
 	}
 	fmt.Printf("deployed %d servers!\n", len(servers))
+	return nil
 }
 
 var deployTmpl *template.Template

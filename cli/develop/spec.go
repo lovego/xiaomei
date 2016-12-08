@@ -1,6 +1,7 @@
 package develop
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
@@ -9,7 +10,7 @@ import (
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
-func Spec(t string) bool {
+func Spec(t string) error {
 	if err := os.Chdir(filepath.Join(config.Root(), `..`)); err != nil {
 		panic(err)
 	}
@@ -19,14 +20,17 @@ func Spec(t string) bool {
 		targets = specChangedTargets(targets)
 	}
 	if len(targets) == 0 {
-		return true
+		return nil
 	}
 
 	if !cmd.Ok(cmd.O{NoStdout: true}, `which`, `gospec`) {
 		cmd.Run(cmd.O{Panic: true}, `go`, `get`, `-u`, `github.com/bughou-go/spec/gospec`)
 	}
 
-	return cmd.Ok(cmd.O{}, `gospec`, targets...)
+	if cmd.Ok(cmd.O{}, `gospec`, targets...) {
+		return nil
+	}
+	return errors.New(`spec check failed.`)
 }
 
 func specTargets() []string {

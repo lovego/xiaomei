@@ -26,7 +26,7 @@ func Assets(args []string) {
 		return
 	}
 	updateAssets(assetsPath, assets)
-	fmt.Printf("assets %d files changed.\n", changed)
+	fmt.Printf("%d assets files changed.\n", changed)
 }
 
 func getFilesPath(args []string) []string {

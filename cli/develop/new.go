@@ -1,6 +1,7 @@
 package develop
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,13 +12,18 @@ import (
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
-func New(dir string) {
-	proPath := projectPath(dir)
-	checkPkgDir(dir)
+func New(dir string) error {
+	proPath, err := projectPath(dir)
+	if err != nil {
+		return err
+	}
+	if err = checkPkgDir(dir); err != nil {
+		return err
+	}
 
 	example := filepath.Join(fmwk.Root(), `example`)
 	if !cmd.Ok(cmd.O{}, `cp`, `-rT`, example, dir) {
-		return
+		return errors.New(`cp templates failed.`)
 	}
 
 	appName := filepath.Base(proPath)
@@ -32,22 +38,21 @@ func New(dir string) {
 		strings.Replace(proPath, `/`, `\/`, -1),
 	)
 	if !cmd.Ok(cmd.O{}, `sh`, `-c`, script) {
-		return
+		return errors.New(`process templates failed.`)
 	}
+	return nil
 }
 
-func checkPkgDir(dir string) {
+func checkPkgDir(dir string) error {
 	fi, err := os.Stat(dir)
 	switch {
 	case err == nil:
 		if fi.IsDir() {
 			if !utils.IsEmptyDir(dir) {
-				fmt.Println(dir, `exist and is not empty.`)
-				os.Exit(0)
+				return errors.New(dir + ` exist and is not empty.`)
 			}
 		} else {
-			fmt.Println(dir, `exist and is not a dir.`)
-			os.Exit(0)
+			return errors.New(dir + ` exist and is not a dir.`)
 		}
 	case os.IsNotExist(err):
 		if err := os.MkdirAll(dir, 0775); err != nil {
@@ -56,12 +61,13 @@ func checkPkgDir(dir string) {
 	default:
 		panic(err)
 	}
+	return nil
 }
 
-func projectPath(dir string) string {
+func projectPath(dir string) (string, error) {
 	if dir == `` {
-		fmt.Println(`project dir can't be empty.`)
-		os.Exit(0)
+		return ``, errors.New(`project name can't be empty.`)
+
 	}
 
 	if !filepath.IsAbs(dir) {
@@ -73,8 +79,8 @@ func projectPath(dir string) string {
 
 	gopath := os.Getenv(`GOPATH`)
 	if gopath == `` {
-		fmt.Println(`no GOPATH environment variable set.`)
-		os.Exit(0)
+		return ``, errors.New(`no GOPATH environment variable set.`)
+
 	}
 	gopath = filepath.Join(gopath, `src`)
 
@@ -83,8 +89,7 @@ func projectPath(dir string) string {
 		panic(err)
 	}
 	if rel[0] == '.' {
-		fmt.Printf("project dir must be under GOPATH(%s).\n", gopath)
-		os.Exit(0)
+		return ``, errors.New(`project dir must be under GOPATH(` + gopath + ").\n")
 	}
-	return rel
+	return rel, nil
 }

@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"syscall"
 )
 
 // option
@@ -14,6 +15,7 @@ type O struct {
 	Stdout, Stderr              io.Writer
 	NoStdin, NoStdout, NoStderr bool
 	Env                         []string
+	Attr                        *syscall.SysProcAttr
 	Print                       bool
 	Panic                       bool // only for Run And Start
 	Output                      bool // only for Run
@@ -55,7 +57,13 @@ func State(o O, name string, args ...string) *os.ProcessState {
 }
 
 func Ok(o O, name string, args ...string) bool {
-	return State(o, name, args...).Success()
+	s := State(o, name, args...)
+	return s != nil && s.Success()
+}
+
+func Fail(o O, name string, args ...string) bool {
+	s := State(o, name, args...)
+	return s != nil && !s.Success()
 }
 
 func makeCmd(o O, name string, args []string) *exec.Cmd {
@@ -65,7 +73,10 @@ func makeCmd(o O, name string, args []string) *exec.Cmd {
 
 	cmd := exec.Command(name, args...)
 	if o.Env != nil {
-		cmd.Env = o.Env
+		cmd.Env = append(os.Environ(), o.Env...)
+	}
+	if o.Attr != nil {
+		cmd.SysProcAttr = o.Attr
 	}
 	setupStdIO(cmd, o)
 	return cmd

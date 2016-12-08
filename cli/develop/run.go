@@ -1,21 +1,26 @@
 package develop
 
 import (
-	"os"
+	"errors"
 	"path/filepath"
 
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
-func Run() {
-	if !build() {
-		return
+func Run() error {
+	if err := build(); err != nil {
+		return err
 	}
-	cmd.Run(cmd.O{}, filepath.Join(config.Root(), config.Data().AppName))
+	if cmd.Ok(cmd.O{}, filepath.Join(config.Root(), config.Data().AppName)) {
+		return nil
+	}
+	return errors.New(`run failed.`)
 }
 
-func build() bool {
-	env := append(os.Environ(), `GOBIN=`+config.Root())
-	return cmd.Ok(cmd.O{Env: env}, `go`, `install`)
+func build() error {
+	if cmd.Ok(cmd.O{Env: []string{`GOBIN=` + config.Root()}}, `go`, `install`) {
+		return nil
+	}
+	return errors.New(`build failed.`)
 }
