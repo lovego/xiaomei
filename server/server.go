@@ -25,13 +25,13 @@ func New(router *Router) *Server {
 		Router: router,
 		Renderer: renderer.New(
 			path.Join(config.Root(), `views`), `layout/default`,
-			config.Data().Env != `dev`, funcs.Map(),
+			config.Env() != `dev`, funcs.Map(),
 		),
 	}
 }
 
 func (s *Server) ListenAndServe() {
-	addr := config.CurrentAppServer().AppAddr + `:` + config.Data().AppPort
+	addr := config.CurrentAppServer().AppAddr + `:` + config.AppPort()
 
 	fmt.Printf("%s listen at %s\n", time.Now().Format(`2006-01-02 15:04:05 -0700`), addr)
 
@@ -40,11 +40,12 @@ func (s *Server) ListenAndServe() {
 			req := NewRequest(request)
 			res := NewResponse(response, req, s.Renderer, s.LayoutDataFunc)
 
-			defer handleError(time.Now(), req, res)
+			var notFound bool
+			defer handleError(time.Now(), req, res, &notFound)
 
 			// 如果返回true，继续交给路由处理
 			if s.FilterFunc == nil || s.FilterFunc(req, res) {
-				s.Router.Handle(req, res, notFound)
+				notFound = !s.Router.Handle(req, res)
 			}
 		})); err != nil {
 		panic(err)

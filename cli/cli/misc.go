@@ -13,7 +13,7 @@ type MysqlConfig struct {
 }
 
 func GetMysqlConfig(name string) MysqlConfig {
-	dsn, ok := config.Data().Mysql[name]
+	dsn, ok := config.Mysql()[name]
 	if !ok {
 		fmt.Println(`no mysql config for: `, name)
 		os.Exit(1)

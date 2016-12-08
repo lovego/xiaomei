@@ -3,13 +3,13 @@ package server
 import "strings"
 
 // 处理请求
-func (r *Router) Handle(req *Request, res *Response, notFound StrRouteHandler) {
+func (r *Router) Handle(req *Request, res *Response) bool {
 	method := strings.ToUpper(req.Method)
 	path := cleanPath(req.URL.Path)
 	if r.strRoutesMatch(method, path, req, res) || r.regRoutesMatch(method, path, req, res) {
-		return
+		return true
 	}
-	notFound(req, res)
+	return false
 }
 
 func (r *Router) strRoutesMatch(method string, path string, req *Request, res *Response) bool {

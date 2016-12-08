@@ -15,7 +15,6 @@ import (
 )
 
 type DeployConfig struct {
-	config.Config
 	Tasks, Addr     string
 	GitTag, GitHost string
 }
@@ -33,9 +32,10 @@ func Deploy(commit string) error {
 	servers := cli.MatchedServers()
 	for _, server := range servers {
 		deployToServer(DeployConfig{
-			Config: config.Data(), Tasks: server.Tasks,
-			Addr:   config.Data().DeployUser + `@` + server.Addr,
-			GitTag: tag, GitHost: gitHost,
+			Tasks:   server.Tasks,
+			Addr:    config.DeployUser + `@` + server.Addr,
+			GitTag:  tag,
+			GitHost: gitHost,
 		})
 	}
 	fmt.Printf("deployed %d servers!\n", len(servers))

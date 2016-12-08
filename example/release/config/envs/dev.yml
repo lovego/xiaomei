@@ -9,7 +9,7 @@ redis:
 
 deployServers:
   - addr: 127.0.0.1
-    appAddr: 127.0.0.1
+    appAddr: 0.0.0.0
     tasks: setup-nginx setup-appserver
     appStartOn: (started mysql and started redis-server)
 

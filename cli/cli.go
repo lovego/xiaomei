@@ -3,9 +3,9 @@ package cli
 import (
 	"errors"
 
-	"github.com/bughou-go/xiaomei/cli/deploy"
+	// "github.com/bughou-go/xiaomei/cli/deploy"
 	"github.com/bughou-go/xiaomei/cli/develop"
-	"github.com/bughou-go/xiaomei/cli/setup"
+	// "github.com/bughou-go/xiaomei/cli/setup"
 	/*
 		"github.com/bughou-go/xiaomei/cli/db"
 		"github.com/bughou-go/xiaomei/cli/oam"
@@ -76,90 +76,90 @@ func allCmds() []*cobra.Command {
 				return nil
 			},
 		},
-		{
-			Use:   `deploy`,
-			Short: `deploy project to a environment.`,
-			RunE: func(c *cobra.Command, args []string) error {
-				return deploy.Deploy(args[0])
-			},
-		},
-		{
-			Use:   `doc-server`,
-			Short: `start doc-server.`,
-			RunE: func(c *cobra.Command, args []string) error {
-				return setup.DocServer()
-			},
-		},
-
 		/*
 			{
-				Name: `restart`,
+				Use:   `deploy`,
+				Short: `deploy project to a environment.`,
 				RunE: func(c *cobra.Command, args []string) error {
-					oam.Restart
+					return deploy.Deploy(args[0])
 				},
 			},
 			{
-				Name: `status`,
+				Use:   `doc-server`,
+				Short: `start doc-server.`,
 				RunE: func(c *cobra.Command, args []string) error {
-					oam.Status
-				},
-			},
-			{
-				Name: `shell`,
-				RunE: func(c *cobra.Command, args []string) error {
-					oam.Shell
-				},
-			},
-			{
-				Name: `exec`,
-				RunE: func(c *cobra.Command, args []string) error {
-					oam.Exec
+					return setup.DocServer()
 				},
 			},
 
-			{
-				Name: `setup`,
-				RunE: func(c *cobra.Command, args []string) error {
-					setup.Setup
+				{
+					Name: `restart`,
+					RunE: func(c *cobra.Command, args []string) error {
+						oam.Restart
+					},
 				},
-			},
-			{
-				Name: `setup-appserver`,
-				RunE: func(c *cobra.Command, args []string) error {
-					setup.SetupAppServer
+				{
+					Name: `status`,
+					RunE: func(c *cobra.Command, args []string) error {
+						oam.Status
+					},
 				},
-			},
-			{
-				Name: `setup-nginx`,
-				RunE: func(c *cobra.Command, args []string) error {
-					setup.SetupNginx
+				{
+					Name: `shell`,
+					RunE: func(c *cobra.Command, args []string) error {
+						oam.Shell
+					},
 				},
-			},
-			{
-				Name: `setup-cron`,
-				RunE: func(c *cobra.Command, args []string) error {
-					setup.SetupCron
+				{
+					Name: `exec`,
+					RunE: func(c *cobra.Command, args []string) error {
+						oam.Exec
+					},
 				},
-			},
-			{
-				Name: `setup-hosts`,
-				RunE: func(c *cobra.Command, args []string) error {
-					setup.SetupHosts
-				},
-			},
 
-			{
-				Name: `mysql`,
-				RunE: func(c *cobra.Command, args []string) error {
-					db.Mysql
+				{
+					Name: `setup`,
+					RunE: func(c *cobra.Command, args []string) error {
+						setup.Setup
+					},
 				},
-			},
-			{
-				Name: `mysqldump`,
-				RunE: func(c *cobra.Command, args []string) error {
-					db.Mysqldump
+				{
+					Name: `setup-appserver`,
+					RunE: func(c *cobra.Command, args []string) error {
+						setup.SetupAppServer
+					},
 				},
-			},
+				{
+					Name: `setup-nginx`,
+					RunE: func(c *cobra.Command, args []string) error {
+						setup.SetupNginx
+					},
+				},
+				{
+					Name: `setup-cron`,
+					RunE: func(c *cobra.Command, args []string) error {
+						setup.SetupCron
+					},
+				},
+				{
+					Name: `setup-hosts`,
+					RunE: func(c *cobra.Command, args []string) error {
+						setup.SetupHosts
+					},
+				},
+
+				{
+					Name: `mysql`,
+					RunE: func(c *cobra.Command, args []string) error {
+						db.Mysql
+					},
+				},
+				{
+					Name: `mysqldump`,
+					RunE: func(c *cobra.Command, args []string) error {
+						db.Mysqldump
+					},
+				},
 		*/
 	}
 }

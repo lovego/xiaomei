@@ -12,7 +12,7 @@ func Run() error {
 	if err := build(); err != nil {
 		return err
 	}
-	if cmd.Ok(cmd.O{}, filepath.Join(config.Root(), config.Data().AppName)) {
+	if cmd.Ok(cmd.O{}, filepath.Join(config.Root(), config.AppName())) {
 		return nil
 	}
 	return errors.New(`run failed.`)

@@ -6,10 +6,20 @@ import (
 	"os"
 	"regexp"
 	"sync"
+	"time"
 
 	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/mailer"
 )
+
+var timeZone *time.Location
+
+func TimeZone() *time.Location {
+	if timeZone == nil {
+		time.FixedZone(data().TimeZoneName, data().TimeZoneOffset)
+	}
+	return timeZone
+}
 
 var _mailer *mailer.Mailer
 var mailerSet bool
@@ -19,7 +29,7 @@ func Mailer() *mailer.Mailer {
 	mailerMutex.Lock()
 	defer mailerMutex.Unlock()
 	if !mailerSet {
-		m := Data().Mailer
+		m := data().Mailer
 		if m.Host != `` || m.Port != `` || m.Sender != `` {
 			_mailer = mailer.New(m.Host, m.Port, m.Sender, m.Passwd)
 		}
@@ -29,8 +39,8 @@ func Mailer() *mailer.Mailer {
 }
 
 func AlarmMail(title, body string) {
-	title = Data().DeployName + ` ` + title
-	Mailer().Send(&mailer.Message{Receivers: Data().AlarmReceivers, Title: title, Body: body})
+	title = DeployName() + ` ` + title
+	Mailer().Send(&mailer.Message{Receivers: data().AlarmReceivers, Title: title, Body: body})
 }
 
 func Debug(name string) bool {

@@ -11,10 +11,13 @@ import (
 	"github.com/bughou-go/xiaomei/utils"
 )
 
-func handleError(t time.Time, req *Request, res *Response) {
+func handleError(t time.Time, req *Request, res *Response, notFound *bool) {
+	if *notFound {
+		handleNotFound(req, res)
+	}
 	err := recover()
 	if err != nil {
-		serverError(req, res)
+		handleServerError(req, res)
 	}
 	access := accessLog(req, res, t)
 	if err != nil {
@@ -34,7 +37,7 @@ func accessLog(req *Request, res *Response, t time.Time) string {
 	}, ` `)
 }
 
-func notFound(req *Request, res *Response) {
+func handleNotFound(req *Request, res *Response) {
 	res.WriteHeader(404)
 	if res.Size() > 0 {
 		return
@@ -46,7 +49,7 @@ func notFound(req *Request, res *Response) {
 	}
 }
 
-func serverError(req *Request, res *Response) {
+func handleServerError(req *Request, res *Response) {
 	res.WriteHeader(500)
 	if res.Size() > 0 {
 		return
