@@ -10,102 +10,63 @@ import (
 	"reflect"
 
 	"github.com/bughou-go/xiaomei/server/renderer"
+	"github.com/bughou-go/xiaomei/server/session"
 )
-
-type Response struct {
-	http.ResponseWriter
-	*Request
-	*renderer.Renderer
-	LayoutDataFunc
-	rwValue reflect.Value
-}
 
 type LayoutDataFunc func(layout string, data interface{}, req *Request, res *Response) interface{}
 
+type Response struct {
+	http.ResponseWriter
+	request        *Request
+	sessionStore   session.Store
+	renderer       *renderer.Renderer
+	layoutDataFunc LayoutDataFunc
+}
+
 func NewResponse(
-	resWriter http.ResponseWriter, req *Request, render *renderer.Renderer, fun LayoutDataFunc,
+	responseWriter http.ResponseWriter, request *Request, store session.Store,
+	rendrr *renderer.Renderer, layoutDataFunc LayoutDataFunc,
 ) *Response {
 	return &Response{
-		ResponseWriter: resWriter,
-		Request:        req,
-		Renderer:       render,
-		LayoutDataFunc: fun,
-		rwValue:        reflect.Indirect(reflect.ValueOf(resWriter)),
+		ResponseWriter: responseWriter,
+		request:        request,
+		sessionStore:   store,
+		renderer:       rendrr,
+		layoutDataFunc: layoutDataFunc,
 	}
 }
 
-func (res *Response) Render(path string, data interface{}) {
-	if res.LayoutDataFunc != nil && res.Layout != `` {
-		data = res.LayoutDataFunc(res.Layout, data, res.Request, res)
+func (res *Response) Session(data interface{}) {
+	res.sessionStore.Set(res.ResponseWriter, data)
+}
+
+func (res *Response) GetLayoutData(layout string, data interface{}) interface{} {
+	if res.layoutDataFunc == nil {
+		return data
 	}
+	return res.layoutDataFunc(layout, data, res.request, res)
+}
+
+func (res *Response) Render(path string, data interface{}, options ...renderer.O) {
+	var option renderer.O
+	if len(options) > 0 {
+		option = options[0]
+	}
+	option.LayoutDataGetter = res
 	var buf bytes.Buffer
-	res.Renderer.Render(&buf, path, data)
+	res.renderer.Render(&buf, path, data, option)
 	res.Write(buf.Bytes())
 }
 
-func (res *Response) RenderL(path, layout string, data interface{}) {
-	if res.LayoutDataFunc != nil && layout != `` {
-		data = res.LayoutDataFunc(layout, data, res.Request, res)
+func (res *Response) RenderToBuffer(path string, data interface{}, options ...renderer.O) bytes.Buffer {
+	var option renderer.O
+	if len(options) > 0 {
+		option = options[0]
 	}
+	option.LayoutDataGetter = res
 	var buf bytes.Buffer
-	res.Renderer.RenderL(&buf, path, layout, data)
-	res.Write(buf.Bytes())
-}
-
-func (res *Response) RenderF(path string, funcs map[string]interface{}, data interface{}) {
-	if res.LayoutDataFunc != nil && res.Layout != `` {
-		data = res.LayoutDataFunc(res.Layout, data, res.Request, res)
-	}
-	var buf bytes.Buffer
-	res.Renderer.RenderF(&buf, path, funcs, data)
-	res.Write(buf.Bytes())
-}
-
-func (res *Response) RenderLF(path, layout string, funcs map[string]interface{}, data interface{}) {
-	if res.LayoutDataFunc != nil && layout != `` {
-		data = res.LayoutDataFunc(layout, data, res.Request, res)
-	}
-	var buf bytes.Buffer
-	res.Renderer.RenderLF(&buf, path, layout, funcs, data)
-	res.Write(buf.Bytes())
-}
-
-func (res *Response) RenderS(path string, data interface{}) string {
-	if res.LayoutDataFunc != nil && res.Layout != `` {
-		data = res.LayoutDataFunc(res.Layout, data, res.Request, res)
-	}
-	var buf bytes.Buffer
-	res.Renderer.Render(&buf, path, data)
-	return buf.String()
-}
-
-func (res *Response) RenderLS(path, layout string, data interface{}) string {
-	if res.LayoutDataFunc != nil && layout != `` {
-		data = res.LayoutDataFunc(layout, data, res.Request, res)
-	}
-	var buf bytes.Buffer
-	res.Renderer.RenderL(&buf, path, layout, data)
-	return buf.String()
-}
-
-func (res *Response) RenderFS(path string, funcs map[string]interface{}, data interface{}) string {
-	if res.LayoutDataFunc != nil && res.Layout != `` {
-		data = res.LayoutDataFunc(res.Layout, data, res.Request, res)
-	}
-	var buf bytes.Buffer
-	res.Renderer.RenderF(&buf, path, funcs, data)
-	return buf.String()
-}
-
-func (res *Response) RenderLFS(
-	path, layout string, funcs map[string]interface{}, data interface{},
-) string {
-	if res.LayoutDataFunc != nil && layout != `` {
-		data = res.LayoutDataFunc(layout, data, res.Request, res)
-	}
-	var buf bytes.Buffer
-	res.Renderer.RenderLF(&buf, path, layout, funcs, data)
-	return buf.String()
+	res.renderer.Render(&buf, path, data, option)
+	return buf
 }
 
 func (res *Response) Json(data interface{}) {
@@ -135,11 +96,11 @@ func (res *Response) Redirect(path string) {
 }
 
 func (res *Response) Status() int64 {
-	return res.rwValue.FieldByName(`status`).Int()
+	return reflect.ValueOf(res.ResponseWriter).Elem().FieldByName(`status`).Int()
 }
 
 func (res *Response) Size() int64 {
-	return res.rwValue.FieldByName(`written`).Int()
+	return reflect.ValueOf(res.ResponseWriter).Elem().FieldByName(`written`).Int()
 }
 
 func (res *Response) Hijack() (net.Conn, *bufio.ReadWriter, error) {

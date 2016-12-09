@@ -17,7 +17,7 @@ var r = New(
 
 func TestRenderer1(t *testing.T) {
 	var buf bytes.Buffer
-	r.Render(&buf, `t1`, testData{`title`, `content`})
+	r.Render(&buf, `t1`, testData{`title`, `content`}, O{})
 	got := buf.String()
 
 	expect := `<html>
@@ -40,7 +40,7 @@ got:
 
 func TestRender2(t *testing.T) {
 	var buf bytes.Buffer
-	r.Render(&buf, `t2`, testData{`title`, `content`})
+	r.Render(&buf, `t2`, testData{`title`, `content`}, O{})
 	got := buf.String()
 
 	expect := `<html>

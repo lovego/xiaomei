@@ -14,14 +14,19 @@ func main() {
 	if len(os.Args) > 1 {
 		cli.Run()
 	} else {
-		svr := server.New(routes.Get())
-		svr.FilterFunc = filter.Process
+		svr := &server.Server{
+			FilterFunc:     filter.Process,
+			Router:         routes.Get(),
+			LayoutDataFunc: layoutData,
+			Renderer:       server.NewRenderer(),
+		}
 		svr.ListenAndServe()
 	}
 }
 
-func layoutData(layout string, data interface{},
-	req *server.Request, res *server.Response) interface{} {
+func layoutData(
+	layout string, data interface{}, req *server.Request, res *server.Response,
+) interface{} {
 	if strings.HasPrefix(layout, `layout/`) {
 		return struct {
 			Data interface{}

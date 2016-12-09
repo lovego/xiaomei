@@ -15,9 +15,10 @@ type Tmpl struct {
 }
 
 type Renderer struct {
-	Root, Layout string
-	Tmpls        map[string]*Tmpl
-	Funcs        template.FuncMap
+	Root   string
+	Layout string
+	Tmpls  map[string]*Tmpl
+	Funcs  template.FuncMap
 }
 
 func New(root, layout string, cache bool, funcs template.FuncMap) *Renderer {
@@ -25,37 +26,29 @@ func New(root, layout string, cache bool, funcs template.FuncMap) *Renderer {
 	if cache {
 		tmpls = make(map[string]*Tmpl)
 	}
-	return &Renderer{path.Clean(root), path.Clean(layout), tmpls, funcs}
+	return &Renderer{
+		Root:   path.Clean(root),
+		Layout: path.Clean(layout),
+		Tmpls:  tmpls,
+		Funcs:  funcs,
+	}
 }
 
-func (r *Renderer) Render(wr io.Writer, name string, data interface{}) {
-	r.RenderLF(wr, name, r.Layout, nil, data)
-}
-
-func (r *Renderer) RenderL(wr io.Writer, name, layout string, data interface{}) {
-	r.RenderLF(wr, name, layout, nil, data)
-}
-
-func (r *Renderer) RenderF(wr io.Writer, name string, funcs template.FuncMap, data interface{}) {
-	r.RenderLF(wr, name, r.Layout, funcs, data)
-}
-
-func (r *Renderer) RenderLF(wr io.Writer, name, layout string,
-	funcs template.FuncMap, data interface{},
-) {
-	tmpl := r.getTemplate(name, layout, funcs)
+func (r *Renderer) Render(wr io.Writer, name string, data interface{}, option O) {
+	option = option.Process(r)
+	tmpl := r.getTemplate(name, option)
 	var err error
-	if layout == `` {
-		err = tmpl.Template.Execute(wr, data)
+	if option.HasLayout() {
+		err = tmpl.Template.ExecuteTemplate(wr, option.Layout, option.LayoutData(data))
 	} else {
-		err = tmpl.Template.ExecuteTemplate(wr, layout, data)
+		err = tmpl.Template.Execute(wr, data)
 	}
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (r *Renderer) getTemplate(name, layout string, funcs template.FuncMap) *Tmpl {
+func (r *Renderer) getTemplate(name string, option O) *Tmpl {
 	name = cleanName(name)
 	tmpl := r.Tmpls[name]
 	if tmpl == nil {
@@ -63,16 +56,16 @@ func (r *Renderer) getTemplate(name, layout string, funcs template.FuncMap) *Tmp
 		if r.Funcs != nil {
 			tmpl.Funcs(r.Funcs)
 		}
-		if funcs != nil {
-			tmpl.Funcs(funcs)
+		if option.Funcs != nil {
+			tmpl.Funcs(option.Funcs)
 		}
 		parseTemplate(tmpl.Template, name, r.Root, r.Root, tmpl.loaded)
 		if r.Tmpls != nil {
 			r.Tmpls[name] = tmpl
 		}
 	}
-	if layout != `` {
-		layout = cleanName(layout)
+	if option.HasLayout() {
+		layout := option.Layout
 		if tmpl.Lookup(layout) == nil {
 			parseTemplate(tmpl.Template.New(layout), layout, r.Root, r.Root, tmpl.loaded)
 		}
@@ -113,7 +106,7 @@ func cleanName(name string) string {
 	if strings.IndexByte(name, '/') >= 0 {
 		name = path.Clean(name)
 		if name[0] == '/' {
-			name = name[1:len(name)]
+			name = name[1:]
 		}
 	}
 	return name

@@ -7,8 +7,6 @@ import (
 )
 
 type Config struct {
-	config.Config `yaml:",inline"`
-
 	Mysql string `yaml:"mysql"`
 	Redis string `yaml:"redis"`
 }

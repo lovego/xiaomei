@@ -29,9 +29,12 @@ func handleError(t time.Time, req *Request, res *Response, notFound *bool) {
 }
 
 func accessLog(req *Request, res *Response, t time.Time) string {
+	var session interface{}
+	req.Session(&session)
+
 	return strings.Join([]string{
 		t.Format(`2006-01-02 15:04:05 -0700`),
-		req.Host, req.Method, req.URL.RequestURI(), req.ClientAddr(), fmt.Sprint(req.Session),
+		req.Host, req.Method, req.URL.RequestURI(), req.ClientAddr(), fmt.Sprint(session),
 		strconv.FormatInt(res.Status(), 10), strconv.FormatInt(res.Size(), 10),
 		time.Since(t).String(), req.Referer(), req.UserAgent(),
 	}, ` `)

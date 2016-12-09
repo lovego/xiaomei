@@ -9,25 +9,21 @@ import (
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/server/renderer"
 	"github.com/bughou-go/xiaomei/server/renderer/funcs"
+	"github.com/bughou-go/xiaomei/server/session"
 )
 
 type Server struct {
-	*Router
+	Router         *Router
+	SessionStore   session.Store
 	Renderer       *renderer.Renderer
+	LayoutDataFunc func(layout string, data interface{}, req *Request, res *Response) interface{}
 	FilterFunc     func(req *Request, res *Response) bool
-	LayoutDataFunc func(
-		layout string, data interface{}, req *Request, res *Response,
-	) interface{}
 }
 
-func New(router *Router) *Server {
-	return &Server{
-		Router: router,
-		Renderer: renderer.New(
-			path.Join(config.Root(), `views`), `layout/default`,
-			config.Env() != `dev`, funcs.Map(),
-		),
-	}
+func NewRenderer() *renderer.Renderer {
+	return renderer.New(
+		path.Join(config.Root(), `views`), `layout/default`, config.Env() != `dev`, funcs.Map(),
+	)
 }
 
 func (s *Server) ListenAndServe() {
@@ -37,8 +33,8 @@ func (s *Server) ListenAndServe() {
 
 	if err := http.ListenAndServe(addr, http.HandlerFunc(
 		func(response http.ResponseWriter, request *http.Request) {
-			req := NewRequest(request)
-			res := NewResponse(response, req, s.Renderer, s.LayoutDataFunc)
+			req := NewRequest(request, s.SessionStore)
+			res := NewResponse(response, req, s.SessionStore, s.Renderer, s.LayoutDataFunc)
 
 			var notFound bool
 			defer handleError(time.Now(), req, res, &notFound)
