@@ -9,16 +9,13 @@ import (
 
 type Request struct {
 	*http.Request
-	session requestSession
-}
-type requestSession struct {
-	store  session.Store
-	parsed bool
-	data   interface{}
+	sess       session.Session
+	sessParsed bool
+	sessData   interface{}
 }
 
-func NewRequest(request *http.Request, store session.Store) *Request {
-	return &Request{Request: request, session: requestSession{store: store}}
+func NewRequest(request *http.Request, sess session.Session) *Request {
+	return &Request{Request: request, sess: sess}
 }
 
 func (req *Request) ClientAddr() string {
@@ -33,10 +30,11 @@ func (req *Request) Query() url.Values {
 	return req.URL.Query()
 }
 
-func (req *Request) Session(p interface{}) {
-	if req.session.parsed {
-		p = req.session.data
-		return
+func (req *Request) Session(p *interface{}) {
+	if req.sessParsed {
+		*p = req.sessData
 	}
-	p = req.session.data
+	req.sess.Get(req.Request, p)
+	req.sessData = *p
+	req.sessParsed = true
 }

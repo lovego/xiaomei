@@ -18,26 +18,26 @@ type LayoutDataFunc func(layout string, data interface{}, req *Request, res *Res
 type Response struct {
 	http.ResponseWriter
 	request        *Request
-	sessionStore   session.Store
+	sess           session.Session
 	renderer       *renderer.Renderer
 	layoutDataFunc LayoutDataFunc
 }
 
 func NewResponse(
-	responseWriter http.ResponseWriter, request *Request, store session.Store,
+	responseWriter http.ResponseWriter, request *Request, sess session.Session,
 	rendrr *renderer.Renderer, layoutDataFunc LayoutDataFunc,
 ) *Response {
 	return &Response{
 		ResponseWriter: responseWriter,
 		request:        request,
-		sessionStore:   store,
+		sess:           sess,
 		renderer:       rendrr,
 		layoutDataFunc: layoutDataFunc,
 	}
 }
 
 func (res *Response) Session(data interface{}) {
-	res.sessionStore.Set(res.ResponseWriter, data)
+	res.sess.Set(res.request.Request, res.ResponseWriter, data)
 }
 
 func (res *Response) GetLayoutData(layout string, data interface{}) interface{} {

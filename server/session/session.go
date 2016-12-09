@@ -4,7 +4,11 @@ import (
 	"net/http"
 )
 
-type Store interface {
+type Session interface {
 	Get(req *http.Request, p interface{})
-	Set(res http.ResponseWriter, data interface{})
+	Set(req *http.Request, res http.ResponseWriter, data interface{})
+}
+
+type CookieSession struct {
+	Name string
 }

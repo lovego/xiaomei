@@ -14,7 +14,7 @@ import (
 
 type Server struct {
 	Router         *Router
-	SessionStore   session.Store
+	Session        session.Session
 	Renderer       *renderer.Renderer
 	LayoutDataFunc func(layout string, data interface{}, req *Request, res *Response) interface{}
 	FilterFunc     func(req *Request, res *Response) bool
@@ -33,8 +33,8 @@ func (s *Server) ListenAndServe() {
 
 	if err := http.ListenAndServe(addr, http.HandlerFunc(
 		func(response http.ResponseWriter, request *http.Request) {
-			req := NewRequest(request, s.SessionStore)
-			res := NewResponse(response, req, s.SessionStore, s.Renderer, s.LayoutDataFunc)
+			req := NewRequest(request, s.Session)
+			res := NewResponse(response, req, s.Session, s.Renderer, s.LayoutDataFunc)
 
 			var notFound bool
 			defer handleError(time.Now(), req, res, &notFound)
