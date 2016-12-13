@@ -69,10 +69,13 @@ func GitBranch() string {
 	return data().GitBranch
 }
 
-/* for db shell */
+/* db config */
 func Mysql() map[string]string {
 	return data().Mysql
 }
 func Redis() map[string]string {
 	return data().Redis
+}
+func Mongo() map[string]string {
+	return data().Mongo
 }

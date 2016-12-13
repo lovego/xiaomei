@@ -29,9 +29,10 @@ type dataConfig struct {
 	Mailer         MailerConfig `yaml:"mailer"`
 	AlarmReceivers []string     `yaml:"alarmReceivers"`
 
-	// for db shell
+	// db
 	Mysql map[string]string `yaml:"mysql"`
 	Redis map[string]string `yaml:"redis"`
+	Mongo map[string]string `yaml:"mongo"`
 }
 
 type ServerConfig struct {
