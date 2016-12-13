@@ -22,6 +22,10 @@ func Env() string {
 func Domain() string {
 	return data().Domain
 }
+func Secret() string {
+	return data().Secret
+}
+
 func CurrentAppServer() ServerConfig {
 	ifcAddrs, err := net.InterfaceAddrs()
 	if err != nil {

@@ -15,6 +15,7 @@ type dataConfig struct {
 	AppPort string `yaml:"appPort"`
 	Env     string `yaml:"env"`
 	Domain  string `yaml:"domain"`
+	Secret  string `yaml:"secret"`
 
 	// for deploy
 	DeployUser    string         `yaml:"deployUser"`

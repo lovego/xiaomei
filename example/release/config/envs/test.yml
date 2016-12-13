@@ -1,5 +1,6 @@
 env:    test
 domain: example-test.org
+secret: secret-string
 
 alarmReceivers: [ ]
 mysql:

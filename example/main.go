@@ -17,8 +17,9 @@ func main() {
 		svr := &server.Server{
 			FilterFunc:     filter.Process,
 			Router:         routes.Get(),
-			LayoutDataFunc: layoutData,
+			Session:        server.NewSession(),
 			Renderer:       server.NewRenderer(),
+			LayoutDataFunc: layoutData,
 		}
 		svr.ListenAndServe()
 	}

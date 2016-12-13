@@ -1,5 +1,6 @@
 env:    dev
 domain: example-dev.org
+secret: secret-string
 
 alarmReceivers: [ ]
 mysql:

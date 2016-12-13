@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 	"net/url"
+	"reflect"
 
 	"github.com/bughou-go/xiaomei/server/session"
 )
@@ -11,7 +12,7 @@ type Request struct {
 	*http.Request
 	sess       session.Session
 	sessParsed bool
-	sessData   interface{}
+	sessData   reflect.Value
 }
 
 func NewRequest(request *http.Request, sess session.Session) *Request {
@@ -30,11 +31,22 @@ func (req *Request) Query() url.Values {
 	return req.URL.Query()
 }
 
-func (req *Request) Session(p *interface{}) {
+// req.Session retains the value the param pointer points to.
+// the next call to req.Session will return the value instead of parsing from req again.
+// so modification to the session value will remain.
+func (req *Request) Session(p interface{}) {
 	if req.sessParsed {
-		*p = req.sessData
+		if req.sessData.IsValid() {
+			reflect.ValueOf(p).Elem().Set(req.sessData)
+		}
+		return
 	}
 	req.sess.Get(req.Request, p)
-	req.sessData = *p
+	if p != nil {
+		v := reflect.ValueOf(p).Elem()
+		if v.IsValid() {
+			req.sessData = v
+		}
+	}
 	req.sessParsed = true
 }
