@@ -28,12 +28,12 @@ func Deploy(commit string) error {
 		return err
 	}
 
-	gitHost := getGitHost(config.Data().GitAddr)
+	gitHost := getGitHost(config.GitAddr())
 	servers := cli.MatchedServers()
 	for _, server := range servers {
 		deployToServer(DeployConfig{
 			Tasks:   server.Tasks,
-			Addr:    config.DeployUser + `@` + server.Addr,
+			Addr:    config.DeployUser() + `@` + server.Addr,
 			GitTag:  tag,
 			GitHost: gitHost,
 		})

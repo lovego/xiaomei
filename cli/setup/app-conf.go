@@ -1,3 +1,6 @@
+package setup
+
+const upstartConfig = `
 # vim: set ft=upstart:
 
 setuid {{.UserName}}
@@ -32,3 +35,4 @@ post-start script
     done
 EOF
 end script
+`

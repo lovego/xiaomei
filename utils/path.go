@@ -10,6 +10,11 @@ func Exist(p string) bool {
 	return fi != nil
 }
 
+func IsFile(p string) bool {
+	fi, _ := os.Stat(p)
+	return fi != nil && fi.Mode().IsRegular()
+}
+
 func IsDir(p string) bool {
 	fi, _ := os.Stat(p)
 	return fi != nil && fi.IsDir()
