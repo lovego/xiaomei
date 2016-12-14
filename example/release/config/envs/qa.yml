@@ -1,3 +1,2 @@
 env:    qa
 domain: example-qa.org
-secret: secret-string
