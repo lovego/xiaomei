@@ -14,6 +14,6 @@ mailer:
 
 deployUser: ubuntu
 deployRoot: /apps
-gitAddr: git@gitlab.retail-tek.com:go/reports.git
+gitAddr: git@gitlab.retail-tek.com:go/example.git
 gitBranch: 
 

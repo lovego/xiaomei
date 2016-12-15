@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"path"
 	"regexp"
 	"text/template"
 
@@ -15,8 +14,8 @@ import (
 )
 
 type DeployConfig struct {
-	Tasks, Addr     string
-	GitTag, GitHost string
+	DeployPath, Env, Tasks              string
+	GitBranch, GitTag, GitHost, GitAddr string
 }
 
 func Deploy(commit string) error {
@@ -31,11 +30,14 @@ func Deploy(commit string) error {
 	gitHost := getGitHost(config.GitAddr())
 	servers := cli.MatchedServers()
 	for _, server := range servers {
-		deployToServer(DeployConfig{
-			Tasks:   server.Tasks,
-			Addr:    config.DeployUser() + `@` + server.Addr,
-			GitTag:  tag,
-			GitHost: gitHost,
+		deployToServer(config.DeployUser()+`@`+server.Addr, DeployConfig{
+			DeployPath: config.DeployPath(),
+			Env:        config.Env(),
+			Tasks:      server.Tasks,
+			GitBranch:  config.GitBranch(),
+			GitTag:     tag,
+			GitHost:    gitHost,
+			GitAddr:    config.GitAddr(),
 		})
 	}
 	fmt.Printf("deployed %d servers!\n", len(servers))
@@ -44,21 +46,19 @@ func Deploy(commit string) error {
 
 var deployTmpl *template.Template
 
-func deployToServer(server DeployConfig) {
-	color.Cyan(server.Addr)
+func deployToServer(userAddr string, deployConf DeployConfig) {
+	color.Cyan(userAddr)
 
 	if deployTmpl == nil {
-		deployTmpl = template.Must(template.ParseFiles(
-			path.Join(config.Root(), `config/shell/deploy.tmpl.sh`),
-		))
+		deployTmpl = template.Must(template.New(``).Parse(deployShell))
 	}
 
 	var buf bytes.Buffer
-	err := deployTmpl.Execute(&buf, server)
+	err := deployTmpl.Execute(&buf, deployConf)
 	if err != nil {
 		panic(err)
 	}
-	cmd.Run(cmd.O{Panic: true}, `ssh`, `-t`, server.Addr, buf.String())
+	cmd.Run(cmd.O{Panic: true}, `ssh`, `-t`, userAddr, buf.String())
 }
 
 func getGitHost(gitAddr string) string {

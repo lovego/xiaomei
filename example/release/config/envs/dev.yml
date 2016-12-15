@@ -3,7 +3,7 @@ domain: example-dev.org
 
 alarmReceivers: [ ]
 mysql:
-  default: root:root@tcp(127.0.0.1:3306)/reports
+  default: root:root@tcp(127.0.0.1:3306)/example
 redis:
   default: redis://:@localhost:6379/0
 

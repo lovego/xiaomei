@@ -89,7 +89,7 @@ func updateAssets(assetsPath string, assets map[string]string) {
 }
 
 func checkAndAddMd5(assets map[string]string, paths []string) (changed int) {
-	publicDir := filepath.Join(config.Root(), `public/reports`)
+	publicDir := filepath.Join(config.Root(), `public`)
 	for _, filePath := range paths {
 		assetPath := strings.Replace(filePath, publicDir, ``, -1)
 		if ext := filepath.Ext(assetPath); ext != `.css` && ext != `.js` {

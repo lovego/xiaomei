@@ -10,7 +10,11 @@ func Cmds() []*cobra.Command {
 			Use:   `deploy`,
 			Short: `deploy project to a environment.`,
 			RunE: func(c *cobra.Command, args []string) error {
-				return Deploy(args[0])
+				var tasks string
+				if len(args) > 0 {
+					tasks = args[0]
+				}
+				return Deploy(tasks)
 			},
 		},
 	}

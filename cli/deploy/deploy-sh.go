@@ -1,3 +1,6 @@
+package deploy
+
+const deployShell = `# vim: set ft=sh:
 main () {
   clone_code_if_should
 
@@ -41,4 +44,4 @@ clear_local_obsolete_deploy_tags() {
 }
 
 main
-
+`
