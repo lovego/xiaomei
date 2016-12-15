@@ -1,7 +1,11 @@
 package setup
 
-const nginxConfig = `
-# vim: set ft=nginx:
+const nginxConfig = `# vim: set ft=nginx:
+
+log_format {{ .DeployName }} '$time_iso8601 $host'
+	' $request_method $request_uri $content_length $remote_addr'
+	' $status $body_bytes_sent $request_time'
+	' $remote_addr "$http_referer" "$http_user_agent"';
 
 upstream {{ .DeployName }} {
 {{- range  .DeployServers -}}
@@ -13,27 +17,28 @@ upstream {{ .DeployName }} {
 
 server {
   charset utf-8;
-
-  server_name  {{ .Domain }};
-  root {{ .AppRoot }}/public/;
-
   listen  80;
-  include proxy_params;
+  server_name {{ .Domain }};
+  root {{ .AppRoot }}/public/;
+  {{ if .Nfs }} sendfile off; {{ end }}
 
   location / {
     proxy_pass   http://{{ .DeployName }};
+		include proxy_params;
   }
 
-  location ~ ^/static/(.*)$ {
-    try_files /$1 =404;
+  location ~ /.*\.html {
+  }
+
+  location ^~ /static/ {
+		alias {{ .AppRoot }}/public/;
     expires max;
   }
 
   location = /favicon.ico {
   }
 
-  {{ if .Nfs }} sendfile off; {{end}}
-  access_log {{ .AppRoot }}/log/nginx.log;
+  access_log {{ .AppRoot }}/log/nginx.log {{ .DeployName }};
   error_log  {{ .AppRoot }}/log/nginx.err;
 }
 `

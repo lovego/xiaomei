@@ -1,38 +1,74 @@
 package setup
 
-const upstartConfig = `
-# vim: set ft=upstart:
+const upstartConfig = `# vim: set ft=upstart:
 
 setuid {{.UserName}}
 chdir {{.AppRoot}}
 
 start on {{.AppStartOn}}
 respawn
-respawn limit 3 10
+respawn limit 5 60
 
+# stop the job if completely impossible to start.
+# pre-start is the only process that can stop the job with exit code or stop.
 pre-start script
-  test -f ./bin/appserver || { stop; exit 1; }
+  exec >>log/appserver.log 2>&1
+  test -x {{.AppName}} || {
+    echo $(date -Iseconds) 'starting canceled: no executable {{.AppName}}.'
+    exit 1
+  }
+  test -f config/config.yml || {
+    echo $(date -Iseconds) 'starting canceled: no config/config.yml.'
+    exit 1
+  }
+  test -f config/env.yml || {
+    echo $(date -Iseconds) 'starting canceled: no config/env.yml.'
+    exit 1
+  }
 end script
 
-script 
-  exec ./bin/appserver >>log/app.log 2>>log/app.err
+script
+  set +e
+  exec >>log/appserver.log 2>&1
+  echo $(date -Iseconds) 'starting.'
+  ./{{.AppName}}
+  exitStatus=$?
+  echo $(date -Iseconds) "crashed with status: $exitStatus."
 end script
 
 post-start script
-  bash >>log/app.err 2>&1 <<'EOF'
-    waited=0
-    while true; do
-      if (( waited >= 120 )); then
-        echo 'app server starting timeout'; stop; exit 1
-      elif status $JOB | fgrep 'stop/post-start,'; then
-        echo 'app server starting failed'; exit 1
-      elif lsof -i4:{{.AppPort}} > /dev/null; then
-        break
-      fi
-      (( w = waited > 0 ? waited : 1 ))
-      sleep $w
-      (( waited += w ))
-    done
-EOF
+  exec >>log/appserver.log 2>&1
+
+  # wait until the AppPort has been bound.
+  i=0;
+  while [ $i -lt {{.AppStartTimeout}} ]; do
+    case $(status) in
+    *' start/post-start, '* )
+      lsof -itcp:{{.AppPort}} > /dev/null && {
+        echo $(date -Iseconds) 'started.'; exit
+      } ;;
+    * )
+      echo $(date -Iseconds) 'starting failed.'; exit ;;
+    esac
+    sleep 1
+    i=$(( i + 1 ));
+  done
+
+  # kill process if timeout
+  s=$(status)
+  case "$s" in
+  *' start/post-start, process '* )
+    s=${s#* start/post-start, process *}
+    pid=${s%%[!0-9]*}
+    test -n "$pid" && kill -- -$pid # kill process group
+    ;;
+  esac
+  echo $(date -Iseconds) 'starting timeout.';
+end script
+
+post-stop script
+  exec >>log/appserver.log 2>&1
+  echo $(date -Iseconds) 'stopped.
+';
 end script
 `

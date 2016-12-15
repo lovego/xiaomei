@@ -18,9 +18,9 @@ func SetupAppServer() {
 	// stop current
 	cmd.Run(cmd.O{}, `sudo`, `stop`, config.DeployName())
 
-	errLog := path.Join(config.Root(), `log/appserver.stderr`)
-	cmd.Run(cmd.O{Panic: true}, `touch`, `-a`, errLog)
-	tail, _ := cmd.Start(cmd.O{Panic: true}, `tail`, `-n0`, `-f`, errLog)
+	appserverLog := path.Join(config.Root(), `log/appserver.log`)
+	cmd.Run(cmd.O{Panic: true}, `touch`, `-a`, appserverLog)
+	tail, _ := cmd.Start(cmd.O{Panic: true}, `tail`, `-n0`, `-f`, appserverLog)
 	// start new
 	output, _ := cmd.Run(cmd.O{Panic: true, Output: true}, `sudo`, `start`, config.DeployName())
 	tail.Process.Kill()
@@ -32,7 +32,8 @@ func SetupAppServer() {
 }
 
 type upstartConfData struct {
-	UserName, AppRoot, AppPort, AppStartOn string
+	UserName, AppRoot, AppName, AppPort, AppStartOn string
+	AppStartTimeout                                 uint16
 }
 
 func writeUpstartConfig() {
@@ -40,10 +41,12 @@ func writeUpstartConfig() {
 
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, upstartConfData{
-		UserName:   config.DeployUser(),
-		AppRoot:    config.Root(),
-		AppPort:    config.AppPort(),
-		AppStartOn: config.CurrentAppServer().AppStartOn,
+		UserName:        config.DeployUser(),
+		AppRoot:         config.Root(),
+		AppName:         config.AppName(),
+		AppPort:         config.AppPort(),
+		AppStartOn:      config.CurrentAppServer().AppStartOn,
+		AppStartTimeout: config.AppStartTimeout(),
 	}); err != nil {
 		panic(err)
 	}

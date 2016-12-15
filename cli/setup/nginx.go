@@ -37,6 +37,7 @@ func writeNginxConfig() {
 
 type nginxConfData struct {
 	DeployName, AppRoot, AppPort, Domain string
+	DeployServers                        []config.ServerConfig
 	Nfs                                  bool
 }
 
@@ -45,10 +46,11 @@ func getNginxConfData() nginxConfData {
 		`stat`, `--file-system`, `--format`, `%T`, config.Root(),
 	)
 	return nginxConfData{
-		DeployName: config.DeployName(),
-		AppRoot:    config.Root(),
-		AppPort:    config.AppPort(),
-		Domain:     config.Domain(),
-		Nfs:        fs == `nfs`,
+		DeployName:    config.DeployName(),
+		AppRoot:       config.Root(),
+		AppPort:       config.AppPort(),
+		Domain:        config.Domain(),
+		DeployServers: config.DeployServers(),
+		Nfs:           fs == `nfs`,
 	}
 }

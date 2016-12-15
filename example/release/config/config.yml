@@ -1,5 +1,6 @@
 appName: example
 appPort: 3000
+appStartTimeout: 10
 
 timeZoneName: China
 timeZoneOffset: 28800

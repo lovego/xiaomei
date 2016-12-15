@@ -11,11 +11,12 @@ import (
 )
 
 type dataConfig struct {
-	AppName string `yaml:"appName"`
-	AppPort string `yaml:"appPort"`
-	Env     string `yaml:"env"`
-	Domain  string `yaml:"domain"`
-	Secret  string `yaml:"secret"`
+	AppName         string `yaml:"appName"`
+	AppPort         string `yaml:"appPort"`
+	Env             string `yaml:"env"`
+	Domain          string `yaml:"domain"`
+	Secret          string `yaml:"secret"`
+	AppStartTimeout uint16 `yaml:"appStartTimeout"`
 
 	// for deploy
 	DeployUser    string         `yaml:"deployUser"`

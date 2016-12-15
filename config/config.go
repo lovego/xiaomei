@@ -25,6 +25,9 @@ func Domain() string {
 func Secret() string {
 	return data().Secret
 }
+func AppStartTimeout() uint16 {
+	return data().AppStartTimeout
+}
 
 func CurrentAppServer() ServerConfig {
 	ifcAddrs, err := net.InterfaceAddrs()
@@ -46,7 +49,7 @@ func CurrentAppServer() ServerConfig {
 /* for deploy */
 
 func DeployName() string {
-	return AppName() + Env()
+	return AppName() + `_` + Env()
 }
 func DeployRoot() string {
 	return data().DeployRoot
