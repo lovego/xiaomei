@@ -1,6 +1,8 @@
 package develop
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"os"
@@ -31,16 +33,27 @@ func New(dir string) error {
 	cd %s
 	sed -i'' 's/example/%s/g' .gitignore $(fgrep -rl example release/config)
 	sed -i'' 's/%s/%s/g' main.go
+	sed -i'' 's/secret-string/%s/g' release/config/envs/production.yml
 	ln -sf envs/dev.yml release/config/env.yml 2>/dev/null ||
 	cp -f release/config/envs/dev.yml release/config/env.yml
 	`, dir, appName,
 		strings.Replace(filepath.Join(fmwk.Path(), `example`), `/`, `\/`, -1),
 		strings.Replace(proPath, `/`, `\/`, -1),
+		generateSecret(),
 	)
 	if !cmd.Ok(cmd.O{}, `sh`, `-c`, script) {
 		return errors.New(`process templates failed.`)
 	}
 	return nil
+}
+
+// 32 byte hex string
+func generateSecret() string {
+	b := make([]byte, 16)
+	if _, err := rand.Read(b); err != nil {
+		panic(err)
+	}
+	return hex.EncodeToString(b)
 }
 
 func checkPkgDir(dir string) error {

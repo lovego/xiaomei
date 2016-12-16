@@ -9,12 +9,9 @@ import (
 )
 
 func Exec(args []string) {
-	if len(args) == 0 {
-		cli.PrintUsage()
-	}
 	for _, addr := range cli.MatchedServerAddrs() {
-		address := config.Data().DeployUser + `@` + addr
+		address := config.DeployUser() + `@` + addr
 		color.Cyan(address)
-		cmd.Run(cmd.O{}, `ssh`, `-t`, address, `cd `+config.Data().DeployPath+`; `+strings.Join(args, ` `))
+		cmd.Run(cmd.O{}, `ssh`, `-t`, address, `cd `+config.DeployPath()+`; `+strings.Join(args, ` `))
 	}
 }

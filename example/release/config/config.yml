@@ -1,18 +1,19 @@
 appName: example
 appPort: 3000
+appStartTimeout: 10
 
 timeZoneName: China
 timeZoneOffset: 28800
 mailer:
   host: imap.exmail.qq.com
   port: 25
-  sender: data-system<data-system@retail-tek.com>
-  passwd: RetailBigdata1234
+  sender: xiaomei<xiaomei-go@qq.com>
+  passwd: abc123
 
-# alarmReceivers: [ 'name<email@example.com>' ] 
+alarmReceivers: [ 'xiaomei<xiaomei-go@qq.com>' ]
 
 deployUser: ubuntu
 deployRoot: /apps
-gitAddr: git@gitlab.retail-tek.com:go/reports.git
+gitAddr: git@github.com:/replace-me-with-git-addr.git
 gitBranch: 
 

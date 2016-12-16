@@ -5,12 +5,12 @@ import (
 )
 
 var mailer = New(
-	`imap.exmail.qq.com`, `25`, `data-system<data-system@retail-tek.com>`, `RetailBigdata1234`,
+	`imap.mail.qq.com`, `25`, `小美<xiaomei-go@retail-tek.com>`, `abc123`,
 )
 
 func TestSend(t *testing.T) {
 	mailer.Send(&Message{
-		Receivers: []string{`侯志良<houzhiliang@retail-tek.com>`},
+		Receivers: []string{`小美<xiaomei-go@retail-tek.com>`},
 		Title:     `test 标题`,
 		Body:      `test 内容`,
 	})
@@ -23,7 +23,7 @@ func TestSendWithAttaches(t *testing.T) {
 		`测试3.txt`:   `测试3`,
 	}
 	mailer.Send(&Message{
-		Receivers: []string{`侯志良<houzhiliang@retail-tek.com>`},
+		Receivers: []string{`小美<xiaomei-go@retail-tek.com>`},
 		Title:     `test 标题`,
 		Body:      `test 内容`,
 		Attaches:  files,

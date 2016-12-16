@@ -13,11 +13,17 @@ import (
 )
 
 type Server struct {
+	FilterFunc     func(req *Request, res *Response) bool
 	Router         *Router
 	Session        session.Session
 	Renderer       *renderer.Renderer
 	LayoutDataFunc func(layout string, data interface{}, req *Request, res *Response) interface{}
-	FilterFunc     func(req *Request, res *Response) bool
+}
+
+func NewSession() session.Session {
+	return session.NewCookieSession(http.Cookie{
+		Name: config.AppName(),
+	}, config.Secret())
 }
 
 func NewRenderer() *renderer.Renderer {

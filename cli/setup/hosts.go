@@ -1,3 +1,19 @@
+package setup
+
+import (
+	"fmt"
+	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/utils/cmd"
+	"path"
+)
+
+func SetupHosts() {
+	cmd.Run(cmd.O{Panic: true}, path.Join(config.Root(), `config/shell/setup-hosts.sh`))
+
+	fmt.Println(`setup hosts ok.`)
+}
+
+/*
 #!/bin/bash
 
 dir="$(dirname $0)/.."
@@ -13,3 +29,4 @@ elif [[ "$config" == *'#begin'*'#end'* ]]; then
 else
   echo $'\n'"$begin_hosts_end" | sudo tee --append "$target" > /dev/null
 fi
+*/

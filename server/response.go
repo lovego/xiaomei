@@ -37,7 +37,7 @@ func NewResponse(
 }
 
 func (res *Response) Session(data interface{}) {
-	res.sess.Set(res.request.Request, res.ResponseWriter, data)
+	res.sess.Set(res.ResponseWriter, data)
 }
 
 func (res *Response) GetLayoutData(layout string, data interface{}) interface{} {

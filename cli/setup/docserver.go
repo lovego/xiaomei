@@ -18,7 +18,7 @@ func DocServer() error {
 		}
 	}
 
-	deployRoot := config.Data().DeployRoot
+	deployRoot := config.DeployRoot()
 	if _, err := cmd.Run(cmd.O{}, `ln`, `-sf`, `.`, filepath.Join(deployRoot, `src`)); err != nil {
 		return err
 	}
