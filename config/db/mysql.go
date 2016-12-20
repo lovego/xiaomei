@@ -2,9 +2,10 @@ package db
 
 import (
 	"database/sql"
+	"time"
+
 	"github.com/bughou-go/xiaomei/config"
 	_ "github.com/go-sql-driver/mysql"
-	"time"
 )
 
 var mysqlConns map[string]*sql.DB

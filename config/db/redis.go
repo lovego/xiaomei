@@ -1,9 +1,10 @@
 package db
 
 import (
+	"time"
+
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/garyburd/redigo/redis"
-	"time"
 )
 
 var redisConns map[string]*redis.Pool
