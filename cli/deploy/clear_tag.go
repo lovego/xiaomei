@@ -23,7 +23,7 @@ func clearRemoteDeployTags() error {
 	const prefix = `refs/tags/`
 
 	lines, err := cmd.Run(cmd.O{Output: true},
-		`git`, `ls-remote`, `--tags`, `origin`, prefix+config.Env()+`*`,
+		`git`, `ls-remote`, `--tags`, `origin`, prefix+config.App.Env()+`*`,
 	)
 	if err != nil {
 		return err
@@ -49,7 +49,7 @@ func clearRemoteDeployTags() error {
 // clear local obsolete deploy tags
 func clearLocalDeployTags() error {
 	lines, err := cmd.Run(cmd.O{Output: true},
-		`git`, `tag`, `--list`, config.Env()+`*`,
+		`git`, `tag`, `--list`, config.App.Env()+`*`,
 	)
 	if err != nil {
 		return err

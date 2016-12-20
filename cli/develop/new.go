@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bughou-go/xiaomei/config/fmwk"
+	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
@@ -23,7 +23,7 @@ func New(dir string) error {
 		return err
 	}
 
-	example := filepath.Join(fmwk.Root(), `example`)
+	example := filepath.Join(config.Fmwk.Root(), `example`)
 	if !cmd.Ok(cmd.O{}, `cp`, `-rT`, example, dir) {
 		return errors.New(`cp templates failed.`)
 	}
@@ -37,7 +37,7 @@ func New(dir string) error {
 	ln -sf envs/dev.yml release/config/env.yml 2>/dev/null ||
 	cp -f release/config/envs/dev.yml release/config/env.yml
 	`, dir, appName,
-		strings.Replace(filepath.Join(fmwk.Path(), `example`), `/`, `\/`, -1),
+		strings.Replace(filepath.Join(config.Fmwk.Path(), `example`), `/`, `\/`, -1),
 		strings.Replace(proPath, `/`, `\/`, -1),
 		generateSecret(),
 	)

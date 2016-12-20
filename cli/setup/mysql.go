@@ -11,7 +11,7 @@ import (
 )
 
 func SetupMysql() {
-	options := config.MysqlOptions(``)
+	options := config.DB.MysqlOptions(``)
 	createDatabaseAndTables(options)
 
 	fmt.Println(`setup mysql ok.`)

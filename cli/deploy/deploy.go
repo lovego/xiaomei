@@ -8,7 +8,6 @@ import (
 	"text/template"
 
 	"github.com/bughou-go/xiaomei/config"
-	"github.com/bughou-go/xiaomei/config/servers"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/fatih/color"
 )
@@ -27,17 +26,17 @@ func Deploy(commit, serverFilter string) error {
 		return err
 	}
 
-	gitHost := getGitHost(config.GitAddr())
-	servers := servers.Matched(serverFilter)
+	gitHost := getGitHost(config.Deploy.GitAddr())
+	servers := config.Servers.Matched(serverFilter)
 	for _, server := range servers {
-		deployToServer(config.DeployUser()+`@`+server.Addr, DeployConfig{
-			DeployPath: config.DeployPath(),
-			Env:        config.Env(),
+		deployToServer(config.Deploy.User()+`@`+server.Addr, DeployConfig{
+			DeployPath: config.Deploy.Path(),
+			Env:        config.App.Env(),
 			Tasks:      server.Tasks,
-			GitBranch:  config.GitBranch(),
+			GitBranch:  config.Deploy.GitBranch(),
 			GitTag:     tag,
 			GitHost:    gitHost,
-			GitAddr:    config.GitAddr(),
+			GitAddr:    config.Deploy.GitAddr(),
 		})
 	}
 	fmt.Printf("deployed %d servers!\n", len(servers))

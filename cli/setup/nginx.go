@@ -32,7 +32,7 @@ func writeNginxConfig() {
 		panic(err)
 	}
 
-	cmd.SudoWriteFile(path.Join(`/etc/nginx/sites-enabled/`, config.DeployName()), &buf)
+	cmd.SudoWriteFile(path.Join(`/etc/nginx/sites-enabled/`, config.Deploy.Name()), &buf)
 }
 
 type nginxConfData struct {
@@ -46,11 +46,11 @@ func getNginxConfData() nginxConfData {
 		`stat`, `--file-system`, `--format`, `%T`, config.App.Root(),
 	)
 	return nginxConfData{
-		DeployName: config.DeployName(),
+		DeployName: config.Deploy.Name(),
 		AppRoot:    config.App.Root(),
-		AppPort:    config.AppPort(),
-		Domain:     config.Domain(),
-		Servers:    config.Servers(),
+		AppPort:    config.App.Port(),
+		Domain:     config.App.Domain(),
+		Servers:    config.Servers,
 		Nfs:        fs == `nfs`,
 	}
 }

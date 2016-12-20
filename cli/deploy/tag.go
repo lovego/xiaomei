@@ -11,7 +11,7 @@ import (
 )
 
 func setupDeployTag(commit string) (string, error) {
-	branch := config.GitBranch()
+	branch := config.Deploy.GitBranch()
 	// 拉取最新代码及tag
 	o := cmd.O{}
 	if _, err := cmd.Run(o, `git`, `fetch`, `origin`, branch, `--tags`, `--prune`); err != nil {
@@ -30,7 +30,7 @@ func setupDeployTag(commit string) (string, error) {
 }
 
 func getDeployTag(commit string) (string, error) {
-	branch := config.GitBranch()
+	branch := config.Deploy.GitBranch()
 
 	commit = strings.TrimSpace(commit)
 	if commit == `` {
@@ -68,7 +68,7 @@ func checkDeployCommit(commit, branch string) error {
 var deployTagTime = regexp.MustCompile(`^\d{4}-\d{4}$`)
 
 func isDeployTag(tag string) bool {
-	env := config.Env()
+	env := config.App.Env()
 	l := len(env)
 	return len(tag) == l+9 && tag[:l] == env && deployTagTime.MatchString(tag[l:])
 }
@@ -92,7 +92,7 @@ func existDeployTag(commit string) (string, error) {
 
 // 新建deployTag
 func newDeployTag(commit string) (string, error) {
-	tag := config.Env() + time.Now().Format(`0102-1504`)
+	tag := config.App.Env() + time.Now().Format(`0102-1504`)
 	if _, err := cmd.Run(cmd.O{}, `git`, `tag`, tag, commit); err != nil {
 		return ``, err
 	}
