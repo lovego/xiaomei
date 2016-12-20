@@ -1,8 +1,10 @@
-env:    test
-domain: example-test.org
+app:
+  env:    test
+  domain: example-test.org
+  keepers: [ ]
 
-alarmReceivers: [ ]
-mysql:
-  default: root:root@tcp(127.0.0.1:3306)/example
-redis:
-  default: redis://:@localhost:6379/0
+db:
+  mysql:
+    default: root:root@tcp(127.0.0.1:3306)/example
+  redis:
+    default: redis://:@localhost:6379/0

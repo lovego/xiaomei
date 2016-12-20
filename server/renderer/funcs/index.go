@@ -10,7 +10,7 @@ import (
 
 func Map() map[string]interface{} {
 	return map[string]interface{}{
-		`asset`:        AssetFunc(config.Env() == `dev`),
+		`asset`:        AssetFunc(config.App.Env() == `dev`),
 		`html_safe`:    HtmlSafe,
 		`dict`:         MakeDict,
 		`keys`:         MapKeys,

@@ -62,7 +62,7 @@ func getLogFields(req *Request, res *Response, t time.Time, err interface{}) []s
 
 func openFile(p string) *os.File {
 	if f, err := os.OpenFile(
-		path.Join(config.Root(), p), os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666,
+		path.Join(config.App.Root(), p), os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666,
 	); err != nil {
 		panic(err)
 	} else {

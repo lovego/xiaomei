@@ -1,3 +1,4 @@
-env:    production
-domain: example.org
-secret: secret-string
+app:
+  env:    production
+  domain: example.org
+  secret: secret-string

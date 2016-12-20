@@ -17,7 +17,7 @@ func handleError(t time.Time, req *Request, res *Response, notFound *bool) {
 	}
 	log := writeLog(req, res, t, err)
 	if err != nil {
-		go config.AlarmMail(`500错误`, string(log))
+		go config.App.Alarm(`500错误`, string(log))
 	}
 }
 

@@ -1,11 +1,13 @@
-env:    dev
-domain: example-dev.org
+app:
+  env:    dev
+  domain: example-dev.org
+  keepers: [ ]
 
-alarmReceivers: [ ]
-mysql:
-  default: root:root@tcp(127.0.0.1:3306)/example
-redis:
-  default: redis://:@localhost:6379/0
+db:
+  mysql:
+    default: root:root@tcp(127.0.0.1:3306)/example
+  redis:
+    default: redis://:@localhost:6379/0
 
 servers:
   - addr: 127.0.0.1

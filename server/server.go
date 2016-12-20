@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/bughou-go/xiaomei/config"
-	"github.com/bughou-go/xiaomei/config/servers"
 	"github.com/bughou-go/xiaomei/server/renderer"
 	"github.com/bughou-go/xiaomei/server/renderer/funcs"
 	"github.com/bughou-go/xiaomei/server/session"
@@ -23,19 +22,18 @@ type Server struct {
 
 func NewSession() session.Session {
 	return session.NewCookieSession(http.Cookie{
-		Name: config.AppName(),
-	}, config.Secret())
+		Name: config.App.Name(),
+	}, config.App.Secret())
 }
 
 func NewRenderer() *renderer.Renderer {
 	return renderer.New(
-		path.Join(config.Root(), `views`), `layout/default`, config.Env() != `dev`, funcs.Map(),
+		path.Join(config.App.Root(), `views`), `layout/default`, config.App.Env() != `dev`, funcs.Map(),
 	)
 }
 
 func (s *Server) ListenAndServe() {
-	fmt.Println(config.Servers())
-	addr := servers.Current().AppAddr + `:` + config.AppPort()
+	addr := config.Servers.Current().AppAddr + `:` + config.App.Port()
 
 	fmt.Printf("%s listen at %s\n", time.Now().Format(`2006-01-02 15:04:05 -0700`), addr)
 
