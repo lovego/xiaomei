@@ -25,26 +25,29 @@ func Cmds() []*cobra.Command {
 			},
 		},
 		{
-			Use: `setup-nginx`,
+			Use:   `setup-nginx`,
+			Short: `setup nginx.`,
 			Run: func(c *cobra.Command, args []string) {
 				SetupNginx()
 			},
 		},
 		{
 			Use:   `setup-docserver`,
-			Short: `start doc-server.`,
+			Short: `setup doc-server.`,
 			Run: func(c *cobra.Command, args []string) {
 				DocServer()
 			},
 		},
 		{
-			Use: `setup-cron`,
+			Use:   `setup-cron`,
+			Short: `setup crontab.`,
 			Run: func(c *cobra.Command, args []string) {
 				SetupCron()
 			},
 		},
 		{
-			Use: `setup-hosts`,
+			Use:   `setup-hosts`,
+			Short: `setup hosts.`,
 			Run: func(c *cobra.Command, args []string) {
 				SetupHosts()
 			},

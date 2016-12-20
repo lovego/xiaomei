@@ -9,6 +9,7 @@ import (
 	"text/template"
 
 	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/config/servers"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
@@ -18,7 +19,7 @@ func SetupAppServer() {
 	// stop current
 	cmd.Run(cmd.O{}, `sudo`, `stop`, config.DeployName())
 
-	appserverLog := path.Join(config.Root(), `log/appserver.log`)
+	appserverLog := path.Join(config.App.Root(), `log/appserver.log`)
 	cmd.Run(cmd.O{Panic: true}, `touch`, `-a`, appserverLog)
 	tail, _ := cmd.Start(cmd.O{Panic: true}, `tail`, `-n0`, `-f`, appserverLog)
 	// start new
@@ -33,7 +34,7 @@ func SetupAppServer() {
 
 type upstartConfData struct {
 	UserName, AppRoot, AppName, AppPort, AppStartOn string
-	AppStartTimeout                                 uint16
+	StartTimeout                                    uint16
 }
 
 func writeUpstartConfig() {
@@ -41,12 +42,12 @@ func writeUpstartConfig() {
 
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, upstartConfData{
-		UserName:        config.DeployUser(),
-		AppRoot:         config.Root(),
-		AppName:         config.AppName(),
-		AppPort:         config.AppPort(),
-		AppStartOn:      config.CurrentAppServer().AppStartOn,
-		AppStartTimeout: config.AppStartTimeout(),
+		UserName:     config.DeployUser(),
+		AppRoot:      config.App.Root(),
+		AppName:      config.AppName(),
+		AppPort:      config.AppPort(),
+		AppStartOn:   servers.Current().AppStartOn,
+		StartTimeout: config.StartTimeout(),
 	}); err != nil {
 		panic(err)
 	}

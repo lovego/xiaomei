@@ -7,7 +7,7 @@ mysql:
 redis:
   default: redis://:@localhost:6379/0
 
-deployServers:
+servers:
   - addr: 127.0.0.1
     appAddr: 0.0.0.0
     tasks: setup-nginx setup-appserver

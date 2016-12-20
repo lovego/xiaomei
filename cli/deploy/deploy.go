@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"text/template"
 
-	"github.com/bughou-go/xiaomei/cli/cli"
 	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/config/servers"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/fatih/color"
 )
@@ -18,8 +18,8 @@ type DeployConfig struct {
 	GitBranch, GitTag, GitHost, GitAddr string
 }
 
-func Deploy(commit string) error {
-	if err := os.Chdir(config.Root()); err != nil {
+func Deploy(commit, serverFilter string) error {
+	if err := os.Chdir(config.App.Root()); err != nil {
 		return err
 	}
 	tag, err := setupDeployTag(commit)
@@ -28,7 +28,7 @@ func Deploy(commit string) error {
 	}
 
 	gitHost := getGitHost(config.GitAddr())
-	servers := cli.MatchedServers()
+	servers := servers.Matched(serverFilter)
 	for _, server := range servers {
 		deployToServer(config.DeployUser()+`@`+server.Addr, DeployConfig{
 			DeployPath: config.DeployPath(),

@@ -8,7 +8,7 @@ import (
 )
 
 func SetupHosts() {
-	cmd.Run(cmd.O{Panic: true}, path.Join(config.Root(), `config/shell/setup-hosts.sh`))
+	cmd.Run(cmd.O{Panic: true}, path.Join(config.App.Root(), `config/shell/setup-hosts.sh`))
 
 	fmt.Println(`setup hosts ok.`)
 }

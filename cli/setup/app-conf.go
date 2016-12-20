@@ -41,7 +41,7 @@ post-start script
 
   # wait until the AppPort has been bound.
   i=0;
-  while [ $i -lt {{.AppStartTimeout}} ]; do
+  while [ $i -lt {{.StartTimeout}} ]; do
     case $(status) in
     *' start/post-start, '* )
       lsof -itcp:{{.AppPort}} > /dev/null && {

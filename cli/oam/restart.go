@@ -5,14 +5,14 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bughou-go/xiaomei/cli/cli"
 	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/config/servers"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/fatih/color"
 )
 
-func Restart() {
-	addrs := cli.MatchedServerAddrs()
+func Restart(serverFilter string) {
+	addrs := servers.MatchedAddrs(serverFilter)
 	for _, addr := range addrs {
 		restartAppServer(config.DeployUser() + `@` + addr)
 	}

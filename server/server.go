@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/config/servers"
 	"github.com/bughou-go/xiaomei/server/renderer"
 	"github.com/bughou-go/xiaomei/server/renderer/funcs"
 	"github.com/bughou-go/xiaomei/server/session"
@@ -33,7 +34,8 @@ func NewRenderer() *renderer.Renderer {
 }
 
 func (s *Server) ListenAndServe() {
-	addr := config.CurrentAppServer().AppAddr + `:` + config.AppPort()
+	fmt.Println(config.Servers())
+	addr := servers.Current().AppAddr + `:` + config.AppPort()
 
 	fmt.Printf("%s listen at %s\n", time.Now().Format(`2006-01-02 15:04:05 -0700`), addr)
 

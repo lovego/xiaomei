@@ -16,12 +16,12 @@ type cronConfData struct {
 
 func SetupCron() {
 	tmpl := template.Must(template.ParseFiles(
-		path.Join(config.Root(), `deploy/cron.tmpl`),
+		path.Join(config.App.Root(), `deploy/cron.tmpl`),
 	))
 
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, cronConfData{
-		config.DeployUser(), config.Root(), config.Env(),
+		config.DeployUser(), config.App.Root(), config.Env(),
 	}); err != nil {
 		panic(err)
 	}

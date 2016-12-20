@@ -19,7 +19,7 @@ func Assets(args []string) {
 	}
 	paths := getFilesPath(args)
 
-	assetsPath := filepath.Join(config.Root(), `config/assets.yml`)
+	assetsPath := filepath.Join(config.App.Root(), `config/assets.yml`)
 	assets := getAssets(assetsPath)
 	changed := checkAndAddMd5(assets, paths)
 	if changed == 0 {
@@ -32,7 +32,7 @@ func Assets(args []string) {
 func getFilesPath(args []string) []string {
 	paths := []string{}
 	for _, arg := range args {
-		filePath := filepath.Join(config.Root(), `..`, arg)
+		filePath := filepath.Join(config.App.Root(), `..`, arg)
 		fi, err := os.Stat(filePath)
 		if err != nil {
 			panic(err)
@@ -89,7 +89,7 @@ func updateAssets(assetsPath string, assets map[string]string) {
 }
 
 func checkAndAddMd5(assets map[string]string, paths []string) (changed int) {
-	publicDir := filepath.Join(config.Root(), `public`)
+	publicDir := filepath.Join(config.App.Root(), `public`)
 	for _, filePath := range paths {
 		assetPath := strings.Replace(filePath, publicDir, ``, -1)
 		if ext := filepath.Ext(assetPath); ext != `.css` && ext != `.js` {

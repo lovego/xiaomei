@@ -19,10 +19,14 @@ func Run() {
 		Use:   `xiaomei `,
 		Short: `be small and beautiful.`,
 	}
+	flags := root.Flags()
+	s := flags.StringP(
+		`server`, `s`, ``, `match servers by Addr or Tasks.`,
+	)
 	root.AddCommand(develop.Cmds()...)
-	root.AddCommand(deploy.Cmds()...)
+	root.AddCommand(deploy.Cmds(s)...)
 	root.AddCommand(setup.Cmds()...)
-	root.AddCommand(oam.Cmds()...)
+	root.AddCommand(oam.Cmds(s)...)
 	root.AddCommand(db.Cmds()...)
 
 	root.Execute()

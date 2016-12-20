@@ -20,7 +20,7 @@ func SetupNginx() {
 
 func writeNginxConfig() {
 	var tmpl *template.Template
-	confFile := path.Join(config.Root(), `deploy/nginx.tmpl.conf`)
+	confFile := path.Join(config.App.Root(), `deploy/nginx.tmpl.conf`)
 	if utils.IsFile(confFile) {
 		tmpl = template.Must(template.ParseFiles(confFile))
 	} else {
@@ -37,20 +37,20 @@ func writeNginxConfig() {
 
 type nginxConfData struct {
 	DeployName, AppRoot, AppPort, Domain string
-	DeployServers                        []config.ServerConfig
+	Servers                              []config.Server
 	Nfs                                  bool
 }
 
 func getNginxConfData() nginxConfData {
 	fs, _ := cmd.Run(cmd.O{Panic: true, Output: true},
-		`stat`, `--file-system`, `--format`, `%T`, config.Root(),
+		`stat`, `--file-system`, `--format`, `%T`, config.App.Root(),
 	)
 	return nginxConfData{
-		DeployName:    config.DeployName(),
-		AppRoot:       config.Root(),
-		AppPort:       config.AppPort(),
-		Domain:        config.Domain(),
-		DeployServers: config.DeployServers(),
-		Nfs:           fs == `nfs`,
+		DeployName: config.DeployName(),
+		AppRoot:    config.App.Root(),
+		AppPort:    config.AppPort(),
+		Domain:     config.Domain(),
+		Servers:    config.Servers(),
+		Nfs:        fs == `nfs`,
 	}
 }

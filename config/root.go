@@ -3,31 +3,22 @@ package config
 import (
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"strings"
 
-	"github.com/bughou-go/xiaomei/config/fmwk"
 	"github.com/bughou-go/xiaomei/utils"
 )
 
-var rootDir string
-
-func Root() string {
-	if rootDir != `` {
-		return rootDir
-	}
+func detectRoot() string {
 	program, cwd := absProgramPath()
-	fmwkBin := filepath.Join(os.Getenv(`GOPATH`), `bin`, path.Base(fmwk.Path()))
-	if program == fmwkBin /* fmwkBin ... */ ||
+	if program == Fmwk.Bin() /* fmwk ... */ ||
 		strings.HasSuffix(program, `.test`) /* go test ... */ ||
 		strings.HasPrefix(program, `/tmp/`) /* go run ... */ {
-		rootDir = filepath.Join(detectRoot(cwd, `release/config/config.yml`), `release`)
+		return filepath.Join(detectDir(cwd, `release/config/config.yml`), `release`)
 	} else {
 		// binary under project/release/ dir
-		rootDir = detectRoot(filepath.Dir(program), `config/config.yml`)
+		return detectDir(filepath.Dir(program), `config/config.yml`)
 	}
-	return rootDir
 }
 
 func absProgramPath() (string, string) {
@@ -47,11 +38,11 @@ func absProgramPath() (string, string) {
 	return program, cwd
 }
 
-func detectRoot(dir, feature string) string {
+func detectDir(dir, feature string) string {
 	for ; dir != `/`; dir = filepath.Dir(dir) {
 		if utils.Exist(filepath.Join(dir, feature)) {
 			return dir
 		}
 	}
-	panic(`project not found.`)
+	return ``
 }
