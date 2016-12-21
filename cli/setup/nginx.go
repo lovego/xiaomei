@@ -50,7 +50,7 @@ func getNginxConfData() nginxConfData {
 		AppRoot:    config.App.Root(),
 		AppPort:    config.App.Port(),
 		Domain:     config.App.Domain(),
-		Servers:    config.Servers,
+		Servers:    config.Servers.All(),
 		Nfs:        fs == `nfs`,
 	}
 }

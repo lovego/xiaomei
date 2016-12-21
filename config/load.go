@@ -25,7 +25,7 @@ func Load() {
 		loader.App = &App.conf
 		loader.DB = &DB.conf
 		loader.Deploy = &Deploy.conf
-		loader.Servers = &Servers
+		loader.Servers = &Servers.conf
 		Parse(&loader)
 	}
 }

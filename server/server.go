@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 	"path"
 	"time"
@@ -34,8 +33,6 @@ func NewRenderer() *renderer.Renderer {
 
 func (s *Server) ListenAndServe() {
 	addr := config.Servers.Current().AppAddr + `:` + config.App.Port()
-
-	fmt.Printf("%s listen at %s\n", time.Now().Format(`2006-01-02 15:04:05 -0700`), addr)
 
 	if err := http.ListenAndServe(addr, http.HandlerFunc(
 		func(response http.ResponseWriter, request *http.Request) {

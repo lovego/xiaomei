@@ -1,15 +1,14 @@
 package setup
 
 import (
-	"github.com/bughou-go/xiaomei/config"
-	"net"
 	"regexp"
-	"strings"
+
+	"github.com/bughou-go/xiaomei/config"
 )
 
 func Setup(tasks string) {
 	if tasks == `` {
-		tasks = currentServerTasks()
+		tasks = config.Servers.CurrentTasks()
 	}
 	for _, task := range regexp.MustCompile(`[\w-]+`).FindAllString(tasks, -1) {
 		switch task {
@@ -27,21 +26,4 @@ func Setup(tasks string) {
 			panic(`unknow task: ` + task)
 		}
 	}
-}
-
-func currentServerTasks() (tasks string) {
-	ifcAddrs, err := net.InterfaceAddrs()
-	if err != nil {
-		panic(err)
-	}
-	for _, server := range config.Servers {
-	loop:
-		for _, ifcAddr := range ifcAddrs {
-			if strings.HasPrefix(ifcAddr.String(), server.Addr+`/`) {
-				tasks += ` ` + server.Tasks
-				break loop
-			}
-		}
-	}
-	return
 }

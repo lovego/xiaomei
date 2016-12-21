@@ -8,7 +8,7 @@ log_format {{ .DeployName }} '$time_iso8601 $host'
 	' $remote_addr "$http_referer" "$http_user_agent"';
 
 upstream {{ .DeployName }} {
-{{- range  .DeployServers -}}
+{{- range  .Servers -}}
   {{- if .AppAddr }}
     server {{ .AppAddr }}:{{ $.AppPort }};
   {{- end -}}

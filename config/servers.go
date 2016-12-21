@@ -5,7 +5,11 @@ import (
 	"strings"
 )
 
-var Servers ServersConf
+var Servers serverVar
+
+type serverVar struct {
+	conf ServersConf
+}
 
 type ServersConf []Server
 
@@ -16,12 +20,17 @@ type Server struct {
 	AppStartOn string `yaml:"appStartOn"`
 }
 
-func (s ServersConf) Current() Server {
+func (s *serverVar) All() []Server {
+	Load()
+	return s.conf
+}
+
+func (s *serverVar) Current() Server {
 	ifcAddrs, err := net.InterfaceAddrs()
 	if err != nil {
 		panic(err)
 	}
-	for _, server := range s {
+	for _, server := range s.All() {
 		if server.AppAddr != `` {
 			for _, ifcAddr := range ifcAddrs {
 				if strings.HasPrefix(ifcAddr.String(), server.Addr+`/`) {
@@ -33,9 +42,27 @@ func (s ServersConf) Current() Server {
 	return Server{}
 }
 
-func (s ServersConf) Matched(feature string) []Server {
+func (s *serverVar) CurrentTasks() string {
+	tasks := []string{}
+	ifcAddrs, err := net.InterfaceAddrs()
+	if err != nil {
+		panic(err)
+	}
+	for _, server := range s.All() {
+	loop:
+		for _, ifcAddr := range ifcAddrs {
+			if strings.HasPrefix(ifcAddr.String(), server.Addr+`/`) {
+				tasks = append(tasks, server.Tasks)
+				break loop
+			}
+		}
+	}
+	return strings.Join(tasks, ` `)
+}
+
+func (s serverVar) Matched(feature string) []Server {
 	matched := []Server{}
-	for _, server := range s {
+	for _, server := range s.All() {
 		if strings.Contains(server.Tasks, feature) ||
 			strings.Contains(server.Addr, feature) {
 			matched = append(matched, server)
@@ -44,9 +71,9 @@ func (s ServersConf) Matched(feature string) []Server {
 	return matched
 }
 
-func (s ServersConf) MatchedAddrs(feature string) []string {
+func (s serverVar) MatchedAddrs(feature string) []string {
 	addrs := []string{}
-	for _, server := range s {
+	for _, server := range s.All() {
 		if strings.Contains(server.Tasks, feature) ||
 			strings.Contains(server.Addr, feature) {
 			if !contains(addrs, server.Addr) {

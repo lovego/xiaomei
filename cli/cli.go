@@ -16,7 +16,7 @@ func Run() {
 	cobra.EnableCommandSorting = false
 
 	root := cobra.Command{
-		Use:   `xiaomei `,
+		Use:   `xiaomei`,
 		Short: `be small and beautiful.`,
 	}
 	flags := root.Flags()
