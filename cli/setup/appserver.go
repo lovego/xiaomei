@@ -32,20 +32,25 @@ func SetupAppServer() {
 }
 
 type upstartConfData struct {
-	UserName, AppRoot, AppName, AppPort, AppStartOn string
-	StartTimeout                                    uint16
+	UserName, AppRoot, AppName, AppAddrPort, AppStartOn string
+	StartTimeout                                        uint16
 }
 
 func writeUpstartConfig() {
 	tmpl := template.Must(template.New(``).Parse(upstartConfig))
 
 	var buf bytes.Buffer
+	server := config.Servers.Current()
+	appAddr := server.AppAddr
+	if appAddr == `` {
+		appAddr = `0.0.0.0`
+	}
 	if err := tmpl.Execute(&buf, upstartConfData{
 		UserName:     config.Deploy.User(),
 		AppRoot:      config.App.Root(),
 		AppName:      config.App.Name(),
-		AppPort:      config.App.Port(),
-		AppStartOn:   config.Servers.Current().AppStartOn,
+		AppAddrPort:  appAddr + `:` + config.App.Port(),
+		AppStartOn:   server.AppStartOn,
 		StartTimeout: config.App.StartTimeout(),
 	}); err != nil {
 		panic(err)

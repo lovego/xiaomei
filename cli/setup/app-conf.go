@@ -44,8 +44,8 @@ post-start script
   while [ $i -lt {{.StartTimeout}} ]; do
     case $(status) in
     *' start/post-start, '* )
-      lsof -itcp:{{.AppPort}} > /dev/null && {
-        echo $(date -Iseconds) 'started.'; exit
+      lsof -itcp@{{.AppAddrPort}} > /dev/null && {
+				echo $(date -Iseconds) 'started. ({{.AppAddrPort}})'; exit
       } ;;
     * )
       echo $(date -Iseconds) 'starting failed.'; exit ;;
