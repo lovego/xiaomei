@@ -10,8 +10,18 @@ import (
 var App appVar
 
 type appVar struct {
-	root string
-	conf appConf
+	root         string
+	conf         appConf
+	startTimeout struct {
+		setted bool
+		time.Duration
+	}
+	timeZone *time.Location
+	mailer   struct {
+		sync.Mutex
+		setted bool
+		*mailer.Mailer
+	}
 }
 
 type appConf struct {
@@ -20,7 +30,7 @@ type appConf struct {
 	Port         string `yaml:"port"`
 	Domain       string `yaml:"domain"`
 	Secret       string `yaml:"secret"`
-	StartTimeout uint16 `yaml:"startTimeout"`
+	StartTimeout string `yaml:"startTimeout"`
 
 	TimeZone TimeZoneConf `yaml:"timeZone"`
 	Mailer   MailerConf   `yaml:"mailer"`
@@ -72,44 +82,39 @@ func (a *appVar) Secret() string {
 	return a.conf.Secret
 }
 
-func (a *appVar) StartTimeout() uint16 {
-	Load()
-	return a.conf.StartTimeout
-}
-
-var timeZone struct {
-	sync.Mutex
-	*time.Location
+func (a *appVar) StartTimeout() time.Duration {
+	if !a.startTimeout.setted {
+		Load()
+		if d, err := time.ParseDuration(a.conf.StartTimeout); err != nil {
+			panic(err)
+		} else {
+			a.startTimeout.Duration = d
+			a.startTimeout.setted = true
+		}
+	}
+	return a.startTimeout.Duration
 }
 
 func (a *appVar) TimeZone() *time.Location {
-	timeZone.Lock()
-	defer timeZone.Unlock()
-	if timeZone.Location == nil {
+	if a.timeZone == nil {
 		Load()
-		timeZone.Location = time.FixedZone(a.conf.TimeZone.Name, a.conf.TimeZone.Offset)
+		a.timeZone = time.FixedZone(a.conf.TimeZone.Name, a.conf.TimeZone.Offset)
 	}
-	return timeZone.Location
-}
-
-var _mailer struct {
-	sync.Mutex
-	setted bool
-	*mailer.Mailer
+	return a.timeZone
 }
 
 func (a *appVar) Mailer() *mailer.Mailer {
-	_mailer.Lock()
-	defer _mailer.Unlock()
-	if !_mailer.setted {
+	a.mailer.Lock()
+	defer a.mailer.Unlock()
+	if !a.mailer.setted {
 		Load()
 		m := a.conf.Mailer
 		if m.Host != `` && m.Port != `` && m.Sender != `` {
-			_mailer.Mailer = mailer.New(m.Host, m.Port, m.Sender, m.Passwd)
+			a.mailer.Mailer = mailer.New(m.Host, m.Port, m.Sender, m.Passwd)
 		}
-		_mailer.setted = true
+		a.mailer.setted = true
 	}
-	return _mailer.Mailer
+	return a.mailer.Mailer
 }
 
 func (a *appVar) Alarm(title, body string) {
