@@ -15,6 +15,7 @@ type dbVar struct {
 type dbConf struct {
 	Mysql map[string]string `yaml:"mysql"`
 	Redis map[string]string `yaml:"redis"`
+	Mongo map[string]string `yaml:"mongo"`
 }
 
 func (db *dbVar) Redis(name string) string {
@@ -29,6 +30,13 @@ func (db *dbVar) Mysql(name string) string {
 		name = `default`
 	}
 	return db.conf.Mysql[name]
+}
+
+func (db *dbVar) Mongo(name string) string {
+	if name == `` {
+		name = "default"
+	}
+	return db.conf.Mongo[name]
 }
 
 type MysqlConf struct {

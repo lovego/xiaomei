@@ -26,5 +26,25 @@ func Cmds() []*cobra.Command {
 				Mysqldump(name)
 			},
 		},
+		{
+			Use: `mongo`,
+			Run: func(c *cobra.Command, args []string) {
+				var name string
+				if len(args) > 0 {
+					name = args[0]
+				}
+				Mongo(name)
+			},
+		},
+		{
+			Use: `redis`,
+			Run: func(c *cobra.Command, args []string) {
+				var name string
+				if len(args) > 0 {
+					name = args[0]
+				}
+				Redis(name)
+			},
+		},
 	}
 }
