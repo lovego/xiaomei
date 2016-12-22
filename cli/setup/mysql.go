@@ -7,12 +7,12 @@ import (
 	"path"
 
 	"github.com/bughou-go/xiaomei/config"
-	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/utils/dsn"
 )
 
 func SetupMysql() {
-	options := utils.MysqlOptions(config.DB.Mysql(``))
+	options := dsn.MysqlDSN(config.DB.Mysql(``)).Options()
 	createDatabaseAndTables(options)
 
 	fmt.Println(`setup mysql ok.`)
