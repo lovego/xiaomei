@@ -1,10 +1,6 @@
 package config
 
-import (
-	"fmt"
-	"os"
-	"regexp"
-)
+import ()
 
 var DB dbVar
 
@@ -40,28 +36,4 @@ func (db *dbVar) Mongo(name string) string {
 		name = "default"
 	}
 	return db.conf.Mongo[name]
-}
-
-type MysqlConf struct {
-	Host, Port, User, Passwd, Db string
-}
-
-func (db *dbVar) MysqlConfig(name string) MysqlConf {
-	dsn := db.Mysql(name)
-	if dsn == `` {
-		fmt.Println(`no mysql config for: `, name)
-		os.Exit(1)
-	}
-	m := regexp.MustCompile(
-		`^(\w+):(\w+)@\w+\(([^()]+):(\d+)\)/(\w+)$`,
-	).FindStringSubmatch(dsn)
-	if len(m) == 0 {
-		panic(`mysql addr match faild.`)
-	}
-	return MysqlConf{m[3], m[4], m[1], m[2], m[5]}
-}
-
-func (db *dbVar) MysqlOptions(name string) []string {
-	c := db.MysqlConfig(name)
-	return []string{`-h` + c.Host, `-u` + c.User, `-p` + c.Passwd, `-P` + c.Port, c.Db}
 }
