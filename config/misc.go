@@ -9,6 +9,8 @@ import (
 	"github.com/bughou-go/xiaomei/utils"
 )
 
+const ISO8601 = `2006-01-02T15:04:05Z0700`
+
 func Debug(name string) bool {
 	matched, _ := regexp.MatchString(`\b`+name+`\b`, os.Getenv(`debug`))
 	return matched

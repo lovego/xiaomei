@@ -81,6 +81,6 @@ func parseInt(str string) int {
 }
 
 func exit(msg string) {
-	println(time.Now().Format(time.RFC3339), msg)
+	println(time.Now().Format(config.ISO8601), msg)
 	os.Exit(0)
 }
