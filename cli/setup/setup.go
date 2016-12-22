@@ -3,6 +3,8 @@ package setup
 import (
 	"regexp"
 
+	"github.com/bughou-go/xiaomei/cli/setup/appserver"
+	"github.com/bughou-go/xiaomei/cli/setup/nginx"
 	"github.com/bughou-go/xiaomei/config"
 )
 
@@ -15,13 +17,13 @@ func Setup(tasks string) {
 		case `setup-hosts`:
 			SetupHosts()
 		case `setup-mysql`:
-			// SetupMysql()
-		case `setup-appserver`:
-			SetupAppServer()
+			SetupMysql()
 		case `setup-cron`:
 			SetupCron()
 		case `setup-nginx`:
-			SetupNginx()
+			nginx.Setup()
+		case `setup-appserver`:
+			appserver.Setup()
 		default:
 			panic(`unknow task: ` + task)
 		}
