@@ -7,6 +7,7 @@ import (
 	"text/template"
 
 	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
@@ -15,9 +16,12 @@ type cronConfData struct {
 }
 
 func SetupCron() {
-	tmpl := template.Must(template.ParseFiles(
-		path.Join(config.App.Root(), `deploy/cron.tmpl`),
-	))
+	filePath := path.Join(config.App.Root(), `deploy/cron.tmpl`)
+	if !utils.IsFile(filePath) {
+		fmt.Println(`no such file: ` + filePath)
+		return
+	}
+	tmpl := template.Must(template.ParseFiles(filePath))
 
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, cronConfData{

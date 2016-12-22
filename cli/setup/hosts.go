@@ -3,12 +3,18 @@ package setup
 import (
 	"fmt"
 	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 	"path"
 )
 
 func SetupHosts() {
-	cmd.Run(cmd.O{Panic: true}, path.Join(config.App.Root(), `config/shell/setup-hosts.sh`))
+	filePath := path.Join(config.App.Root(), `config/shell/setup-hosts.sh`)
+	if !utils.IsFile(filePath) {
+		fmt.Println(`no such file: ` + filePath)
+		return
+	}
+	cmd.Run(cmd.O{Panic: true}, filePath)
 
 	fmt.Println(`setup hosts ok.`)
 }
