@@ -19,6 +19,7 @@ type dbConf struct {
 }
 
 func (db *dbVar) Redis(name string) string {
+	Load()
 	if name == `` {
 		name = `default`
 	}
@@ -26,6 +27,7 @@ func (db *dbVar) Redis(name string) string {
 }
 
 func (db *dbVar) Mysql(name string) string {
+	Load()
 	if name == `` {
 		name = `default`
 	}
@@ -33,6 +35,7 @@ func (db *dbVar) Mysql(name string) string {
 }
 
 func (db *dbVar) Mongo(name string) string {
+	Load()
 	if name == `` {
 		name = "default"
 	}
