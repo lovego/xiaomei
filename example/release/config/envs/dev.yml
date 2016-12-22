@@ -8,6 +8,8 @@ db:
     default: root:root@tcp(127.0.0.1:3306)/example
   redis:
     default: redis://:@localhost:6379/0
+  mongo:
+    default: mongodb://10.249.6.30/members
 
 servers:
   - addr: 127.0.0.1
