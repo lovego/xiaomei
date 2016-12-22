@@ -1,6 +1,6 @@
-package setup
+package nginx
 
-const nginxConfig = `# vim: set ft=nginx:
+const defaultConfig = `# vim: set ft=nginx:
 
 log_format {{ .DeployName }} '$time_iso8601 $host'
 	' $request_method $request_uri $content_length $remote_addr'

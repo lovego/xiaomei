@@ -1,6 +1,8 @@
 package setup
 
 import (
+	"github.com/bughou-go/xiaomei/cli/setup/appserver"
+	"github.com/bughou-go/xiaomei/cli/setup/nginx"
 	"github.com/spf13/cobra"
 )
 
@@ -21,14 +23,21 @@ func Cmds() []*cobra.Command {
 			Use:   `setup-appserver`,
 			Short: `setup appserver.`,
 			Run: func(c *cobra.Command, args []string) {
-				SetupAppServer()
+				appserver.Setup()
+			},
+		},
+		{
+			Use:   `wait-appserver`,
+			Short: `wait appserver until it's started.`,
+			Run: func(c *cobra.Command, args []string) {
+				appserver.Wait()
 			},
 		},
 		{
 			Use:   `setup-nginx`,
 			Short: `setup nginx.`,
 			Run: func(c *cobra.Command, args []string) {
-				SetupNginx()
+				nginx.Setup()
 			},
 		},
 		{

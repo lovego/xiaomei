@@ -1,4 +1,4 @@
-package setup
+package nginx
 
 import (
 	"bytes"
@@ -11,41 +11,41 @@ import (
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
-func SetupNginx() {
-	writeNginxConfig()
+func Setup() {
+	writeConfig()
 
 	cmd.Run(cmd.O{Panic: true}, `sudo`, `nginx`, `-t`)
 	cmd.Run(cmd.O{Panic: true}, `sudo`, `service`, `nginx`, `restart`)
 }
 
-func writeNginxConfig() {
+func writeConfig() {
 	var tmpl *template.Template
 	confFile := path.Join(config.App.Root(), `deploy/nginx.tmpl.conf`)
 	if utils.IsFile(confFile) {
 		tmpl = template.Must(template.ParseFiles(confFile))
 	} else {
-		tmpl = template.Must(template.New(``).Parse(nginxConfig))
+		tmpl = template.Must(template.New(``).Parse(defaultConfig))
 	}
 
 	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, getNginxConfData()); err != nil {
+	if err := tmpl.Execute(&buf, getConfData()); err != nil {
 		panic(err)
 	}
 
 	cmd.SudoWriteFile(path.Join(`/etc/nginx/sites-enabled/`, config.Deploy.Name()), &buf)
 }
 
-type nginxConfData struct {
+type confData struct {
 	DeployName, AppRoot, AppPort, Domain string
 	Servers                              []config.Server
 	Nfs                                  bool
 }
 
-func getNginxConfData() nginxConfData {
+func getConfData() confData {
 	fs, _ := cmd.Run(cmd.O{Panic: true, Output: true},
 		`stat`, `--file-system`, `--format`, `%T`, config.App.Root(),
 	)
-	return nginxConfData{
+	return confData{
 		DeployName: config.Deploy.Name(),
 		AppRoot:    config.App.Root(),
 		AppPort:    config.App.Port(),
