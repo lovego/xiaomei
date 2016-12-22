@@ -1,4 +1,4 @@
-package setup
+package appserver
 
 import (
 	"bytes"
@@ -12,7 +12,7 @@ import (
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
-func SetupAppServer() {
+func Setup() {
 	writeUpstartConfig()
 
 	// stop current
@@ -32,26 +32,19 @@ func SetupAppServer() {
 }
 
 type upstartConfData struct {
-	UserName, AppRoot, AppName, AppAddrPort, AppStartOn string
-	StartTimeout                                        uint16
+	UserName, AppRoot, AppName, AppStartOn string
 }
 
 func writeUpstartConfig() {
 	tmpl := template.Must(template.New(``).Parse(upstartConfig))
 
-	var buf bytes.Buffer
 	server := config.Servers.Current()
-	appAddr := server.AppAddr
-	if appAddr == `` {
-		appAddr = `0.0.0.0`
-	}
+	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, upstartConfData{
-		UserName:     config.Deploy.User(),
-		AppRoot:      config.App.Root(),
-		AppName:      config.App.Name(),
-		AppAddrPort:  appAddr + `:` + config.App.Port(),
-		AppStartOn:   server.AppStartOn,
-		StartTimeout: config.App.StartTimeout(),
+		UserName:   config.Deploy.User(),
+		AppRoot:    config.App.Root(),
+		AppName:    config.App.Name(),
+		AppStartOn: server.AppStartOn,
 	}); err != nil {
 		panic(err)
 	}
