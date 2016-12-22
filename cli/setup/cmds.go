@@ -34,6 +34,13 @@ func Cmds() []*cobra.Command {
 			},
 		},
 		{
+			Use:   `setup-mysql`,
+			Short: `setup mysql.`,
+			Run: func(c *cobra.Command, args []string) {
+				SetupMysql()
+			},
+		},
+		{
 			Use:   `setup-nginx`,
 			Short: `setup nginx.`,
 			Run: func(c *cobra.Command, args []string) {
