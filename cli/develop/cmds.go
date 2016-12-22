@@ -40,7 +40,11 @@ func Cmds() []*cobra.Command {
 			Use:   `spec`,
 			Short: `check coding specification.`,
 			RunE: func(c *cobra.Command, args []string) error {
-				return Spec(args[0])
+				arg := ``
+				if len(args) > 0 {
+					arg = args[0]
+				}
+				return Spec(arg)
 			},
 		},
 		{
