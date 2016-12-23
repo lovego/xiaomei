@@ -42,7 +42,7 @@ func getLogLine(req *Request, res *Response, t time.Time, err interface{}) []byt
   $session $remote_addr $http_referer $http_user_agent, $error, $stack
 */
 func getLogFields(req *Request, res *Response, t time.Time, err interface{}) []string {
-	slice := []string{t.Format(`2006-01-02T15:04:05-0700`), req.Host,
+	slice := []string{t.Format(config.ISO8601), req.Host,
 		req.Method, req.URL.RequestURI(), strconv.FormatInt(req.ContentLength, 10), req.Proto,
 		strconv.FormatInt(res.Status(), 10), strconv.FormatInt(res.Size(), 10), time.Since(t).String(),
 		fmt.Sprint(req.Session), req.ClientAddr(), req.Referer(), req.UserAgent(),

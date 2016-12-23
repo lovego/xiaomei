@@ -55,5 +55,12 @@ func Cmds() []*cobra.Command {
 				return nil
 			},
 		},
+		{
+			Use:   `godoc`,
+			Short: `start godoc service.`,
+			RunE: func(c *cobra.Command, args []string) error {
+				return Godoc()
+			},
+		},
 	}
 }
