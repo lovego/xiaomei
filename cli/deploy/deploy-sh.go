@@ -1,6 +1,6 @@
 package deploy
 
-const deployShell = `# vim: set ft=sh:
+const updateShell = `# vim: set ft=sh:
 main () {
   clone_code_if_should
 
@@ -8,12 +8,19 @@ main () {
 
   reset_code_to_target_point
 
-  ln -sfT envs/{{.Env}}.json config/config.json || exit 1
-  ./bin/tools setup '{{ .Tasks }}' || exit 1
-
-  clear_local_obsolete_deploy_tags
+  mkdir -p bins
 }
 
+clone_code_if_should() {
+  test -d {{.DeployPath}} ||
+    sudo mkdir -p {{.DeployPath}} &&
+    sudo chown -R $(id -un):$(id -gn) {{.DeployPath}} || exit 1
+
+  if test ! -d {{.DeployPath}}/.git; then
+    ssh-keygen -F {{.GitHost}} > /dev/null || ssh-keyscan -H {{.GitHost}} >> ~/.ssh/known_hosts
+    git clone --depth=1 {{.GitAddr}} {{.DeployPath}} || exit 1
+  fi
+}
 
 reset_code_to_target_point() {
   git fetch origin -u --tags {{.GitBranch}}:{{.GitBranch}} || exit 1
@@ -26,15 +33,18 @@ reset_code_to_target_point() {
   fi
 }
 
-clone_code_if_should() {
-  test -d {{.DeployPath}} ||
-    sudo mkdir -p {{.DeployPath}} &&
-    sudo chown -R $(id -un):$(id -gn) {{.DeployPath}} || exit 1
+main
+`
 
-  if test ! -d {{.DeployPath}}/.git; then
-    ssh-keygen -F {{.GitHost}} > /dev/null || ssh-keyscan -H {{.GitHost}} >> ~/.ssh/known_hosts
-    git clone --depth=1 {{.GitAddr}} {{.DeployPath}} || exit 1
-  fi
+const deployShell = `# vim: set ft=sh:
+main () {
+  cd {{.DeployPath}}/release || exit 1
+
+  ln -sfT envs/{{.Env}}.yml config/env.yml || exit 1
+  ln -sfT bins/{{ .GitTag }} {{ .AppName }} || exit 1
+  ./{{ .AppName }} setup '{{ .Tasks }}' || exit 1
+
+  clear_local_obsolete_deploy_tags
 }
 
 clear_local_obsolete_deploy_tags() {

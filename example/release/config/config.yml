@@ -1,7 +1,7 @@
 app:
   name: example
   port: 3000
-  startTimeout: 10
+  startTimeout: 10s
 
   timeZone:
     name: China
@@ -16,6 +16,6 @@ app:
 deploy:
   user: ubuntu
   root: /apps
-  gitAddr: git@github.com:/replace-me-with-git-addr.git
-  gitBranch: 
+  gitAddr:
+  gitBranch:
 
