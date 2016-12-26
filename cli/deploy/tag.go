@@ -65,12 +65,14 @@ func checkDeployCommit(commit, branch string) error {
 	return nil
 }
 
-var deployTagTime = regexp.MustCompile(`^\d{4}-\d{4}$`)
+const tagTimeLayout = `0102-150405`
+
+var deployTagTime = regexp.MustCompile(`^\d{4}-\d{6}$`)
 
 func isDeployTag(tag string) bool {
 	env := config.App.Env()
 	l := len(env)
-	return len(tag) == l+9 && tag[:l] == env && deployTagTime.MatchString(tag[l:])
+	return len(tag) == l+len(tagTimeLayout) && tag[:l] == env && deployTagTime.MatchString(tag[l:])
 }
 
 // 已有的deployTag
@@ -92,7 +94,7 @@ func existDeployTag(commit string) (string, error) {
 
 // 新建deployTag
 func newDeployTag(commit string) (string, error) {
-	tag := config.App.Env() + time.Now().Format(`0102-1504`)
+	tag := config.App.Env() + time.Now().Format(tagTimeLayout)
 	if _, err := cmd.Run(cmd.O{}, `git`, `tag`, tag, commit); err != nil {
 		return ``, err
 	}

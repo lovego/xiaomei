@@ -2,8 +2,10 @@ package deploy
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
+	"path"
 	"regexp"
 	"strings"
 	"text/template"
@@ -13,44 +15,85 @@ import (
 	"github.com/fatih/color"
 )
 
+type UpdateConfig struct {
+	AppName, DeployPath, GitBranch, GitTag, GitHost, GitAddr string
+}
+
 type DeployConfig struct {
-	DeployPath, Env, Tasks              string
-	GitBranch, GitTag, GitHost, GitAddr string
+	AppName, DeployPath, Env, Tasks, GitTag string
 }
 
 func Deploy(commit, serverFilter string) error {
 	if err := os.Chdir(config.App.Root()); err != nil {
 		return err
 	}
+	isRollback := commit != ``
 	tag, err := setupDeployTag(commit)
 	if err != nil {
 		return err
 	}
 
-	gitHost := getGitHost(config.Deploy.GitAddr())
+	gitAddr := config.Deploy.GitAddr()
+	if gitAddr == `` {
+		return errors.New(`no such git address`)
+	}
+	gitHost := getGitHost(gitAddr)
 	servers := config.Servers.Matched(serverFilter)
+
+	var updated = make(map[string]bool)
 	for _, server := range servers {
-		deployToServer(server.SshAddr(), DeployConfig{
+		sshAddr := server.SshAddr()
+		if !updated[server.Addr] {
+			updateCodeAndBin(sshAddr, isRollback, UpdateConfig{
+				AppName:    config.App.Name(),
+				DeployPath: config.Deploy.Path(),
+				GitBranch:  config.Deploy.GitBranch(),
+				GitTag:     tag,
+				GitHost:    gitHost,
+				GitAddr:    gitAddr,
+			})
+		}
+		setupServer(sshAddr, DeployConfig{
+			AppName:    config.App.Name(),
 			DeployPath: config.Deploy.Path(),
 			Env:        config.App.Env(),
 			Tasks:      strings.Join(server.Tasks, ` `),
-			GitBranch:  config.Deploy.GitBranch(),
 			GitTag:     tag,
-			GitHost:    gitHost,
-			GitAddr:    config.Deploy.GitAddr(),
 		})
+		updated[server.Addr] = true
 	}
 	fmt.Printf("deployed %d servers!\n", len(servers))
 	return nil
 }
 
+var updateTmpl *template.Template
+
+func updateCodeAndBin(sshAddr string, isRollback bool, updateConf UpdateConfig) {
+	color.Cyan(sshAddr)
+
+	if updateTmpl == nil {
+		updateTmpl = template.Must(template.New(``).Parse(updateCodeShell))
+	}
+
+	var buf bytes.Buffer
+	err := updateTmpl.Execute(&buf, updateConf)
+	if err != nil {
+		panic(err)
+	}
+	cmd.Run(cmd.O{Panic: true}, `ssh`, `-t`, sshAddr, buf.String())
+	if !isRollback {
+		cmd.Run(cmd.O{Panic: true}, `scp`, path.Join(config.App.Root(), updateConf.AppName),
+			sshAddr+`:`+path.Join(updateConf.DeployPath, `release/bins`, updateConf.GitTag))
+	}
+}
+
 var deployTmpl *template.Template
 
-func deployToServer(userAddr string, deployConf DeployConfig) {
-	color.Cyan(userAddr)
+func setupServer(sshAddr string, deployConf DeployConfig) {
+	color.Cyan(sshAddr)
 
 	if deployTmpl == nil {
-		deployTmpl = template.Must(template.New(``).Parse(deployShell))
+		deployTmpl = template.Must(template.New(``).Parse(setupShell))
 	}
 
 	var buf bytes.Buffer
@@ -58,7 +101,7 @@ func deployToServer(userAddr string, deployConf DeployConfig) {
 	if err != nil {
 		panic(err)
 	}
-	cmd.Run(cmd.O{Panic: true}, `ssh`, `-t`, userAddr, buf.String())
+	cmd.Run(cmd.O{Panic: true}, `ssh`, `-t`, sshAddr, buf.String())
 }
 
 func getGitHost(gitAddr string) string {

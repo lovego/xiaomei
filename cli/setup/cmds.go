@@ -24,8 +24,9 @@ func Cmds() []*cobra.Command {
 			},
 		},
 		{
-			Use:   `wait-appserver`,
-			Short: `wait appserver until it's started.`,
+			Use:    `wait-appserver`,
+			Short:  `wait appserver until it's started.`,
+			Hidden: true,
 			Run: func(c *cobra.Command, args []string) {
 				appserver.Wait()
 			},
