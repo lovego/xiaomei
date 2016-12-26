@@ -2,7 +2,6 @@ package deploy
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -33,33 +32,15 @@ func Deploy(commit, serverFilter string) error {
 		return err
 	}
 
-	gitAddr := config.Deploy.GitAddr()
-	if gitAddr == `` {
-		return errors.New(`no such git address`)
-	}
-	gitHost := getGitHost(gitAddr)
 	servers := config.Servers.Matched(serverFilter)
 
 	var updated = make(map[string]bool)
 	for _, server := range servers {
 		sshAddr := server.SshAddr()
 		if !updated[server.Addr] {
-			updateCodeAndBin(sshAddr, isRollback, UpdateConfig{
-				AppName:    config.App.Name(),
-				DeployPath: config.Deploy.Path(),
-				GitBranch:  config.Deploy.GitBranch(),
-				GitTag:     tag,
-				GitHost:    gitHost,
-				GitAddr:    gitAddr,
-			})
+			updateCodeAndBin(sshAddr, tag, isRollback)
 		}
-		setupServer(sshAddr, DeployConfig{
-			AppName:    config.App.Name(),
-			DeployPath: config.Deploy.Path(),
-			Env:        config.App.Env(),
-			Tasks:      strings.Join(server.Tasks, ` `),
-			GitTag:     tag,
-		})
+		setupServer(sshAddr, tag, server.Tasks)
 		updated[server.Addr] = true
 	}
 	fmt.Printf("deployed %d servers!\n", len(servers))
@@ -68,7 +49,20 @@ func Deploy(commit, serverFilter string) error {
 
 var updateTmpl *template.Template
 
-func updateCodeAndBin(sshAddr string, isRollback bool, updateConf UpdateConfig) {
+func updateCodeAndBin(sshAddr, tag string, isRollback bool) {
+	gitAddr := config.Deploy.GitAddr()
+	if gitAddr == `` {
+		panic(`no such git address`)
+	}
+	gitHost := getGitHost(gitAddr)
+	updateConf := UpdateConfig{
+		AppName:    config.App.Name(),
+		DeployPath: config.Deploy.Path(),
+		GitBranch:  config.Deploy.GitBranch(),
+		GitTag:     tag,
+		GitHost:    gitHost,
+		GitAddr:    gitAddr,
+	}
 	color.Cyan(sshAddr)
 
 	if updateTmpl == nil {
@@ -83,13 +77,20 @@ func updateCodeAndBin(sshAddr string, isRollback bool, updateConf UpdateConfig) 
 	cmd.Run(cmd.O{Panic: true}, `ssh`, `-t`, sshAddr, buf.String())
 	if !isRollback {
 		cmd.Run(cmd.O{Panic: true}, `scp`, path.Join(config.App.Root(), updateConf.AppName),
-			sshAddr+`:`+path.Join(updateConf.DeployPath, `release/bins`, updateConf.GitTag))
+			sshAddr+`:`+path.Join(updateConf.DeployPath, `release/bins`, tag))
 	}
 }
 
 var deployTmpl *template.Template
 
-func setupServer(sshAddr string, deployConf DeployConfig) {
+func setupServer(sshAddr, tag string, tasks []string) {
+	deployConf := DeployConfig{
+		AppName:    config.App.Name(),
+		DeployPath: config.Deploy.Path(),
+		Env:        config.App.Env(),
+		Tasks:      strings.Join(tasks, ` `),
+		GitTag:     tag,
+	}
 	color.Cyan(sshAddr)
 
 	if deployTmpl == nil {
