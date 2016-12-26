@@ -2,20 +2,25 @@ package develop
 
 import (
 	"errors"
+	"os"
 	"path/filepath"
 
+	"github.com/bughou-go/xiaomei/cli/setup/appserver"
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
-func Run() error {
+func Run() {
 	if err := build(); err != nil {
-		return err
+		return
 	}
-	if cmd.Ok(cmd.O{}, filepath.Join(config.App.Root(), config.App.Name())) {
-		return nil
+	config.Log(`starting.`)
+	app, err := cmd.Start(cmd.O{}, filepath.Join(config.App.Root(), config.App.Name()))
+	if err != nil {
+		return
 	}
-	return errors.New(`run failed.`)
+	appserver.WaitPort(os.Getpid(), app.Process.Pid)
+	app.Wait()
 }
 
 func build() error {

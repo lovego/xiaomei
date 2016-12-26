@@ -1,7 +1,6 @@
 package appserver
 
 import (
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -14,24 +13,35 @@ import (
 
 func Wait() {
 	ppidStr := getPpid()
+	if ppidStr == `` {
+		return
+	}
 	pidStr := getPid(ppidStr)
-	ppid := parseInt(ppidStr)
-	pid := parseInt(pidStr)
+	if pidStr == `` {
+		return
+	}
 
-	// wait until the AppPort has been bound.
+	WaitPort(parseInt(ppidStr), parseInt(pidStr))
+}
+
+// wait until the AppPort has been bound.
+func WaitPort(ppid, pid int) {
+	pidStr := strconv.Itoa(pid)
 	for w := time.Duration(0); w <= config.App.StartTimeout(); w += time.Second {
 		if cmd.Ok(cmd.O{NoStdout: true, NoStderr: true},
 			`lsof`, `-ap`, pidStr, `-itcp:`+config.App.Port(),
 		) {
-			exit(`started. (` + config.Servers.CurrentAppServer().AppAddr() + `)`)
+			config.Log(`started. (` + config.Servers.CurrentAppServer().AppAddr() + `)`)
+			return
 		}
 		if !processAlive(ppid) || !processAlive(pid) {
-			exit(`starting failed.`)
+			config.Log(`starting failed.`)
+			return
 		}
-		time.Sleep(time.Second)
+		time.Sleep(100 * time.Millisecond)
 	}
 	syscall.Kill(-ppid, syscall.SIGTERM) // kill process group
-	exit(`starting timeout.`)
+	config.Log(`starting timeout.`)
 }
 
 func processAlive(pid int) bool {
@@ -46,12 +56,14 @@ func getPpid() string {
 	status, _ := cmd.Run(cmd.O{Output: true, Panic: true}, `status`, deployName)
 	prefix := deployName + ` start/post-start, process `
 	if !strings.HasPrefix(status, prefix) {
-		exit(`unexpected status: ` + status + `.`)
+		config.Log(`unexpected status: ` + status + `.`)
+		return ``
 	}
 	ppidStr := status[len(prefix):]
 	ppidStr = prefixDigits.FindString(ppidStr)
 	if ppidStr == `` {
-		exit(`unexpected status: ` + status + `.`)
+		config.Log(`unexpected status: ` + status + `.`)
+		return ``
 	}
 	return ppidStr
 }
@@ -68,7 +80,7 @@ func getPid(ppid string) string {
 		}
 		time.Sleep(100 * time.Millisecond)
 	}
-	exit(`find appserver pid timeout.`)
+	config.Log(`find appserver pid timeout.`)
 	return ``
 }
 
@@ -78,9 +90,4 @@ func parseInt(str string) int {
 	} else {
 		return i
 	}
-}
-
-func exit(msg string) {
-	println(time.Now().Format(config.ISO8601), msg)
-	os.Exit(0)
 }
