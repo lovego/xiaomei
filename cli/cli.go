@@ -15,11 +15,11 @@ import (
 func Run() {
 	cobra.EnableCommandSorting = false
 
-	root := cobra.Command{
+	root := &cobra.Command{
 		Use:   `xiaomei`,
 		Short: `be small and beautiful.`,
 	}
-	flags := root.Flags()
+	flags := root.PersistentFlags()
 	s := flags.StringP(
 		`server`, `s`, ``, `match servers by Addr or Tasks.`,
 	)
