@@ -9,8 +9,8 @@ log_format {{ .DeployName }} '$time_iso8601 $host'
 
 upstream {{ .DeployName }} {
 {{- range  .Servers -}}
-  {{- if .AppAddr }}
-    server {{ .AppAddr }}:{{ $.AppPort }};
+  {{- if .HasTask "appserver" }}
+    server {{ .AppAddr }};
   {{- end -}}
 {{ end }}
 }

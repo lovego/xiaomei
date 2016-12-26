@@ -4,7 +4,7 @@ const nginxConfig = `# vim: set ft=nginx:
 
 upstream {{ .Deploy.Name }}_godoc {
 {{- range  .Servers -}}
-  {{- if .HasTask "app" }}
+  {{- if .HasTask "appserver" }}
     server {{ .ListenAddr }}:{{ $.Godoc.Port }};
   {{- end -}}
 {{ end }}

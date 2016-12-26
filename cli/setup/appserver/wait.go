@@ -9,6 +9,7 @@ import (
 
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/fatih/color"
 )
 
 func Wait() {
@@ -31,11 +32,11 @@ func WaitPort(ppid, pid int) {
 		if cmd.Ok(cmd.O{NoStdout: true, NoStderr: true},
 			`lsof`, `-ap`, pidStr, `-itcp:`+config.App.Port(),
 		) {
-			config.Log(`started. (` + config.Servers.CurrentAppServer().AppAddr() + `)`)
+			config.Log(color.GreenString(`started. (` + config.Servers.CurrentAppServer().AppAddr() + `)`))
 			return
 		}
 		if !processAlive(ppid) || !processAlive(pid) {
-			config.Log(`starting failed.`)
+			config.Log(color.RedString(`starting failed.`))
 			return
 		}
 		time.Sleep(100 * time.Millisecond)
