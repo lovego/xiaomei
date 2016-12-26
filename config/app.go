@@ -8,9 +8,9 @@ import (
 	"github.com/bughou-go/xiaomei/utils/mailer"
 )
 
-var App appVar
+var App AppConf
 
-type appVar struct {
+type AppConf struct {
 	root         string
 	conf         appConf
 	startTimeout struct {
@@ -47,7 +47,7 @@ type MailerConf struct {
 	Host, Port, Sender, Passwd string
 }
 
-func (a *appVar) Root() string {
+func (a *AppConf) Root() string {
 	if a.root == `` {
 		if root := detectRoot(); root != `` {
 			a.root = root
@@ -58,36 +58,36 @@ func (a *appVar) Root() string {
 	return a.root
 }
 
-func (a *appVar) Name() string {
+func (a *AppConf) Name() string {
 	Load()
 	return a.conf.Name
 }
 
-func (a *appVar) Port() string {
+func (a *AppConf) Port() string {
 	Load()
 	return a.conf.Port
 }
 
-func (a *appVar) Env() string {
+func (a *AppConf) Env() string {
 	Load()
 	return a.conf.Env
 }
 
-func (a *appVar) Bin() string {
+func (a *AppConf) Bin() string {
 	return filepath.Join(a.Root(), a.Name())
 }
 
-func (a *appVar) Domain() string {
+func (a *AppConf) Domain() string {
 	Load()
 	return a.conf.Domain
 }
 
-func (a *appVar) Secret() string {
+func (a *AppConf) Secret() string {
 	Load()
 	return a.conf.Secret
 }
 
-func (a *appVar) StartTimeout() time.Duration {
+func (a *AppConf) StartTimeout() time.Duration {
 	if !a.startTimeout.setted {
 		Load()
 		if d, err := time.ParseDuration(a.conf.StartTimeout); err != nil {
@@ -100,7 +100,7 @@ func (a *appVar) StartTimeout() time.Duration {
 	return a.startTimeout.Duration
 }
 
-func (a *appVar) TimeZone() *time.Location {
+func (a *AppConf) TimeZone() *time.Location {
 	if a.timeZone == nil {
 		Load()
 		a.timeZone = time.FixedZone(a.conf.TimeZone.Name, a.conf.TimeZone.Offset)
@@ -108,7 +108,7 @@ func (a *appVar) TimeZone() *time.Location {
 	return a.timeZone
 }
 
-func (a *appVar) Mailer() *mailer.Mailer {
+func (a *AppConf) Mailer() *mailer.Mailer {
 	a.mailer.Lock()
 	defer a.mailer.Unlock()
 	if !a.mailer.setted {
@@ -122,12 +122,12 @@ func (a *appVar) Mailer() *mailer.Mailer {
 	return a.mailer.Mailer
 }
 
-func (a *appVar) Alarm(title, body string) {
+func (a *AppConf) Alarm(title, body string) {
 	title = Deploy.Name() + ` ` + title
 	a.Mailer().Send(&mailer.Message{Receivers: a.Keeper(), Title: title, Body: body})
 }
 
-func (a *appVar) Keeper() []string {
+func (a *AppConf) Keeper() []string {
 	Load()
 	return a.conf.Keeper
 }

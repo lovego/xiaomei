@@ -19,7 +19,10 @@ func Start() error {
 		return errors.New(`empty GOPATH.`)
 	}
 	godoc, _ := cmd.Run(cmd.O{Output: true, Panic: true}, `which`, `godoc`)
-	return Upstart(gopath, godoc)
+	if err := Upstart(gopath, godoc); err != nil {
+		return err
+	}
+	return Nginx()
 }
 
 func Setup() error {
@@ -27,7 +30,7 @@ func Setup() error {
 		return nil
 	}
 	gopath := config.Deploy.Root()
-	if _, err := cmd.Run(cmd.O{}, `ln`, `-sf`, `.`, filepath.Join(gopath, `src`)); err != nil {
+	if _, err := cmd.Run(cmd.O{}, `sudo`, `ln`, `-Tsf`, `.`, filepath.Join(gopath, `src`)); err != nil {
 		return err
 	}
 	godoc, _ := cmd.Run(cmd.O{Output: true}, `which`, `godoc`)
@@ -41,5 +44,8 @@ func Setup() error {
 		return errors.New(`godoc not found.`)
 	}
 
-	return Upstart(gopath, godoc)
+	if err := Upstart(gopath, godoc); err != nil {
+		return err
+	}
+	return Nginx()
 }

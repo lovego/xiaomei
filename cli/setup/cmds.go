@@ -48,8 +48,8 @@ func Cmds() []*cobra.Command {
 		{
 			Use:   `setup-godoc`,
 			Short: `setup godoc.`,
-			Run: func(c *cobra.Command, args []string) {
-				godoc.Setup()
+			RunE: func(c *cobra.Command, args []string) error {
+				return godoc.Setup()
 			},
 		},
 		{

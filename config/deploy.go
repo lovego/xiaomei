@@ -6,9 +6,9 @@ import (
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
-var Deploy deployVar
+var Deploy DeployConf
 
-type deployVar struct {
+type DeployConf struct {
 	conf deployConf
 }
 
@@ -19,24 +19,24 @@ type deployConf struct {
 	GitBranch string `yaml:"gitBranch"`
 }
 
-func (d *deployVar) Name() string {
+func (d *DeployConf) Name() string {
 	return App.Name() + `_` + App.Env()
 }
-func (d *deployVar) Root() string {
+func (d *DeployConf) Root() string {
 	return d.conf.Root
 }
-func (d *deployVar) Path() string {
+func (d *DeployConf) Path() string {
 	return filepath.Join(d.Root(), d.Name())
 }
-func (d *deployVar) User() string {
+func (d *DeployConf) User() string {
 	return d.conf.User
 }
 
-func (d *deployVar) GitAddr() string {
+func (d *DeployConf) GitAddr() string {
 	return d.conf.GitAddr
 }
 
-func (d *deployVar) GitBranch() string {
+func (d *DeployConf) GitBranch() string {
 	if d.conf.GitBranch != `` {
 		return d.conf.GitBranch
 	}

@@ -5,20 +5,20 @@ import (
 	"strings"
 )
 
-var Servers serverVar
+var Servers ServerConf
 
-type serverVar struct {
+type ServerConf struct {
 	conf serversConf
 }
 
 type serversConf []Server
 
-func (s *serverVar) All() []Server {
+func (s *ServerConf) All() []Server {
 	Load()
 	return s.conf
 }
 
-func (s *serverVar) CurrentAppServer() *Server {
+func (s *ServerConf) CurrentAppServer() *Server {
 	addrs := machineAddrs()
 	for _, server := range s.All() {
 		if server.HasTask(`appserver`) && server.HasAddr(addrs) {
@@ -28,7 +28,7 @@ func (s *serverVar) CurrentAppServer() *Server {
 	return nil
 }
 
-func (s *serverVar) CurrentTasks() (tasks []string) {
+func (s *ServerConf) CurrentTasks() (tasks []string) {
 	addrs := machineAddrs()
 	for _, server := range s.All() {
 		if server.HasAddr(addrs) {
@@ -38,7 +38,7 @@ func (s *serverVar) CurrentTasks() (tasks []string) {
 	return
 }
 
-func (s *serverVar) Matched(feature string) []Server {
+func (s *ServerConf) Matched(feature string) []Server {
 	matched := []Server{}
 	for _, server := range s.All() {
 		if server.Match(feature) {
@@ -48,7 +48,7 @@ func (s *serverVar) Matched(feature string) []Server {
 	return matched
 }
 
-func (s *serverVar) MatchedAddrs(feature string) []string {
+func (s *ServerConf) MatchedAddrs(feature string) []string {
 	addrs := []string{}
 	for _, server := range s.All() {
 		if server.Match(feature) && !contains(addrs, server.Addr) {
