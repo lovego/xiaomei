@@ -1,6 +1,7 @@
 package config
 
 import (
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -70,6 +71,10 @@ func (a *appVar) Port() string {
 func (a *appVar) Env() string {
 	Load()
 	return a.conf.Env
+}
+
+func (a *appVar) Bin() string {
+	return filepath.Join(a.Root(), a.Name())
 }
 
 func (a *appVar) Domain() string {

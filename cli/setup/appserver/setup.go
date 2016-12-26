@@ -20,7 +20,7 @@ func Setup() {
 
 	appserverLog := path.Join(config.App.Root(), `log/appserver.log`)
 	cmd.Run(cmd.O{Panic: true}, `touch`, `-a`, appserverLog)
-	tail, _ := cmd.Start(cmd.O{Panic: true}, `tail`, `-n0`, `-f`, appserverLog)
+	tail, _ := cmd.Start(cmd.O{Panic: true}, `tail`, `-fn0`, appserverLog)
 	// start new
 	output, _ := cmd.Run(cmd.O{Panic: true, Output: true}, `sudo`, `start`, config.Deploy.Name())
 	tail.Process.Kill()
