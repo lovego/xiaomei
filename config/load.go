@@ -15,7 +15,8 @@ var loader struct {
 	App     *appConf     `yaml:"app"`
 	DB      *dbConf      `yaml:"db"`
 	Deploy  *deployConf  `yaml:"deploy"`
-	Servers *ServersConf `yaml:"servers"`
+	Servers *serversConf `yaml:"servers"`
+	Godoc   *godocConf   `yaml:"godoc"`
 }
 
 func Load() {
@@ -26,6 +27,7 @@ func Load() {
 		loader.DB = &DB.conf
 		loader.Deploy = &Deploy.conf
 		loader.Servers = &Servers.conf
+		loader.Godoc = &Godoc.conf
 		Parse(&loader)
 	}
 }

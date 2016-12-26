@@ -23,7 +23,7 @@ func Wait() {
 		if cmd.Ok(cmd.O{NoStdout: true, NoStderr: true},
 			`lsof`, `-ap`, pidStr, `-itcp:`+config.App.Port(),
 		) {
-			exit(`started. (` + config.Servers.Current().AppAddr + `:` + config.App.Port() + `)`)
+			exit(`started. (` + config.Servers.CurrentAppServer().AppAddr() + `)`)
 		}
 		if !processAlive(ppid) || !processAlive(pid) {
 			exit(`starting failed.`)

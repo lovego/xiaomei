@@ -32,7 +32,7 @@ func NewRenderer() *renderer.Renderer {
 }
 
 func (s *Server) ListenAndServe() {
-	addr := config.Servers.Current().AppAddr + `:` + config.App.Port()
+	addr := config.Servers.CurrentAppServer().AppAddr()
 
 	if err := http.ListenAndServe(addr, http.HandlerFunc(
 		func(response http.ResponseWriter, request *http.Request) {

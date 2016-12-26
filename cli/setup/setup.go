@@ -1,28 +1,26 @@
 package setup
 
 import (
-	"regexp"
-
 	"github.com/bughou-go/xiaomei/cli/setup/appserver"
 	"github.com/bughou-go/xiaomei/cli/setup/nginx"
 	"github.com/bughou-go/xiaomei/config"
 )
 
-func Setup(tasks string) {
-	if tasks == `` {
+func Setup(tasks []string) {
+	if len(tasks) == 0 {
 		tasks = config.Servers.CurrentTasks()
 	}
-	for _, task := range regexp.MustCompile(`[\w-]+`).FindAllString(tasks, -1) {
+	for _, task := range tasks {
 		switch task {
-		case `setup-hosts`:
+		case `hosts`:
 			SetupHosts()
-		case `setup-mysql`:
+		case `mysql`:
 			SetupMysql()
-		case `setup-cron`:
+		case `cron`:
 			SetupCron()
-		case `setup-nginx`:
+		case `nginx`:
 			nginx.Setup()
-		case `setup-appserver`:
+		case `appserver`:
 			appserver.Setup()
 		default:
 			panic(`unknow task: ` + task)

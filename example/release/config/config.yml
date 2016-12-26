@@ -16,6 +16,10 @@ app:
 deploy:
   user: ubuntu
   root: /apps
-  gitAddr: git@github.com:/replace-me-with-git-addr.git
-  gitBranch: 
+  gitAddr:
+  gitBranch:
 
+godoc:
+  domain: godoc
+  port: 1234
+  indexInterval: -1

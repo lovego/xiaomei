@@ -14,7 +14,11 @@ func detectRoot() string {
 	if program == Fmwk.Bin() /* fmwk ... */ ||
 		strings.HasSuffix(program, `.test`) /* go test ... */ ||
 		strings.HasPrefix(program, `/tmp/`) /* go run ... */ {
-		return filepath.Join(detectDir(cwd, `release/config/config.yml`), `release`)
+		if dir := detectDir(cwd, `release/config/config.yml`); dir == `` {
+			return ``
+		} else {
+			return filepath.Join(dir, `release`)
+		}
 	} else {
 		// binary under project/release/ dir
 		return detectDir(filepath.Dir(program), `config/config.yml`)

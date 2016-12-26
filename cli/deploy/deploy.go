@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
 	"text/template"
 
 	"github.com/bughou-go/xiaomei/config"
@@ -29,10 +30,10 @@ func Deploy(commit, serverFilter string) error {
 	gitHost := getGitHost(config.Deploy.GitAddr())
 	servers := config.Servers.Matched(serverFilter)
 	for _, server := range servers {
-		deployToServer(config.Deploy.User()+`@`+server.Addr, DeployConfig{
+		deployToServer(server.SshAddr(), DeployConfig{
 			DeployPath: config.Deploy.Path(),
 			Env:        config.App.Env(),
-			Tasks:      server.Tasks,
+			Tasks:      strings.Join(server.Tasks, ` `),
 			GitBranch:  config.Deploy.GitBranch(),
 			GitTag:     tag,
 			GitHost:    gitHost,

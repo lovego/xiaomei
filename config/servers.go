@@ -8,63 +8,40 @@ import (
 var Servers serverVar
 
 type serverVar struct {
-	conf ServersConf
+	conf serversConf
 }
 
-type ServersConf []Server
-
-type Server struct {
-	Addr       string `yaml:"addr"`
-	Tasks      string `yaml:"tasks"`
-	AppAddr    string `yaml:"appAddr"`
-	AppStartOn string `yaml:"appStartOn"`
-}
+type serversConf []Server
 
 func (s *serverVar) All() []Server {
 	Load()
 	return s.conf
 }
 
-func (s *serverVar) Current() Server {
-	ifcAddrs, err := net.InterfaceAddrs()
-	if err != nil {
-		panic(err)
-	}
+func (s *serverVar) CurrentAppServer() *Server {
+	addrs := machineAddrs()
 	for _, server := range s.All() {
-		if server.AppAddr != `` {
-			for _, ifcAddr := range ifcAddrs {
-				if strings.HasPrefix(ifcAddr.String(), server.Addr+`/`) {
-					return server
-				}
-			}
+		if server.HasTask(`appserver`) && server.HasAddr(addrs) {
+			return &server
 		}
 	}
-	return Server{}
+	return nil
 }
 
-func (s *serverVar) CurrentTasks() string {
-	tasks := []string{}
-	ifcAddrs, err := net.InterfaceAddrs()
-	if err != nil {
-		panic(err)
-	}
+func (s *serverVar) CurrentTasks() (tasks []string) {
+	addrs := machineAddrs()
 	for _, server := range s.All() {
-	loop:
-		for _, ifcAddr := range ifcAddrs {
-			if strings.HasPrefix(ifcAddr.String(), server.Addr+`/`) {
-				tasks = append(tasks, server.Tasks)
-				break loop
-			}
+		if server.HasAddr(addrs) {
+			tasks = append(tasks, server.Tasks...)
 		}
 	}
-	return strings.Join(tasks, ` `)
+	return
 }
 
 func (s serverVar) Matched(feature string) []Server {
 	matched := []Server{}
 	for _, server := range s.All() {
-		if strings.Contains(server.Tasks, feature) ||
-			strings.Contains(server.Addr, feature) {
+		if server.Match(feature) {
 			matched = append(matched, server)
 		}
 	}
@@ -74,14 +51,27 @@ func (s serverVar) Matched(feature string) []Server {
 func (s serverVar) MatchedAddrs(feature string) []string {
 	addrs := []string{}
 	for _, server := range s.All() {
-		if strings.Contains(server.Tasks, feature) ||
-			strings.Contains(server.Addr, feature) {
-			if !contains(addrs, server.Addr) {
-				addrs = append(addrs, server.Addr)
-			}
+		if server.Match(feature) && !contains(addrs, server.Addr) {
+			addrs = append(addrs, server.Addr)
 		}
 	}
 	return addrs
+}
+
+func machineAddrs() []string {
+	ifcAddrs, err := net.InterfaceAddrs()
+	if err != nil {
+		panic(err)
+	}
+	result := make([]string, len(ifcAddrs))
+	for i, ifcAddr := range ifcAddrs {
+		addr := ifcAddr.String()
+		if i := strings.IndexByte(addr, '/'); i >= 0 {
+			addr = addr[:i]
+		}
+		result[i] = addr
+	}
+	return result
 }
 
 func contains(slice []string, target string) bool {

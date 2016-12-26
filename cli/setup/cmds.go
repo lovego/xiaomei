@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"github.com/bughou-go/xiaomei/cli/godoc"
 	"github.com/bughou-go/xiaomei/cli/setup/appserver"
 	"github.com/bughou-go/xiaomei/cli/setup/nginx"
 	"github.com/spf13/cobra"
@@ -9,14 +10,10 @@ import (
 func Cmds() []*cobra.Command {
 	return []*cobra.Command{
 		{
-			Use:   `setup [<tasks>]`,
+			Use:   `setup [<tasks> ...]`,
 			Short: `setup all tasks.`,
 			Run: func(c *cobra.Command, args []string) {
-				var tasks string
-				if len(args) > 0 {
-					tasks = args[0]
-				}
-				Setup(tasks)
+				Setup(args)
 			},
 		},
 		{
@@ -48,10 +45,10 @@ func Cmds() []*cobra.Command {
 			},
 		},
 		{
-			Use:   `setup-docserver`,
-			Short: `setup doc-server.`,
+			Use:   `setup-godoc`,
+			Short: `setup godoc.`,
 			Run: func(c *cobra.Command, args []string) {
-				DocServer()
+				godoc.Setup()
 			},
 		},
 		{

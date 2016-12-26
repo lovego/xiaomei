@@ -38,13 +38,12 @@ type upstartConfData struct {
 func writeUpstartConfig() {
 	tmpl := template.Must(template.New(``).Parse(upstartConfig))
 
-	server := config.Servers.Current()
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, upstartConfData{
 		UserName:   config.Deploy.User(),
 		AppRoot:    config.App.Root(),
 		AppName:    config.App.Name(),
-		AppStartOn: server.AppStartOn,
+		AppStartOn: config.Servers.CurrentAppServer().AppStartOn,
 	}); err != nil {
 		panic(err)
 	}
