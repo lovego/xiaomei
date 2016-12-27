@@ -2,9 +2,9 @@ package config
 
 import ()
 
-var DB dbVar
+var DB DbConf
 
-type dbVar struct {
+type DbConf struct {
 	conf dbConf
 }
 
@@ -14,7 +14,7 @@ type dbConf struct {
 	Mongo map[string]string `yaml:"mongo"`
 }
 
-func (db *dbVar) Redis(name string) string {
+func (db *DbConf) Redis(name string) string {
 	Load()
 	if name == `` {
 		name = `default`
@@ -22,7 +22,7 @@ func (db *dbVar) Redis(name string) string {
 	return db.conf.Redis[name]
 }
 
-func (db *dbVar) Mysql(name string) string {
+func (db *DbConf) Mysql(name string) string {
 	Load()
 	if name == `` {
 		name = `default`
@@ -30,7 +30,7 @@ func (db *dbVar) Mysql(name string) string {
 	return db.conf.Mysql[name]
 }
 
-func (db *dbVar) Mongo(name string) string {
+func (db *DbConf) Mongo(name string) string {
 	Load()
 	if name == `` {
 		name = "default"

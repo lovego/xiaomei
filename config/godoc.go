@@ -1,8 +1,8 @@
 package config
 
-var Godoc godocVar
+var Godoc GodocConf
 
-type godocVar struct {
+type GodocConf struct {
 	conf godocConf
 }
 
@@ -12,17 +12,17 @@ type godocConf struct {
 	IndexInterval string `yaml:"indexInterval"`
 }
 
-func (g *godocVar) Port() string {
+func (g *GodocConf) Port() string {
 	Load()
 	return g.conf.Port
 }
 
-func (g *godocVar) Domain() string {
+func (g *GodocConf) Domain() string {
 	Load()
 	return g.conf.Domain
 }
 
-func (g *godocVar) IndexInterval() string {
+func (g *GodocConf) IndexInterval() string {
 	Load()
 	return g.conf.IndexInterval
 }
