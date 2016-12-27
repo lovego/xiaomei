@@ -1,10 +1,22 @@
 package setup
 
 import (
+	"github.com/bughou-go/xiaomei/cli/godoc"
 	"github.com/bughou-go/xiaomei/cli/setup/appserver"
 	"github.com/bughou-go/xiaomei/cli/setup/nginx"
 	"github.com/bughou-go/xiaomei/config"
+	"github.com/spf13/cobra"
 )
+
+func Cmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   `setup [<tasks> ...]`,
+		Short: `setup the specified tasks.`,
+		Run: func(c *cobra.Command, args []string) {
+			Setup(args)
+		},
+	}
+}
 
 func Setup(tasks []string) {
 	if len(tasks) == 0 {
@@ -18,12 +30,16 @@ func Setup(tasks []string) {
 			SetupMysql()
 		case `cron`:
 			SetupCron()
+		case `godoc`:
+			godoc.Setup()
 		case `nginx`:
 			nginx.Setup()
 		case `appserver`:
 			appserver.Setup()
+		case `wait-appserver`:
+			appserver.Wait()
 		default:
-			panic(`unknow task: ` + task)
+			panic(`unknown task: ` + task)
 		}
 	}
 }

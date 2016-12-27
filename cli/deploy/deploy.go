@@ -26,17 +26,17 @@ func Deploy(commit, serverFilter string) error {
 	if err := os.Chdir(config.App.Root()); err != nil {
 		return err
 	}
-	isRollback := commit != ``
 	tag, err := setupDeployTag(commit)
 	if err != nil {
 		return err
 	}
 
+	isRollback := commit != ``
+	updated := make(map[string]bool)
 	servers := config.Servers.Matched(serverFilter)
-
-	var updated = make(map[string]bool)
 	for _, server := range servers {
 		sshAddr := server.SshAddr()
+		color.Cyan(sshAddr)
 		if !updated[server.Addr] {
 			updateCodeAndBin(sshAddr, tag, isRollback)
 		}
@@ -63,7 +63,6 @@ func updateCodeAndBin(sshAddr, tag string, isRollback bool) {
 		GitHost:    gitHost,
 		GitAddr:    gitAddr,
 	}
-	color.Cyan(sshAddr)
 
 	if updateTmpl == nil {
 		updateTmpl = template.Must(template.New(``).Parse(updateCodeShell))
@@ -76,7 +75,7 @@ func updateCodeAndBin(sshAddr, tag string, isRollback bool) {
 	}
 	cmd.Run(cmd.O{Panic: true}, `ssh`, `-t`, sshAddr, buf.String())
 	if !isRollback {
-		cmd.Run(cmd.O{Panic: true}, `scp`, path.Join(config.App.Root(), updateConf.AppName),
+		cmd.Run(cmd.O{Panic: true}, `scp`, config.App.Bin(),
 			sshAddr+`:`+path.Join(updateConf.DeployPath, `release/bins`, tag))
 	}
 }
@@ -91,7 +90,6 @@ func setupServer(sshAddr, tag string, tasks []string) {
 		Tasks:      strings.Join(tasks, ` `),
 		GitTag:     tag,
 	}
-	color.Cyan(sshAddr)
 
 	if deployTmpl == nil {
 		deployTmpl = template.Must(template.New(``).Parse(setupShell))

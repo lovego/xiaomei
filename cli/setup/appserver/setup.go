@@ -2,10 +2,6 @@ package appserver
 
 import (
 	"bytes"
-	"fmt"
-	"os"
-	"path"
-	"strings"
 	"text/template"
 
 	"github.com/bughou-go/xiaomei/config"
@@ -14,21 +10,7 @@ import (
 
 func Setup() {
 	writeUpstartConfig()
-
-	// stop current
-	cmd.Run(cmd.O{}, `sudo`, `stop`, config.Deploy.Name())
-
-	appserverLog := path.Join(config.App.Root(), `log/appserver.log`)
-	cmd.Run(cmd.O{Panic: true}, `touch`, `-a`, appserverLog)
-	tail, _ := cmd.Start(cmd.O{Panic: true}, `tail`, `-fn0`, appserverLog)
-	// start new
-	output, _ := cmd.Run(cmd.O{Panic: true, Output: true}, `sudo`, `start`, config.Deploy.Name())
-	tail.Process.Kill()
-
-	fmt.Println(output)
-	if !strings.Contains(output, `start/running,`) {
-		os.Exit(1)
-	}
+	Restart()
 }
 
 type upstartConfData struct {
