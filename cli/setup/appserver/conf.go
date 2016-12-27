@@ -23,7 +23,7 @@ post-start script
   set +e
   exec >>log/appserver.log 2>&1
 
-  ./{{.AppName}} wait-appserver
+  ./{{.AppName}} setup wait-appserver
 end script
 
 post-stop script

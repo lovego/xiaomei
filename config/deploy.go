@@ -20,23 +20,29 @@ type deployConf struct {
 }
 
 func (d *DeployConf) Name() string {
+	Load()
 	return App.Name() + `_` + App.Env()
 }
 func (d *DeployConf) Root() string {
+	Load()
 	return d.conf.Root
 }
 func (d *DeployConf) Path() string {
+	Load()
 	return filepath.Join(d.Root(), d.Name())
 }
 func (d *DeployConf) User() string {
+	Load()
 	return d.conf.User
 }
 
 func (d *DeployConf) GitAddr() string {
+	Load()
 	return d.conf.GitAddr
 }
 
 func (d *DeployConf) GitBranch() string {
+	Load()
 	if d.conf.GitBranch != `` {
 		return d.conf.GitBranch
 	}
