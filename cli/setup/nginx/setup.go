@@ -36,9 +36,8 @@ func writeConfig() {
 }
 
 type confData struct {
-	DeployName, AppRoot, AppPort, Domain string
-	Servers                              []config.Server
-	Nfs                                  bool
+	config.Conf
+	Nfs bool
 }
 
 func getConfData() confData {
@@ -46,11 +45,7 @@ func getConfData() confData {
 		`stat`, `--file-system`, `--format`, `%T`, config.App.Root(),
 	)
 	return confData{
-		DeployName: config.Deploy.Name(),
-		AppRoot:    config.App.Root(),
-		AppPort:    config.App.Port(),
-		Domain:     config.App.Domain(),
-		Servers:    config.Servers.All(),
-		Nfs:        fs == `nfs`,
+		Conf: config.Data(),
+		Nfs:  fs == `nfs`,
 	}
 }

@@ -2,10 +2,10 @@ package appserver
 
 const upstartConfig = `# vim: set ft=upstart:
 
-setuid {{.UserName}}
-chdir {{.AppRoot}}
+setuid {{.Deploy.User}}
+chdir {{.App.Root}}
 
-start on {{.AppStartOn}}
+start on {{.Servers.CurrentAppServer.AppStartOn}}
 respawn
 respawn limit 5 60
 
@@ -14,7 +14,7 @@ script
   exec >>log/appserver.log 2>&1
 
   echo $(date -Iseconds) 'starting.'
-  ./{{.AppName}}
+  ./{{.App.Name}}
   exitStatus=$?
   echo $(date -Iseconds) "crashed with status: $exitStatus."
 end script
@@ -23,7 +23,7 @@ post-start script
   set +e
   exec >>log/appserver.log 2>&1
 
-  ./{{.AppName}} setup wait-appserver
+  ./{{.App.Name}} setup wait-appserver
 end script
 
 post-stop script

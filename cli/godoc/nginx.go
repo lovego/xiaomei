@@ -31,11 +31,8 @@ func writeNginxConfig() error {
 }
 
 type confData struct {
-	Deploy  *config.DeployConf
-	App     *config.AppConf
-	Servers *config.ServerConf
-	Godoc   *config.GodocConf
-	Nfs     bool
+	config.Conf
+	Nfs bool
 }
 
 func getConfData() confData {
@@ -43,10 +40,7 @@ func getConfData() confData {
 		`stat`, `--file-system`, `--format`, `%T`, config.App.Root(),
 	)
 	return confData{
-		Deploy:  &config.Deploy,
-		App:     &config.App,
-		Servers: &config.Servers,
-		Godoc:   &config.Godoc,
-		Nfs:     fs == `nfs`,
+		Conf: config.Data(),
+		Nfs:  fs == `nfs`,
 	}
 }

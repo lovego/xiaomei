@@ -15,11 +15,13 @@ import (
 )
 
 type UpdateConfig struct {
-	AppName, DeployPath, GitBranch, GitTag, GitHost, GitAddr string
+	config.Conf
+	GitTag, GitHost, GitAddr string
 }
 
 type DeployConfig struct {
-	AppName, DeployPath, Env, Tasks, GitTag string
+	config.Conf
+	Tasks, GitTag string
 }
 
 func Deploy(commit, serverFilter string) error {
@@ -56,12 +58,10 @@ func updateCode(sshAddr, tag string) {
 	}
 	gitHost := getGitHost(gitAddr)
 	updateConf := UpdateConfig{
-		AppName:    config.App.Name(),
-		DeployPath: config.Deploy.Path(),
-		GitBranch:  config.Deploy.GitBranch(),
-		GitTag:     tag,
-		GitHost:    gitHost,
-		GitAddr:    gitAddr,
+		Conf:    config.Data(),
+		GitTag:  tag,
+		GitHost: gitHost,
+		GitAddr: gitAddr,
 	}
 
 	if updateTmpl == nil {
@@ -86,11 +86,9 @@ var setupTmpl *template.Template
 
 func setupServer(sshAddr, tag string, tasks []string) {
 	deployConf := DeployConfig{
-		AppName:    config.App.Name(),
-		DeployPath: config.Deploy.Path(),
-		Env:        config.App.Env(),
-		Tasks:      strings.Join(tasks, ` `),
-		GitTag:     tag,
+		Conf:   config.Data(),
+		Tasks:  strings.Join(tasks, ` `),
+		GitTag: tag,
 	}
 
 	if setupTmpl == nil {

@@ -13,20 +13,11 @@ func Setup() {
 	Restart()
 }
 
-type upstartConfData struct {
-	UserName, AppRoot, AppName, AppStartOn string
-}
-
 func writeUpstartConfig() {
 	tmpl := template.Must(template.New(``).Parse(upstartConfig))
 
 	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, upstartConfData{
-		UserName:   config.Deploy.User(),
-		AppRoot:    config.App.Root(),
-		AppName:    config.App.Name(),
-		AppStartOn: config.Servers.CurrentAppServer().AppStartOn,
-	}); err != nil {
+	if err := tmpl.Execute(&buf, config.Data()); err != nil {
 		panic(err)
 	}
 
