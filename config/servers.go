@@ -3,6 +3,8 @@ package config
 import (
 	"net"
 	"strings"
+
+	"github.com/bughou-go/xiaomei/utils/slice"
 )
 
 var Servers ServerConf
@@ -51,7 +53,7 @@ func (s *ServerConf) Matched(feature string) []Server {
 func (s *ServerConf) MatchedAddrs(feature string) []string {
 	addrs := []string{}
 	for _, server := range s.All() {
-		if server.Match(feature) && !contains(addrs, server.Addr) {
+		if server.Match(feature) && !slice.ContainsString(addrs, server.Addr) {
 			addrs = append(addrs, server.Addr)
 		}
 	}
@@ -72,13 +74,4 @@ func machineAddrs() []string {
 		result[i] = addr
 	}
 	return result
-}
-
-func contains(slice []string, target string) bool {
-	for _, s := range slice {
-		if s == target {
-			return true
-		}
-	}
-	return false
 }

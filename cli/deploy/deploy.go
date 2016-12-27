@@ -46,7 +46,7 @@ func Deploy(commit, serverFilter string) error {
 		setupServer(sshAddr, tag, server.Tasks)
 	}
 	fmt.Printf("deployed %d servers!\n", len(servers))
-	return nil
+	return ClearTags()
 }
 
 var updateTmpl *template.Template

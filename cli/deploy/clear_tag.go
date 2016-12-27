@@ -5,66 +5,87 @@ import (
 
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/utils/slice"
 )
 
-func ClearDeployTags() error {
-	err1 := clearRemoteDeployTags()
-	err2 := clearLocalDeployTags()
-	if err1 != nil {
-		return err1
+func ClearTags() error {
+	if tags, err := ClearRemoteTags(); err == nil && len(tags) > 0 {
+		return clearLocalTags(tags)
 	} else {
-		return err2
+		return err
 	}
 }
 
 // clear remote obsolete deploy tags
-func clearRemoteDeployTags() error {
+func ClearRemoteTags() ([]string, error) {
 	const historyCount = 5
-	const prefix = `refs/tags/`
 
+	refs, err := getRemoteTagRefs()
+	obsoleteCount := len(refs) - historyCount
+	if err != nil || obsoleteCount <= 0 {
+		return nil, err
+	}
+	_, err = cmd.Run(cmd.O{}, `git`, append(
+		[]string{`push`, `--delete`, `origin`}, refs[:obsoleteCount]...,
+	)...)
+
+	return refs2tags(refs[obsoleteCount:]), err
+}
+
+const tagRefsPrefix = `refs/tags/`
+
+func getRemoteTagRefs() ([]string, error) {
 	lines, err := cmd.Run(cmd.O{Output: true},
-		`git`, `ls-remote`, `--tags`, `origin`, prefix+config.App.Env()+`*`,
+		`git`, `ls-remote`, `--tags`, `origin`, tagRefsPrefix+config.App.Env()+`*`,
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	refs := []string{}
+	var result []string
 	for _, line := range strings.Split(lines, "\n") {
+		if index := strings.Index(line, tagRefsPrefix); index > 0 {
+			line = line[index:]
+		} else {
+			continue
+		}
 		line = strings.TrimSpace(line)
-		if len(line) > len(prefix) && isDeployTag(line[len(prefix):]) {
-			refs = append(refs, line)
+		if len(line) > len(tagRefsPrefix) && isDeployTag(line[len(tagRefsPrefix):]) {
+			result = append(result, line)
 		}
 	}
-	if len(refs) <= historyCount {
-		return nil
+	return result, nil
+}
+
+func refs2tags(refs []string) (result []string) {
+	for _, ref := range refs {
+		result = append(result, ref[len(tagRefsPrefix):])
 	}
-	refs = refs[:historyCount]
-
-	args := append([]string{`push`, `--delete`, `origin`}, refs...)
-
-	_, err = cmd.Run(cmd.O{}, `git`, args...)
-	return err
+	return
 }
 
 // clear local obsolete deploy tags
-func clearLocalDeployTags() error {
+func ClearLocalTags() error {
+	if refs, err := getRemoteTagRefs(); err != nil {
+		return err
+	} else {
+		return clearLocalTags(refs2tags(refs))
+	}
+}
+
+func clearLocalTags(remoteTags []string) error {
 	lines, err := cmd.Run(cmd.O{Output: true},
 		`git`, `tag`, `--list`, config.App.Env()+`*`,
 	)
 	if err != nil {
 		return err
 	}
-	tags := []string{}
 	for _, line := range strings.Split(lines, "\n") {
-		line = strings.TrimSpace(line)
-		if isDeployTag(line) {
-			tags = append(tags, line)
+		tag := strings.TrimSpace(line)
+		if isDeployTag(tag) && !slice.ContainsString(remoteTags, tag) {
+			if _, err := cmd.Run(cmd.O{}, `git`, `tag`, `-d`, tag); err != nil {
+				return err
+			}
 		}
 	}
-	for _, tag := range tags {
-		if cmd.Fail(cmd.O{NoStdout: true}, `git`, `ls-remote`, `--tags`, `--exit-code`, `origin`, tag) {
-			_, err = cmd.Run(cmd.O{}, `git`, `tag`, `-d`, tag)
-		}
-	}
-	return err
+	return nil
 }
