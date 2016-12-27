@@ -1,6 +1,10 @@
 package config
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/bughou-go/xiaomei/utils/slice"
+)
 
 type Server struct {
 	Addr       string   `yaml:"addr"`
@@ -10,18 +14,18 @@ type Server struct {
 }
 
 func (s *Server) HasTask(name string) bool {
-	return contains(s.Tasks, name)
+	return slice.ContainsString(s.Tasks, name)
 }
 
 func (s *Server) HasAddr(addrs []string) bool {
-	return contains(addrs, s.Addr) || contains(addrs, s.ListenAddr)
+	return slice.ContainsString(addrs, s.Addr) || slice.ContainsString(addrs, s.ListenAddr)
 }
 
 func (s *Server) Match(feature string) bool {
 	if feature == `` {
 		return true
 	}
-	return contains(s.Tasks, feature) ||
+	return slice.ContainsString(s.Tasks, feature) ||
 		strings.Contains(s.Addr, feature) ||
 		strings.Contains(s.ListenAddr, feature)
 }

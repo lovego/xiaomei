@@ -25,11 +25,10 @@ func Run() {
 		`server`, `s`, ``, `match servers by Addr or Tasks.`,
 	)
 	root.AddCommand(develop.Cmds()...)
-	root.AddCommand(db.Cmds()...)
 	root.AddCommand(oam.Cmds(s)...)
+	root.AddCommand(db.Cmds()...)
 
-	root.AddCommand(deploy.Cmds(s)...)
-	root.AddCommand(setup.Cmd())
+	root.AddCommand(deploy.Cmd(s), setup.Cmd())
 
 	root.Execute()
 }

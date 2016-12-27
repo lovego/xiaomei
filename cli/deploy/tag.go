@@ -25,7 +25,6 @@ func setupDeployTag(commit string) (string, error) {
 	if _, err := cmd.Run(o, `git`, `push`, `origin`, branch, tag); err != nil {
 		return ``, err
 	}
-	ClearDeployTags()
 	return tag, nil
 }
 
