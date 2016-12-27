@@ -16,6 +16,7 @@ func Run() {
 		return
 	}
 	tail := tailLog()
+	defer tail.Process.Kill()
 
 	config.Log(`starting.`)
 	if app, err := cmd.Start(cmd.O{}, config.App.Bin()); err != nil {
@@ -25,7 +26,6 @@ func Run() {
 		app.Wait()
 	}
 
-	tail.Process.Kill()
 }
 
 func tailLog() *exec.Cmd {

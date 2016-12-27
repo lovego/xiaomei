@@ -29,8 +29,8 @@ func Stop() {
 
 func Start() {
 	tail := tailLog()
+	defer tail.Process.Kill()
 	output, _ := cmd.Run(cmd.O{Panic: true, Output: true}, `sudo`, `start`, config.Deploy.Name())
-	tail.Process.Kill()
 
 	println(output)
 	if !strings.Contains(output, `start/running,`) {
