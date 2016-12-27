@@ -31,17 +31,17 @@ func Deploy(commit, serverFilter string) error {
 		return err
 	}
 
-	isRollback := commit != ``
 	updated := make(map[string]bool)
 	servers := config.Servers.Matched(serverFilter)
 	for _, server := range servers {
 		sshAddr := server.SshAddr()
 		color.Cyan(sshAddr)
 		if !updated[server.Addr] {
-			updateCodeAndBin(sshAddr, tag, isRollback)
+			updateCode(sshAddr, tag)
+			scpBinary(sshAddr, tag)
+			updated[server.Addr] = true
 		}
 		setupServer(sshAddr, tag, server.Tasks)
-		updated[server.Addr] = true
 	}
 	fmt.Printf("deployed %d servers!\n", len(servers))
 	return nil
@@ -49,10 +49,10 @@ func Deploy(commit, serverFilter string) error {
 
 var updateTmpl *template.Template
 
-func updateCodeAndBin(sshAddr, tag string, isRollback bool) {
+func updateCode(sshAddr, tag string) {
 	gitAddr := config.Deploy.GitAddr()
 	if gitAddr == `` {
-		panic(`no such git address`)
+		panic(`empty config gitAddr.`)
 	}
 	gitHost := getGitHost(gitAddr)
 	updateConf := UpdateConfig{
@@ -69,18 +69,20 @@ func updateCodeAndBin(sshAddr, tag string, isRollback bool) {
 	}
 
 	var buf bytes.Buffer
-	err := updateTmpl.Execute(&buf, updateConf)
-	if err != nil {
+	if err := updateTmpl.Execute(&buf, updateConf); err != nil {
 		panic(err)
 	}
 	cmd.Run(cmd.O{Panic: true}, `ssh`, `-t`, sshAddr, buf.String())
-	if !isRollback {
-		cmd.Run(cmd.O{Panic: true}, `scp`, config.App.Bin(),
-			sshAddr+`:`+path.Join(updateConf.DeployPath, `release/bins`, tag))
+}
+
+func scpBinary(sshAddr, tag string) {
+	binPath := path.Join(config.Deploy.Path(), `release/bins`, tag)
+	if cmd.Fail(cmd.O{Print: true}, `ssh`, sshAddr, `test`, `-x`, binPath) {
+		cmd.Run(cmd.O{Panic: true}, `scp`, config.App.Bin(), sshAddr+`:`+binPath)
 	}
 }
 
-var deployTmpl *template.Template
+var setupTmpl *template.Template
 
 func setupServer(sshAddr, tag string, tasks []string) {
 	deployConf := DeployConfig{
@@ -91,12 +93,12 @@ func setupServer(sshAddr, tag string, tasks []string) {
 		GitTag:     tag,
 	}
 
-	if deployTmpl == nil {
-		deployTmpl = template.Must(template.New(``).Parse(setupShell))
+	if setupTmpl == nil {
+		setupTmpl = template.Must(template.New(``).Parse(setupShell))
 	}
 
 	var buf bytes.Buffer
-	err := deployTmpl.Execute(&buf, deployConf)
+	err := setupTmpl.Execute(&buf, deployConf)
 	if err != nil {
 		panic(err)
 	}
