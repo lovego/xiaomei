@@ -18,15 +18,19 @@ func Upstart(gopath, godoc string) error {
 	return err
 }
 
+type upstartData struct {
+	config.Conf
+	GoPath, GodocBin string
+}
+
 func writeUpstartConfig(gopath, godoc string) error {
 	tmpl := template.Must(template.New(``).Parse(upstartConfig))
 
 	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, struct{ GoPath, Godoc, AddrPort, IndexInterval string }{
-		GoPath:        gopath,
-		Godoc:         strings.TrimSpace(godoc),
-		AddrPort:      config.Servers.CurrentAppServer().GodocAddr(),
-		IndexInterval: config.Godoc.IndexInterval(),
+	if err := tmpl.Execute(&buf, upstartData{
+		Conf:     config.Data(),
+		GoPath:   gopath,
+		GodocBin: strings.TrimSpace(godoc),
 	}); err != nil {
 		panic(err)
 	}

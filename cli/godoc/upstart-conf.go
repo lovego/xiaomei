@@ -6,6 +6,6 @@ respawn
 respawn limit 2 60
 
 script
-  GOPATH={{.GoPath}} {{.Godoc}} -http={{.AddrPort}} -index_interval={{.IndexInterval}}
+  GOPATH={{.GoPath}} {{.GodocBin}} -http={{.Servers.CurrentAppServer.GodocAddr}} -index_interval={{.Godoc.IndexInterval}}
 end script
 `

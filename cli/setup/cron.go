@@ -11,10 +11,6 @@ import (
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
-type cronConfData struct {
-	UserName, AppRoot, Env string
-}
-
 func SetupCron() {
 	filePath := path.Join(config.App.Root(), `deploy/cron.tmpl`)
 	if !utils.IsFile(filePath) {
@@ -24,9 +20,7 @@ func SetupCron() {
 	tmpl := template.Must(template.ParseFiles(filePath))
 
 	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, cronConfData{
-		config.Deploy.User(), config.App.Root(), config.App.Env(),
-	}); err != nil {
+	if err := tmpl.Execute(&buf, config.Data()); err != nil {
 		panic(err)
 	}
 
