@@ -13,8 +13,7 @@ func sshOptions(command string, options []string) (string, []string) {
 		if len(servers) == 0 {
 			os.Exit(1)
 		}
-		address := config.Deploy.User() + `@` + servers[0].SshAddr()
-		options = append([]string{`-t`, address, command}, options...)
+		options = append([]string{`-t`, servers[0].SshAddr(), command}, options...)
 		return `ssh`, options
 	}
 	return command, options

@@ -12,7 +12,8 @@ import (
 func Mysql(name string) {
 	options := dsn.MysqlDSN(config.DB.Mysql(name)).Options()
 	options = append([]string{`--pager=less -SX`}, options...)
-	cmd.Run(cmd.O{Panic: true}, `mysql`, options...)
+	command, options := sshOptions(`mysql`, options)
+	cmd.Run(cmd.O{Panic: true}, command, options...)
 }
 
 func Mysqldump(name string) {
