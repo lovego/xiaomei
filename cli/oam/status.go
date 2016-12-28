@@ -7,8 +7,8 @@ import (
 )
 
 func Status(serverFilter string) {
-	for _, addr := range config.Servers.MatchedAddrs(serverFilter) {
-		address := config.Deploy.User() + `@` + addr
+	for _, server := range config.Servers.MatchedAppserver(serverFilter) {
+		address := server.SshAddr()
 		color.Cyan(address)
 		cmd.Run(cmd.O{}, `ssh`, `-t`, address, `status `+config.Deploy.Name()+`; ps -FC `+config.App.Name())
 	}

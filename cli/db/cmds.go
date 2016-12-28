@@ -7,7 +7,8 @@ import (
 func Cmds() []*cobra.Command {
 	return []*cobra.Command{
 		{
-			Use: `mysql`,
+			Use:   `mysql <dbname>`,
+			Short: `into the specified dbname of mysql command line tool`,
 			Run: func(c *cobra.Command, args []string) {
 				var name string
 				if len(args) > 0 {
@@ -17,7 +18,8 @@ func Cmds() []*cobra.Command {
 			},
 		},
 		{
-			Use: `mysqldump`,
+			Use:   `mysqldump <name>`,
+			Short: `dump the specified dbname of mysql`,
 			Run: func(c *cobra.Command, args []string) {
 				var name string
 				if len(args) > 0 {
@@ -27,7 +29,8 @@ func Cmds() []*cobra.Command {
 			},
 		},
 		{
-			Use: `mongo`,
+			Use:   `mongo <name>`,
+			Short: `into the specified dbname of mongo command line tool`,
 			Run: func(c *cobra.Command, args []string) {
 				var name string
 				if len(args) > 0 {
@@ -37,7 +40,8 @@ func Cmds() []*cobra.Command {
 			},
 		},
 		{
-			Use: `redis`,
+			Use:   `redis <name>`,
+			Short: `into the specified dbname of redis command line tool`,
 			Run: func(c *cobra.Command, args []string) {
 				var name string
 				if len(args) > 0 {

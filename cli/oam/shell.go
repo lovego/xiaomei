@@ -6,9 +6,8 @@ import (
 )
 
 func Shell(serverFilter string) {
-	for _, addr := range config.Servers.MatchedAddrs(serverFilter) {
-		address := config.Deploy.User() + `@` + addr
-		cmd.Run(cmd.O{Panic: true}, `ssh`, `-t`, address, `cd `+config.Deploy.Path()+`; bash`)
+	for _, server := range config.Servers.MatchedAppserver(serverFilter) {
+		cmd.Run(cmd.O{Panic: true}, `ssh`, `-t`, server.SshAddr(), `cd `+config.Deploy.Path()+`; bash`)
 		return
 	}
 }

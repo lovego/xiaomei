@@ -8,8 +8,8 @@ import (
 )
 
 func Exec(serverFilter string, args []string) {
-	for _, addr := range config.Servers.MatchedAddrs(serverFilter) {
-		address := config.Deploy.User() + `@` + addr
+	for _, server := range config.Servers.MatchedAppserver(serverFilter) {
+		address := server.SshAddr()
 		color.Cyan(address)
 		cmd.Run(cmd.O{}, `ssh`, `-t`, address, `cd `+config.Deploy.Path()+`; `+strings.Join(args, ` `))
 	}

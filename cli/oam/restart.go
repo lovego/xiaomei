@@ -11,11 +11,11 @@ import (
 )
 
 func Restart(serverFilter string) {
-	addrs := config.Servers.MatchedAddrs(serverFilter)
-	for _, addr := range addrs {
-		restartAppServer(config.Deploy.User() + `@` + addr)
+	servers := config.Servers.MatchedAppserver(serverFilter)
+	for _, server := range servers {
+		restartAppServer(server.SshAddr())
 	}
-	fmt.Printf("restart %d server!\n", len(addrs))
+	fmt.Printf("restart %d server!\n", len(servers))
 }
 
 func restartAppServer(address string) {

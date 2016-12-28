@@ -50,14 +50,14 @@ func (s *ServerConf) Matched(feature string) []Server {
 	return matched
 }
 
-func (s *ServerConf) MatchedAddrs(feature string) []string {
-	addrs := []string{}
+func (s *ServerConf) MatchedAppserver(feature string) []Server {
+	matched := []Server{}
 	for _, server := range s.All() {
-		if server.Match(feature) && !slice.ContainsString(addrs, server.Addr) {
-			addrs = append(addrs, server.Addr)
+		if server.Match(feature) && server.HasTask(`appserver`) {
+			matched = append(matched, server)
 		}
 	}
-	return addrs
+	return matched
 }
 
 func machineAddrs() []string {
