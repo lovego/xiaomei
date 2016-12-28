@@ -1,11 +1,11 @@
-package server
+package xm
 
 import (
 	"net/http"
 	"net/url"
 	"reflect"
 
-	"github.com/bughou-go/xiaomei/server/session"
+	"github.com/bughou-go/xiaomei/server/xm/session"
 )
 
 type Request struct {

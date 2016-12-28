@@ -1,4 +1,4 @@
-package server
+package xm
 
 // go test -c -gcflags "-N -l"
 

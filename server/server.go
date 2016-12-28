@@ -6,17 +6,18 @@ import (
 	"time"
 
 	"github.com/bughou-go/xiaomei/config"
-	"github.com/bughou-go/xiaomei/server/renderer"
-	"github.com/bughou-go/xiaomei/server/renderer/funcs"
-	"github.com/bughou-go/xiaomei/server/session"
+	"github.com/bughou-go/xiaomei/server/funcs"
+	"github.com/bughou-go/xiaomei/server/xm"
+	"github.com/bughou-go/xiaomei/server/xm/renderer"
+	"github.com/bughou-go/xiaomei/server/xm/session"
 )
 
 type Server struct {
-	FilterFunc     func(req *Request, res *Response) bool
-	Router         *Router
+	FilterFunc     func(req *xm.Request, res *xm.Response) bool
+	Router         *xm.Router
 	Session        session.Session
 	Renderer       *renderer.Renderer
-	LayoutDataFunc func(layout string, data interface{}, req *Request, res *Response) interface{}
+	LayoutDataFunc func(layout string, data interface{}, req *xm.Request, res *xm.Response) interface{}
 }
 
 func NewSession() session.Session {
@@ -36,8 +37,8 @@ func (s *Server) ListenAndServe() {
 
 	if err := http.ListenAndServe(addr, http.HandlerFunc(
 		func(response http.ResponseWriter, request *http.Request) {
-			req := NewRequest(request, s.Session)
-			res := NewResponse(response, req, s.Session, s.Renderer, s.LayoutDataFunc)
+			req := xm.NewRequest(request, s.Session)
+			res := xm.NewResponse(response, req, s.Session, s.Renderer, s.LayoutDataFunc)
 
 			var notFound bool
 			defer handleError(time.Now(), req, res, &notFound)
