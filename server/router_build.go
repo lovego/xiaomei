@@ -21,47 +21,55 @@ func (r *Router) Group(p string) *Router {
 }
 
 func (r *Router) Get(p string, handler StrRouteHandler) *Router {
-	return r.addStrRoute(`GET`, p, handler)
+	return r.Add(`GET`, p, handler)
 }
 
 func (r *Router) Post(p string, handler StrRouteHandler) *Router {
-	return r.addStrRoute(`POST`, p, handler)
+	return r.Add(`POST`, p, handler)
 }
 
 func (r *Router) GetPost(p string, handler StrRouteHandler) *Router {
-	return r.addStrRoute(`GET`, p, handler).addStrRoute(`POST`, p, handler)
+	return r.Add(`GET`, p, handler).Add(`POST`, p, handler)
 }
 
 func (r *Router) Put(p string, handler StrRouteHandler) *Router {
-	return r.addStrRoute(`PUT`, p, handler)
+	return r.Add(`PUT`, p, handler)
+}
+
+func (r *Router) Options(p string, handler StrRouteHandler) *Router {
+	return r.Add(`OPTIONS`, p, handler)
 }
 
 func (r *Router) Delete(p string, handler StrRouteHandler) *Router {
-	return r.addStrRoute(`DELETE`, p, handler)
+	return r.Add(`DELETE`, p, handler)
 }
 
 func (r *Router) GetX(reg string, handler RegRouteHandler) *Router {
-	return r.addRegRoute(`GET`, reg, handler)
+	return r.AddX(`GET`, reg, handler)
 }
 
 func (r *Router) PostX(reg string, handler RegRouteHandler) *Router {
-	return r.addRegRoute(`POST`, reg, handler)
+	return r.AddX(`POST`, reg, handler)
 }
 
 func (r *Router) GetPostX(reg string, handler RegRouteHandler) *Router {
-	return r.addRegRoute(`GET`, reg, handler).addRegRoute(`POST`, reg, handler)
+	return r.AddX(`GET`, reg, handler).AddX(`POST`, reg, handler)
 }
 
 func (r *Router) PutX(reg string, handler RegRouteHandler) *Router {
-	return r.addRegRoute(`PUT`, reg, handler)
+	return r.AddX(`PUT`, reg, handler)
 }
 
 func (r *Router) DeleteX(reg string, handler RegRouteHandler) *Router {
-	return r.addRegRoute(`DELETE`, reg, handler)
+	return r.AddX(`DELETE`, reg, handler)
+}
+
+func (r *Router) OptionsX(reg string, handler RegRouteHandler) *Router {
+	return r.AddX(`OPTIONS`, reg, handler)
 }
 
 // 增加字符串路由
-func (r *Router) addStrRoute(method string, p string, handler StrRouteHandler) *Router {
+func (r *Router) Add(method string, p string, handler StrRouteHandler) *Router {
 	p = cleanPath(p)
 	if r.basePath != `` {
 		p = path.Join(r.basePath, p)
@@ -74,7 +82,7 @@ func (r *Router) addStrRoute(method string, p string, handler StrRouteHandler) *
 }
 
 // 增加正则路由
-func (r *Router) addRegRoute(method string, reg string, handler RegRouteHandler) *Router {
+func (r *Router) AddX(method string, reg string, handler RegRouteHandler) *Router {
 	if r.regRoutes[method] == nil {
 		r.regRoutes[method] = make(map[string][]RegRoute)
 	}
