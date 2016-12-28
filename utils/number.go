@@ -1,15 +1,36 @@
 package utils
 
 import (
+	"fmt"
 	"gopkg.in/inf.v0"
+	"reflect"
+	"strconv"
 	"strings"
 )
 
-func ThousandSep(dec *inf.Dec) string {
-	if dec == nil {
+func ThousandSep(value interface{}) string {
+	if value == nil {
 		return `0`
 	}
-	number := dec.String()
+	var number string
+	switch value.(type) {
+	case string:
+		number = value.(string)
+	case *inf.Dec:
+		number = value.(*inf.Dec).String()
+	case int:
+		number = strconv.Itoa(value.(int))
+	case int64:
+		number = strconv.FormatInt(value.(int64), 10)
+	case float64:
+		number = fmt.Sprintf(`%0.2f`, value.(float64))
+	default:
+		panic(fmt.Sprintf(`unsupported value type: %v`, reflect.TypeOf(value).Name()))
+	}
+	return thousandSep(number)
+}
+
+func thousandSep(number string) string {
 	start, end := 0, len(number)
 	if number[0] == '-' {
 		start = 1
