@@ -60,7 +60,7 @@ func Cmds() []*cobra.Command {
 			Use:   `godoc`,
 			Short: `start godoc service.`,
 			RunE: func(c *cobra.Command, args []string) error {
-				return godoc.Start()
+				return godoc.InDevelop()
 			},
 		},
 	}

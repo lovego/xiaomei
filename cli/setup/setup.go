@@ -31,11 +31,13 @@ func Setup(tasks []string) {
 		case `cron`:
 			SetupCron()
 		case `godoc`:
-			godoc.Setup()
+			godoc.InDeploy()
 		case `nginx`:
 			nginx.Setup()
+			godoc.SetupNginxInDeploy()
 		case `appserver`:
 			appserver.Setup()
+			godoc.SetupUpstartInDeploy()
 		case `wait-appserver`:
 			appserver.Wait()
 		default:

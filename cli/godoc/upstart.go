@@ -2,15 +2,17 @@ package godoc
 
 import (
 	"bytes"
-	"strings"
 	"text/template"
 
-	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
-func Upstart(gopath, godoc string) error {
-	if err := writeUpstartConfig(gopath, godoc); err != nil {
+type upstartConf struct {
+	GoPath, GodocBin, Addr, IndexInterval string
+}
+
+func setupUpstart(conf *upstartConf) error {
+	if err := writeUpstartConfig(conf); err != nil {
 		return err
 	}
 	cmd.Run(cmd.O{}, `sudo`, `stop`, `godoc`)
@@ -18,20 +20,11 @@ func Upstart(gopath, godoc string) error {
 	return err
 }
 
-type upstartData struct {
-	config.Conf
-	GoPath, GodocBin string
-}
-
-func writeUpstartConfig(gopath, godoc string) error {
+func writeUpstartConfig(conf *upstartConf) error {
 	tmpl := template.Must(template.New(``).Parse(upstartConfig))
 
 	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, upstartData{
-		Conf:     config.Data(),
-		GoPath:   gopath,
-		GodocBin: strings.TrimSpace(godoc),
-	}); err != nil {
+	if err := tmpl.Execute(&buf, conf); err != nil {
 		panic(err)
 	}
 

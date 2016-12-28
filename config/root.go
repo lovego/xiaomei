@@ -9,6 +9,10 @@ import (
 	"github.com/bughou-go/xiaomei/utils"
 )
 
+func InProject() bool {
+	return detectRoot() != ``
+}
+
 func detectRoot() string {
 	program, cwd := absProgramPath()
 	if program == Fmwk.Bin() /* fmwk ... */ ||

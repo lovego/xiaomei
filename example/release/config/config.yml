@@ -20,6 +20,6 @@ deploy:
   gitBranch:
 
 godoc:
-  domain: godoc
+  domain: godoc.dev
   port: 1234
   indexInterval: -1
