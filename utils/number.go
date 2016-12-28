@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"gopkg.in/inf.v0"
 	"reflect"
 	"strconv"
 	"strings"
@@ -16,8 +15,6 @@ func ThousandSep(value interface{}) string {
 	switch value.(type) {
 	case string:
 		number = value.(string)
-	case *inf.Dec:
-		number = value.(*inf.Dec).String()
 	case int:
 		number = strconv.Itoa(value.(int))
 	case int64:

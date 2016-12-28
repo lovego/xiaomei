@@ -3,8 +3,6 @@ package config
 import (
 	"net"
 	"strings"
-
-	"github.com/bughou-go/xiaomei/utils/slice"
 )
 
 var Servers ServerConf

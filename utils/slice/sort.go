@@ -1,7 +1,6 @@
 package slice
 
 import (
-	"gopkg.in/inf.v0"
 	"reflect"
 	"sort"
 )
@@ -22,8 +21,6 @@ func (d sortable) Less(i, j int) bool {
 	jv := d.fieldValue(j, d.sort)
 	if iv != nil && jv != nil {
 		switch v := iv.(type) {
-		case *inf.Dec:
-			return v.Cmp(jv.(*inf.Dec)) < 0
 		case int:
 			return v < jv.(int)
 		default:
