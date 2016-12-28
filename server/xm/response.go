@@ -1,4 +1,4 @@
-package server
+package xm
 
 import (
 	"bufio"
@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/bughou-go/xiaomei/server/renderer"
-	"github.com/bughou-go/xiaomei/server/session"
+	"github.com/bughou-go/xiaomei/server/xm/renderer"
+	"github.com/bughou-go/xiaomei/server/xm/session"
 )
 
 type LayoutDataFunc func(layout string, data interface{}, req *Request, res *Response) interface{}

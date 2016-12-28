@@ -1,9 +1,9 @@
 package filter
 
 import (
-	"github.com/bughou-go/xiaomei/server"
+	"github.com/bughou-go/xiaomei/server/xm"
 )
 
-func Process(req *server.Request, res *server.Response) bool {
+func Process(req *xm.Request, res *xm.Response) bool {
 	return true
 }

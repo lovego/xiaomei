@@ -4,9 +4,10 @@ import (
 	"time"
 
 	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/server/xm"
 )
 
-func handleError(t time.Time, req *Request, res *Response, notFound *bool) {
+func handleError(t time.Time, req *xm.Request, res *xm.Response, notFound *bool) {
 	if *notFound {
 		handleNotFound(req, res)
 	}
@@ -21,7 +22,7 @@ func handleError(t time.Time, req *Request, res *Response, notFound *bool) {
 	}
 }
 
-func handleNotFound(req *Request, res *Response) {
+func handleNotFound(req *xm.Request, res *xm.Response) {
 	res.WriteHeader(404)
 	if res.Size() > 0 {
 		return
@@ -33,7 +34,7 @@ func handleNotFound(req *Request, res *Response) {
 	}
 }
 
-func handleServerError(req *Request, res *Response) {
+func handleServerError(req *xm.Request, res *xm.Response) {
 	res.WriteHeader(500)
 	if res.Size() > 0 {
 		return
