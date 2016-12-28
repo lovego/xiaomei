@@ -11,21 +11,20 @@ import (
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
-func Run() {
+func Run() error {
 	if err := build(); err != nil {
-		return
+		return err
 	}
 	tail := tailLog()
 	defer tail.Process.Kill()
 
 	config.Log(`starting.`)
 	if app, err := cmd.Start(cmd.O{}, config.App.Bin()); err != nil {
-		return
+		return err
 	} else {
 		appserver.WaitPort(os.Getpid(), app.Process.Pid)
-		app.Wait()
+		return app.Wait()
 	}
-
 }
 
 func tailLog() *exec.Cmd {

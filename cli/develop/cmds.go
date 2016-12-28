@@ -26,8 +26,8 @@ func Cmds() []*cobra.Command {
 		{
 			Use:   `run`,
 			Short: `build the binary and run it.`,
-			Run: func(c *cobra.Command, args []string) {
-				Run()
+			RunE: func(c *cobra.Command, args []string) error {
+				return Run()
 			},
 		},
 		{
