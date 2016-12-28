@@ -82,7 +82,7 @@ func testHandleReq(
 	method := strings.Replace(route.method, `x`, ``, 1)
 	path := strings.Replace(route.path, `(\d+)`, `123`, 1)
 	req, _ := http.NewRequest(method, prefix+path, nil)
-	r.Handle(&Request{Request: req}, nil, notFound)
+	r.Handle(&Request{Request: req}, nil)
 	if !matched[route.name] {
 		t.Errorf(`%s not matched`, prefix+path)
 	}
