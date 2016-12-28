@@ -3,6 +3,7 @@ package develop
 import (
 	"errors"
 
+	"github.com/bughou-go/xiaomei/cli/develop/copy2vendor"
 	"github.com/bughou-go/xiaomei/cli/godoc"
 	"github.com/spf13/cobra"
 )
@@ -63,5 +64,6 @@ func Cmds() []*cobra.Command {
 				return godoc.InDevelop()
 			},
 		},
+		copy2vendor.Cmds(),
 	}
 }
