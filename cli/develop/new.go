@@ -85,7 +85,6 @@ func checkPkgDir(dir string) error {
 func projectPath(dir string) (string, error) {
 	if dir == `` {
 		return ``, errors.New(`project name can't be empty.`)
-
 	}
 
 	if !filepath.IsAbs(dir) {
