@@ -33,9 +33,9 @@ type appConf struct {
 	Secret       string `yaml:"secret"`
 	StartTimeout string `yaml:"startTimeout"`
 
-	TimeZone TimeZoneConf `yaml:"timeZone"`
-	Mailer   MailerConf   `yaml:"mailer"`
-	Keeper   []string     `yaml:"keeper"`
+	TimeZone TimeZoneConf    `yaml:"timeZone"`
+	Mailer   MailerConf      `yaml:"mailer"`
+	Keepers  []mailer.People `yaml:"keepers"`
 }
 
 type TimeZoneConf struct {
@@ -44,7 +44,10 @@ type TimeZoneConf struct {
 }
 
 type MailerConf struct {
-	Host, Port, Sender, Passwd string
+	Host   string `yaml:"host"`
+	Port   string `yaml:"port"`
+	Sender mailer.People
+	Passwd string `yaml:"passwd"`
 }
 
 func (a *AppConf) Root() string {
@@ -114,9 +117,7 @@ func (a *AppConf) Mailer() *mailer.Mailer {
 	if !a.mailer.setted {
 		Load()
 		m := a.conf.Mailer
-		if m.Host != `` && m.Port != `` && m.Sender != `` {
-			a.mailer.Mailer = mailer.New(m.Host, m.Port, m.Sender, m.Passwd)
-		}
+		a.mailer.Mailer = mailer.New(m.Host, m.Port, m.Sender, m.Passwd)
 		a.mailer.setted = true
 	}
 	return a.mailer.Mailer
@@ -124,10 +125,10 @@ func (a *AppConf) Mailer() *mailer.Mailer {
 
 func (a *AppConf) Alarm(title, body string) {
 	title = Deploy.Name() + ` ` + title
-	a.Mailer().Send(&mailer.Message{Receivers: a.Keeper(), Title: title, Body: body})
+	a.Mailer().Send(&mailer.Message{Receivers: a.Keepers(), Title: title, Body: body})
 }
 
-func (a *AppConf) Keeper() []string {
+func (a *AppConf) Keepers() []mailer.People {
 	Load()
-	return a.conf.Keeper
+	return a.conf.Keepers
 }
