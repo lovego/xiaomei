@@ -8,28 +8,28 @@ func Cmds(serverFilter *string) []*cobra.Command {
 	return []*cobra.Command{
 		{
 			Use:   `restart`,
-			Short: `restart the specified environment appserver`,
+			Short: `[oam] restart appserver`,
 			Run: func(c *cobra.Command, args []string) {
 				Restart(*serverFilter)
 			},
 		},
 		{
 			Use:   `status`,
-			Short: `check the specified environment appserver status`,
+			Short: `[oam] show appserver status`,
 			Run: func(c *cobra.Command, args []string) {
 				Status(*serverFilter)
 			},
 		},
 		{
 			Use:   `shell`,
-			Short: `into the specified environment command line`,
+			Short: `[oam] enter shell`,
 			Run: func(c *cobra.Command, args []string) {
 				Shell(*serverFilter)
 			},
 		},
 		{
 			Use:   `exec <cmd> [<args>...]`,
-			Short: `execute the specified environment command`,
+			Short: `[oam] execute command`,
 			Run: func(c *cobra.Command, args []string) {
 				Exec(*serverFilter, args)
 			},

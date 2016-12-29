@@ -1,4 +1,4 @@
-package copy2vendor
+package develop
 
 import (
 	"errors"

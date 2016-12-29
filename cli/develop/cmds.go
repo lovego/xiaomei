@@ -3,7 +3,6 @@ package develop
 import (
 	"errors"
 
-	"github.com/bughou-go/xiaomei/cli/develop/copy2vendor"
 	"github.com/bughou-go/xiaomei/cli/godoc"
 	"github.com/spf13/cobra"
 )
@@ -12,7 +11,7 @@ func Cmds() []*cobra.Command {
 	return []*cobra.Command{
 		{
 			Use:   `new <project-name>`,
-			Short: `create a new project.`,
+			Short: `[develop] create a new project.`,
 			RunE: func(c *cobra.Command, args []string) error {
 				switch len(args) {
 				case 0:
@@ -26,21 +25,21 @@ func Cmds() []*cobra.Command {
 		},
 		{
 			Use:   `run`,
-			Short: `build the binary and run it.`,
+			Short: `[develop] build the binary and run it.`,
 			RunE: func(c *cobra.Command, args []string) error {
 				return Run()
 			},
 		},
 		{
 			Use:   `build`,
-			Short: `build the binary, check coding spec, compile assets.`,
+			Short: `[develop] build the binary, check coding spec, compile assets.`,
 			RunE: func(c *cobra.Command, args []string) error {
 				return Build()
 			},
 		},
 		{
 			Use:   `spec`,
-			Short: `check coding specification.`,
+			Short: `[develop] check coding specification.`,
 			RunE: func(c *cobra.Command, args []string) error {
 				arg := ``
 				if len(args) > 0 {
@@ -51,7 +50,7 @@ func Cmds() []*cobra.Command {
 		},
 		{
 			Use:   `assets`,
-			Short: `compile assets.`,
+			Short: `[develop] compile assets.`,
 			RunE: func(c *cobra.Command, args []string) error {
 				Assets(args)
 				return nil
@@ -59,18 +58,35 @@ func Cmds() []*cobra.Command {
 		},
 		{
 			Use:   `godoc`,
-			Short: `start godoc service.`,
+			Short: `[develop] start godoc service.`,
 			RunE: func(c *cobra.Command, args []string) error {
 				return godoc.InDevelop()
 			},
 		},
 		{
 			Use:   `deps`,
-			Short: `list all dependences of project.`,
+			Short: `[develop] list all dependences of project.`,
 			Run: func(c *cobra.Command, args []string) {
 				Dependences()
 			},
 		},
-		copy2vendor.Cmds(),
+		copy2vendorCmd(),
 	}
+}
+
+func copy2vendorCmd() *cobra.Command {
+	var n bool
+	cmd := &cobra.Command{
+		Use:   `copy2vendor`,
+		Short: `[develop] copy the specified packages to project vendor dir.`,
+		RunE: func(c *cobra.Command, args []string) error {
+			if len(args) <= 0 {
+				return errors.New(`need at least a package path`)
+			}
+			return Copy2Vendor(args, n)
+		},
+	}
+	flags := cmd.Flags()
+	flags.BoolVarP(&n, `no-clobber`, `n`, false, `do not overwrite an existing file.`)
+	return cmd
 }
