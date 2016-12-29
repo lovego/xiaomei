@@ -74,7 +74,7 @@ func checkDir(dir string) error {
 func pkgDeps(pkgDir string) (result []string) {
 	deps, _ := cmd.Run(cmd.O{Output: true}, `go`, `list`, `-e`, `-f`, `'{{join .Deps "\n" }}'`, pkgDir)
 	for _, dep := range strings.Split(deps, "\n") {
-		if strings.Contains(dep, `.`) {
+		if strings.Contains(dep, `.`) && !strings.Contains(dep, `vendor`) {
 			result = append(result, dep)
 		}
 	}
