@@ -7,7 +7,7 @@ import (
 func Cmd(serverFilter *string) *cobra.Command {
 	cmd := cobra.Command{
 		Use:   `deploy`,
-		Short: `deploy project to a environment.`,
+		Short: `[deploy] deploy project.`,
 		RunE: func(c *cobra.Command, args []string) error {
 			return Deploy(c.Flags().Arg(0), *serverFilter)
 		},
