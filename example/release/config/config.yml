@@ -9,9 +9,9 @@ app:
   mailer:
     host: imap.exmail.qq.com
     port: 25
-    sender: xiaomei<xiaomei-go@qq.com>
+    sender: { name: xiaomei, addr: xiaomei-go@qq.com }
     passwd: abc123
-  keepers: [ 'xiaomei<xiaomei-go@qq.com>' ]
+  keepers: [ { name: xiaomei, addr: xiaomei-go@qq.com } ]
 
 deploy:
   user: ubuntu

@@ -30,13 +30,9 @@ server {
   location ~ /.*\.html {
   }
 
-  location ^~ /static/ {
-		alias {{ .App.Root }}/public/;
-    expires max;
-  }
-
-  location = /favicon.ico {
-  }
+	location ~ \.(js|css|png|gif|jpg|svg|ico|woff|ttf|eot|map|json)$ {
+		expires max;
+	}
 
   access_log {{ .App.Root }}/log/nginx.log {{ .Deploy.Name }};
   error_log  {{ .App.Root }}/log/nginx.err;

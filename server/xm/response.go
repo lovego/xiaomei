@@ -79,14 +79,15 @@ func (res *Response) Json(data interface{}) {
 	}
 }
 
-func (res Response) Json2(data interface{}) {
-	bytes, err := json.Marshal(data)
-	if err == nil {
-		res.Header().Set(`Content-Type`, `application/json; charset=utf-8`)
-		res.Write(bytes)
+func (res Response) Json2(data interface{}, err error) {
+	type result struct {
+		Msg  string      `json:"msg"`
+		Data interface{} `json:"data"`
+	}
+	if err != nil {
+		res.Json(result{Msg: `ok`, Data: data})
 	} else {
-		res.Header().Set(`Content-Type`, `application/json; charset=utf-8`)
-		res.Write([]byte(`null`))
+		res.Json(result{Msg: err.Error()})
 	}
 }
 
