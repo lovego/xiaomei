@@ -9,7 +9,7 @@ func Cmds() *cobra.Command {
 	var n bool
 	copy := &cobra.Command{
 		Use:   `copy2vendor`,
-		Short: `copy the specified packages to project vendor.`,
+		Short: `copy the specified packages to project vendor dir.`,
 		RunE: func(c *cobra.Command, args []string) error {
 			if len(args) <= 0 {
 				return errors.New(`need at least a package path`)

@@ -64,6 +64,13 @@ func Cmds() []*cobra.Command {
 				return godoc.InDevelop()
 			},
 		},
+		{
+			Use:   `deps`,
+			Short: `list all dependences of project.`,
+			Run: func(c *cobra.Command, args []string) {
+				Dependences()
+			},
+		},
 		copy2vendor.Cmds(),
 	}
 }
