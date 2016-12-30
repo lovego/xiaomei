@@ -17,7 +17,7 @@ func Run() {
 		Short: `setup the specified tasks.`,
 	}
 	root.AddCommand(db.Cmds()...)
-	root.AddCommand(oam.Cmds(s)...)
+	root.AddCommand(oam.Cmds()...)
 	root.AddCommand(setup.Cmd())
 
 	root.Execute()

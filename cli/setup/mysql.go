@@ -13,17 +13,17 @@ import (
 )
 
 func SetupMysql() {
-	options := dsn.MysqlDSN(config.DB.Mysql(``)).Options()
-	if msg := createDatabaseAndTables(options); msg == `ok` {
+	flags := dsn.Mysql(config.DB.Mysql(``)).Flags()
+	if msg := createDatabaseAndTables(flags); msg == `ok` {
 		fmt.Println(`setup mysql ok.`)
 	} else {
 		fmt.Println(msg)
 	}
 }
 
-func createDatabaseAndTables(options []string) string {
-	l := len(options)
-	db := options[l-1]
+func createDatabaseAndTables(flags []string) string {
+	l := len(flags)
+	db := flags[l-1]
 
 	createDb := fmt.Sprintf(`create database if not exists %s charset utf8; use %s;`, db, db)
 	filePath := path.Join(config.App.Root(), `config/data/ddl.mysql`)
@@ -36,15 +36,15 @@ func createDatabaseAndTables(options []string) string {
 	}
 	sqls := bytes.NewBufferString(createDb + string(createTables))
 
-	cmd.Run(cmd.O{Stdin: sqls, Panic: true}, `mysql`, options[:l-1]...)
+	cmd.Run(cmd.O{Stdin: sqls, Panic: true}, `mysql`, flags[:l-1]...)
 	return `ok`
 }
 
-func loadData(options []string) {
+func loadData(flags []string) {
 	insert_data, err := ioutil.ReadFile(path.Join(config.App.Root(), `config/data/data.mysql`))
 	if err != nil {
 		panic(err)
 	}
 	sqls := bytes.NewBuffer(insert_data)
-	cmd.Run(cmd.O{Stdin: sqls, Panic: true}, `mysql`, options...)
+	cmd.Run(cmd.O{Stdin: sqls, Panic: true}, `mysql`, flags...)
 }

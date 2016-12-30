@@ -3,7 +3,6 @@ package deploy
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"path"
 	"regexp"
 	"strings"
@@ -25,9 +24,6 @@ type DeployConfig struct {
 }
 
 func Deploy(commit, serverFilter string) error {
-	if err := os.Chdir(config.App.Root()); err != nil {
-		return err
-	}
 	tag, err := setupDeployTag(commit)
 	if err != nil {
 		return err

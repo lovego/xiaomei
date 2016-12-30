@@ -1,8 +1,8 @@
 package setup
 
 import (
-	"github.com/bughou-go/xiaomei/cli/godoc"
 	"github.com/bughou-go/xiaomei/cli/setup/appserver"
+	"github.com/bughou-go/xiaomei/cli/setup/godoc"
 	"github.com/bughou-go/xiaomei/cli/setup/nginx"
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/spf13/cobra"

@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func Cmds(serverFilter *string) []*cobra.Command {
+func Cmds() []*cobra.Command {
 	return []*cobra.Command{
 		makeCmd(`status`, `show appserver status`, Status),
 		makeCmd(`restart`, `restart appserver`, Restart),

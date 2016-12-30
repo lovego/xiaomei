@@ -3,7 +3,7 @@ package develop
 import (
 	"errors"
 
-	"github.com/bughou-go/xiaomei/cli/godoc"
+	"github.com/bughou-go/xiaomei/cli/setup/godoc"
 	"github.com/spf13/cobra"
 )
 
