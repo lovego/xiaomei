@@ -6,33 +6,22 @@ import (
 
 func Cmds(serverFilter *string) []*cobra.Command {
 	return []*cobra.Command{
-		{
-			Use:   `restart`,
-			Short: `[oam] restart appserver`,
-			Run: func(c *cobra.Command, args []string) {
-				Restart(*serverFilter)
-			},
-		},
-		{
-			Use:   `status`,
-			Short: `[oam] show appserver status`,
-			Run: func(c *cobra.Command, args []string) {
-				Status(*serverFilter)
-			},
-		},
-		{
-			Use:   `shell`,
-			Short: `[oam] enter shell`,
-			Run: func(c *cobra.Command, args []string) {
-				Shell(*serverFilter)
-			},
-		},
-		{
-			Use:   `exec <cmd> [<args>...]`,
-			Short: `[oam] execute command`,
-			Run: func(c *cobra.Command, args []string) {
-				Exec(*serverFilter, args)
-			},
+		makeCmd(`status`, `show appserver status`, Status),
+		makeCmd(`restart`, `restart appserver`, Restart),
+		makeCmd(`shell`, `enter shell`, Shell),
+		makeCmd(`exec <cmd> [<args>...]`, `execute command`, Exec),
+	}
+}
+
+func makeCmd(use, short string, fun func(filter string, args []string) error) *cobra.Command {
+	var filter *string
+	cmd := &cobra.Command{
+		Use:   use,
+		Short: `[oam] ` + short,
+		RunE: func(c *cobra.Command, args []string) error {
+			return fun(*filter, args)
 		},
 	}
+	filter = cmd.Flags().StringP(`server`, `s`, ``, `match servers by Addr or Tasks.`)
+	return cmd
 }

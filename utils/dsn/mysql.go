@@ -6,11 +6,11 @@ import (
 	"regexp"
 )
 
-type MysqlConf struct {
+type MysqlDSN struct {
 	Host, Port, User, Passwd, Db string
 }
 
-func MysqlDSN(uri string) MysqlConf {
+func Mysql(uri string) MysqlDSN {
 	if uri == `` {
 		fmt.Println(`invalid mysql config`)
 		os.Exit(1)
@@ -21,9 +21,9 @@ func MysqlDSN(uri string) MysqlConf {
 	if len(m) == 0 {
 		panic(`mysql addr match faild.`)
 	}
-	return MysqlConf{m[3], m[4], m[1], m[2], m[5]}
+	return MysqlDSN{m[3], m[4], m[1], m[2], m[5]}
 }
 
-func (c MysqlConf) Options() []string {
+func (c MysqlDSN) Flags() []string {
 	return []string{`-h` + c.Host, `-u` + c.User, `-p` + c.Passwd, `-P` + c.Port, c.Db}
 }

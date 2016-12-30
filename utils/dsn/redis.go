@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-type RedisConf struct {
+type RedisDSN struct {
 	Passwd, Host, Port, Db string
 }
 
-func RedisDSN(uri string) RedisConf {
+func Redis(uri string) RedisDSN {
 	if uri == `` {
 		fmt.Println(`invalid redis config`)
 		os.Exit(1)
@@ -20,7 +20,7 @@ func RedisDSN(uri string) RedisConf {
 	if err != nil {
 		panic(err)
 	}
-	c := RedisConf{}
+	c := RedisDSN{}
 	passwd, has := info.User.Password()
 	if has {
 		c.Passwd = passwd
@@ -31,11 +31,11 @@ func RedisDSN(uri string) RedisConf {
 	return c
 }
 
-func (c RedisConf) Options() []string {
-	options := []string{}
+func (c RedisDSN) Flags() []string {
+	flags := []string{}
 	if c.Passwd != `` {
-		options = append(options, `-a`, c.Passwd)
+		flags = append(flags, `-a`, c.Passwd)
 	}
-	options = append(options, `-h`, c.Host, `-p`, c.Port, `-n`, c.Db)
-	return options
+	flags = append(flags, `-h`, c.Host, `-p`, c.Port, `-n`, c.Db)
+	return flags
 }

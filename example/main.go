@@ -13,7 +13,7 @@ import (
 
 func main() {
 	if len(os.Args) > 1 {
-		cli.RunSetup()
+		cli.Run()
 	} else {
 		svr := &server.Server{
 			FilterFunc:     filter.Process,

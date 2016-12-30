@@ -1,10 +1,5 @@
 package config
 
-import (
-	"net"
-	"strings"
-)
-
 var Servers ServerConf
 
 type ServerConf struct {
@@ -19,9 +14,8 @@ func (s *ServerConf) All() []Server {
 }
 
 func (s *ServerConf) CurrentAppServer() *Server {
-	addrs := machineAddrs()
 	for _, server := range s.All() {
-		if server.HasTask(`appserver`) && server.HasAddr(addrs) {
+		if server.HasTask(`appserver`) && server.IsLocal() {
 			return &server
 		}
 	}
@@ -29,9 +23,8 @@ func (s *ServerConf) CurrentAppServer() *Server {
 }
 
 func (s *ServerConf) CurrentTasks() (tasks []string) {
-	addrs := machineAddrs()
 	for _, server := range s.All() {
-		if server.HasAddr(addrs) {
+		if server.IsLocal() {
 			tasks = append(tasks, server.Tasks...)
 		}
 	}
@@ -39,6 +32,9 @@ func (s *ServerConf) CurrentTasks() (tasks []string) {
 }
 
 func (s *ServerConf) Matched(feature string) []Server {
+	if feature == `` {
+		return s.All()
+	}
 	matched := []Server{}
 	for _, server := range s.All() {
 		if server.Match(feature) {
@@ -48,28 +44,15 @@ func (s *ServerConf) Matched(feature string) []Server {
 	return matched
 }
 
-func (s *ServerConf) MatchedAppserver(feature string) []Server {
+func (s *ServerConf) Matched2(feature, task string) []Server {
+	if feature == `` && task == `` {
+		return s.All()
+	}
 	matched := []Server{}
 	for _, server := range s.All() {
-		if server.Match(feature) && server.HasTask(`appserver`) {
+		if server.Match(feature) && server.HasTask(task) {
 			matched = append(matched, server)
 		}
 	}
 	return matched
-}
-
-func machineAddrs() []string {
-	ifcAddrs, err := net.InterfaceAddrs()
-	if err != nil {
-		panic(err)
-	}
-	result := make([]string, len(ifcAddrs))
-	for i, ifcAddr := range ifcAddrs {
-		addr := ifcAddr.String()
-		if i := strings.IndexByte(addr, '/'); i >= 0 {
-			addr = addr[:i]
-		}
-		result[i] = addr
-	}
-	return result
 }

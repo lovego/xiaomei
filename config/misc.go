@@ -16,6 +16,11 @@ func Log(msg string) {
 	println(time.Now().Format(ISO8601), msg)
 }
 
+func IsLocalEnv() bool {
+	goenv := os.Getenv(`GOENV`)
+	return goenv == `` || goenv == App.Env()
+}
+
 func Debug(name string) bool {
 	matched, _ := regexp.MatchString(`\b`+name+`\b`, os.Getenv(`debug`))
 	return matched
