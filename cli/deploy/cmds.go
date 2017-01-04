@@ -22,5 +22,13 @@ func Cmd() *cobra.Command {
 			return ClearTags()
 		},
 	})
+
+	cmd.AddCommand(&cobra.Command{
+		Use:   `clear-local-tags`,
+		Short: `clear local deploy tags.`,
+		RunE: func(c *cobra.Command, args []string) error {
+			return ClearLocalTags()
+		},
+	})
 	return &cmd
 }

@@ -2,6 +2,7 @@ package cli
 
 import (
 	"github.com/bughou-go/xiaomei/cli/db"
+	"github.com/bughou-go/xiaomei/cli/deploy"
 	"github.com/bughou-go/xiaomei/cli/oam"
 	"github.com/bughou-go/xiaomei/cli/setup"
 	"github.com/bughou-go/xiaomei/config"
@@ -18,7 +19,7 @@ func Run() {
 	}
 	root.AddCommand(db.Cmds()...)
 	root.AddCommand(oam.Cmds()...)
-	root.AddCommand(setup.Cmd())
+	root.AddCommand(deploy.Cmd(), setup.Cmd())
 
 	root.Execute()
 }

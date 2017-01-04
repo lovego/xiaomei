@@ -32,6 +32,15 @@ func ClearRemoteTags() ([]string, error) {
 	return refs2tags(refs[obsoleteCount:]), err
 }
 
+// clear local obsolete deploy tags
+func ClearLocalTags() error {
+	if refs, err := getRemoteTagRefs(); err != nil {
+		return err
+	} else {
+		return clearLocalTags(refs2tags(refs))
+	}
+}
+
 const tagRefsPrefix = `refs/tags/`
 
 func getRemoteTagRefs() ([]string, error) {
@@ -61,15 +70,6 @@ func refs2tags(refs []string) (result []string) {
 		result = append(result, ref[len(tagRefsPrefix):])
 	}
 	return
-}
-
-// clear local obsolete deploy tags
-func ClearLocalTags() error {
-	if refs, err := getRemoteTagRefs(); err != nil {
-		return err
-	} else {
-		return clearLocalTags(refs2tags(refs))
-	}
 }
 
 func clearLocalTags(remoteTags []string) error {
