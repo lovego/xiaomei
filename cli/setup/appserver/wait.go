@@ -54,8 +54,8 @@ var suffixDigits = regexp.MustCompile(`^\d+`)
 
 func getPpid() string {
 	deployName := config.Deploy.Name()
-	status, _ := cmd.Run(cmd.O{Output: true, Panic: true}, `status`, deployName)
-	prefix := deployName + ` start/post-start, process `
+	status, _ := cmd.Run(cmd.O{Output: true, Panic: true}, `status`, `apps/`+deployName)
+	prefix := `apps/` + deployName + ` start/post-start, process `
 	if !strings.HasPrefix(status, prefix) {
 		config.Log(`unexpected status: ` + status + `.`)
 		return ``

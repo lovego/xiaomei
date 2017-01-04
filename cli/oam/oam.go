@@ -9,7 +9,7 @@ import (
 )
 
 func Status(serverFilter string, args []string) error {
-	return run(serverFilter, `status `+config.Deploy.Name()+`; ps -FC `+config.App.Name()+`; true`)
+	return run(serverFilter, `status apps/`+config.Deploy.Name()+`; ps -FC `+config.App.Name()+`; true`)
 }
 
 func Restart(serverFilter string, args []string) error {

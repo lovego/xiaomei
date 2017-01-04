@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"syscall"
 )
@@ -107,6 +108,11 @@ func setupStdIO(cmd *exec.Cmd, o O) {
 }
 
 func SudoWriteFile(file string, reader io.Reader) {
+	dir := filepath.Dir(file)
+	if !isDir(dir) {
+		Run(O{Panic: true}, `sudo`, `mkdir`, `-p`, dir)
+	}
+
 	cmd := exec.Command(`sudo`, `cp`, `/dev/stdin`, file)
 	cmd.Stdin = reader
 	cmd.Stdout = os.Stdout
@@ -115,4 +121,9 @@ func SudoWriteFile(file string, reader io.Reader) {
 		panic(err)
 	}
 	Run(O{Panic: true}, `sudo`, `chmod`, `644`, file)
+}
+
+func isDir(p string) bool {
+	fi, _ := os.Stat(p)
+	return fi != nil && fi.IsDir()
 }

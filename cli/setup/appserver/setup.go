@@ -21,5 +21,5 @@ func writeUpstartConfig() {
 		panic(err)
 	}
 
-	cmd.SudoWriteFile(`/etc/init/`+config.Deploy.Name()+`.conf`, &buf)
+	cmd.SudoWriteFile(`/etc/init/apps/`+config.Deploy.Name()+`.conf`, &buf)
 }

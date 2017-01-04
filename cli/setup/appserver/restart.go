@@ -20,7 +20,7 @@ func Restart() {
 
 func Stop() {
 	var buf bytes.Buffer
-	cmd.Run(cmd.O{Stderr: &buf}, `sudo`, `stop`, config.Deploy.Name())
+	cmd.Run(cmd.O{Stderr: &buf}, `sudo`, `stop`, `apps/`+config.Deploy.Name())
 	stdErr := buf.String()
 	if stdErr != "stop: Unknown instance: \n" {
 		print(stdErr)
@@ -30,7 +30,7 @@ func Stop() {
 func Start() {
 	tail := tailLog()
 	defer tail.Process.Kill()
-	output, _ := cmd.Run(cmd.O{Panic: true, Output: true}, `sudo`, `start`, config.Deploy.Name())
+	output, _ := cmd.Run(cmd.O{Panic: true, Output: true}, `sudo`, `start`, `apps/`+config.Deploy.Name())
 
 	println(output)
 	if !strings.Contains(output, `start/running,`) {

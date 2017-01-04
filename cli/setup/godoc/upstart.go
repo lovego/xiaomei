@@ -15,8 +15,15 @@ func setupUpstart(conf *upstartConf) error {
 	if err := writeUpstartConfig(conf); err != nil {
 		return err
 	}
-	cmd.Run(cmd.O{}, `sudo`, `stop`, `godoc`)
-	_, err := cmd.Run(cmd.O{}, `sudo`, `start`, `godoc`)
+
+	var buf bytes.Buffer
+	cmd.Run(cmd.O{Stderr: &buf}, `sudo`, `stop`, `apps/godoc`)
+	stdErr := buf.String()
+	if stdErr != "stop: Unknown instance: \n" {
+		print(stdErr)
+	}
+
+	_, err := cmd.Run(cmd.O{}, `sudo`, `start`, `apps/godoc`)
 	return err
 }
 
@@ -28,6 +35,6 @@ func writeUpstartConfig(conf *upstartConf) error {
 		panic(err)
 	}
 
-	cmd.SudoWriteFile(`/etc/init/godoc.conf`, &buf)
+	cmd.SudoWriteFile(`/etc/init/apps/godoc.conf`, &buf)
 	return nil
 }
