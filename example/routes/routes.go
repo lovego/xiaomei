@@ -31,5 +31,9 @@ func Get() *xm.Router {
 		res.Json(sess)
 	})
 
+	router.Get(`/session-delete`, func(req *xm.Request, res *xm.Response) {
+		res.Session(nil)
+	})
+
 	return router
 }

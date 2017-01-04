@@ -3,6 +3,7 @@ package session
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/securecookie"
 )
@@ -39,6 +40,7 @@ func (cs *CookieSession) Set(res http.ResponseWriter, data interface{}) {
 	ck := cs.cookie // make a copy
 	if data == nil {
 		ck.MaxAge = -1
+		ck.Expires = time.Unix(1, 0)
 	} else {
 		if encoded, err := cs.secure.Encode(cs.cookie.Name, data); err == nil {
 			ck.Value = encoded
