@@ -23,6 +23,7 @@ type Server struct {
 func NewSession() session.Session {
 	return session.NewCookieSession(http.Cookie{
 		Name: config.App.Name(),
+		Path: `/`,
 	}, config.App.Secret())
 }
 
