@@ -66,6 +66,7 @@ func getDirFiles(dir string) (paths []string) {
 }
 
 func getAssets(assetsPath string) (assets map[string]string) {
+	assets = make(map[string]string)
 	data, err := ioutil.ReadFile(assetsPath)
 	if err != nil {
 		panic(err)
