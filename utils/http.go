@@ -37,3 +37,21 @@ func Http(method, url string, headers map[string]string, body io.Reader, data in
 	}
 	return content
 }
+
+func HttpStatus(method, url string, headers map[string]string, body io.Reader) int {
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		panic(err)
+	}
+	for k, v := range headers {
+		req.Header.Set(k, v)
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if resp != nil {
+		defer resp.Body.Close()
+	}
+	if err != nil {
+		panic(err)
+	}
+	return resp.StatusCode
+}
