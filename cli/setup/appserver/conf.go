@@ -2,7 +2,7 @@ package appserver
 
 const upstartConfig = `# vim: set ft=upstart:
 
-env PATH={{.PATH}}
+env PATH={{.Path}}
 chdir {{.App.Root}}
 setuid {{.Deploy.User}}
 

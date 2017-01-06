@@ -24,7 +24,7 @@ func writeUpstartConfig() {
 		config.Conf
 		Path string
 	}{
-		config.Data(), upstartPath(),
+		config.Data(), os.Getenv(`PATH`),
 	}); err != nil {
 		panic(err)
 	}
@@ -37,6 +37,7 @@ func upstartPath() string {
 	if path == `` {
 		path = `/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin`
 	}
+
 	if gopath := os.Getenv(`GOPATH`); gopath != `` {
 		for _, workspace := range strings.Split(gopath, `:`) {
 			path += `:` + filepath.Join(workspace, `bin`)

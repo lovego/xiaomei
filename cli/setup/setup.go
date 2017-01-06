@@ -11,7 +11,7 @@ import (
 func Cmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   `setup [nginx|appserver|hosts|mysql|cron|godoc] ...`,
-		Short: `[deploy] setup nginx, appserver, hosts, mysql, cron and godoc.`,
+		Short: `setup nginx, appserver, hosts, mysql, cron and godoc.`,
 		Run: func(c *cobra.Command, args []string) {
 			Setup(args)
 		},

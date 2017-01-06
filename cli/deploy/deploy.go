@@ -20,7 +20,7 @@ func Deploy(commit, serverFilter string) error {
 		color.Cyan(sshAddr)
 		if !updated[server.Addr] {
 			updateCode(sshAddr, tag)
-			copyBinary(sshAddr, tag)
+			copyBinaries(sshAddr, tag)
 			updated[server.Addr] = true
 		}
 		setupTasks(sshAddr, tag, server.Tasks)

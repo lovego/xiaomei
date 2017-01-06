@@ -8,7 +8,7 @@ func Cmd() *cobra.Command {
 	var filter *string
 	cmd := cobra.Command{
 		Use:   `deploy`,
-		Short: `[deploy] deploy project.`,
+		Short: `deploy project.`,
 		RunE: func(c *cobra.Command, args []string) error {
 			return Deploy(c.Flags().Arg(0), *filter)
 		},
