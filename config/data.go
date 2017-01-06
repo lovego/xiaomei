@@ -1,6 +1,7 @@
 package config
 
 type Conf struct {
+	Fmwk    *FmwkConf
 	App     *AppConf
 	Db      *DbConf
 	Deploy  *DeployConf
@@ -9,5 +10,5 @@ type Conf struct {
 }
 
 func Data() Conf {
-	return Conf{&App, &DB, &Deploy, &Godoc, &Servers}
+	return Conf{&Fmwk, &App, &DB, &Deploy, &Godoc, &Servers}
 }

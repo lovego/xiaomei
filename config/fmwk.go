@@ -5,23 +5,27 @@ import (
 	"path/filepath"
 
 	"github.com/bughou-go/xiaomei/utils"
+	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
-var Fmwk fmwk
+var Fmwk FmwkConf
 
-type fmwk struct {
-	root string
+type FmwkConf struct {
+	root, bin string
 }
 
-func (f *fmwk) Path() string {
+func (f *FmwkConf) Path() string {
 	return `github.com/bughou-go/xiaomei`
 }
 
-func (f *fmwk) Bin() string {
-	return filepath.Join(os.Getenv(`GOPATH`), `bin`, filepath.Base(f.Path()))
+func (f *FmwkConf) Bin() string {
+	if f.bin == `` {
+		f.bin, _ = cmd.Run(cmd.O{Output: true, Panic: true}, `which`, `xiaomei`)
+	}
+	return f.bin
 }
 
-func (f *fmwk) Root() string {
+func (f *FmwkConf) Root() string {
 	if f.root != `` {
 		return f.root
 	}

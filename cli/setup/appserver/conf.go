@@ -2,8 +2,9 @@ package appserver
 
 const upstartConfig = `# vim: set ft=upstart:
 
-setuid {{.Deploy.User}}
+env PATH={{.PATH}}
 chdir {{.App.Root}}
+setuid {{.Deploy.User}}
 
 start on {{.Servers.CurrentAppServer.AppStartOn}}
 respawn
@@ -23,7 +24,7 @@ post-start script
   set +e
   exec >>log/appserver.log 2>&1
 
-  ./{{.App.Name}} setup wait-appserver
+  xiaomei setup wait-appserver
 end script
 
 post-stop script

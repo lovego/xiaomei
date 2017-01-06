@@ -18,7 +18,7 @@ func Log(msg string) {
 
 func IsLocalEnv() bool {
 	goenv := os.Getenv(`GOENV`)
-	return goenv == `` || goenv == App.Env()
+	return goenv == ``
 }
 
 func Debug(name string) bool {

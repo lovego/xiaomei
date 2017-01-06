@@ -48,8 +48,8 @@ main () {
 
   ln -sfT envs/{{.App.Env}}.yml config/env.yml || exit 1
   ln -sfT bins/{{ .GitTag }} {{ .App.Name }} || exit 1
-  ./{{ .App.Name }} setup {{ .Tasks }} || exit 1
-  ./{{ .App.Name }} deploy clear-local-tags || exit 1
+  xiaomei setup {{ .Tasks }} || exit 1
+  xiaomei deploy clear-local-tags || exit 1
 }
 
 main

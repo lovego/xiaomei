@@ -24,7 +24,7 @@ func Spec(t string) error {
 	}
 
 	if !cmd.Ok(cmd.O{NoStdout: true}, `which`, `gospec`) {
-		cmd.Run(cmd.O{Panic: true}, `go`, `get`, `-u`, `github.com/bughou-go/spec/gospec`)
+		cmd.Run(cmd.O{Panic: true}, `go`, `get`, `-v`, `github.com/bughou-go/spec/gospec`)
 	}
 
 	if cmd.Ok(cmd.O{}, `gospec`, targets...) {
@@ -49,9 +49,9 @@ func specTargets() []string {
 }
 
 func specChangedTargets(targets []string) []string {
-	output, _ := cmd.Run(cmd.O{Output: true}, `git`,
-		append([]string{`diff`, `--name-only`, `--diff-filter=AMR`, `--`}, targets...)...,
-	)
+	output, _ := cmd.Run(cmd.O{Output: true}, `git`, append(
+		[]string{`diff`, `--name-only`, `--diff-filter=AMR`, `--relative`, `--`}, targets...,
+	)...)
 	lines := strings.Split(output, "\n")
 	results := []string{}
 	for _, v := range lines {

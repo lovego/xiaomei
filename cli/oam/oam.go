@@ -17,7 +17,7 @@ func Restart(serverFilter string, args []string) error {
 		appserver.Restart()
 		return nil
 	} else {
-		return run(serverFilter, `cd `+config.Deploy.Path()+`; ./`+config.App.Name()+` restart`)
+		return run(serverFilter, `cd `+config.Deploy.Path()+`; xiaomei restart`)
 	}
 }
 

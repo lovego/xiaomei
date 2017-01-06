@@ -1,10 +1,8 @@
 package main
 
 import (
-	"os"
 	"strings"
 
-	"github.com/bughou-go/xiaomei/cli"
 	"github.com/bughou-go/xiaomei/example/filter"
 	"github.com/bughou-go/xiaomei/example/routes"
 	"github.com/bughou-go/xiaomei/server"
@@ -12,18 +10,14 @@ import (
 )
 
 func main() {
-	if len(os.Args) > 1 {
-		cli.Run()
-	} else {
-		svr := &server.Server{
-			FilterFunc:     filter.Process,
-			Router:         routes.Get(),
-			Session:        server.NewSession(),
-			Renderer:       server.NewRenderer(),
-			LayoutDataFunc: layoutData,
-		}
-		svr.ListenAndServe()
+	svr := &server.Server{
+		FilterFunc:     filter.Process,
+		Router:         routes.Get(),
+		Session:        server.NewSession(),
+		Renderer:       server.NewRenderer(),
+		LayoutDataFunc: layoutData,
 	}
+	svr.ListenAndServe()
 }
 
 func layoutData(
