@@ -6,5 +6,5 @@ import (
 )
 
 func TestMachineAddrs(t *testing.T) {
-	fmt.Println(machineAddrs())
+	fmt.Println(MachineAddrs())
 }
