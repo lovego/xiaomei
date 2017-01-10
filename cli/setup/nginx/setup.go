@@ -4,6 +4,7 @@ import (
 	"bytes"
 	// "fmt"
 	"path"
+	"strings"
 	"text/template"
 
 	"github.com/bughou-go/xiaomei/config"
@@ -12,19 +13,29 @@ import (
 )
 
 func Setup() {
-	writeConfig()
+	writeMainConfig()
+	writeServerConfig()
 
 	cmd.Run(cmd.O{Panic: true}, `sudo`, `nginx`, `-t`)
 	cmd.Run(cmd.O{Panic: true}, `sudo`, `service`, `nginx`, `restart`)
 }
 
-func writeConfig() {
+func writeMainConfig() {
+	confFile := path.Join(config.App.Root(), `deploy/nginx.conf`)
+	if utils.IsFile(confFile) {
+		cmd.Run(cmd.O{Panic: true}, `sudo`, `cp`, confFile, `/etc/nginx/`)
+	} else {
+		cmd.SudoWriteFile(`/etc/nginx/nginx.conf`, strings.NewReader(defaultMainConfig))
+	}
+}
+
+func writeServerConfig() {
 	var tmpl *template.Template
 	confFile := path.Join(config.App.Root(), `deploy/nginx.tmpl.conf`)
 	if utils.IsFile(confFile) {
 		tmpl = template.Must(template.ParseFiles(confFile))
 	} else {
-		tmpl = template.Must(template.New(``).Parse(defaultConfig))
+		tmpl = template.Must(template.New(``).Parse(defaultServerConfig))
 	}
 
 	var buf bytes.Buffer

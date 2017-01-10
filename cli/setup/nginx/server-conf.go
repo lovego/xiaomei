@@ -1,11 +1,6 @@
 package nginx
 
-const defaultConfig = `# vim: set ft=nginx:
-
-log_format {{ .Deploy.Name }} '$time_iso8601 $host'
-	' $request_method $request_uri $content_length $remote_addr'
-	' $status $body_bytes_sent $request_time'
-	' $remote_addr "$http_referer" "$http_user_agent"';
+const defaultServerConfig = `# vim: set ft=nginx:
 
 upstream {{ .Deploy.Name }} {
 {{- range .Servers.All -}}
@@ -34,7 +29,7 @@ server {
 		expires max;
 	}
 
-  access_log {{ .App.Root }}/log/nginx.log {{ .Deploy.Name }};
+  access_log {{ .App.Root }}/log/nginx.log std;
   error_log  {{ .App.Root }}/log/nginx.err;
 }
 `

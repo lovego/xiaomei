@@ -28,7 +28,8 @@ func Wait() {
 // wait until the AppPort has been bound.
 func WaitPort(ppid, pid int) {
 	pidStr := strconv.Itoa(pid)
-	for w := time.Duration(0); w <= config.App.StartTimeout(); w += time.Second {
+	const step = 100 * time.Millisecond
+	for w := time.Duration(0); w <= config.App.StartTimeout(); w += step {
 		if cmd.Ok(cmd.O{NoStdout: true, NoStderr: true},
 			`lsof`, `-ap`, pidStr, `-itcp:`+config.App.Port(),
 		) {
@@ -39,7 +40,7 @@ func WaitPort(ppid, pid int) {
 			config.Log(color.RedString(`starting failed.`))
 			return
 		}
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(step)
 	}
 	syscall.Kill(-ppid, syscall.SIGTERM) // kill process group
 	config.Log(`starting timeout.`)
