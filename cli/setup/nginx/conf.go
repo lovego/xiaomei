@@ -30,7 +30,7 @@ server {
   location ~ /.*\.html {
   }
 
-	location ~ \.(js|css|png|gif|jpg|svg|ico|woff|ttf|eot|map|json)$ {
+	location ~ \.(js|css|png|gif|jpg|svg|ico|woff|woff2|ttf|eot|map|json)$ {
 		expires max;
 	}
 

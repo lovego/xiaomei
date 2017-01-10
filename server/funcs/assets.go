@@ -28,7 +28,7 @@ func AssetFunc(dev bool) func(string) string {
 		if dev {
 			return src + `?` + modificationTime(src)
 		}
-		if mt, ok := assets[src[7:]]; ok {
+		if mt, ok := assets[src]; ok {
 			return src + `?` + mt
 		} else {
 			return src
@@ -37,7 +37,7 @@ func AssetFunc(dev bool) func(string) string {
 }
 
 func modificationTime(src string) string {
-	info, err := os.Stat(path.Join(config.App.Root(), `public`, src[7:])) // remove "/static" prefix
+	info, err := os.Stat(path.Join(config.App.Root(), `public`, src))
 	if err != nil {
 		panic(err)
 	}
