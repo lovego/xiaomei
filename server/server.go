@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 	"path"
+	"runtime"
 	"time"
 
 	"github.com/bughou-go/xiaomei/config"
@@ -11,6 +12,12 @@ import (
 	"github.com/bughou-go/xiaomei/server/xm/renderer"
 	"github.com/bughou-go/xiaomei/server/xm/session"
 )
+
+func init() {
+	if n := runtime.NumCPU() - 1; n >= 1 {
+		runtime.GOMAXPROCS(n)
+	}
+}
 
 type Server struct {
 	FilterFunc     func(req *xm.Request, res *xm.Response) bool
