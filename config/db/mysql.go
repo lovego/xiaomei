@@ -2,22 +2,22 @@ package db
 
 import (
 	"database/sql"
+	"sync"
 	"time"
 
 	"github.com/bughou-go/xiaomei/config"
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var mysqlConns map[string]*sql.DB
-
-func init() {
-	if mysqlConns == nil {
-		mysqlConns = make(map[string]*sql.DB)
-	}
-}
+var mysqlConns = struct {
+	sync.RWMutex
+	m map[string]*sql.DB
+}{m: make(map[string]*sql.DB)}
 
 func Mysql(name string) *sql.DB {
+	mysqlConns.RLock()
 	mysql := mysqlConns[name]
+	mysqlConns.RUnlock()
 	if mysql != nil {
 		return mysql
 	}
@@ -32,6 +32,8 @@ func Mysql(name string) *sql.DB {
 	mysql.SetConnMaxLifetime(time.Minute * 10)
 	mysql.SetMaxIdleConns(5)
 	mysql.SetMaxOpenConns(50)
+	mysqlConns.Lock()
 	mysqlConns[name] = mysql
+	mysqlConns.Unlock()
 	return mysql
 }
