@@ -1,22 +1,22 @@
 package db
 
 import (
+	"sync"
 	"time"
 
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/garyburd/redigo/redis"
 )
 
-var redisConns map[string]*redis.Pool
-
-func init() {
-	if redisConns == nil {
-		redisConns = make(map[string]*redis.Pool)
-	}
-}
+var redisConns = struct {
+	sync.RWMutex
+	m map[string]*redis.Pool
+}{m: make(map[string]*redis.Pool)}
 
 func RedisDo(name string, work func(redis.Conn)) {
+	redisConns.RLock()
 	redisPool := redisConns[name]
+	redisConns.RUnlock()
 	if redisPool == nil {
 		redisPool = &redis.Pool{
 			MaxIdle:     3,
@@ -30,7 +30,9 @@ func RedisDo(name string, work func(redis.Conn)) {
 				)
 			},
 		}
+		redisConns.Lock()
 		redisConns[name] = redisPool
+		redisConns.Unlock()
 	}
 	conn := redisPool.Get()
 	defer conn.Close()
