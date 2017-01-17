@@ -18,7 +18,7 @@ func copyFmwkBin(sshAddr, tag string) {
 		return
 	}
 	if cmd.Fail(cmd.O{}, `ssh`, sshAddr, `which`, `xiaomei`) {
-		cmd.Run(cmd.O{Panic: true}, `scp`, fmwkBin, sshAddr+`:/tmp/xiaomei`)
+		cmd.Run(cmd.O{Panic: true}, `scp`, `-p`, fmwkBin, sshAddr+`:/tmp/xiaomei`)
 		cmd.Run(cmd.O{Panic: true}, `ssh`, sshAddr, `sudo mv /tmp/xiaomei /usr/local/bin`)
 	}
 }
@@ -31,7 +31,7 @@ func copyProjectBin(sshAddr, tag string) {
 		}
 	} else {
 		if cmd.Fail(cmd.O{}, `ssh`, sshAddr, `test`, `-x`, tagBin) {
-			cmd.Run(cmd.O{Panic: true}, `scp`, config.App.Bin(), sshAddr+`:`+tagBin)
+			cmd.Run(cmd.O{Panic: true}, `scp`, `-p`, config.App.Bin(), sshAddr+`:`+tagBin)
 		}
 	}
 }
