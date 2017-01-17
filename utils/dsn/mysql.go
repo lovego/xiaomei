@@ -7,7 +7,7 @@ import (
 )
 
 type MysqlDSN struct {
-	Host, Port, User, Passwd, Db string
+	User, Passwd, Host, Port, Db string
 }
 
 func Mysql(uri string) MysqlDSN {
@@ -21,7 +21,7 @@ func Mysql(uri string) MysqlDSN {
 	if len(m) == 0 {
 		panic(`mysql addr match faild.`)
 	}
-	return MysqlDSN{m[3], m[4], m[1], m[2], m[5]}
+	return MysqlDSN{m[1], m[2], m[3], m[4], m[5]}
 }
 
 func (c MysqlDSN) Flags() []string {
