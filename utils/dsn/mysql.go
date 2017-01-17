@@ -16,7 +16,7 @@ func Mysql(uri string) MysqlDSN {
 		os.Exit(1)
 	}
 	m := regexp.MustCompile(
-		`^(\w+):(\w+)@\w+\(([^()]+):(\d+)\)/(\w+)$`,
+		`^(\w+):(\w+)@\w+\(([^()]+):(\d+)\)/(\w+)`,
 	).FindStringSubmatch(uri)
 	if len(m) == 0 {
 		panic(`mysql addr match faild.`)
