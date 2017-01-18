@@ -22,7 +22,7 @@ func Restart(serverFilter string, args []string) error {
 }
 
 func Shell(serverFilter string, args []string) error {
-	return run(serverFilter, `cd `+config.Deploy.Path()+`; bash`)
+	return runOnce(serverFilter, `cd `+config.Deploy.Path()+`; bash`)
 }
 
 func Exec(serverFilter string, args []string) error {
@@ -41,6 +41,23 @@ func run(filter, shellScript string) error {
 		if err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func runOnce(filter, shellScript string) error {
+	if config.IsLocalEnv() {
+		_, err := cmd.Run(cmd.O{}, `sh`, `-c`, shellScript)
+		return err
+	}
+	for _, server := range config.Servers.Matched2(filter, `appserver`) {
+		addr := server.SshAddr()
+		color.Cyan(addr)
+		_, err := cmd.Run(cmd.O{}, `ssh`, `-t`, addr, shellScript)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 	return nil
 }
