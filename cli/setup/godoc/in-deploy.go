@@ -4,9 +4,9 @@ import (
 	"errors"
 	"path/filepath"
 
-	"github.com/bughou-go/xiaomei/cli/install"
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/utils/install"
 )
 
 func InDeploy() error {

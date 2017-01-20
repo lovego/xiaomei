@@ -20,7 +20,7 @@ func (f *FmwkConf) Path() string {
 
 func (f *FmwkConf) Bin() string {
 	if f.bin == `` {
-		f.bin, _ = cmd.Run(cmd.O{Output: true, Panic: true}, `which`, `xiaomei`)
+		f.bin, _ = cmd.Run(cmd.O{Output: true}, `which`, `xiaomei`)
 	}
 	return f.bin
 }

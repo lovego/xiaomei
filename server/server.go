@@ -11,6 +11,7 @@ import (
 	"github.com/bughou-go/xiaomei/server/xm"
 	"github.com/bughou-go/xiaomei/server/xm/renderer"
 	"github.com/bughou-go/xiaomei/server/xm/session"
+	"github.com/bughou-go/xiaomei/utils"
 )
 
 func init() {
@@ -41,6 +42,7 @@ func NewRenderer() *renderer.Renderer {
 }
 
 func (s *Server) ListenAndServe() {
+	utils.MaximizeNOFILE()
 	addr := config.Servers.CurrentAppServer().AppAddr()
 
 	if err := http.ListenAndServe(addr, http.HandlerFunc(
