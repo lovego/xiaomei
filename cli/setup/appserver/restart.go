@@ -1,49 +1,75 @@
 package appserver
 
 import (
-	"bytes"
-	"os"
-	"os/exec"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/utils/process"
 )
 
-func Restart() {
+func Restart(daemon bool) {
 	// stop current
 	Stop()
 	// start new
-	Start()
+	Start(daemon)
+}
+
+func Running() string {
+	output, _ := cmd.Run(cmd.O{Output: true},
+		`docker`, `inspect`, `--format`, `{{ .State.Running }}`, config.Deploy.Name())
+	return strings.TrimSpace(output)
 }
 
 func Stop() {
-	var buf bytes.Buffer
-	cmd.Run(cmd.O{Stderr: &buf}, `sudo`, `stop`, `apps/`+config.Deploy.Name())
-	stdErr := buf.String()
-	if stdErr != "stop: Unknown instance: \n" {
-		print(stdErr)
+	if Running() == `true` {
+		cmd.Run(cmd.O{Panic: true}, `docker`, `stop`, config.Deploy.Name())
 	}
 }
 
-func Start() {
-	tail := tailLog()
+func Start(daemon bool) {
+	tail := cmd.TailFollow(path.Join(config.App.Root(), `log/appserver.log`))
 	defer tail.Process.Kill()
-	output, _ := cmd.Run(cmd.O{Panic: true, Output: true}, `sudo`, `start`, `apps/`+config.Deploy.Name())
 
-	println(output)
-	if !strings.Contains(output, `start/running,`) {
-		os.Exit(1)
+	StartDocker(daemon)
+	if daemon && process.WaitPort(getAppServerPid(),
+		config.App.Port(), config.App.StartTimeout()+3*time.Second,
+	) != `ok` {
+		cmd.Run(cmd.O{Panic: true}, `docker`, `stop`, config.Deploy.Name())
 	}
 }
 
-func tailLog() *exec.Cmd {
-	appserverLog := path.Join(config.App.Root(), `log/appserver.log`)
-	cmd.Run(cmd.O{Panic: true}, `touch`, `-a`, appserverLog)
-	tail, err := cmd.Start(cmd.O{Panic: true}, `tail`, `-fn0`, appserverLog)
-	if err != nil {
-		panic(err)
+func StartDocker(daemon bool) {
+	root := config.App.Root()
+	xiaomei, _ := cmd.Run(cmd.O{Output: true, Panic: true}, `which`, `xiaomei`)
+	args := []string{
+		`run`, `--name=` + config.Deploy.Name(),
+		`-v`, root + `:` + root,
+		`-v`, xiaomei + `:/usr/local/bin/xiaomei`,
+		`-w`, root, `--network=host`,
 	}
-	return tail
+	if daemon {
+		args = append(args, `-d`, `--restart=on-failure:3`)
+	} else {
+		args = append(args, `-it`, `--rm`)
+	}
+	args = append(args, `ubuntu:16.04`, `xiaomei`, `launch`)
+
+	cmd.Run(cmd.O{Panic: true}, `docker`, args...)
+}
+
+func getAppServerPid() int {
+	deployName := config.Deploy.Name()
+	ppid, _ := cmd.Run(cmd.O{Output: true, Panic: true},
+		`docker`, `inspect`, `--format`, `{{ .State.Pid }}`, deployName)
+	if ppid = strings.TrimSpace(ppid); ppid == `` {
+		panic(`empty AppServer ppid.`)
+	}
+	pid := process.ChildPid(ppid, config.App.Name(), time.Second)
+	if pid <= 0 {
+		panic(`find appserver pid failed.`)
+	}
+	return pid
 }

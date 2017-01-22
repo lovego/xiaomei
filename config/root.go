@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bughou-go/xiaomei/utils"
+	"github.com/bughou-go/xiaomei/utils/fs"
 )
 
 func InProject() bool {
@@ -48,7 +48,7 @@ func absProgramPath() (string, string) {
 
 func detectDir(dir, feature string) string {
 	for ; dir != `/`; dir = filepath.Dir(dir) {
-		if utils.Exist(filepath.Join(dir, feature)) {
+		if fs.Exist(filepath.Join(dir, feature)) {
 			return dir
 		}
 	}
