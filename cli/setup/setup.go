@@ -8,12 +8,22 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func Cmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   `setup [nginx|appserver|hosts|mysql|cron|godoc] ...`,
-		Short: `setup nginx, appserver, hosts, mysql, cron and godoc.`,
-		Run: func(c *cobra.Command, args []string) {
-			Setup(args)
+func Cmds() []*cobra.Command {
+	return []*cobra.Command{
+		{
+			Use:   `setup [nginx|appserver|hosts|mysql|cron|godoc] ...`,
+			Short: `setup nginx, appserver, hosts, mysql, cron and godoc.`,
+			Run: func(c *cobra.Command, args []string) {
+				Setup(args)
+			},
+		},
+		{
+			Use:    `launch`,
+			Short:  `launch appserver.`,
+			Hidden: true,
+			Run: func(c *cobra.Command, args []string) {
+				appserver.Launch()
+			},
 		},
 	}
 }
@@ -36,10 +46,8 @@ func Setup(tasks []string) {
 			nginx.Setup()
 			godoc.SetupNginxInDeploy()
 		case `appserver`:
-			appserver.Setup()
+			appserver.Restart(true)
 			godoc.SetupUpstartInDeploy()
-		case `wait-appserver`:
-			appserver.Wait()
 		default:
 			panic(`unknown task: ` + task)
 		}

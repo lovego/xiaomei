@@ -14,7 +14,7 @@ func Status(serverFilter string, args []string) error {
 
 func Restart(serverFilter string, args []string) error {
 	if config.IsLocalEnv() {
-		appserver.Restart()
+		appserver.Restart(true)
 		return nil
 	} else {
 		return run(serverFilter, `cd `+config.Deploy.Path()+`; xiaomei restart`)

@@ -20,7 +20,8 @@ func main() {
 	root.AddCommand(develop.Cmds()...)
 	root.AddCommand(db.Cmds()...)
 	root.AddCommand(oam.Cmds()...)
-	root.AddCommand(deploy.Cmd(), setup.Cmd())
+	root.AddCommand(deploy.Cmd())
+	root.AddCommand(setup.Cmds()...)
 
 	root.Execute()
 }

@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/bughou-go/xiaomei/config"
-	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/utils/fs"
 )
 
 func New(dir string) error {
@@ -30,8 +30,6 @@ func New(dir string) error {
 		return errors.New(`cp templates failed.`)
 	}
 
-	r := mrand.New(mrand.NewSource(time.Now().UnixNano()))
-	port := r.Intn(10000) + 30000
 	appName := filepath.Base(proPath)
 	script := fmt.Sprintf(`
 	cd %s
@@ -44,7 +42,8 @@ func New(dir string) error {
 	`, dir, appName,
 		strings.Replace(filepath.Join(config.Fmwk.Path(), `example`), `/`, `\/`, -1),
 		strings.Replace(proPath, `/`, `\/`, -1),
-		generateSecret(), port,
+		generateSecret(),
+		mrand.New(mrand.NewSource(time.Now().UnixNano())).Intn(10000)+30000,
 	)
 	if !cmd.Ok(cmd.O{}, `sh`, `-c`, script) {
 		return errors.New(`process templates failed.`)
@@ -66,7 +65,7 @@ func checkPkgDir(dir string) error {
 	switch {
 	case err == nil:
 		if fi.IsDir() {
-			if !utils.IsEmptyDir(dir) {
+			if !fs.IsEmptyDir(dir) {
 				return errors.New(dir + ` exist and is not empty.`)
 			}
 		} else {

@@ -8,8 +8,8 @@ import (
 	"text/template"
 
 	"github.com/bughou-go/xiaomei/config"
-	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/utils/fs"
 )
 
 func Setup() {
@@ -22,7 +22,7 @@ func Setup() {
 
 func writeMainConfig() {
 	confFile := path.Join(config.App.Root(), `deploy/nginx.conf`)
-	if utils.IsFile(confFile) {
+	if fs.IsFile(confFile) {
 		cmd.Run(cmd.O{Panic: true}, `sudo`, `cp`, confFile, `/etc/nginx/`)
 	} else {
 		cmd.SudoWriteFile(`/etc/nginx/nginx.conf`, strings.NewReader(defaultMainConfig))
@@ -32,7 +32,7 @@ func writeMainConfig() {
 func writeServerConfig() {
 	var tmpl *template.Template
 	confFile := path.Join(config.App.Root(), `deploy/nginx.tmpl.conf`)
-	if utils.IsFile(confFile) {
+	if fs.IsFile(confFile) {
 		tmpl = template.Must(template.ParseFiles(confFile))
 	} else {
 		tmpl = template.Must(template.New(``).Parse(defaultServerConfig))

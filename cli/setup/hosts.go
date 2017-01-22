@@ -3,14 +3,14 @@ package setup
 import (
 	"fmt"
 	"github.com/bughou-go/xiaomei/config"
-	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/utils/fs"
 	"path"
 )
 
 func SetupHosts() {
 	filePath := path.Join(config.App.Root(), `config/shell/setup-hosts.sh`)
-	if !utils.IsFile(filePath) {
+	if !fs.IsFile(filePath) {
 		fmt.Println(`no such file: ` + filePath)
 		return
 	}

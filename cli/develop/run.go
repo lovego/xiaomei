@@ -2,8 +2,6 @@ package develop
 
 import (
 	"errors"
-	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/bughou-go/xiaomei/cli/setup/appserver"
@@ -15,24 +13,14 @@ func Run() error {
 	if err := build(); err != nil {
 		return err
 	}
-	tail := tailLog()
+	tail := cmd.TailFollow(
+		filepath.Join(config.App.Root(), `log/app.log`),
+		filepath.Join(config.App.Root(), `log/app.err`),
+	)
 	defer tail.Process.Kill()
 
-	config.Log(`starting.`)
-	if app, err := cmd.Start(cmd.O{}, config.App.Bin()); err != nil {
-		return err
-	} else {
-		appserver.WaitPort(os.Getpid(), app.Process.Pid)
-		return app.Wait()
-	}
-}
-
-func tailLog() *exec.Cmd {
-	appLog := filepath.Join(config.App.Root(), `log/app.log`)
-	appErr := filepath.Join(config.App.Root(), `log/app.err`)
-	cmd.Run(cmd.O{Panic: true}, `touch`, `-a`, appLog, appErr)
-	tail, _ := cmd.Start(cmd.O{Panic: true}, `tail`, `-fqn0`, appLog, appErr)
-	return tail
+	appserver.Restart(false)
+	return nil
 }
 
 func build() error {

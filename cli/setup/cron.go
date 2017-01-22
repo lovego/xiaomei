@@ -7,13 +7,13 @@ import (
 	"text/template"
 
 	"github.com/bughou-go/xiaomei/config"
-	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/utils/fs"
 )
 
 func SetupCron() {
 	filePath := path.Join(config.App.Root(), `deploy/cron.tmpl`)
-	if !utils.IsFile(filePath) {
+	if !fs.IsFile(filePath) {
 		fmt.Println(`no such file: ` + filePath)
 		return
 	}

@@ -7,9 +7,9 @@ import (
 	"path"
 
 	"github.com/bughou-go/xiaomei/config"
-	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/bughou-go/xiaomei/utils/dsn"
+	"github.com/bughou-go/xiaomei/utils/fs"
 )
 
 func SetupMysql() {
@@ -27,7 +27,7 @@ func createDatabaseAndTables(flags []string) string {
 
 	createDb := fmt.Sprintf(`create database if not exists %s charset utf8; use %s;`, db, db)
 	filePath := path.Join(config.App.Root(), `config/data/ddl.mysql`)
-	if !utils.IsFile(filePath) {
+	if !fs.IsFile(filePath) {
 		return `no such file: ` + filePath
 	}
 	createTables, err := ioutil.ReadFile(filePath)

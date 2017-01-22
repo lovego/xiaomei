@@ -3,8 +3,8 @@ package develop
 import (
 	"errors"
 	"github.com/bughou-go/xiaomei/config"
-	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/utils/fs"
 	"os"
 	"path"
 	"strings"
@@ -32,7 +32,7 @@ func checkAndCopy(pkgDir string, noClobber bool) error {
 		return err
 	}
 	// package src dir not empty
-	if utils.IsEmptyDir(pkgSrcDir) {
+	if fs.IsEmptyDir(pkgSrcDir) {
 		return errors.New(pkgSrcDir + ` exist and is empty.`)
 	}
 	pkgVendorDir := path.Join(vendorDir, pkgDir)
