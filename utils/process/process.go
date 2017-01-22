@@ -11,11 +11,17 @@ import (
 )
 
 // wait until the process has bound the port.
-func WaitPort(pid int, port string, timeout time.Duration) string {
-	pidStr := strconv.Itoa(pid)
+func WaitPort(pid int, port string, timeout time.Duration, sudo bool) string {
+	binary := `lsof`
+	args := []string{`-ap`, strconv.Itoa(pid), `-itcp:` + port}
+	if sudo {
+		args = append([]string{binary}, args...)
+		binary = `sudo`
+	}
+
 	const step = 100 * time.Millisecond
 	for w := time.Duration(0); w <= timeout; w += step {
-		if cmd.Ok(cmd.O{NoStdout: true, NoStderr: true}, `lsof`, `-ap`, pidStr, `-itcp:`+port) {
+		if cmd.Ok(cmd.O{NoStdout: true, NoStderr: true}, binary, args...) {
 			return `ok`
 		}
 		if !Alive(pid) {

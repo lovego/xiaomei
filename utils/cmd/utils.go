@@ -6,7 +6,7 @@ import (
 
 func TailFollow(paths ...string) *exec.Cmd {
 	Run(O{Panic: true}, `touch`, append([]string{`-a`}, paths...)...)
-	tail, err := Start(O{Panic: true}, `tail`, append([]string{`-fn0`}, paths...)...)
+	tail, err := Start(O{Panic: true}, `tail`, append([]string{`-fqn0`}, paths...)...)
 	if err != nil {
 		panic(err)
 	}

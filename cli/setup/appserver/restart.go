@@ -1,6 +1,7 @@
 package appserver
 
 import (
+	"bytes"
 	"path"
 	"strings"
 	"time"
@@ -18,8 +19,15 @@ func Restart(daemon bool) {
 }
 
 func Running() string {
-	output, _ := cmd.Run(cmd.O{Output: true},
-		`docker`, `inspect`, `--format`, `{{ .State.Running }}`, config.Deploy.Name())
+	buf := bytes.Buffer{}
+	output, _ := cmd.Run(cmd.O{Output: true, Stderr: &buf},
+		`docker`, `inspect`, `--type=container`, `--format={{ .State.Running }}`, config.Deploy.Name(),
+	)
+
+	if stdErr := buf.String(); stdErr != `` &&
+		stdErr != "Error: No such container: "+config.Deploy.Name()+"\n" {
+		print(stdErr)
+	}
 	return strings.TrimSpace(output)
 }
 
@@ -35,7 +43,7 @@ func Start(daemon bool) {
 
 	StartDocker(daemon)
 	if daemon && process.WaitPort(getAppServerPid(),
-		config.App.Port(), config.App.StartTimeout()+3*time.Second,
+		config.App.Port(), config.App.StartTimeout()+3*time.Second, true,
 	) != `ok` {
 		cmd.Run(cmd.O{Panic: true}, `docker`, `stop`, config.Deploy.Name())
 	}
@@ -55,7 +63,7 @@ func StartDocker(daemon bool) {
 	} else {
 		args = append(args, `-it`, `--rm`)
 	}
-	args = append(args, `ubuntu:16.04`, `xiaomei`, `launch`)
+	args = append(args, `bughou/xiaomei-appserver`, `xiaomei`, `launch`)
 
 	cmd.Run(cmd.O{Panic: true}, `docker`, args...)
 }

@@ -19,7 +19,7 @@ func Launch() {
 	config.Logf(f, `starting.`)
 	app, _ := cmd.Start(cmd.O{Panic: true, Stdout: f, Stderr: f}, `./`+config.App.Name())
 
-	result := process.WaitPort(app.Process.Pid, config.App.Port(), config.App.StartTimeout())
+	result := process.WaitPort(app.Process.Pid, config.App.Port(), config.App.StartTimeout(), false)
 	switch result {
 	case `ok`:
 		config.Logf(f, color.GreenString(`started. (`+config.Servers.CurrentAppServer().AppAddr()+`)`))

@@ -53,7 +53,12 @@ func Start(o O, name string, args ...string) (cmd *exec.Cmd, err error) {
 
 func State(o O, name string, args ...string) *os.ProcessState {
 	cmd := makeCmd(o, name, args)
-	cmd.Run()
+	err := cmd.Run()
+	if err != nil {
+		if _, ok := err.(*exec.ExitError); !ok {
+			panic(err)
+		}
+	}
 	return cmd.ProcessState
 }
 

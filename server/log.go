@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/csv"
 	"fmt"
-	"os"
 	"path"
 	"strconv"
 	"strings"
