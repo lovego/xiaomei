@@ -8,6 +8,7 @@ import (
 
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/utils/fs"
 	"github.com/bughou-go/xiaomei/utils/process"
 )
 
@@ -59,13 +60,15 @@ func StartDocker(daemon bool) {
 		`-w`, root, `--network=host`,
 	}
 	if daemon {
-		args = append(args, `-d`, `--restart=on-failure:3`)
+		args = append(args, `-d`, `--restart=always`)
 	} else {
-		args = append(args, `-it`, `--rm`)
+		args = append(args, `--rm`)
 	}
 	args = append(args, `bughou/xiaomei-appserver`, `xiaomei`, `launch`)
 
-	cmd.Run(cmd.O{Panic: true}, `docker`, args...)
+	f := fs.OpenAppend(path.Join(config.App.Root(), `log/appserver.log`))
+	defer f.Close()
+	cmd.Run(cmd.O{Panic: true, Stdout: f, Stderr: f}, `docker`, args...)
 }
 
 func getAppServerPid() int {
