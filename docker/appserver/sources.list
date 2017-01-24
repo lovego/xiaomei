@@ -11,4 +11,3 @@ deb-src http://mirrors.aliyun.com/ubuntu/ xenial-backports main restricted unive
 deb-src http://mirrors.aliyun.com/ubuntu/ xenial-proposed main restricted universe multiverse
 
 deb http://archive.canonical.com/ubuntu/ xenial partner
-deb http://extras.ubuntu.com/ubuntu/ xenial main
