@@ -10,6 +10,8 @@ import (
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
+const WaitStep = 100 * time.Millisecond
+
 // wait until the process has bound the port.
 func WaitPort(pid int, port string, timeout time.Duration, sudo bool) string {
 	binary := `lsof`
@@ -19,15 +21,14 @@ func WaitPort(pid int, port string, timeout time.Duration, sudo bool) string {
 		binary = `sudo`
 	}
 
-	const step = 100 * time.Millisecond
-	for w := time.Duration(0); w <= timeout; w += step {
+	for w := time.Duration(0); w <= timeout; w += WaitStep {
 		if cmd.Ok(cmd.O{NoStdout: true, NoStderr: true}, binary, args...) {
 			return `ok`
 		}
 		if !Alive(pid) {
 			return `died`
 		}
-		time.Sleep(step)
+		time.Sleep(WaitStep)
 	}
 	return `timeout`
 }
@@ -40,8 +41,7 @@ var prefixDigits = regexp.MustCompile(`^\d+`)
 var suffixDigits = regexp.MustCompile(`^\d+`)
 
 func ChildPid(ppid, child string, timeout time.Duration) int {
-	const step = 100 * time.Millisecond
-	for w := time.Duration(0); w <= timeout; w += step {
+	for w := time.Duration(0); w <= timeout; w += WaitStep {
 		output, _ := cmd.Run(cmd.O{Output: true}, `ps`, `-o`, `pid,cmd`, `--no-headers`, `--ppid`, ppid)
 		if index := strings.Index(output, ` ./`+child); index > 0 {
 			if str := suffixDigits.FindString(strings.TrimSpace(output[0:index])); str != `` {
@@ -52,7 +52,7 @@ func ChildPid(ppid, child string, timeout time.Duration) int {
 				}
 			}
 		}
-		time.Sleep(step)
+		time.Sleep(WaitStep)
 	}
 	return -1
 }

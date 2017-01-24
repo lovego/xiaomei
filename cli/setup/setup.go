@@ -1,6 +1,8 @@
 package setup
 
 import (
+	"errors"
+
 	"github.com/bughou-go/xiaomei/cli/setup/appserver"
 	"github.com/bughou-go/xiaomei/cli/setup/godoc"
 	"github.com/bughou-go/xiaomei/cli/setup/nginx"
@@ -13,8 +15,8 @@ func Cmds() []*cobra.Command {
 		{
 			Use:   `setup [nginx|appserver|hosts|mysql|cron|godoc] ...`,
 			Short: `setup nginx, appserver, hosts, mysql, cron and godoc.`,
-			Run: func(c *cobra.Command, args []string) {
-				Setup(args)
+			RunE: func(c *cobra.Command, args []string) error {
+				return Setup(args)
 			},
 		},
 		{
@@ -28,7 +30,7 @@ func Cmds() []*cobra.Command {
 	}
 }
 
-func Setup(tasks []string) {
+func Setup(tasks []string) error {
 	if len(tasks) == 0 {
 		tasks = config.Servers.CurrentTasks()
 	}
@@ -46,10 +48,13 @@ func Setup(tasks []string) {
 			nginx.Setup()
 			godoc.SetupNginxInDeploy()
 		case `appserver`:
-			appserver.Restart(true)
+			if err := appserver.Restart(true); err != nil {
+				return err
+			}
 			godoc.SetupUpstartInDeploy()
 		default:
-			panic(`unknown task: ` + task)
+			return errors.New(`unknown task: ` + task)
 		}
 	}
+	return nil
 }

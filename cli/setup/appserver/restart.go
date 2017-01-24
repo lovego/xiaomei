@@ -2,21 +2,23 @@ package appserver
 
 import (
 	"bytes"
+	"errors"
 	"path"
 	"strings"
 	"time"
 
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
-	"github.com/bughou-go/xiaomei/utils/fs"
 	"github.com/bughou-go/xiaomei/utils/process"
 )
 
-func Restart(daemon bool) {
+func Restart(daemon bool) error {
 	// stop current
 	Stop()
+	// remove current
+	Remove()
 	// start new
-	Start(daemon)
+	return Start(daemon)
 }
 
 func Running() string {
@@ -34,11 +36,23 @@ func Running() string {
 
 func Stop() {
 	if Running() == `true` {
-		cmd.Run(cmd.O{Panic: true}, `docker`, `stop`, config.Deploy.Name())
+		out, _ := cmd.Run(cmd.O{Panic: true, Output: true}, `docker`, `stop`, config.Deploy.Name())
+		if out != config.Deploy.Name() {
+			println(out)
+		}
 	}
 }
 
-func Start(daemon bool) {
+func Remove() {
+	if Running() != `` {
+		out, _ := cmd.Run(cmd.O{Panic: true, Output: true}, `docker`, `rm`, config.Deploy.Name())
+		if out != config.Deploy.Name() {
+			println(out)
+		}
+	}
+}
+
+func Start(daemon bool) error {
 	tail := cmd.TailFollow(path.Join(config.App.Root(), `log/appserver.log`))
 	defer tail.Process.Kill()
 
@@ -47,7 +61,11 @@ func Start(daemon bool) {
 		config.App.Port(), config.App.StartTimeout()+3*time.Second, true,
 	) != `ok` {
 		cmd.Run(cmd.O{Panic: true}, `docker`, `stop`, config.Deploy.Name())
+		return errors.New(`start AppServer failed.`)
 	}
+	// wait one more step, ensure tail have gotten the started message.
+	time.Sleep(process.WaitStep)
+	return nil
 }
 
 func StartDocker(daemon bool) {
@@ -66,9 +84,7 @@ func StartDocker(daemon bool) {
 	}
 	args = append(args, `bughou/xiaomei-appserver`, `xiaomei`, `launch`)
 
-	f := fs.OpenAppend(path.Join(config.App.Root(), `log/appserver.log`))
-	defer f.Close()
-	cmd.Run(cmd.O{Panic: true, Stdout: f, Stderr: f}, `docker`, args...)
+	cmd.Run(cmd.O{Panic: true}, `docker`, args...)
 }
 
 func getAppServerPid() int {
@@ -78,7 +94,7 @@ func getAppServerPid() int {
 	if ppid = strings.TrimSpace(ppid); ppid == `` {
 		panic(`empty AppServer ppid.`)
 	}
-	pid := process.ChildPid(ppid, config.App.Name(), time.Second)
+	pid := process.ChildPid(ppid, config.App.Name(), 3*time.Second)
 	if pid <= 0 {
 		panic(`find appserver pid failed.`)
 	}
