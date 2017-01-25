@@ -82,7 +82,7 @@ func StartDocker(daemon bool) {
 	} else {
 		args = append(args, `--rm`)
 	}
-	args = append(args, `bughou/xiaomei-appserver`, `xiaomei`, `launch`)
+	args = append(args, config.App.DockerImage(), `xiaomei`, `launch`)
 
 	cmd.Run(cmd.O{Panic: true}, `docker`, args...)
 }

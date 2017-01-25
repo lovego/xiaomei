@@ -31,6 +31,7 @@ type appConf struct {
 	Port         string `yaml:"port"`
 	Domain       string `yaml:"domain"`
 	Secret       string `yaml:"secret"`
+	DockerImage  string `yaml:"dockerImage"`
 	StartTimeout string `yaml:"startTimeout"`
 
 	TimeZone TimeZoneConf    `yaml:"timeZone"`
@@ -88,6 +89,11 @@ func (a *AppConf) Domain() string {
 func (a *AppConf) Secret() string {
 	Load()
 	return a.conf.Secret
+}
+
+func (a *AppConf) DockerImage() string {
+	Load()
+	return a.conf.DockerImage
 }
 
 func (a *AppConf) StartTimeout() time.Duration {

@@ -1,6 +1,7 @@
 app:
   name: example
   port: 3000
+  dockerImage: bughou/xiaomei-appserver
   startTimeout: 10s
 
   timeZone:
