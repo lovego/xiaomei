@@ -16,13 +16,13 @@ var mysqlConns = struct {
 
 func Mysql(name string) *sql.DB {
 	mysqlConns.RLock()
-	mysql := mysqlConns[name]
+	mysql := mysqlConns.m[name]
 	mysqlConns.RUnlock()
 	if mysql != nil {
 		return mysql
 	}
 	var err error
-	mysql, err = sql.Open(`mysql`, config.Mysql()[name])
+	mysql, err = sql.Open(`mysql`, config.DB.Mysql(name))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -33,7 +33,7 @@ func Mysql(name string) *sql.DB {
 	mysql.SetMaxIdleConns(5)
 	mysql.SetMaxOpenConns(50)
 	mysqlConns.Lock()
-	mysqlConns[name] = mysql
+	mysqlConns.m[name] = mysql
 	mysqlConns.Unlock()
 	return mysql
 }

@@ -15,7 +15,7 @@ var redisConns = struct {
 
 func RedisDo(name string, work func(redis.Conn)) {
 	redisConns.RLock()
-	redisPool := redisConns[name]
+	redisPool := redisConns.m[name]
 	redisConns.RUnlock()
 	if redisPool == nil {
 		redisPool = &redis.Pool{
@@ -23,7 +23,7 @@ func RedisDo(name string, work func(redis.Conn)) {
 			IdleTimeout: 600 * time.Second,
 			Dial: func() (redis.Conn, error) {
 				return redis.DialURL(
-					config.Redis()[name],
+					config.DB.Redis(name),
 					redis.DialConnectTimeout(time.Second),
 					redis.DialReadTimeout(time.Second),
 					redis.DialWriteTimeout(time.Second),
@@ -31,7 +31,7 @@ func RedisDo(name string, work func(redis.Conn)) {
 			},
 		}
 		redisConns.Lock()
-		redisConns[name] = redisPool
+		redisConns.m[name] = redisPool
 		redisConns.Unlock()
 	}
 	conn := redisPool.Get()
@@ -41,7 +41,7 @@ func RedisDo(name string, work func(redis.Conn)) {
 
 func RedisSubscribeConn(name string) (redis.Conn, error) {
 	return redis.DialURL(
-		config.Redis()[name],
+		config.DB.Redis(name),
 		redis.DialConnectTimeout(time.Second),
 		redis.DialWriteTimeout(time.Second),
 	)
