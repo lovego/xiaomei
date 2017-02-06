@@ -9,7 +9,11 @@ import (
 )
 
 func Status(serverFilter string, args []string) error {
-	return run(serverFilter, `status apps/`+config.Deploy.Name()+`; ps -FC `+config.App.Name()+`; true`)
+	const format = `table {{.ID }}\t{{.Names}}\t{{.Status}}\t{{.CreatedAt}}\t{{.Image}}\t{{.Command}}`
+	return run(serverFilter,
+		`docker ps -af name=`+config.Deploy.Name()+` --format='`+format+`'
+		pid=$(docker inspect --type=container -f '{{ .State.Pid }}' `+config.Deploy.Name()+`)
+		test -n "$pid" && echo && ps -F $pid; true`)
 }
 
 func Restart(serverFilter string, args []string) error {
