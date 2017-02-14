@@ -14,11 +14,12 @@ app:
     passwd: abc123
   keepers: [ { name: xiaomei, addr: xiaomei-go@qq.com } ]
 
-deploy:
-  user: ubuntu
-  root: /apps
   gitAddr:
   gitBranch:
+
+cluster:
+  user: ubuntu
+  deployRoot: /apps
 
 godoc:
   domain: godoc.dev

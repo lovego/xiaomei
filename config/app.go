@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/bughou-go/xiaomei/utils/mailer"
 )
 
@@ -37,6 +38,9 @@ type appConf struct {
 	TimeZone TimeZoneConf    `yaml:"timeZone"`
 	Mailer   MailerConf      `yaml:"mailer"`
 	Keepers  []mailer.People `yaml:"keepers"`
+
+	GitAddr   string `yaml:"gitAddr"`
+	GitBranch string `yaml:"gitBranch"`
 }
 
 type TimeZoneConf struct {
@@ -130,11 +134,26 @@ func (a *AppConf) Mailer() *mailer.Mailer {
 }
 
 func (a *AppConf) Alarm(title, body string) {
-	title = Deploy.Name() + ` ` + title
+	title = Cluster.DeployName() + ` ` + title
 	a.Mailer().Send(&mailer.Message{Receivers: a.Keepers(), Title: title, Body: body})
 }
 
 func (a *AppConf) Keepers() []mailer.People {
 	Load()
 	return a.conf.Keepers
+}
+
+func (a *AppConf) GitAddr() string {
+	Load()
+	return a.conf.GitAddr
+}
+
+func (a *AppConf) GitBranch() string {
+	Load()
+	if a.conf.GitBranch != `` {
+		return a.conf.GitBranch
+	}
+	a.conf.GitBranch, _ = cmd.Run(cmd.O{Output: true, Panic: true},
+		`git`, `rev-parse`, `--abbrev-ref`, `HEAD`)
+	return a.conf.GitBranch
 }

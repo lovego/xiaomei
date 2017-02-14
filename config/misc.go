@@ -22,8 +22,7 @@ func Logf(w io.Writer, msg string) {
 }
 
 func IsLocalEnv() bool {
-	goenv := os.Getenv(`GOENV`)
-	return goenv == ``
+	return os.Getenv(`GOENV`) == ``
 }
 
 func Debug(name string) bool {

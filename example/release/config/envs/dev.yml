@@ -11,11 +11,9 @@ db:
   mongo:
     default: mongodb://10.249.6.30/members
 
-servers:
-  - addr: 127.0.0.1
-    listenAddr: 0.0.0.0
-    tasks: [nginx, appserver]
-    appStartOn: (started mysql and started redis-server)
+cluster:
+  masters: [ 127.0.0.1 ]
+  workers:
 
 godoc:
   indexInterval: 1s

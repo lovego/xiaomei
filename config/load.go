@@ -14,8 +14,7 @@ var loader struct {
 	mutex   sync.Mutex
 	App     *appConf     `yaml:"app"`
 	DB      *dbConf      `yaml:"db"`
-	Deploy  *deployConf  `yaml:"deploy"`
-	Servers *serversConf `yaml:"servers"`
+	Cluster *clusterConf `yaml:"cluster"`
 	Godoc   *godocConf   `yaml:"godoc"`
 }
 
@@ -25,8 +24,7 @@ func Load() {
 	if loader.App == nil {
 		loader.App = &App.conf
 		loader.DB = &DB.conf
-		loader.Deploy = &Deploy.conf
-		loader.Servers = &Servers.conf
+		loader.Cluster = &Cluster.conf
 		loader.Godoc = &Godoc.conf
 		Parse(&loader)
 	}

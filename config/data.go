@@ -4,11 +4,10 @@ type Conf struct {
 	Fmwk    *FmwkConf
 	App     *AppConf
 	Db      *DbConf
-	Deploy  *DeployConf
 	Godoc   *GodocConf
-	Servers *ServerConf
+	Cluster *ClusterConf
 }
 
 func Data() Conf {
-	return Conf{&Fmwk, &App, &DB, &Deploy, &Godoc, &Servers}
+	return Conf{&Fmwk, &App, &DB, &Godoc, &Cluster}
 }
