@@ -11,9 +11,8 @@ main() {
 }
 
 setup_sudo_no_password() {
-  local line='ubuntu  ALL=NOPASSWD: ALL'
-  local regexp="$(echo "$line" | sed -r 's/[\t ]+/[[:space:]]+/g')"
-  sudo egrep -q "^$regexp$" /etc/sudoers || echo "$line" | sudo tee --append /etc/sudoers > /dev/null
+  local file='/etc/sudoers.d/ubuntu'
+  test -f "$file"  || echo 'ubuntu  ALL=NOPASSWD: ALL' | sudo tee --append "$file" > /dev/null
 }
 
 

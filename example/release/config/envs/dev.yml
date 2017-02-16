@@ -12,7 +12,8 @@ db:
     default: mongodb://10.249.6.30/members
 
 cluster:
-  masters: [ 127.0.0.1 ]
+  managers:
+    - addr: 127.0.0.1
   workers:
 
 godoc:

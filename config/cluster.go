@@ -11,10 +11,21 @@ type ClusterConf struct {
 }
 
 type clusterConf struct {
-	User       string   `yaml:"user"`
-	DeployRoot string   `yaml:"deployRoot"`
-	Masters    []string `yaml:"masters"`
-	Workers    []string `yaml:"workers"`
+	User       string        `yaml:"user"`
+	DeployRoot string        `yaml:"deployRoot"`
+	Managers   []ManagerNode `yaml:"managers"`
+	Workers    []WorkerNode  `yaml:"workers"`
+}
+
+type ManagerNode struct {
+	Addr       string   `yaml:"addr"`
+	ListenAddr string   `yaml:"listenAddr"`
+	Labels     []string `yaml:"labels"`
+}
+
+type WorkerNode struct {
+	Addr   string   `yaml:"addr"`
+	Labels []string `yaml:"labels"`
 }
 
 func (c *ClusterConf) User() string {
@@ -37,12 +48,24 @@ func (c *ClusterConf) DeployPath() string {
 	return filepath.Join(c.DeployRoot(), c.DeployName())
 }
 
-func (c *ClusterConf) Masters() []string {
+func (c *ClusterConf) Managers() []ManagerNode {
 	Load()
-	return c.conf.Masters
+	return c.conf.Managers
 }
 
-func (c *ClusterConf) Workers() []string {
+func (c *ClusterConf) Workers() []WorkerNode {
 	Load()
 	return c.conf.Workers
+}
+
+type Node interface {
+	SshAddr() string
+}
+
+func (n ManagerNode) SshAddr() string {
+	return Cluster.User() + `@` + n.Addr
+}
+
+func (n WorkerNode) SshAddr() string {
+	return Cluster.User() + `@` + n.Addr
 }
