@@ -3,12 +3,56 @@ package cluster
 import (
 	"encoding/json"
 	"errors"
+
 	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
 type Node struct {
 	Config config.Node
 	Role   string // current role
+}
+
+func (n *Node) init() error {
+	_, err := cmd.Run(cmd.O{Print: true}, `ssh`,
+		append([]string{n.SshAddr(), `docker`, `swarm`, `init`}, n.addrFlags()...)...,
+	)
+	if err == nil {
+		n.Role = `manager`
+	}
+	return err
+}
+
+func (n *Node) join(role, token, addr string) {
+	args := []string{n.SshAddr(), `docker`, `swarm`, `join`}
+	if role == `manager` {
+		args = append(args, m.addrFlags()...)
+	}
+	args = append(args, `--token`, token, addr)
+	_, err := cmd.Run(cmd.O{Print: true}, `ssh`, args...)
+	if err == nil {
+		n.Role = role
+	}
+	return err
+}
+
+func (n Node) token(role string) (string, error) {
+	if n.Role == `` {
+		return ``, nil
+	}
+	return cmd.Run(cmd.O{Output: true}, `ssh`, n.SshAddr(),
+		`docker`, `swarm`, `join-token`, `-q`, role,
+	)
+}
+
+func (n Node) addrFlags() []string {
+	var addr string
+	if n.Config.ListenAddr != `` {
+		addr = n.Config.ListenAddr
+	} else {
+		addr = n.Config.Addr
+	}
+	return []string{`--advertise-addr`, addr, `--listen-addr`, addr}
 }
 
 func getClusterNodes() ([]Node, []Node, error) {

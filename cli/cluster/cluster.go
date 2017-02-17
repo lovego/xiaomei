@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
 type Cluster struct {
@@ -23,6 +24,9 @@ func Setup() error {
 }
 
 func (c Cluster) setup() error {
+	if c.manager().Role == `` { // No Manager
+		c.Managers[0].init()
+	}
 	if err := c.setupManagers(); err != nil {
 		return err
 	}
@@ -30,10 +34,12 @@ func (c Cluster) setup() error {
 }
 
 func (c Cluster) setupManagers() error {
-	for _, m := range c.Managers {
-		switch m.Role {
+	for i := 0; i < len(c.Managers); i++ {
+		switch c.Managers[i].Role {
 		case ``:
-			c.managerAddr()
+			if err := c.Managers[i].join(); err != nil {
+				return err
+			}
 		case `worker`:
 		}
 	}
@@ -41,7 +47,7 @@ func (c Cluster) setupManagers() error {
 }
 
 func (c Cluster) setupWorkers() error {
-	for _, w := range c.Workers {
+	for i, w := range c.Workers {
 		switch w.Role {
 		case ``:
 		case `manager`:
@@ -50,14 +56,18 @@ func (c Cluster) setupWorkers() error {
 	return nil
 }
 
-func (c Cluster) managerAddr() string {
+func (c Cluster) join(node Node, role string) error {
+	m := c.manager().token()
+}
+
+func (c Cluster) manager() Node {
 	if m := findManager(c.Managers); m.Role != `` {
-		return m.Config.Addr
+		return m
 	}
 	if m := findManager(c.Workers); m.Role != `` {
-		return m.Config.Addr
+		return m
 	}
-	return ``
+	return Node{}
 }
 
 func findManager(nodes []Node) Node {
