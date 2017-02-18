@@ -15,7 +15,7 @@ type Node struct {
 
 func (n *Node) init() error {
 	_, err := cmd.Run(cmd.O{Print: true}, `ssh`,
-		append([]string{n.SshAddr(), `docker`, `swarm`, `init`}, n.addrFlags()...)...,
+		append([]string{n.Config.SshAddr(), `docker`, `swarm`, `init`}, n.addrFlags()...)...,
 	)
 	if err == nil {
 		n.Role = `manager`
@@ -23,10 +23,10 @@ func (n *Node) init() error {
 	return err
 }
 
-func (n *Node) join(role, token, addr string) {
-	args := []string{n.SshAddr(), `docker`, `swarm`, `join`}
+func (n *Node) join(role, token, addr string) error {
+	args := []string{n.Config.SshAddr(), `docker`, `swarm`, `join`}
 	if role == `manager` {
-		args = append(args, m.addrFlags()...)
+		args = append(args, n.addrFlags()...)
 	}
 	args = append(args, `--token`, token, addr)
 	_, err := cmd.Run(cmd.O{Print: true}, `ssh`, args...)
@@ -40,7 +40,7 @@ func (n Node) token(role string) (string, error) {
 	if n.Role == `` {
 		return ``, nil
 	}
-	return cmd.Run(cmd.O{Output: true}, `ssh`, n.SshAddr(),
+	return cmd.Run(cmd.O{Output: true}, `ssh`, n.Config.SshAddr(),
 		`docker`, `swarm`, `join-token`, `-q`, role,
 	)
 }

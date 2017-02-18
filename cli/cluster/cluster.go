@@ -25,7 +25,9 @@ func Setup() error {
 
 func (c Cluster) setup() error {
 	if c.manager().Role == `` { // No Manager
-		c.Managers[0].init()
+		if err := c.Managers[0].init(); err != nil {
+			return err
+		}
 	}
 	if err := c.setupManagers(); err != nil {
 		return err
@@ -37,7 +39,7 @@ func (c Cluster) setupManagers() error {
 	for i := 0; i < len(c.Managers); i++ {
 		switch c.Managers[i].Role {
 		case ``:
-			if err := c.Managers[i].join(); err != nil {
+			if err := c.Managers[i].join(`manager`); err != nil {
 				return err
 			}
 		case `worker`:
@@ -57,7 +59,31 @@ func (c Cluster) setupWorkers() error {
 }
 
 func (c Cluster) join(node Node, role string) error {
-	m := c.manager().token()
+	if token, err := c.token(role); err != nil {
+		return err
+	}
+	node.join(role, token, c.manager().Config.Addr)
+}
+
+func (c Cluster) token(role string) (string, error) {
+	if role == `manager` {
+		if c.managerToken != `` {
+			return c.managerToken, nil
+		}
+	} else {
+		if c.workerToken != `` {
+			return c.workerToken, nil
+		}
+	}
+	token, err := c.manager().token(role)
+	if err == nil {
+		if role == `manager` {
+			c.managerToken = token
+		} else {
+			c.workerToken = token
+		}
+	}
+	return token, err
 }
 
 func (c Cluster) manager() Node {
