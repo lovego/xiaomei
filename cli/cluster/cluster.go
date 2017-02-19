@@ -4,12 +4,13 @@ import (
 	"errors"
 
 	"github.com/bughou-go/xiaomei/config"
-	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
 type Cluster struct {
-	Managers []Node
-	Workers  []Node
+	Managers     []*Node
+	Workers      []*Node
+	managerToken string
+	workerToken  string
 }
 
 func Setup() error {
@@ -20,7 +21,7 @@ func Setup() error {
 	if err != nil {
 		return err
 	}
-	return Cluster{managers, workers}.setup()
+	return Cluster{Managers: managers, Workers: workers}.setup()
 }
 
 func (c Cluster) setup() error {
@@ -36,10 +37,10 @@ func (c Cluster) setup() error {
 }
 
 func (c Cluster) setupManagers() error {
-	for i := 0; i < len(c.Managers); i++ {
-		switch c.Managers[i].Role {
+	for _, m := range c.Managers {
+		switch m.Role {
 		case ``:
-			if err := c.Managers[i].join(`manager`); err != nil {
+			if err := c.join(m, `manager`); err != nil {
 				return err
 			}
 		case `worker`:
@@ -49,20 +50,24 @@ func (c Cluster) setupManagers() error {
 }
 
 func (c Cluster) setupWorkers() error {
-	for i, w := range c.Workers {
+	for _, w := range c.Workers {
 		switch w.Role {
 		case ``:
+			if err := c.join(w, `worker`); err != nil {
+				return err
+			}
 		case `manager`:
 		}
 	}
 	return nil
 }
 
-func (c Cluster) join(node Node, role string) error {
+func (c Cluster) join(node *Node, role string) error {
 	if token, err := c.token(role); err != nil {
 		return err
+	} else {
+		return node.join(role, token, c.manager().Config.Addr)
 	}
-	node.join(role, token, c.manager().Config.Addr)
 }
 
 func (c Cluster) token(role string) (string, error) {
@@ -86,21 +91,21 @@ func (c Cluster) token(role string) (string, error) {
 	return token, err
 }
 
-func (c Cluster) manager() Node {
+func (c Cluster) manager() *Node {
 	if m := findManager(c.Managers); m.Role != `` {
 		return m
 	}
 	if m := findManager(c.Workers); m.Role != `` {
 		return m
 	}
-	return Node{}
+	return &Node{}
 }
 
-func findManager(nodes []Node) Node {
+func findManager(nodes []*Node) *Node {
 	for _, node := range nodes {
 		if node.Role == `manager` {
 			return node
 		}
 	}
-	return Node{}
+	return &Node{}
 }

@@ -28,7 +28,7 @@ func (n *Node) join(role, token, addr string) error {
 	if role == `manager` {
 		args = append(args, n.addrFlags()...)
 	}
-	args = append(args, `--token`, token, addr)
+	args = append(args, `--token`, token, addr+`:2377`)
 	_, err := cmd.Run(cmd.O{Print: true}, `ssh`, args...)
 	if err == nil {
 		n.Role = role
@@ -55,7 +55,7 @@ func (n Node) addrFlags() []string {
 	return []string{`--advertise-addr`, addr, `--listen-addr`, addr}
 }
 
-func getClusterNodes() ([]Node, []Node, error) {
+func getClusterNodes() ([]*Node, []*Node, error) {
 	if managers, workers, err := getNodesInfo(); err != nil {
 		return nil, nil, err
 	} else if err = checkIsInOneCluster(managers, workers); err != nil {
@@ -88,9 +88,9 @@ func addToClusterIDMap(infos []NodeInfo, m map[string][]string) {
 	}
 }
 
-func mapNodes(infos []NodeInfo) (result []Node) {
+func mapNodes(infos []NodeInfo) (result []*Node) {
 	for _, info := range infos {
-		result = append(result, info.Node)
+		result = append(result, &info.Node)
 	}
 	return
 }
