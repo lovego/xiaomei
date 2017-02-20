@@ -1,6 +1,7 @@
 package server
 
 import (
+	"net"
 	"net/http"
 	"path"
 	"runtime"
@@ -11,7 +12,7 @@ import (
 	"github.com/bughou-go/xiaomei/server/xm"
 	"github.com/bughou-go/xiaomei/server/xm/renderer"
 	"github.com/bughou-go/xiaomei/server/xm/session"
-	"github.com/bughou-go/xiaomei/utils"
+	"github.com/fatih/color"
 )
 
 func init() {
@@ -42,10 +43,18 @@ func NewRenderer() *renderer.Renderer {
 }
 
 func (s *Server) ListenAndServe() {
-	utils.MaximizeNOFILE()
-	addr := config.Servers.CurrentAppServer().AppAddr()
+	addr := config.App.Addr()
+	ln := listen(addr)
+	config.Log(color.GreenString(`started. (` + addr + `)`))
 
-	if err := http.ListenAndServe(addr, http.HandlerFunc(
+	svr := http.Server{Handler: s.Handler()}
+	if err := svr.Serve(ln); err != nil {
+		panic(err)
+	}
+}
+
+func (s *Server) Handler() http.Handler {
+	return http.HandlerFunc(
 		func(response http.ResponseWriter, request *http.Request) {
 			req := xm.NewRequest(request, s.Session)
 			res := xm.NewResponse(response, req, s.Session, s.Renderer, s.LayoutDataFunc)
@@ -57,7 +66,31 @@ func (s *Server) ListenAndServe() {
 			if s.FilterFunc == nil || s.FilterFunc(req, res) {
 				notFound = !s.Router.Handle(req, res)
 			}
-		})); err != nil {
+		})
+}
+
+func listen(addr string) net.Listener {
+	if ln, err := net.Listen(`tcp`, addr); err != nil {
 		panic(err)
+	} else {
+		return tcpKeepAliveListener{ln.(*net.TCPListener)}
 	}
+}
+
+// tcpKeepAliveListener sets TCP keep-alive timeouts on accepted
+// connections. It's used by ListenAndServe and ListenAndServeTLS so
+// dead TCP connections (e.g. closing laptop mid-download) eventually
+// go away.
+type tcpKeepAliveListener struct {
+	*net.TCPListener
+}
+
+func (ln tcpKeepAliveListener) Accept() (c net.Conn, err error) {
+	tc, err := ln.AcceptTCP()
+	if err != nil {
+		return
+	}
+	tc.SetKeepAlive(true)
+	tc.SetKeepAlivePeriod(3 * time.Minute)
+	return tc, nil
 }

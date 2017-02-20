@@ -73,7 +73,15 @@ func (a *AppConf) Name() string {
 
 func (a *AppConf) Port() string {
 	Load()
-	return a.conf.Port
+	port := a.conf.Port
+	if port == `` {
+		port = `3000`
+	}
+	return port
+}
+
+func (a *AppConf) Addr() string {
+	return `:` + a.Port()
 }
 
 func (a *AppConf) Env() string {

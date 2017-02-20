@@ -1,6 +1,8 @@
 package main
 
 import (
+	_ "github.com/bughou-go/xiaomei/server/a-init" // this package must be the first.
+
 	"strings"
 
 	"github.com/bughou-go/xiaomei/example/filter"
