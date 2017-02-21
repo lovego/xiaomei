@@ -10,6 +10,18 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type Conf struct {
+	App     *AppConf
+	Cluster *ClusterConf
+	Db      *DbConf
+	Fmwk    *FmwkConf
+	Godoc   *GodocConf
+}
+
+func Data() Conf {
+	return Conf{&App, &Cluster, &DB, &Fmwk, &Godoc}
+}
+
 var loader struct {
 	mutex   sync.Mutex
 	App     *appConf     `yaml:"app"`
