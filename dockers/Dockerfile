@@ -18,7 +18,7 @@ ENV LANGUAGE en_US:en
 ENV LC_ALL   en_US.UTF-8 
 
 USER ubuntu
-WORKDIR /home/ubuntu
+WORKDIR /home/ubuntu/appserver
 EXPOSE 3000
 
 HEALTHCHECK --interval=3s --timeout=3s --retries=1 \

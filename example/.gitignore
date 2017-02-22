@@ -3,8 +3,6 @@
 *.pyc
 tmp
 /example
-release/example
-release/config/env.yml
-release/log/*
+/docker/example
 *.exe
 !.gitkeep
