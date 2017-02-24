@@ -1,9 +1,8 @@
-package develop
+package app
 
 import (
 	"errors"
 
-	"github.com/bughou-go/xiaomei/cli/setup/godoc"
 	"github.com/spf13/cobra"
 )
 
@@ -46,21 +45,6 @@ func Cmds() []*cobra.Command {
 					arg = args[0]
 				}
 				return Spec(arg)
-			},
-		},
-		{
-			Use:   `assets`,
-			Short: `[develop] compile assets.`,
-			RunE: func(c *cobra.Command, args []string) error {
-				Assets(args)
-				return nil
-			},
-		},
-		{
-			Use:   `godoc`,
-			Short: `[develop] start godoc service.`,
-			RunE: func(c *cobra.Command, args []string) error {
-				return godoc.InDevelop()
 			},
 		},
 		{

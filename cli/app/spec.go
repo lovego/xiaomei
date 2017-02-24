@@ -1,4 +1,4 @@
-package develop
+package app
 
 import (
 	"errors"

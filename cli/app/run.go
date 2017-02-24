@@ -1,16 +1,15 @@
-package develop
+package app
 
 import (
 	"errors"
 	"path/filepath"
 
-	"github.com/bughou-go/xiaomei/cli/setup/appserver"
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
 func Run() error {
-	if err := build(); err != nil {
+	if err := buildBinary(); err != nil {
 		return err
 	}
 	tail := cmd.TailFollow(
@@ -19,11 +18,21 @@ func Run() error {
 	)
 	defer tail.Process.Kill()
 
-	appserver.Restart(false)
+	startDocker()
 	return nil
 }
 
-func build() error {
+func startDocker() {
+	rootDir := config.App.Root()
+	cmd.Run(cmd.O{Panic: true}, `docker`,
+		`run`, `--name=`+config.Cluster.DeployName(), `-it`, `--rm`, `--network=host`,
+		`-v`, rootDir+`:/home/ubuntu/appserver`,
+		`-v`, rootDir+`/log:/home/ubuntu/appserver/log`,
+		config.App.DockerImage(),
+	)
+}
+
+func buildBinary() error {
 	config.Log(`building.`)
 	if cmd.Ok(cmd.O{Env: []string{`GOBIN=` + config.App.Root()}}, `go`, `install`) {
 		return nil

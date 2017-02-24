@@ -1,4 +1,4 @@
-package develop
+package app
 
 import (
 	"github.com/bughou-go/xiaomei/utils/cmd"

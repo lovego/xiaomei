@@ -29,7 +29,6 @@ type AppConf struct {
 type appConf struct {
 	Name         string `yaml:"name"`
 	Env          string `yaml:"env"`
-	Port         string `yaml:"port"`
 	Domain       string `yaml:"domain"`
 	Secret       string `yaml:"secret"`
 	DockerImage  string `yaml:"dockerImage"`
@@ -71,22 +70,13 @@ func (a *AppConf) Name() string {
 	return a.conf.Name
 }
 
-func (a *AppConf) Port() string {
-	Load()
-	port := a.conf.Port
-	if port == `` {
-		port = `3000`
-	}
-	return port
-}
-
-func (a *AppConf) Addr() string {
-	return `:` + a.Port()
-}
-
 func (a *AppConf) Env() string {
 	Load()
 	return a.conf.Env
+}
+
+func (a *AppConf) DeployName() string {
+	return a.Name() + `_` + a.Env()
 }
 
 func (a *AppConf) Bin() string {
@@ -142,7 +132,7 @@ func (a *AppConf) Mailer() *mailer.Mailer {
 }
 
 func (a *AppConf) Alarm(title, body string) {
-	title = Cluster.DeployName() + ` ` + title
+	title = a.DeployName() + ` ` + title
 	a.Mailer().Send(&mailer.Message{Receivers: a.Keepers(), Title: title, Body: body})
 }
 

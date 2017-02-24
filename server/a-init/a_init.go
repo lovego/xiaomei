@@ -12,11 +12,9 @@ import (
 )
 
 func init() {
-	redirectStdoutStderr()
+	// redirectStdoutStderr()
 	log(`starting.`)
 	go logSignals()
-
-	// `crashed.`
 }
 
 func redirectStdoutStderr() {

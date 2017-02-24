@@ -1,9 +1,5 @@
 package config
 
-import (
-	"path/filepath"
-)
-
 var Cluster ClusterConf
 
 type ClusterConf struct {
@@ -11,10 +7,9 @@ type ClusterConf struct {
 }
 
 type clusterConf struct {
-	User       string `yaml:"user"`
-	DeployRoot string `yaml:"deployRoot"`
-	Managers   []Node `yaml:"managers"`
-	Workers    []Node `yaml:"workers"`
+	User     string `yaml:"user"`
+	Managers []Node `yaml:"managers"`
+	Workers  []Node `yaml:"workers"`
 }
 
 type Node struct {
@@ -26,21 +21,6 @@ type Node struct {
 func (c *ClusterConf) User() string {
 	Load()
 	return c.conf.User
-}
-
-func (c *ClusterConf) DeployName() string {
-	Load()
-	return App.Name() + `_` + App.Env()
-}
-
-func (c *ClusterConf) DeployRoot() string {
-	Load()
-	return c.conf.DeployRoot
-}
-
-func (c *ClusterConf) DeployPath() string {
-	Load()
-	return filepath.Join(c.DeployRoot(), c.DeployName())
 }
 
 func (c *ClusterConf) Managers() []Node {

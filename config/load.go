@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/bughou-go/xiaomei/utils"
@@ -63,17 +64,14 @@ func loadConfig(p interface{}, path string) {
 
 func envConfigPath() string {
 	env := os.Getenv(`GOENV`)
-	if env != `` {
-		env = `envs/` + env
-	} else {
-		program := os.Args[0]
-		if program[len(program)-5:] == `.test` {
-			env = `envs/test`
+	if env == `` {
+		if program := os.Args[0]; strings.HasSuffix(program, `.test`) {
+			env = `test`
 		} else {
-			env = `env`
+			env = `dev`
 		}
 	}
-	configPath := `config/` + env + `.yml`
+	configPath := `config/envs/` + env + `.yml`
 
 	return configPath
 }

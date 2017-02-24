@@ -3,6 +3,7 @@
 *.pyc
 tmp
 /example
-/app/images/example
+/release/img-*/example
+/release/img-*/log/*
 *.exe
 !.gitkeep
