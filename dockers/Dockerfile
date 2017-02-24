@@ -13,9 +13,7 @@ RUN useradd -ms /bin/bash ubuntu \
       # echo 'ubuntu - nofile unlimited' > /etc/security/limits.d/99-ubuntu.conf
 
 # set locale
-ENV LANG     en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL   en_US.UTF-8 
+ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 
 WORKDIR /home/ubuntu/appserver
 VOLUME /home/ubuntu/appserver/log
