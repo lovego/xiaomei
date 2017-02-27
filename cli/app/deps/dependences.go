@@ -1,9 +1,41 @@
 package deps
 
 import (
-	"github.com/bughou-go/xiaomei/utils/cmd"
+	"errors"
 	"strings"
+
+	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/spf13/cobra"
 )
+
+func Cmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   `deps`,
+		Short: `list all dependences pacakge.`,
+		Run: func(c *cobra.Command, args []string) {
+			List()
+		},
+	}
+	cmd.AddCommand(copy2vendorCmd())
+	return cmd
+}
+
+func copy2vendorCmd() *cobra.Command {
+	var n bool
+	cmd := &cobra.Command{
+		Use:   `copy2vendor <package-path> ...`,
+		Short: `copy the specified packages to vendor dir.`,
+		RunE: func(c *cobra.Command, args []string) error {
+			if len(args) <= 0 {
+				return errors.New(`need at least one package path.`)
+			}
+			return Copy2Vendor(args, n)
+		},
+	}
+	flags := cmd.Flags()
+	flags.BoolVarP(&n, `no-clobber`, `n`, false, `do not overwrite an existing file.`)
+	return cmd
+}
 
 func List() {
 	deps, _ := cmd.Run(cmd.O{Output: true}, `go`, `list`, `-e`, `-f`, `'{{join .Deps "\n" }}'`)

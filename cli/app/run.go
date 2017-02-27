@@ -1,12 +1,36 @@
 package app
 
 import (
-	"errors"
-
+	"github.com/bughou-go/xiaomei/cli/app/deps"
 	"github.com/bughou-go/xiaomei/cli/stack"
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/spf13/cobra"
 )
+
+func Cmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   `app`,
+		Short: `the appserver.`,
+	}
+	cmd.AddCommand(
+		RunCmd(),
+		BuildCmd(),
+		CheckCodeCmd(),
+		deps.Cmd(),
+	)
+	return cmd
+}
+
+func RunCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   `run`,
+		Short: `build the binary and run it.`,
+		RunE: func(c *cobra.Command, args []string) error {
+			return Run()
+		},
+	}
+}
 
 func Run() error {
 	if err := BuildBinary(); err != nil {
@@ -26,33 +50,4 @@ func Run() error {
 		image,
 	)
 	return err
-}
-
-func Build() error {
-	if err := BuildBinary(); err != nil {
-		return err
-	}
-	if err := Spec(``); err != nil {
-		return err
-	}
-	// Assets(nil)
-
-	return BuildImage()
-}
-
-func BuildBinary() error {
-	config.Log(`building binary.`)
-	if cmd.Ok(cmd.O{Env: []string{`GOBIN=` + config.Root()}}, `go`, `install`) {
-		return nil
-	}
-	return errors.New(`building binary failed.`)
-}
-
-func BuildImage() error {
-	if svc, err := stack.GetService(`app`); err != nil {
-		return err
-	} else if err = svc.BuildImage(); err != nil {
-		return err
-	}
-	return nil
 }

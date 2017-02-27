@@ -8,7 +8,22 @@ import (
 
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/spf13/cobra"
 )
+
+func CheckCodeCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   `check-code`,
+		Short: `check non-standard code.`,
+		RunE: func(c *cobra.Command, args []string) error {
+			arg := ``
+			if len(args) > 0 {
+				arg = args[0]
+			}
+			return Spec(arg)
+		},
+	}
+}
 
 func Spec(t string) error {
 	if err := os.Chdir(filepath.Join(config.Root(), `..`)); err != nil {

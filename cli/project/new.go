@@ -11,7 +11,25 @@ import (
 
 	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/bughou-go/xiaomei/utils/fs"
+	"github.com/spf13/cobra"
 )
+
+func NewCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   `new <project-name>`,
+		Short: `create a new project.`,
+		RunE: func(c *cobra.Command, args []string) error {
+			switch len(args) {
+			case 0:
+				return errors.New(`<project-name> is required.`)
+			case 1:
+				return New(args[0])
+			default:
+				return errors.New(`redundant args.`)
+			}
+		},
+	}
+}
 
 func New(proDir string) error {
 	proPath, err := projectPath(proDir)
@@ -22,9 +40,14 @@ func New(proDir string) error {
 		return err
 	}
 
-	exampleDir := filepath.Join(fmwkRoot(), `example`)
-	if !cmd.Ok(cmd.O{}, `cp`, `-rT`, exampleDir, proDir) {
-		return errors.New(`cp templates failed.`)
+	var exampleDir string
+	if fmwkRootDir, err := fmwkRoot(); err != nil {
+		return err
+	} else {
+		exampleDir = filepath.Join(fmwkRootDir, `example`)
+		if !cmd.Ok(cmd.O{}, `cp`, `-rT`, exampleDir, proDir) {
+			return errors.New(`cp templates failed.`)
+		}
 	}
 
 	proName := filepath.Base(proPath)
