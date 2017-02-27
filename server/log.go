@@ -4,7 +4,8 @@ import (
 	"bytes"
 	"encoding/csv"
 	"fmt"
-	"path"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -15,8 +16,16 @@ import (
 	"github.com/bughou-go/xiaomei/utils/fs"
 )
 
-var accessLog = fs.OpenAppend(path.Join(config.Root(), `log/app.log`))
-var errLog = fs.OpenAppend(path.Join(config.Root(), `log/app.err`))
+var accessLog, errLog = setupLogger()
+
+func setupLogger() (*os.File, *os.File) {
+	if config.Env() == `dev` {
+		return os.Stdout, os.Stderr
+	} else {
+		return fs.OpenAppend(filepath.Join(config.Root(), `log/app.log`)),
+			fs.OpenAppend(filepath.Join(config.Root(), `log/app.err`))
+	}
+}
 
 func writeLog(req *xm.Request, res *xm.Response, t time.Time, err interface{}) []byte {
 	line := getLogLine(req, res, t, err)

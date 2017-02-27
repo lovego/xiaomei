@@ -35,5 +35,9 @@ func Get() *xm.Router {
 		res.Session(nil)
 	})
 
+	router.Get(`/alive`, func(req *xm.Request, res *xm.Response) {
+		res.Write([]byte(`ok`))
+	})
+
 	return router
 }
