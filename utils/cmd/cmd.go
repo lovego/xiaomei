@@ -15,6 +15,7 @@ type O struct {
 	Stdin                       io.Reader
 	Stdout, Stderr              io.Writer
 	NoStdin, NoStdout, NoStderr bool
+	Dir                         string
 	Env                         []string
 	Attr                        *syscall.SysProcAttr
 	Print                       bool
@@ -78,6 +79,9 @@ func makeCmd(o O, name string, args []string) *exec.Cmd {
 	}
 
 	cmd := exec.Command(name, args...)
+	if o.Dir != `` {
+		cmd.Dir = o.Dir
+	}
 	if o.Env != nil {
 		cmd.Env = append(os.Environ(), o.Env...)
 	}

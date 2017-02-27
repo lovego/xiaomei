@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/bughou-go/xiaomei/cli/app/deps"
-	"github.com/bughou-go/xiaomei/cli/app/pro"
+	"github.com/bughou-go/xiaomei/cli/app/project"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +18,7 @@ func Cmds() []*cobra.Command {
 				case 0:
 					return errors.New(`<project-name> is required.`)
 				case 1:
-					return pro.New(args[0])
+					return project.New(args[0])
 				default:
 					return errors.New(`redundant args.`)
 				}
@@ -35,7 +35,7 @@ func Cmds() []*cobra.Command {
 			Use:   `build`,
 			Short: `[develop] build the binary, check coding spec, compile assets.`,
 			RunE: func(c *cobra.Command, args []string) error {
-				return Build()
+				return BuildBinary()
 			},
 		},
 		{

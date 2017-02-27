@@ -1,4 +1,4 @@
-package pro
+package project
 
 import (
 	"os"
