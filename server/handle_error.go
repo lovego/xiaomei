@@ -18,7 +18,7 @@ func handleError(t time.Time, req *xm.Request, res *xm.Response, notFound *bool)
 	}
 	log := writeLog(req, res, t, err)
 	if err != nil {
-		go config.App.Alarm(`500错误`, string(log))
+		go config.Alarm(`500错误`, string(log))
 	}
 }
 

@@ -1,4 +1,4 @@
-package app
+package pro
 
 import (
 	"crypto/rand"
@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/bughou-go/xiaomei/utils/fs"
 )
@@ -23,7 +22,7 @@ func New(proDir string) error {
 		return err
 	}
 
-	exampleDir := filepath.Join(config.Fmwk.Root(), `example`)
+	exampleDir := filepath.Join(fmwkRoot(), `example`)
 	if !cmd.Ok(cmd.O{}, `cp`, `-rT`, exampleDir, proDir) {
 		return errors.New(`cp templates failed.`)
 	}
@@ -35,7 +34,7 @@ func New(proDir string) error {
 	sed -i'' 's/%s/%s/g' main.go
 	sed -i'' 's/secret-string/%s/g' release/config/envs/production.yml
 	`, proDir, proName,
-		strings.Replace(filepath.Join(config.Fmwk.Path(), `example`), `/`, `\/`, -1),
+		strings.Replace(filepath.Join(fmwkPath, `example`), `/`, `\/`, -1),
 		strings.Replace(proPath, `/`, `\/`, -1),
 		generateSecret(),
 	)

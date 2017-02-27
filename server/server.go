@@ -31,19 +31,19 @@ type Server struct {
 
 func NewSession() session.Session {
 	return session.NewCookieSession(http.Cookie{
-		Name: config.App.Name(),
+		Name: config.Name(),
 		Path: `/`,
-	}, config.App.Secret())
+	}, config.Secret())
 }
 
 func NewRenderer() *renderer.Renderer {
 	return renderer.New(
-		path.Join(config.App.Root(), `views`), `layout/default`, config.App.Env() != `dev`, funcs.Map(),
+		path.Join(config.Root(), `views`), `layout/default`, config.Env() != `dev`, funcs.Map(),
 	)
 }
 
 func (s *Server) ListenAndServe() {
-	addr := config.App.Addr()
+	const addr = `:3000`
 	ln := listen(addr)
 	config.Log(color.GreenString(`started. (` + addr + `)`))
 

@@ -13,8 +13,8 @@ func Run() error {
 		return err
 	}
 	tail := cmd.TailFollow(
-		filepath.Join(config.App.Root(), `log/app.log`),
-		filepath.Join(config.App.Root(), `log/app.err`),
+		filepath.Join(config.Root(), `log/app.log`),
+		filepath.Join(config.Root(), `log/app.err`),
 	)
 	defer tail.Process.Kill()
 
@@ -23,18 +23,18 @@ func Run() error {
 }
 
 func startDocker() {
-	rootDir := config.App.Root()
+	rootDir := config.Root()
 	cmd.Run(cmd.O{Panic: true}, `docker`,
-		`run`, `--name=`+config.Cluster.DeployName(), `-it`, `--rm`, `--network=host`,
+		`run`, `--name=`+config.DeployName(), `-it`, `--rm`, `--network=host`,
 		`-v`, rootDir+`:/home/ubuntu/appserver`,
 		`-v`, rootDir+`/log:/home/ubuntu/appserver/log`,
-		config.App.DockerImage(),
+		// config.DockerImage(),
 	)
 }
 
 func buildBinary() error {
 	config.Log(`building.`)
-	if cmd.Ok(cmd.O{Env: []string{`GOBIN=` + config.App.Root()}}, `go`, `install`) {
+	if cmd.Ok(cmd.O{Env: []string{`GOBIN=` + config.Root()}}, `go`, `install`) {
 		return nil
 	}
 	return errors.New(`build failed.`)

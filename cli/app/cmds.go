@@ -3,6 +3,8 @@ package app
 import (
 	"errors"
 
+	"github.com/bughou-go/xiaomei/cli/app/deps"
+	"github.com/bughou-go/xiaomei/cli/app/pro"
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +18,7 @@ func Cmds() []*cobra.Command {
 				case 0:
 					return errors.New(`<project-name> is required.`)
 				case 1:
-					return New(args[0])
+					return pro.New(args[0])
 				default:
 					return errors.New(`redundant args.`)
 				}
@@ -51,7 +53,7 @@ func Cmds() []*cobra.Command {
 			Use:   `deps`,
 			Short: `[develop] list all dependences of project.`,
 			Run: func(c *cobra.Command, args []string) {
-				Dependences()
+				deps.List()
 			},
 		},
 		copy2vendorCmd(),
@@ -67,7 +69,7 @@ func copy2vendorCmd() *cobra.Command {
 			if len(args) <= 0 {
 				return errors.New(`need at least a package path`)
 			}
-			return Copy2Vendor(args, n)
+			return deps.Copy2Vendor(args, n)
 		},
 	}
 	flags := cmd.Flags()

@@ -15,8 +15,8 @@ import (
 	"github.com/bughou-go/xiaomei/utils/fs"
 )
 
-var accessLog = fs.OpenAppend(path.Join(config.App.Root(), `log/app.log`))
-var errLog = fs.OpenAppend(path.Join(config.App.Root(), `log/app.err`))
+var accessLog = fs.OpenAppend(path.Join(config.Root(), `log/app.log`))
+var errLog = fs.OpenAppend(path.Join(config.Root(), `log/app.err`))
 
 func writeLog(req *xm.Request, res *xm.Response, t time.Time, err interface{}) []byte {
 	line := getLogLine(req, res, t, err)

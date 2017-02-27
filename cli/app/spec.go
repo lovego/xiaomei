@@ -11,7 +11,7 @@ import (
 )
 
 func Spec(t string) error {
-	if err := os.Chdir(filepath.Join(config.App.Root(), `..`)); err != nil {
+	if err := os.Chdir(filepath.Join(config.Root(), `..`)); err != nil {
 		panic(err)
 	}
 

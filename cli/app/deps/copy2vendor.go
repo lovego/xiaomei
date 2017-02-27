@@ -1,4 +1,4 @@
-package app
+package deps
 
 import (
 	"errors"
@@ -24,7 +24,7 @@ func Copy2Vendor(pkgDirs []string, noClobber bool) error {
 
 func checkAndCopy(pkgDir string, noClobber bool) error {
 	goPath := os.Getenv(`GOPATH`)
-	vendorDir := path.Join(config.App.Root(), `../vendor`)
+	vendorDir := path.Join(config.Root(), `../vendor`)
 
 	pkgSrcDir := path.Join(goPath, `src`, pkgDir)
 	// package src dir is exists
