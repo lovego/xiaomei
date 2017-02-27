@@ -35,7 +35,7 @@ func Protect(fn func()) {
 		err := recover()
 		if err != nil {
 			errMsg := fmt.Sprintf("PANIC: %s\n%s", err, utils.Stack(4))
-			App.Alarm(`Protect错误`, errMsg)
+			Alarm(`Protect错误`, errMsg)
 			log.Printf(errMsg)
 		}
 	}()

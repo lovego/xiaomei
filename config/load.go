@@ -5,41 +5,17 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 
 	"github.com/bughou-go/xiaomei/utils"
 	"gopkg.in/yaml.v2"
 )
 
-type Conf struct {
-	App     *AppConf
-	Cluster *ClusterConf
-	Db      *DbConf
-	Fmwk    *FmwkConf
-	Godoc   *GodocConf
-}
-
-func Data() Conf {
-	return Conf{&App, &Cluster, &DB, &Fmwk, &Godoc}
-}
-
-var loader struct {
-	mutex   sync.Mutex
-	App     *appConf     `yaml:"app"`
-	DB      *dbConf      `yaml:"db"`
-	Cluster *clusterConf `yaml:"cluster"`
-	Godoc   *godocConf   `yaml:"godoc"`
-}
-
-func Load() {
-	loader.mutex.Lock()
-	defer loader.mutex.Unlock()
-	if loader.App == nil {
-		loader.App = &App.conf
-		loader.DB = &DB.conf
-		loader.Cluster = &Cluster.conf
-		loader.Godoc = &Godoc.conf
-		Parse(&loader)
+func (c *Conf) Load() {
+	c.Lock()
+	defer c.Unlock()
+	if c.data == nil {
+		c.data = &conf{}
+		Parse(c.data)
 	}
 }
 
@@ -52,7 +28,7 @@ func Parse(p interface{}) {
 }
 
 func loadConfig(p interface{}, path string) {
-	content, err := ioutil.ReadFile(filepath.Join(App.Root(), path))
+	content, err := ioutil.ReadFile(filepath.Join(Root(), path))
 	if err != nil {
 		panic(err)
 	}

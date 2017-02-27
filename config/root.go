@@ -6,25 +6,27 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/bughou-go/xiaomei/utils/fs"
 )
 
 func InProject() bool {
-	return detectRoot() != ``
+	return DetectRoot() != ``
 }
 
-func detectRoot() string {
+func DetectRoot() string {
 	program, cwd := absProgramPath()
-	if program == Fmwk.Bin() /* fmwk ... */ ||
+	fmwkBin, _ := cmd.Run(cmd.O{Output: true}, `which`, `xiaomei`)
+	if program == fmwkBin /* fmwk ... */ ||
 		strings.HasSuffix(program, `.test`) /* go test ... */ ||
 		strings.HasPrefix(program, `/tmp/`) /* go run ... */ {
-		if dir := detectDir(cwd, `app/images/config/config.yml`); dir == `` {
+		if dir := detectDir(cwd, `release/stack.yml`); dir == `` {
 			return ``
 		} else {
-			return filepath.Join(dir, `app/images`)
+			return filepath.Join(dir, `release/img-app`)
 		}
 	} else {
-		// binary under project/release/ dir
+		// project binary file
 		return detectDir(filepath.Dir(program), `config/config.yml`)
 	}
 }
