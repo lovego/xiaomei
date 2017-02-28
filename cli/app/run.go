@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/bughou-go/xiaomei/cli/app/deps"
-	"github.com/bughou-go/xiaomei/cli/stack"
+	"github.com/bughou-go/xiaomei/cli/project"
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/spf13/cobra"
@@ -16,7 +16,8 @@ func Cmd() *cobra.Command {
 	cmd.AddCommand(
 		RunCmd(),
 		BuildCmd(),
-		CheckCodeCmd(),
+		PsCmd(),
+		SpecCmd(),
 		deps.Cmd(),
 	)
 	return cmd
@@ -38,7 +39,7 @@ func Run() error {
 	}
 
 	var image string
-	if svc, err := stack.GetService(`app`); err != nil {
+	if svc, err := project.GetService(`app`); err != nil {
 		return err
 	} else if image, err = svc.GetImage(); err != nil {
 		return err

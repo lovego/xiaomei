@@ -1,4 +1,4 @@
-package stack
+package project
 
 import (
 	"io/ioutil"
@@ -22,10 +22,10 @@ func GetStack() (*Stack, error) {
 	if err != nil {
 		return nil, err
 	}
-	_stack := &Stack{Services: make(map[string]Service)}
-	if err := yaml.Unmarshal(content, _stack); err != nil {
+	stack := &Stack{Services: make(map[string]Service)}
+	if err := yaml.Unmarshal(content, stack); err != nil {
 		return nil, err
 	}
-	theStack = _stack
+	theStack = stack
 	return theStack, nil
 }

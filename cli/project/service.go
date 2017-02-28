@@ -1,4 +1,4 @@
-package stack
+package project
 
 import (
 	"fmt"

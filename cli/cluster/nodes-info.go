@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
@@ -39,12 +38,12 @@ func (info *NodeInfo) fetch() error {
 	return nil
 }
 
-func getNodesInfo() ([]NodeInfo, []NodeInfo, error) {
-	managers, err1 := fetchNodesInfo(config.Cluster.Managers())
+func getNodesInfo(clusterConf ClusterConf) ([]NodeInfo, []NodeInfo, error) {
+	managers, err1 := fetchNodesInfo(clusterConf.Managers)
 	if err1 != nil {
 		return nil, nil, err1
 	}
-	workers, err2 := fetchNodesInfo(config.Cluster.Workers())
+	workers, err2 := fetchNodesInfo(clusterConf.Workers)
 	if err2 != nil {
 		return nil, nil, err2
 	}
@@ -55,7 +54,7 @@ func getNodesInfo() ([]NodeInfo, []NodeInfo, error) {
 	return managers, workers, nil
 }
 
-func fetchNodesInfo(nodes []config.Node) (result []NodeInfo, err error) {
+func fetchNodesInfo(nodes []NodeConf) (result []NodeInfo, err error) {
 	for _, n := range nodes {
 		info := NodeInfo{Node: Node{Config: n}}
 		if err := info.fetch(); err != nil {

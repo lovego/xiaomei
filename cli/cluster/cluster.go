@@ -2,8 +2,6 @@ package cluster
 
 import (
 	"errors"
-
-	"github.com/bughou-go/xiaomei/config"
 )
 
 type Cluster struct {
@@ -13,11 +11,15 @@ type Cluster struct {
 	workerToken  string
 }
 
-func Setup() error {
-	if len(config.Cluster.Managers()) == 0 {
+func Setup(env string) error {
+	clusterConf, err := GetConfig(env)
+	if err != nil {
+		return err
+	}
+	if len(clusterConf.Managers) == 0 {
 		return errors.New(`the cluster have no managers.`)
 	}
-	managers, workers, err := getClusterNodes()
+	managers, workers, err := getClusterNodes(clusterConf)
 	if err != nil {
 		return err
 	}

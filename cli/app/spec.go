@@ -11,10 +11,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CheckCodeCmd() *cobra.Command {
+func SpecCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   `check-code`,
-		Short: `check non-standard code.`,
+		Use:   `spec`,
+		Short: `check code spec.`,
 		RunE: func(c *cobra.Command, args []string) error {
 			arg := ``
 			if len(args) > 0 {
