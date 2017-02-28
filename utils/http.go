@@ -38,7 +38,7 @@ func Http(method, url string, headers map[string]string, body io.Reader, data in
 	return content
 }
 
-func HttpStatus(method, url string, headers map[string]string, body io.Reader) int {
+func HttpStatus(method, url string, headers map[string]string, body io.Reader) (int, error) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		panic(err)
@@ -51,7 +51,7 @@ func HttpStatus(method, url string, headers map[string]string, body io.Reader) i
 		defer resp.Body.Close()
 	}
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
-	return resp.StatusCode
+	return resp.StatusCode, nil
 }
