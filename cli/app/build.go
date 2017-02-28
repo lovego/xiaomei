@@ -2,6 +2,7 @@ package app
 
 import (
 	"errors"
+	"path/filepath"
 
 	"github.com/bughou-go/xiaomei/cli/stack"
 	"github.com/bughou-go/xiaomei/config"
@@ -55,7 +56,10 @@ func Build(binary, checkCode, assets, image bool) error {
 
 func BuildBinary() error {
 	config.Log(`building binary.`)
-	if cmd.Ok(cmd.O{Env: []string{`GOBIN=` + config.Root()}}, `go`, `install`) {
+	if cmd.Ok(cmd.O{
+		Dir: filepath.Join(config.Root(), "../.."),
+		Env: []string{`GOBIN=` + config.Root()},
+	}, `go`, `install`) {
 		return nil
 	}
 	return errors.New(`building binary failed.`)

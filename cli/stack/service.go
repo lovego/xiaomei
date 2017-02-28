@@ -46,7 +46,7 @@ func (s Service) BuildImage() error {
 	}
 	context = filepath.Join(config.Root(), `..`, context)
 	_, err = cmd.Run(cmd.O{Dir: context}, `docker`, `build`,
-		`--dockerfile=`+dockerfile, `--tag=`+image, `.`)
+		`--file=`+dockerfile, `--tag=`+image, `.`)
 	return err
 }
 

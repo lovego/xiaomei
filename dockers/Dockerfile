@@ -22,6 +22,6 @@ COPY launch gosu /usr/local/bin/
 ENTRYPOINT ["launch"]
 
 EXPOSE 3000
-HEALTHCHECK --interval=3s --timeout=3s --retries=1 \
+HEALTHCHECK --interval=1m --timeout=3s --retries=1 \
   CMD wget --spider http://localhost:3000/alive || exit 1
 
