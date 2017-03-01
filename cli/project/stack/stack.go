@@ -1,7 +1,8 @@
-package project
+package stack
 
 import (
 	"io/ioutil"
+	"path"
 	"path/filepath"
 
 	"github.com/bughou-go/xiaomei/config"
@@ -10,7 +11,8 @@ import (
 
 type Stack struct {
 	Version  string
-	Services map[string]Service
+	Registry string             `yaml:"-"`
+	Services map[string]Service `yaml:",omitempty"`
 	Volumes  map[string]Volume  `yaml:",omitempty"`
 	Networks map[string]Network `yaml:",omitempty"`
 }
@@ -20,11 +22,11 @@ type Network map[string]interface{}
 
 var theStack *Stack
 
-func GetStack() (*Stack, error) {
+func getStack() (*Stack, error) {
 	if theStack != nil {
 		return theStack, nil
 	}
-	content, err := GetStackFileContent()
+	content, err := ioutil.ReadFile(filepath.Join(config.Root(), `../stack.yml`))
 	if err != nil {
 		return nil, err
 	}
@@ -36,6 +38,6 @@ func GetStack() (*Stack, error) {
 	return theStack, nil
 }
 
-func GetStackFileContent() ([]byte, error) {
-	return ioutil.ReadFile(filepath.Join(config.Root(), `../stack.yml`))
+func (s Stack) ImageName(svcName string) string {
+	return path.Join(s.Registry, config.Name(), svcName)
 }

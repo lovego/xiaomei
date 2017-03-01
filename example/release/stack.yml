@@ -1,12 +1,10 @@
 version: "3"
+registry: 192.168.202.12:5000
 services:
   app:
-    image: 192.168.202.12:5000/example-app
-    build: ./img-app
+    ports: [ "3000:3000" ]
     deploy:
       replicas: 1
 # web:
-#   image: 192.168.202.12:5000/example-web
-#   build: ./img-web
 #   deploy:
 #     replicas: 1

@@ -1,4 +1,4 @@
-package app
+package project
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func PsCmd() *cobra.Command {
+func psCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   `ps [<env>]`,
 		Short: `list tasks of app service.`,
@@ -17,23 +17,23 @@ func PsCmd() *cobra.Command {
 			if len(args) > 0 {
 				env = args[0]
 			}
-			return Ps(env)
+			return ps(env)
 		},
 	}
 }
 
-func Ps(env string) error {
-	return cluster.Run(env, fmt.Sprintf(`docker service ps %s_app`, config.DeployName()))
+func ps(env string) error {
+	return cluster.Run(env, fmt.Sprintf(`docker stack ps %s`, config.DeployName()))
 }
 
-func Restart(env string) error {
+func restart(env string) error {
 	return nil
 }
 
-func Shell(env string) error {
+func shell(env string) error {
 	return nil
 }
 
-func Exec(env string) error {
+func exec(env string) error {
 	return nil
 }

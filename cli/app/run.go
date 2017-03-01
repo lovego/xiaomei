@@ -1,27 +1,11 @@
 package app
 
 import (
-	"github.com/bughou-go/xiaomei/cli/app/deps"
-	"github.com/bughou-go/xiaomei/cli/project"
+	"github.com/bughou-go/xiaomei/cli/project/stack"
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/spf13/cobra"
 )
-
-func Cmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   `app`,
-		Short: `the appserver.`,
-	}
-	cmd.AddCommand(
-		RunCmd(),
-		BuildCmd(),
-		PsCmd(),
-		SpecCmd(),
-		deps.Cmd(),
-	)
-	return cmd
-}
 
 func RunCmd() *cobra.Command {
 	return &cobra.Command{
@@ -38,17 +22,14 @@ func Run() error {
 		return err
 	}
 
-	var image string
-	if svc, err := project.GetService(`app`); err != nil {
-		return err
-	} else if image, err = svc.GetImage(); err != nil {
+	image, err := stack.ImageName(`app`)
+	if err != nil {
 		return err
 	}
 
-	_, err := cmd.Run(cmd.O{}, `docker`,
+	_, err = cmd.Run(cmd.O{}, `docker`,
 		`run`, `--name=`+config.DeployName(), `-it`, `--rm`, `--network=host`,
-		`-v`, config.Root()+`:/home/ubuntu/appserver`,
-		image,
+		`-v`, config.Root()+`:/home/ubuntu/appserver`, image,
 	)
 	return err
 }

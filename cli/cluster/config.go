@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/utils/cmd"
 	"gopkg.in/yaml.v2"
 )
 
@@ -20,6 +21,23 @@ type NodeConf struct {
 	Addr       string   `yaml:"addr"`
 	Labels     []string `yaml:"labels"`
 	ListenAddr string   `yaml:"listenAddr"` // only for manager
+}
+
+func Run(env, script string) error {
+	addr, err := ManagerAddr(env)
+	if err != nil {
+		return err
+	}
+	_, err = cmd.SshRun(cmd.O{}, addr, script)
+	return err
+}
+
+func ManagerAddr(env string) (string, error) {
+	clusterConf, err := GetConfig(env)
+	if err != nil {
+		return ``, err
+	}
+	return clusterConf.SshAddr()
 }
 
 var theClusters map[string]ClusterConf
@@ -52,14 +70,6 @@ func loadClustersConfig() (map[string]ClusterConf, error) {
 		return nil, err
 	}
 	return clusters, nil
-}
-
-func ManagerAddr(env string) (string, error) {
-	clusterConf, err := GetConfig(env)
-	if err != nil {
-		return ``, err
-	}
-	return clusterConf.SshAddr()
 }
 
 func (c *ClusterConf) init() {

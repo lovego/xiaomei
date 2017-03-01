@@ -4,9 +4,10 @@ import (
 	"errors"
 	"path/filepath"
 
-	"github.com/bughou-go/xiaomei/cli/project"
+	"github.com/bughou-go/xiaomei/cli/project/stack"
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -49,27 +50,18 @@ func Build(binary, spec, assets, image bool) error {
 		*/
 	}
 	if image {
-		return BuildImage()
+		return stack.BuildImage(`app`)
 	}
 	return nil
 }
 
 func BuildBinary() error {
-	config.Log(`building binary.`)
+	config.Log(color.GreenString(`building app binary.`))
 	if cmd.Ok(cmd.O{
 		Dir: filepath.Join(config.Root(), "../.."),
 		Env: []string{`GOBIN=` + config.Root()},
 	}, `go`, `install`) {
 		return nil
 	}
-	return errors.New(`building binary failed.`)
-}
-
-func BuildImage() error {
-	if svc, err := project.GetService(`app`); err != nil {
-		return err
-	} else if err = svc.BuildImage(); err != nil {
-		return err
-	}
-	return nil
+	return errors.New(`building app binary failed.`)
 }

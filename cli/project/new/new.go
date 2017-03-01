@@ -1,4 +1,4 @@
-package project
+package new
 
 import (
 	"crypto/rand"
@@ -14,7 +14,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewCmd() *cobra.Command {
+func Cmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   `new <project-name>`,
 		Short: `create a new project.`,

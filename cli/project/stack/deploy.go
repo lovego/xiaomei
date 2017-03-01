@@ -1,43 +1,25 @@
-package project
+package stack
 
 import (
 	"bytes"
-	"errors"
 	"gopkg.in/yaml.v2"
 	"text/template"
 
 	"github.com/bughou-go/xiaomei/cli/cluster"
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
-	"github.com/spf13/cobra"
 )
 
-func DeployCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   `deploy <env>`,
-		Short: `deploy project to the specified env.`,
-		RunE: func(c *cobra.Command, args []string) error {
-			var env string
-			if len(args) > 1 {
-				return errors.New(`redundant args.`)
-			} else if len(args) == 1 {
-				env = args[0]
-			}
-			return Deploy(env, ``)
-		},
-	}
-}
-
-func Deploy(env, svc string) error {
+func Deploy(env, svcName string) error {
 	addr, err := cluster.ManagerAddr(env)
 	if err != nil {
 		return err
 	}
-	stack, err := GetDeployStack(svc)
+	stack, err := getDeployStack(svcName)
 	if err != nil {
 		return err
 	}
-	script, err := GetDeployScript(svc)
+	script, err := getDeployScript(svcName)
 	if err != nil {
 		return err
 	}
@@ -45,14 +27,28 @@ func Deploy(env, svc string) error {
 	return err
 }
 
-func GetDeployScript(svc string) (string, error) {
+func getDeployStack(svcName string) ([]byte, error) {
+	stack, err := getStack()
+	if err != nil {
+		return nil, err
+	}
+	if svcName != `` {
+		stack.Services = map[string]Service{svcName: stack.Services[svcName]}
+	}
+	for svcName, service := range stack.Services {
+		service[`image`] = stack.ImageName(svcName)
+	}
+	return yaml.Marshal(stack)
+}
+
+func getDeployScript(svcName string) (string, error) {
 	deployConf := struct {
 		DeployName, FileName string
 	}{
 		DeployName: config.DeployName(), FileName: `stack`,
 	}
-	if svc != `` {
-		deployConf.FileName = svc
+	if svcName != `` {
+		deployConf.FileName = svcName
 	}
 
 	tmpl := template.Must(template.New(``).Parse(deployScriptTmpl))
@@ -61,20 +57,6 @@ func GetDeployScript(svc string) (string, error) {
 		return ``, err
 	}
 	return buf.String(), nil
-}
-
-func GetDeployStack(svc string) ([]byte, error) {
-	stack, err := GetStack()
-	if err != nil {
-		return nil, err
-	}
-	if svc != `` {
-		stack.Services = map[string]Service{svc: stack.Services[svc]}
-	}
-	for _, service := range stack.Services {
-		delete(service, `build`)
-	}
-	return yaml.Marshal(stack)
 }
 
 const deployScriptTmpl = `
