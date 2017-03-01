@@ -54,6 +54,14 @@ func loadClustersConfig() (map[string]ClusterConf, error) {
 	return clusters, nil
 }
 
+func ManagerAddr(env string) (string, error) {
+	clusterConf, err := GetConfig(env)
+	if err != nil {
+		return ``, err
+	}
+	return clusterConf.SshAddr()
+}
+
 func (c *ClusterConf) init() {
 	for i := range c.Managers {
 		c.Managers[i].user = c.User

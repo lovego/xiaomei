@@ -5,8 +5,8 @@ services:
     build: ./img-app
     deploy:
       replicas: 1
-  web:
-    image: 192.168.202.12:5000/example-web
-    build: ./img-web
-    deploy:
-      replicas: 1
+# web:
+#   image: 192.168.202.12:5000/example-web
+#   build: ./img-web
+#   deploy:
+#     replicas: 1

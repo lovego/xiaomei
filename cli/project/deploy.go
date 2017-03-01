@@ -1,40 +1,83 @@
 package project
 
 import (
-	"fmt"
-	"os"
-	"path/filepath"
+	"bytes"
+	"errors"
+	"gopkg.in/yaml.v2"
+	"text/template"
 
 	"github.com/bughou-go/xiaomei/cli/cluster"
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/spf13/cobra"
 )
 
-func Deploy(env, svc string) error {
-	stackContent, err := GetDeployStackContent(svc)
-	if err != nil {
-		return err
+func DeployCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   `deploy <env>`,
+		Short: `deploy project to the specified env.`,
+		RunE: func(c *cobra.Command, args []string) error {
+			switch len(args) {
+			case 0:
+				return errors.New(`<env> is required.`)
+			case 1:
+				return Deploy(args[0], ``)
+			default:
+				return errors.New(`redundant args.`)
+			}
+		},
 	}
-	clusterConf, err := cluster.GetConfig(env)
-	if err != nil {
-		return err
-	}
-	addr, err := clusterConf.SshAddr()
-	if err != nil {
-		return err
-	}
-	stackFile = config.DeployName + `_`
-	cmd.SshRun(cmd.O{}, addr, `cat - > %s; docker stack deploy --compose-file=%s`)
 }
 
-func GetDeployStackContent(svc string) (string, error) {
-	var stackContent string
-	if svc == `` {
-		if _stack, err := GetStackFile(); err == nil {
-			stack = _stack
-		} else {
-			return ``, err
-		}
-	} else {
+func Deploy(env, svc string) error {
+	addr, err := cluster.ManagerAddr(env)
+	if err != nil {
+		return err
 	}
+	stack, err := GetDeployStack(svc)
+	if err != nil {
+		return err
+	}
+	script, err := GetDeployScript(svc)
+	if err != nil {
+		return err
+	}
+	_, err = cmd.SshRun(cmd.O{Stdin: bytes.NewReader(stack)}, addr, script)
+	return err
 }
+
+func GetDeployScript(svc string) (string, error) {
+	deployConf := struct {
+		DeployName, FileName string
+	}{
+		DeployName: config.DeployName(), FileName: `stack`,
+	}
+	if svc != `` {
+		deployConf.FileName = svc
+	}
+
+	tmpl := template.Must(template.New(``).Parse(deployScriptTmpl))
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, deployConf); err != nil {
+		return ``, err
+	}
+	return buf.String(), nil
+}
+
+func GetDeployStack(svc string) ([]byte, error) {
+	if svc == `` {
+		return GetStackFileContent()
+	}
+	stack, err := GetStack()
+	if err != nil {
+		return nil, err
+	}
+	stack.Services = map[string]Service{svc: stack.Services[svc]}
+	return yaml.Marshal(stack)
+}
+
+const deployScriptTmpl = `
+	cd && mkdir -p {{ .DeployName }} && cd {{ .DeployName }} &&
+	cat - > {{ .FileName }}.yml &&
+	docker stack deploy --compose-file={{ .FileName }}.yml {{ .DeployName }}
+`

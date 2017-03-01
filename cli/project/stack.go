@@ -11,9 +11,10 @@ import (
 type Stack struct {
 	Version  string
 	Services map[string]Service
-	Volumes  map[string]Volume
-	Networks map[string]Network
+	Volumes  map[string]Volume  `yaml:",omitempty"`
+	Networks map[string]Network `yaml:",omitempty"`
 }
+type Service map[string]interface{}
 type Volume map[string]interface{}
 type Network map[string]interface{}
 
@@ -23,7 +24,7 @@ func GetStack() (*Stack, error) {
 	if theStack != nil {
 		return theStack, nil
 	}
-	content, err := GetStackFile()
+	content, err := GetStackFileContent()
 	if err != nil {
 		return nil, err
 	}
@@ -35,6 +36,6 @@ func GetStack() (*Stack, error) {
 	return theStack, nil
 }
 
-func GetStackFile() (string, error) {
+func GetStackFileContent() ([]byte, error) {
 	return ioutil.ReadFile(filepath.Join(config.Root(), `../stack.yml`))
 }

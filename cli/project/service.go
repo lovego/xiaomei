@@ -11,28 +11,25 @@ import (
 func GetService(name string) (Service, error) {
 	stack, err := GetStack()
 	if err != nil {
-		return Service{}, err
+		return nil, err
 	}
 	if svc, ok := stack.Services[name]; ok {
-		svc.name = name
+		svc[`name`] = name
 		return svc, nil
 	} else {
-		return Service{}, fmt.Errorf(`services.%s: undefined.`, name)
+		return nil, fmt.Errorf(`services.%s: undefined.`, name)
 	}
-}
-
-type Service struct {
-	name  string
-	Image string
-	Build interface{}
 }
 
 func (s Service) GetImage() (string, error) {
-	if img := s.Image; img != `` {
-		return img, nil
-	} else {
-		return ``, fmt.Errorf(`services.%s.image: undefined. `, s.name)
+	if v := s[`image`]; v != nil {
+		if img, ok := v.(string); ok && img != `` {
+			return img, nil
+		} else if !ok {
+			return ``, fmt.Errorf(`services.%s.image: must be a string. `, s[`name`])
+		}
 	}
+	return ``, fmt.Errorf(`services.%s.image: undefined. `, s[`name`])
 }
 
 func (s Service) BuildImage() error {
@@ -51,17 +48,17 @@ func (s Service) BuildImage() error {
 }
 
 func (s Service) GetBuild() (context, dockerfile string, err error) {
-	switch build := s.Build.(type) {
+	switch build := s[`build`].(type) {
 	case string:
 		context = build
 	case map[string]interface{}:
 		for key, ifc := range build {
 			if key != `context` && key != `dockerfile` {
-				return ``, ``, fmt.Errorf(`services.%s.build.%s: unknown key.`, s.name, key)
+				return ``, ``, fmt.Errorf(`services.%s.build.%s: unknown key.`, s[`name`], key)
 			}
 			value, ok := ifc.(string)
 			if !ok {
-				return ``, ``, fmt.Errorf(`services.%s.build.%s: should be a string.`, s.name, key)
+				return ``, ``, fmt.Errorf(`services.%s.build.%s: should be a string.`, s[`name`], key)
 			}
 			switch key {
 			case `context`:
@@ -71,7 +68,7 @@ func (s Service) GetBuild() (context, dockerfile string, err error) {
 			}
 		}
 	default:
-		return ``, ``, fmt.Errorf(`services.%s.build: should be a string or map[string]string.`, s.name)
+		return ``, ``, fmt.Errorf(`services.%s.build: should be a string or map[string]string.`, s[`name`])
 	}
 	return
 }
