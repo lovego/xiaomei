@@ -4,7 +4,6 @@ import (
 	"github.com/bughou-go/xiaomei/cli/app"
 	"github.com/bughou-go/xiaomei/cli/project"
 	// "github.com/bughou-go/xiaomei/cli/db"
-	// "github.com/bughou-go/xiaomei/cli/oam"
 
 	"github.com/spf13/cobra"
 )
@@ -18,11 +17,10 @@ func main() {
 	}
 
 	root.AddCommand(
-		app.Cmd(), project.NewCmd(),
+		app.Cmd(), project.Cmd(),
 	)
 	/*
 		root.AddCommand(db.Cmds()...)
-		root.AddCommand(oam.Cmds()...)
 	*/
 
 	root.Execute()
