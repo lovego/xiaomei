@@ -1,4 +1,0 @@
-#!/bin/bash
-
-git describe --tags --exact-match $1
-

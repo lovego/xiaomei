@@ -1,10 +1,9 @@
 package project
 
 import (
-	"errors"
-
 	new "github.com/bughou-go/xiaomei/cli/project/new"
 	"github.com/bughou-go/xiaomei/cli/project/stack"
+	"github.com/bughou-go/xiaomei/cli/z"
 	"github.com/spf13/cobra"
 )
 
@@ -14,25 +13,21 @@ func Cmd() *cobra.Command {
 		Short: `the whole project.`,
 	}
 	cmd.AddCommand(
-		deployCmd(),
-		psCmd(),
+		&cobra.Command{
+			Use:   `deploy <env>`,
+			Short: `deploy project to the specified env.`,
+			RunE: z.Arg1Call(`dev`, func(env string) error {
+				return stack.Deploy(env, ``)
+			}),
+		},
+		&cobra.Command{
+			Use:   `ps [<env>]`,
+			Short: `list tasks of app service.`,
+			RunE: z.Arg1Call(`dev`, func(env string) error {
+				return stack.Ps(env, ``)
+			}),
+		},
 		new.Cmd(),
 	)
 	return cmd
-}
-
-func deployCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   `deploy <env>`,
-		Short: `deploy project to the specified env.`,
-		RunE: func(c *cobra.Command, args []string) error {
-			var env string
-			if len(args) > 1 {
-				return errors.New(`redundant args.`)
-			} else if len(args) == 1 {
-				env = args[0]
-			}
-			return stack.Deploy(env, ``)
-		},
-	}
 }
