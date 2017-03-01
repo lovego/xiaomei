@@ -17,14 +17,13 @@ func DeployCmd() *cobra.Command {
 		Use:   `deploy <env>`,
 		Short: `deploy project to the specified env.`,
 		RunE: func(c *cobra.Command, args []string) error {
-			switch len(args) {
-			case 0:
-				return errors.New(`<env> is required.`)
-			case 1:
-				return Deploy(args[0], ``)
-			default:
+			var env string
+			if len(args) > 1 {
 				return errors.New(`redundant args.`)
+			} else if len(args) == 1 {
+				env = args[0]
 			}
+			return Deploy(env, ``)
 		},
 	}
 }
@@ -65,14 +64,16 @@ func GetDeployScript(svc string) (string, error) {
 }
 
 func GetDeployStack(svc string) ([]byte, error) {
-	if svc == `` {
-		return GetStackFileContent()
-	}
 	stack, err := GetStack()
 	if err != nil {
 		return nil, err
 	}
-	stack.Services = map[string]Service{svc: stack.Services[svc]}
+	if svc != `` {
+		stack.Services = map[string]Service{svc: stack.Services[svc]}
+	}
+	for _, service := range stack.Services {
+		delete(service, `build`)
+	}
 	return yaml.Marshal(stack)
 }
 
