@@ -7,18 +7,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func RunCmd() *cobra.Command {
+func runCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   `run`,
 		Short: `build the binary and run it.`,
 		RunE: func(c *cobra.Command, args []string) error {
-			return Run()
+			return run()
 		},
 	}
 }
 
-func Run() error {
-	if err := BuildBinary(); err != nil {
+func run() error {
+	if err := buildBinary(); err != nil {
 		return err
 	}
 

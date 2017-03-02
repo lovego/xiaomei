@@ -8,54 +8,28 @@ import (
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/fatih/color"
-	"github.com/spf13/cobra"
 )
 
-func BuildCmd() *cobra.Command {
-	var binary, spec, assets, image bool
-	cmd := &cobra.Command{
-		Use:   `build`,
-		Short: `build binary, check code spec, build assets, build docker image.`,
-		RunE: func(c *cobra.Command, args []string) error {
-			return Build(binary, spec, assets, image)
-		},
-	}
-	flags := cmd.Flags()
-	flags.BoolVarP(&binary, `binary`, `b`, false, `build binary.`)
-	flags.BoolVarP(&spec, `spec`, `s`, false, `check code spec.`)
-	flags.BoolVarP(&assets, `assets`, `a`, false, `build assets.`)
-	flags.BoolVarP(&image, `image`, `i`, false, `build image.`)
-	return cmd
+func init() {
+	stack.ImageBuilders[`app`] = buildImage
 }
 
-func Build(binary, spec, assets, image bool) error {
-	if !(binary || spec || assets || image) {
-		binary, spec, assets, image = true, true, true, true
+func buildImage(imageName string) error {
+	if err := buildBinary(); err != nil {
+		return err
 	}
-	if binary {
-		if err := BuildBinary(); err != nil {
+	/*
+		if err :=	Assets(nil); err != nil {
 			return err
 		}
-	}
-	if spec {
-		if err := Spec(``); err != nil {
-			return err
-		}
-	}
-	if assets {
-		/*
-			if err :=	Assets(nil); err != nil {
-				return err
-			}
-		*/
-	}
-	if image {
-		return stack.BuildImage(`app`)
-	}
-	return nil
+	*/
+	config.Log(color.GreenString(`building app image.`))
+	dir := filepath.Join(config.Root(), `../img-app`)
+	_, err := cmd.Run(cmd.O{Dir: dir}, `docker`, `build`, `--tag=`+imageName, `.`)
+	return err
 }
 
-func BuildBinary() error {
+func buildBinary() error {
 	config.Log(color.GreenString(`building app binary.`))
 	if cmd.Ok(cmd.O{
 		Dir: filepath.Join(config.Root(), "../.."),

@@ -10,8 +10,11 @@ import (
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
-func Deploy(env, svcName string) error {
-	if err := PushImages(svcName); err != nil {
+func deploy(env, svcName string) error {
+	if err := build(svcName); err != nil {
+		return err
+	}
+	if err := push(svcName); err != nil {
 		return err
 	}
 	stack, err := getDeployStack(svcName)
@@ -34,10 +37,16 @@ func getDeployStack(svcName string) ([]byte, error) {
 		stack.Services = map[string]Service{svcName: stack.Services[svcName]}
 	}
 	for svcName, service := range stack.Services {
-		service[`image`] = stack.ImageName(svcName)
+		service[`image`] = stack.imageName(svcName)
 	}
 	return yaml.Marshal(stack)
 }
+
+const deployScriptTmpl = `
+	cd && mkdir -p {{ .DeployName }} && cd {{ .DeployName }} &&
+	cat - > {{ .FileName }}.yml &&
+	docker stack deploy --compose-file={{ .FileName }}.yml {{ .DeployName }}
+`
 
 func getDeployScript(svcName string) (string, error) {
 	deployConf := struct {
@@ -57,8 +66,14 @@ func getDeployScript(svcName string) (string, error) {
 	return buf.String(), nil
 }
 
-const deployScriptTmpl = `
-	cd && mkdir -p {{ .DeployName }} && cd {{ .DeployName }} &&
-	cat - > {{ .FileName }}.yml &&
-	docker stack deploy --compose-file={{ .FileName }}.yml {{ .DeployName }}
-`
+func push(svcName string) error {
+	if svcName == `` {
+		return eachServiceDo(push)
+	}
+	imageName, err := ImageName(svcName)
+	if err != nil {
+		return err
+	}
+	_, err = cmd.Run(cmd.O{}, `docker`, `push`, imageName)
+	return err
+}

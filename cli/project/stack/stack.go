@@ -9,6 +9,14 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+func ImageName(svcName string) (string, error) {
+	if stack, err := getStack(); err != nil {
+		return ``, err
+	} else {
+		return stack.imageName(svcName), nil
+	}
+}
+
 type Stack struct {
 	Version  string
 	Registry string             `yaml:"-"`
@@ -38,14 +46,21 @@ func getStack() (*Stack, error) {
 	return theStack, nil
 }
 
-func (s Stack) ImageName(svcName string) string {
+func (s Stack) imageName(svcName string) string {
 	return path.Join(s.Registry, config.Name(), svcName)
 }
 
-func Services() (map[string]Service, error) {
+func eachServiceDo(work func(svcName string) error) error {
 	stack, err := getStack()
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return stack.Services, nil
+	for svcName := range stack.Services {
+		if svcName != `` {
+			if err := work(svcName); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
