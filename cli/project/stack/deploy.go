@@ -11,8 +11,7 @@ import (
 )
 
 func Deploy(env, svcName string) error {
-	addr, err := cluster.ManagerAddr(env)
-	if err != nil {
+	if err := PushImages(svcName); err != nil {
 		return err
 	}
 	stack, err := getDeployStack(svcName)
@@ -23,8 +22,7 @@ func Deploy(env, svcName string) error {
 	if err != nil {
 		return err
 	}
-	_, err = cmd.SshRun(cmd.O{Stdin: bytes.NewReader(stack)}, addr, script)
-	return err
+	return cluster.Run(cmd.O{Stdin: bytes.NewReader(stack)}, env, script)
 }
 
 func getDeployStack(svcName string) ([]byte, error) {

@@ -5,6 +5,7 @@ import (
 
 	"github.com/bughou-go/xiaomei/cli/cluster"
 	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
 func Ps(env, svcName string) error {
@@ -14,5 +15,5 @@ func Ps(env, svcName string) error {
 	} else {
 		typ, name = `stack`, config.DeployName()
 	}
-	return cluster.Run(env, fmt.Sprintf(`docker %s ps %s`, typ, name))
+	return cluster.Run(cmd.O{}, env, fmt.Sprintf(`docker %s ps %s`, typ, name))
 }

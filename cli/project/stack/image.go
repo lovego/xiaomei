@@ -16,6 +16,27 @@ func ImageName(svcName string) (string, error) {
 	}
 }
 
+func PushImages(svcName string) error {
+	if svcName != `` {
+		imageName, err := ImageName(svcName)
+		if err != nil {
+			return err
+		}
+		_, err = cmd.Run(cmd.O{}, `docker`, `push`, imageName)
+		return err
+	}
+	services, err := Services()
+	if err != nil {
+		return err
+	}
+	for svcName, _ := range services {
+		if err := PushImages(svcName); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func BuildImage(svcName string) error {
 	config.Log(color.GreenString(`building ` + svcName + ` image.`))
 

@@ -23,7 +23,7 @@ type NodeConf struct {
 	ListenAddr string   `yaml:"listenAddr"` // only for manager
 }
 
-func Run(env, script string) error {
+func Run(o cmd.O, env, script string) error {
 	addr, err := ManagerAddr(env)
 	if err != nil {
 		return err

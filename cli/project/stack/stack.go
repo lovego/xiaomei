@@ -41,3 +41,11 @@ func getStack() (*Stack, error) {
 func (s Stack) ImageName(svcName string) string {
 	return path.Join(s.Registry, config.Name(), svcName)
 }
+
+func Services() (map[string]Service, error) {
+	stack, err := getStack()
+	if err != nil {
+		return nil, err
+	}
+	return stack.Services, nil
+}

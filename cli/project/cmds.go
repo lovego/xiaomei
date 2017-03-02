@@ -15,14 +15,14 @@ func Cmd() *cobra.Command {
 	cmd.AddCommand(
 		&cobra.Command{
 			Use:   `deploy <env>`,
-			Short: `deploy project to the specified env.`,
+			Short: `deploy the project.`,
 			RunE: z.Arg1Call(`dev`, func(env string) error {
 				return stack.Deploy(env, ``)
 			}),
 		},
 		&cobra.Command{
 			Use:   `ps [<env>]`,
-			Short: `list tasks of app service.`,
+			Short: `list tasks of the project.`,
 			RunE: z.Arg1Call(`dev`, func(env string) error {
 				return stack.Ps(env, ``)
 			}),
