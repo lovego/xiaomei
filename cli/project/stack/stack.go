@@ -10,16 +10,16 @@ import (
 )
 
 func ImageName(svcName string) (string, error) {
-	if stack, err := getStack(); err != nil {
+	if _, err := getStack(); err != nil {
 		return ``, err
 	} else {
-		return stack.imageName(svcName), nil
+		return path.Join(theRegistry, config.Name(), svcName), nil
 	}
 }
 
 type Stack struct {
 	Version  string
-	Registry string             `yaml:"-"`
+	Registry string             `yaml:",omitempty"`
 	Services map[string]Service `yaml:",omitempty"`
 	Volumes  map[string]Volume  `yaml:",omitempty"`
 	Networks map[string]Network `yaml:",omitempty"`
@@ -29,6 +29,7 @@ type Volume map[string]interface{}
 type Network map[string]interface{}
 
 var theStack *Stack
+var theRegistry string
 
 func getStack() (*Stack, error) {
 	if theStack != nil {
@@ -43,11 +44,9 @@ func getStack() (*Stack, error) {
 		return nil, err
 	}
 	theStack = stack
+	theRegistry = stack.Registry
+	stack.Registry = ``
 	return theStack, nil
-}
-
-func (s Stack) imageName(svcName string) string {
-	return path.Join(s.Registry, config.Name(), svcName)
 }
 
 func eachServiceDo(work func(svcName string) error) error {

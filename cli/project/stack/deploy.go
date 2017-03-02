@@ -37,7 +37,11 @@ func getDeployStack(svcName string) ([]byte, error) {
 		stack.Services = map[string]Service{svcName: stack.Services[svcName]}
 	}
 	for svcName, service := range stack.Services {
-		service[`image`] = stack.imageName(svcName)
+		if imageName, err := ImageName(svcName); err != nil {
+			return nil, err
+		} else {
+			service[`image`] = imageName
+		}
 	}
 	return yaml.Marshal(stack)
 }
