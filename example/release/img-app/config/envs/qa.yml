@@ -1,3 +1,2 @@
-app:
-  env:    qa
-  domain: example-qa.org
+env:    qa
+domain: example-qa.com

@@ -1,7 +1,6 @@
-app:
-  env:    test
-  domain: example-test.org
-  keepers: [ ]
+env:    test
+domain: example-test.com
+keepers: [ ]
 
 db:
   mysql:
