@@ -28,7 +28,7 @@ func Run(o cmd.O, env, script string) error {
 	if err != nil {
 		return err
 	}
-	_, err = cmd.SshRun(cmd.O{}, addr, script)
+	_, err = cmd.SshRun(o, addr, script)
 	return err
 }
 

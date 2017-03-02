@@ -8,6 +8,7 @@ import (
 	"github.com/bughou-go/xiaomei/cli/cluster"
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/fatih/color"
 )
 
 func deploy(env, svcName string) error {
@@ -16,6 +17,11 @@ func deploy(env, svcName string) error {
 	}
 	if err := push(svcName); err != nil {
 		return err
+	}
+	if svcName == `` {
+		config.Log(color.GreenString(`deploying all services.`))
+	} else {
+		config.Log(color.GreenString(`deploying ` + svcName + ` service.`))
 	}
 	stack, err := getDeployStack(svcName)
 	if err != nil {
@@ -74,6 +80,7 @@ func push(svcName string) error {
 	if svcName == `` {
 		return eachServiceDo(push)
 	}
+	config.Log(color.GreenString(`pushing ` + svcName + ` image.`))
 	imageName, err := ImageName(svcName)
 	if err != nil {
 		return err
