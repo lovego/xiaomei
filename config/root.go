@@ -14,7 +14,16 @@ func InProject() bool {
 	return DetectRoot() != ``
 }
 
+var theRootDir interface{}
+
 func DetectRoot() string {
+	if theRootDir == nil {
+		theRootDir = detectRoot()
+	}
+	return theRootDir.(string)
+}
+
+func detectRoot() string {
 	program, cwd := absProgramPath()
 	fmwkBin, _ := cmd.Run(cmd.O{Output: true}, `which`, `xiaomei`)
 	if program == fmwkBin /* fmwk ... */ ||

@@ -1,9 +1,7 @@
 package config
 
 import (
-	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 	"time"
 
@@ -15,8 +13,8 @@ var Config Conf
 type Conf struct {
 	sync.Mutex
 
-	root     string
 	env      string
+	envs     []string
 	data     *conf
 	timeZone *time.Location
 	mailer   struct {
@@ -50,14 +48,11 @@ type MailerConf struct {
 }
 
 func (c *Conf) Root() string {
-	if c.root == `` {
-		if root := DetectRoot(); root != `` {
-			c.root = root
-		} else {
-			panic(`app root not found.`)
-		}
+	if root := DetectRoot(); root != `` {
+		return root
+	} else {
+		panic(`app root not found.`)
 	}
-	return c.root
 }
 
 func (c *Conf) Name() string {
@@ -67,17 +62,16 @@ func (c *Conf) Name() string {
 
 func (c *Conf) Env() string {
 	if c.env == `` {
-		env := os.Getenv(`GOENV`)
-		if env == `` {
-			if program := os.Args[0]; strings.HasSuffix(program, `.test`) {
-				env = `test`
-			} else {
-				env = `dev`
-			}
-		}
-		c.env = env
+		c.env = detectEnv()
 	}
 	return c.env
+}
+
+func (c *Conf) Envs() []string {
+	if c.envs == nil {
+		c.envs = availableEnvs()
+	}
+	return c.envs
 }
 
 func (c *Conf) DeployName() string {
