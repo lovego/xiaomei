@@ -8,6 +8,13 @@ import (
 	"github.com/bughou-go/xiaomei/utils/slice"
 )
 
+var arg1IsEnv bool
+
+func Arg1IsEnv() bool {
+	Env()
+	return arg1IsEnv
+}
+
 func detectEnv() string {
 	env := os.Getenv(`GOENV`)
 	if env != `` {
@@ -18,6 +25,7 @@ func detectEnv() string {
 	} else if os.Args[0] == `xiaomei` && len(os.Args) >= 2 &&
 		slice.ContainsString(Envs(), os.Args[1]) {
 		env = os.Args[1]
+		arg1IsEnv = true
 	} else {
 		env = `dev`
 	}
@@ -28,12 +36,14 @@ func availableEnvs() (results []string) {
 	if !InProject() {
 		return nil
 	}
-	pathes, err := filepath.Glob(filepath.Join(Root(), `*.yml`))
+	pathes, err := filepath.Glob(filepath.Join(Root(), `config/envs/*.yml`))
 	if err != nil {
 		panic(err)
 	}
 	for _, p := range pathes {
-		results = append(results, strings.TrimSuffix(filepath.Base(p), `.yml`))
+		if env := strings.TrimSuffix(filepath.Base(p), `.yml`); env != `dev` {
+			results = append(results, env)
+		}
 	}
 	return
 }
