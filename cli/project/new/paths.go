@@ -23,34 +23,31 @@ func getExampleDir() (string, error) {
 	}
 }
 
-func checkProjectDir(proDir string) (string, string, error) {
+func getProjectPath(proDir string) (string, error) {
 	if proDir == `` {
-		return ``, ``, errors.New(`project path can't be empty.`)
+		return ``, errors.New(`project path can't be empty.`)
 	}
 
 	if !filepath.IsAbs(proDir) {
 		var err error
 		if proDir, err = filepath.Abs(proDir); err != nil {
-			return ``, ``, err
+			return ``, err
 		}
 	}
 
 	srcPath, err := getGoSrcPath()
 	if err != nil {
-		return ``, ``, err
+		return ``, err
 	}
 
 	proPath, err := filepath.Rel(srcPath, proDir)
 	if err != nil {
-		return ``, ``, err
+		return ``, err
 	}
 	if proPath[0] == '.' {
-		return ``, ``, errors.New(`project dir must be under ` + srcPath + "\n")
+		return ``, errors.New(`project dir must be under ` + srcPath + "\n")
 	}
-	if err := makeProjectDir(proDir); err != nil {
-		return ``, ``, err
-	}
-	return proPath, proDir, nil
+	return proPath, nil
 }
 
 func makeProjectDir(dir string) error {

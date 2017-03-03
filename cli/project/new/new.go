@@ -1,58 +1,81 @@
 package new
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/hex"
-	"errors"
-	"fmt"
+	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
+	"text/template"
 
-	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/utils/fs"
 )
 
-func New(dir string) error {
-	proPath, proDir, err := checkProjectDir(dir)
+func New(proDir string) error {
+	proPath, err := getProjectPath(proDir)
 	if err != nil {
 		return err
 	}
-	if err := copyTemplates(proDir); err != nil {
-		return err
-	}
-
-	return processTemplates(proPath, proDir)
-}
-
-func copyTemplates(proDir string) error {
 	exampleDir, err := getExampleDir()
 	if err != nil {
 		return err
 	}
-	if !cmd.Ok(cmd.O{}, `cp`, `-rT`, exampleDir, proDir) {
-		return errors.New(`cp templates failed.`)
+	if err := makeProjectDir(proDir); err != nil {
+		return err
 	}
-	return nil
+	return execTemplates(exampleDir, proDir, proPath)
 }
 
-func processTemplates(proPath, proDir string) error {
-	proName := filepath.Base(proPath)
-	script := fmt.Sprintf(`
-	sed -i'' 's/example/%s/g' .gitignore $(fgrep -rl example release/config)
-	sed -i'' 's/%s/%s/g' main.go
-	sed -i'' 's/secret-string/%s/g' release/config/envs/production.yml
-	`, proDir, proName,
-		strings.Replace(examplePath, `/`, `\/`, -1),
-		strings.Replace(proPath, `/`, `\/`, -1),
-		generateSecret(),
-	)
-	if !cmd.Ok(cmd.O{Dir: proDir}, `sh`, `-c`, script) {
-		return errors.New(`process templates failed.`)
+func execTemplates(exampleDir, proDir, proPath string) error {
+	data := struct {
+		ProPath, ProName string
+	}{
+		proPath, filepath.Base(proPath),
 	}
-	return nil
+
+	return filepath.Walk(exampleDir, func(src string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		dst := strings.Replace(src, exampleDir, proDir, 1)
+		if info.IsDir() {
+			return os.Mkdir(dst, 0755)
+		} else {
+			return copyFile(src, dst, info, data)
+		}
+	})
+}
+
+func copyFile(src, dst string, info os.FileInfo, data interface{}) error {
+	dir, file := filepath.Split(dst)
+	if !strings.Contains(file, `.tmpl.`) {
+		return fs.Copy(src, dst)
+	}
+	dst = filepath.Join(dir, strings.Replace(file, `.tmpl.`, `.`, 1))
+	if content, err := renderTmpl(src, data); err == nil {
+		return ioutil.WriteFile(dst, content, info.Mode())
+	} else {
+		return err
+	}
+}
+
+func renderTmpl(tmplPath string, data interface{}) ([]byte, error) {
+	tmpl, err := template.ParseFiles(tmplPath)
+	if err != nil {
+		return nil, err
+	}
+	tmpl.Funcs(template.FuncMap{`genSecret`: genSecret})
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, data); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
 
 // 32 byte hex string
-func generateSecret() string {
+func genSecret() string {
 	b := make([]byte, 16)
 	if _, err := rand.Read(b); err != nil {
 		panic(err)
