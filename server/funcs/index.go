@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/bughou-go/xiaomei/config"
-	"github.com/bughou-go/xiaomei/utils/number"
 	"github.com/bughou-go/xiaomei/utils/slice"
+	"github.com/bughou-go/xiaomei/utils/strnum"
 )
 
 func Map() map[string]interface{} {
@@ -19,7 +19,7 @@ func Map() map[string]interface{} {
 		`field`:        StructOrMapField,
 		`union`:        slice.Union,
 		`keys_union`:   MapKeysUnion,
-		`thousand_sep`: number.ThousandSep,
+		`thousand_sep`: strnum.ThousandSep,
 		`contains`:     strings.Contains,
 	}
 }

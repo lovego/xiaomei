@@ -50,25 +50,6 @@ func getProjectPath(proDir string) (string, error) {
 	return proPath, nil
 }
 
-func makeProjectDir(dir string) error {
-	fi, err := os.Stat(dir)
-	switch {
-	case err == nil:
-		if fi.IsDir() {
-			if !fs.IsEmptyDir(dir) {
-				return errors.New(dir + ` not empty.`)
-			}
-		} else {
-			return errors.New(dir + ` not dir.`)
-		}
-	case os.IsNotExist(err):
-		return os.MkdirAll(dir, 0775)
-	default:
-		return err
-	}
-	return nil
-}
-
 func getGoSrcPath() (string, error) {
 	gopath := os.Getenv(`GOPATH`)
 	if gopath == `` {

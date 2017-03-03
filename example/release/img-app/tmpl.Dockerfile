@@ -1,8 +1,8 @@
 FROM goxiaomei/appserver
 
-COPY example ./
+COPY {{ .ProName }} ./
 COPY config  ./config
 COPY views   ./views
 
-CMD [ "./example" ]
+CMD [ "./{{ .ProName }}" ]
 

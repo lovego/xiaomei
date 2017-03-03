@@ -22,17 +22,14 @@ func New(proDir string) error {
 	if err != nil {
 		return err
 	}
-	if err := makeProjectDir(proDir); err != nil {
-		return err
-	}
 	return execTemplates(exampleDir, proDir, proPath)
 }
 
 func execTemplates(exampleDir, proDir, proPath string) error {
 	data := struct {
-		ProPath, ProName string
+		ProPath, ProName, Secret string
 	}{
-		proPath, filepath.Base(proPath),
+		proPath, filepath.Base(proPath), genSecret(),
 	}
 
 	return filepath.Walk(exampleDir, func(src string, info os.FileInfo, err error) error {
@@ -66,7 +63,6 @@ func renderTmpl(tmplPath string, data interface{}) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	tmpl.Funcs(template.FuncMap{`genSecret`: genSecret})
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, data); err != nil {
 		return nil, err
