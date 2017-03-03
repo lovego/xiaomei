@@ -18,18 +18,24 @@ func runCmd() *cobra.Command {
 }
 
 func run() error {
-	if err := buildBinary(); err != nil {
-		return err
-	}
-
-	image, err := stack.ImageName(`app`)
+	imageName, err := stack.ImageName(`app`)
 	if err != nil {
 		return err
 	}
 
+	if cmd.Ok(cmd.O{NoStdout: true, NoStderr: true}, `docker`, `image`, `inspect`, imageName) {
+		if err := buildBinary(); err != nil {
+			return err
+		}
+	} else {
+		if err := stack.Build(`app`); err != nil {
+			return err
+		}
+	}
+
 	_, err = cmd.Run(cmd.O{}, `docker`,
 		`run`, `--name=`+config.DeployName(), `-it`, `--rm`, `--network=host`,
-		`-v`, config.Root()+`:/home/ubuntu/appserver`, image,
+		`-v`, config.Root()+`:/home/ubuntu/appserver`, imageName,
 	)
 	return err
 }

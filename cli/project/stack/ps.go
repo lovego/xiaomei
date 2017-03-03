@@ -8,7 +8,7 @@ import (
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
-func ps(env, svcName string) error {
+func Ps(env, svcName string) error {
 	var typ, name string
 	if svcName != `` {
 		typ, name = `service`, config.DeployName()+`_`+svcName

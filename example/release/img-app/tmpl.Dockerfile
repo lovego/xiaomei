@@ -1,4 +1,4 @@
-FROM goxiaomei/appserver
+FROM 192.168.202.12:5000/goxiaomei/appserver
 
 COPY {{ .ProName }} ./
 COPY config  ./config

@@ -11,8 +11,8 @@ import (
 	"github.com/fatih/color"
 )
 
-func deploy(env, svcName string) error {
-	if err := build(svcName); err != nil {
+func Deploy(env, svcName string) error {
+	if err := Build(svcName); err != nil {
 		return err
 	}
 	if err := push(svcName); err != nil {

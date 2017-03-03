@@ -8,9 +8,9 @@ type imageBuilder func(imageName string) error
 
 var ImageBuilders = make(map[string]imageBuilder)
 
-func build(svcName string) error {
+func Build(svcName string) error {
 	if svcName == `` {
-		return eachServiceDo(build)
+		return eachServiceDo(Build)
 	}
 	builder, ok := ImageBuilders[svcName]
 	if !ok {
