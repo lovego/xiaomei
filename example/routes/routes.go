@@ -3,6 +3,7 @@ package routes
 import (
 	"time"
 
+	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/server/xm"
 )
 
@@ -16,7 +17,7 @@ func Get() *xm.Router {
 	router := xm.NewRouter()
 
 	router.Get(`/`, func(req *xm.Request, res *xm.Response) {
-		res.Json(map[string]string{`hello`: `world`})
+		res.Json(map[string]string{`hello`: config.DeployName()})
 	})
 
 	router.Get(`/session-get`, func(req *xm.Request, res *xm.Response) {

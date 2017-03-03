@@ -1,3 +1,2 @@
-env:    production
 domain: {{ .ProName }}.com
 secret: {{ .Secret }}

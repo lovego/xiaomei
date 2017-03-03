@@ -1,4 +1,3 @@
-env:    dev
 domain: {{ .ProName }}-dev.com
 keepers: [ ]
 

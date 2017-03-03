@@ -1,7 +1,9 @@
 package config
 
 import (
+	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -14,6 +16,7 @@ type Conf struct {
 	sync.Mutex
 
 	root     string
+	env      string
 	data     *conf
 	timeZone *time.Location
 	mailer   struct {
@@ -24,7 +27,6 @@ type Conf struct {
 
 type conf struct {
 	Name   string `yaml:"name"`
-	Env    string `yaml:"env"`
 	Domain string `yaml:"domain"`
 	Secret string `yaml:"secret"`
 
@@ -64,8 +66,18 @@ func (c *Conf) Name() string {
 }
 
 func (c *Conf) Env() string {
-	c.Load()
-	return c.data.Env
+	if c.env == `` {
+		env := os.Getenv(`GOENV`)
+		if env == `` {
+			if program := os.Args[0]; strings.HasSuffix(program, `.test`) {
+				env = `test`
+			} else {
+				env = `dev`
+			}
+		}
+		c.env = env
+	}
+	return c.env
 }
 
 func (c *Conf) DeployName() string {

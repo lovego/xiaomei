@@ -2,9 +2,7 @@ package config
 
 import (
 	"io/ioutil"
-	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/bughou-go/xiaomei/utils"
 	"gopkg.in/yaml.v2"
@@ -21,7 +19,7 @@ func (c *Conf) Load() {
 
 func Parse(p interface{}) {
 	loadConfig(p, `config/config.yml`)
-	loadConfig(p, envConfigPath())
+	loadConfig(p, `config/envs/`+Env()+`.yml`)
 	if Debug(`config`) {
 		utils.PrintJson(p)
 	}
@@ -36,18 +34,4 @@ func loadConfig(p interface{}, path string) {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func envConfigPath() string {
-	env := os.Getenv(`GOENV`)
-	if env == `` {
-		if program := os.Args[0]; strings.HasSuffix(program, `.test`) {
-			env = `test`
-		} else {
-			env = `dev`
-		}
-	}
-	configPath := `config/envs/` + env + `.yml`
-
-	return configPath
 }

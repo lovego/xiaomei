@@ -23,7 +23,7 @@ func Deploy(env, svcName string) error {
 	} else {
 		config.Log(color.GreenString(`deploying ` + svcName + ` service.`))
 	}
-	stack, err := getDeployStack(svcName)
+	stack, err := getDeployStack(svcName, env)
 	if err != nil {
 		return err
 	}
@@ -34,7 +34,7 @@ func Deploy(env, svcName string) error {
 	return cluster.Run(cmd.O{Stdin: bytes.NewReader(stack)}, env, script)
 }
 
-func getDeployStack(svcName string) ([]byte, error) {
+func getDeployStack(svcName, env string) ([]byte, error) {
 	stack, err := getStack()
 	if err != nil {
 		return nil, err
@@ -47,6 +47,13 @@ func getDeployStack(svcName string) ([]byte, error) {
 			return nil, err
 		} else {
 			service[`image`] = imageName
+		}
+		if svcName == `app` {
+			if m, ok := service[`environment`].(map[string]interface{}); ok {
+				m[`GOENV`] = env
+			} else {
+				service[`environment`] = map[string]string{`GOENV`: env}
+			}
 		}
 	}
 	return yaml.Marshal(stack)
