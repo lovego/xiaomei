@@ -5,8 +5,8 @@ import (
 
 	"strings"
 
-	"github.com/bughou-go/xiaomei/example/filter"
-	"github.com/bughou-go/xiaomei/example/routes"
+	"{{ .ProPath }}/filter"
+	"{{ .ProPath }}/routes"
 	"github.com/bughou-go/xiaomei/server"
 	"github.com/bughou-go/xiaomei/server/xm"
 )

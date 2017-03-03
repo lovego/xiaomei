@@ -1,0 +1,9 @@
+.*.swp
+*.test
+*.pyc
+tmp
+/{{ .ProName }}
+/release/img-*/{{ .ProName }}
+/release/img-*/log
+*.exe
+!.gitkeep

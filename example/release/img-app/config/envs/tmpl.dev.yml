@@ -1,0 +1,12 @@
+env:    dev
+domain: {{ .ProName }}-dev.com
+keepers: [ ]
+
+db:
+  mysql:
+    default: root:root@tcp(127.0.0.1:3306)/dbname
+  redis:
+    default: redis://:@localhost:6379/0
+  mongo:
+    default: mongodb://127.0.0.1/dbname
+

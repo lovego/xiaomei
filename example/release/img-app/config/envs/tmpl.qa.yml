@@ -1,0 +1,2 @@
+env:    qa
+domain: {{ .ProName }}-qa.com

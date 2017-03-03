@@ -50,10 +50,10 @@ func execTemplates(exampleDir, proDir, proPath string) error {
 
 func copyFile(src, dst string, info os.FileInfo, data interface{}) error {
 	dir, file := filepath.Split(dst)
-	if !strings.Contains(file, `.tmpl.`) {
+	if !strings.HasPrefix(file, `tmpl.`) {
 		return fs.Copy(src, dst)
 	}
-	dst = filepath.Join(dir, strings.Replace(file, `.tmpl.`, `.`, 1))
+	dst = filepath.Join(dir, strings.TrimPrefix(file, `tmpl.`))
 	if content, err := renderTmpl(src, data); err == nil {
 		return ioutil.WriteFile(dst, content, info.Mode())
 	} else {
