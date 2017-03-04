@@ -49,27 +49,24 @@ func getDeployStack(svcName string) ([]byte, error) {
 			service[`image`] = imageName
 		}
 		if svcName == `app` {
-			if m, ok := service[`environment`].(map[string]interface{}); ok {
-				m[`GOENV`] = config.Env()
-			} else {
-				service[`environment`] = map[string]string{`GOENV`: config.Env()}
-			}
+			service[`environment`] = map[string]string{`GOENV`: config.Env()}
+			service[`volumes`] = []string{`./log:/home/ubuntu/appserver/log`}
 		}
 	}
 	return yaml.Marshal(stack)
 }
 
 const deployScriptTmpl = `
-	cd && mkdir -p {{ .DeployName }} && cd {{ .DeployName }} &&
+	cd && mkdir -p {{ .DeployName }}/log && cd {{ .DeployName }} &&
 	cat - > {{ .FileName }}.yml &&
-	docker stack deploy --compose-file={{ .FileName }}.yml {{ .DeployName }}
+	docker stack deploy --compose-file={{ .FileName }}.yml {{ .Name }}
 `
 
 func getDeployScript(svcName string) (string, error) {
 	deployConf := struct {
-		DeployName, FileName string
+		Name, DeployName, FileName string
 	}{
-		DeployName: config.DeployName(), FileName: `stack`,
+		Name: config.Name(), DeployName: config.DeployName(), FileName: `stack`,
 	}
 	if svcName != `` {
 		deployConf.FileName = svcName
