@@ -11,7 +11,7 @@ import (
 	"github.com/fatih/color"
 )
 
-func Deploy(env, svcName string) error {
+func Deploy(svcName string) error {
 	if err := Build(svcName); err != nil {
 		return err
 	}
@@ -23,7 +23,7 @@ func Deploy(env, svcName string) error {
 	} else {
 		config.Log(color.GreenString(`deploying ` + svcName + ` service.`))
 	}
-	stack, err := getDeployStack(svcName, env)
+	stack, err := getDeployStack(svcName)
 	if err != nil {
 		return err
 	}
@@ -31,10 +31,10 @@ func Deploy(env, svcName string) error {
 	if err != nil {
 		return err
 	}
-	return cluster.Run(cmd.O{Stdin: bytes.NewReader(stack)}, env, script)
+	return cluster.Run(cmd.O{Stdin: bytes.NewReader(stack)}, config.Env(), script)
 }
 
-func getDeployStack(svcName, env string) ([]byte, error) {
+func getDeployStack(svcName string) ([]byte, error) {
 	stack, err := getStack()
 	if err != nil {
 		return nil, err
@@ -50,9 +50,9 @@ func getDeployStack(svcName, env string) ([]byte, error) {
 		}
 		if svcName == `app` {
 			if m, ok := service[`environment`].(map[string]interface{}); ok {
-				m[`GOENV`] = env
+				m[`GOENV`] = config.Env()
 			} else {
-				service[`environment`] = map[string]string{`GOENV`: env}
+				service[`environment`] = map[string]string{`GOENV`: config.Env()}
 			}
 		}
 	}

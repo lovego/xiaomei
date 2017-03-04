@@ -8,12 +8,12 @@ import (
 	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
-func Ps(env, svcName string) error {
+func Ps(svcName string) error {
 	var typ, name string
 	if svcName != `` {
 		typ, name = `service`, config.DeployName()+`_`+svcName
 	} else {
 		typ, name = `stack`, config.DeployName()
 	}
-	return cluster.Run(cmd.O{}, env, fmt.Sprintf(`docker %s ps %s`, typ, name))
+	return cluster.Run(cmd.O{}, config.Env(), fmt.Sprintf(`docker %s ps %s`, typ, name))
 }

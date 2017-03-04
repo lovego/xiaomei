@@ -8,6 +8,15 @@ import (
 
 type cmdFunc func(c *cobra.Command, args []string) error
 
+func NoArgCall(work func() error) cmdFunc {
+	return func(c *cobra.Command, args []string) error {
+		if len(args) > 0 {
+			return errors.New(`redundant args.`)
+		}
+		return work()
+	}
+}
+
 func Arg1Call(arg1 string, work func(string) error) cmdFunc {
 	return func(c *cobra.Command, args []string) error {
 		switch len(args) {

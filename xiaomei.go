@@ -32,9 +32,12 @@ func rootCmd() *cobra.Command {
 		Use:   `xiaomei`,
 		Short: `be small and beautiful.`,
 	}
-	if envs := config.Envs(); len(envs) > 0 {
-		cmd.Use += `[` + strings.Join(envs, `|`) + `]`
-	}
+
+	/*
+		if envs := config.Envs(); len(envs) > 0 {
+			cmd.Use += ` [` + strings.Join(envs, `|`) + `]`
+		}
+	*/
 	if config.Arg1IsEnv() {
 		cmd.SetArgs(os.Args[2:])
 	}

@@ -20,22 +20,22 @@ func BDPcmds(svcName string) []*cobra.Command {
 		{
 			Use:   `build`,
 			Short: fmt.Sprintf(`build %s image%s.`, target, s),
-			RunE: func(c *cobra.Command, args []string) error {
+			RunE: z.NoArgCall(func() error {
 				return Build(svcName)
-			},
-		},
-		{
-			Use:   `deploy <env>`,
-			Short: fmt.Sprintf(`deploy %s service%s.`, target, s),
-			RunE: z.Arg1Call(`dev`, func(env string) error {
-				return Deploy(env, svcName)
 			}),
 		},
 		{
-			Use:   `ps [<env>]`,
+			Use:   `deploy`,
+			Short: fmt.Sprintf(`deploy %s service%s.`, target, s),
+			RunE: z.NoArgCall(func() error {
+				return Deploy(svcName)
+			}),
+		},
+		{
+			Use:   `ps`,
 			Short: fmt.Sprintf(`list tasks of %s service%s.`, target, s),
-			RunE: z.Arg1Call(`dev`, func(env string) error {
-				return Ps(env, svcName)
+			RunE: z.NoArgCall(func() error {
+				return Ps(svcName)
 			}),
 		},
 	}
