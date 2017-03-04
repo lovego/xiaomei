@@ -34,7 +34,7 @@ func run() error {
 	}
 
 	_, err = cmd.Run(cmd.O{}, `docker`,
-		`run`, `--name=`+config.DeployName(), `-it`, `--rm`, `--network=host`,
+		`run`, `--name=`+config.DeployName(), `-it`, `--rm`, `--network=host`, `--no-healthcheck`,
 		`-v`, config.Root()+`:/home/ubuntu/appserver`, imageName,
 	)
 	return err

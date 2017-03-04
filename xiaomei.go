@@ -2,7 +2,7 @@ package main
 
 import (
 	"os"
-	"strings"
+	// "strings"
 
 	"github.com/bughou-go/xiaomei/cli/app"
 	"github.com/bughou-go/xiaomei/cli/project"
