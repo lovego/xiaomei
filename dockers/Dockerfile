@@ -15,11 +15,9 @@ RUN useradd -ms /bin/bash ubuntu \
 # set locale
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 
-WORKDIR /home/ubuntu/appserver
-VOLUME /home/ubuntu/appserver/log
-
-COPY launch gosu /usr/local/bin/
-ENTRYPOINT ["launch"]
+USER ubuntu
+RUN mkdir /home/ubuntu/app /home/ubuntu/logs
+WORKDIR /home/ubuntu/app
 
 EXPOSE 3000
 HEALTHCHECK --interval=1s --timeout=3s --retries=1 \

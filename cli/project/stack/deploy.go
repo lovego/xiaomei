@@ -50,14 +50,13 @@ func getDeployStack(svcName string) ([]byte, error) {
 		}
 		if svcName == `app` {
 			service[`environment`] = map[string]string{`GOENV`: config.Env()}
-			service[`volumes`] = []string{`./log:/home/ubuntu/appserver/log`}
 		}
 	}
 	return yaml.Marshal(stack)
 }
 
 const deployScriptTmpl = `
-	cd && mkdir -p {{ .DeployName }}/log && cd {{ .DeployName }} &&
+	cd && mkdir -p {{ .DeployName }} && cd {{ .DeployName }} &&
 	cat - > {{ .FileName }}.yml &&
 	docker stack deploy --compose-file={{ .FileName }}.yml {{ .Name }}
 `

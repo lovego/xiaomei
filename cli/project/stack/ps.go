@@ -15,5 +15,6 @@ func Ps(svcName string) error {
 	} else {
 		typ, name = `stack`, config.Name()
 	}
-	return cluster.Run(cmd.O{}, config.Env(), fmt.Sprintf(`docker %s ps %s`, typ, name))
+	return cluster.Run(cmd.O{}, config.Env(),
+		fmt.Sprintf(`docker %s ps --no-trunc %s`, typ, name))
 }

@@ -5,6 +5,10 @@ services:
     ports: [ "3000:3000" ]
     deploy:
       replicas: 1
+    volumes: ["logs:/home/ubuntu/logs"]
 # web:
 #   deploy:
 #     replicas: 1
+
+volumes:
+  logs:
