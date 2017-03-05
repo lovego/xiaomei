@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker build -t goxiaomei/appserver .
+docker build -t 192.168.202.12:5000/goxiaomei/appserver .
