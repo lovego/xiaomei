@@ -11,12 +11,16 @@ import (
 	"github.com/fatih/color"
 )
 
-func Deploy(svcName string) error {
-	if err := Build(svcName); err != nil {
-		return err
+func Deploy(svcName string, noBuild, noPush bool) error {
+	if !noBuild {
+		if err := Build(svcName); err != nil {
+			return err
+		}
 	}
-	if err := push(svcName); err != nil {
-		return err
+	if !noPush {
+		if err := push(svcName); err != nil {
+			return err
+		}
 	}
 	if svcName == `` {
 		config.Log(color.GreenString(`deploying all services.`))

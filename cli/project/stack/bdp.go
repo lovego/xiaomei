@@ -24,13 +24,7 @@ func BDPcmds(svcName string) []*cobra.Command {
 				return Build(svcName)
 			}),
 		},
-		{
-			Use:   `deploy`,
-			Short: fmt.Sprintf(`deploy %s service%s.`, target, s),
-			RunE: z.NoArgCall(func() error {
-				return Deploy(svcName)
-			}),
-		},
+		deployCmd(svcName, target, s),
 		{
 			Use:   `ps`,
 			Short: fmt.Sprintf(`list tasks of %s service%s.`, target, s),
@@ -39,4 +33,18 @@ func BDPcmds(svcName string) []*cobra.Command {
 			}),
 		},
 	}
+}
+
+func deployCmd(svcName, target, s string) *cobra.Command {
+	var noBuild, noPush *bool
+	cmd := &cobra.Command{
+		Use:   `deploy`,
+		Short: fmt.Sprintf(`deploy %s service%s.`, target, s),
+		RunE: z.NoArgCall(func() error {
+			return Deploy(svcName, *noBuild, *noPush)
+		}),
+	}
+	noBuild = cmd.Flags().BoolP(`no-build`, `B`, false, fmt.Sprintf(`do not build the image%s.`, s))
+	noPush = cmd.Flags().BoolP(`no-push`, `P`, false, fmt.Sprintf(`do not build the image%s.`, s))
+	return cmd
 }
