@@ -19,6 +19,6 @@ func Cmd() *cobra.Command {
 			return new.New(dir)
 		}),
 	})
-	cmd.AddCommand(stack.BDPcmds(``)...)
+	cmd.AddCommand(stack.Cmds(``)...)
 	return cmd
 }

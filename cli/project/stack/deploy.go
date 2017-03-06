@@ -11,14 +11,14 @@ import (
 	"github.com/fatih/color"
 )
 
-func Deploy(svcName string, noBuild, noPush bool) error {
-	if !noBuild {
+func Deploy(svcName string, doBuild, doPush bool) error {
+	if doBuild {
 		if err := Build(svcName); err != nil {
 			return err
 		}
 	}
-	if !noPush {
-		if err := push(svcName); err != nil {
+	if doPush {
+		if err := Push(svcName); err != nil {
 			return err
 		}
 	}
@@ -39,19 +39,12 @@ func Deploy(svcName string, noBuild, noPush bool) error {
 }
 
 func getDeployStack(svcName string) ([]byte, error) {
-	stack, err := getStack()
-	if err != nil {
-		return nil, err
-	}
+	stack := getStack()
 	if svcName != `` {
 		stack.Services = map[string]Service{svcName: stack.Services[svcName]}
 	}
 	for svcName, service := range stack.Services {
-		if imageName, err := ImageName(svcName); err != nil {
-			return nil, err
-		} else {
-			service[`image`] = imageName
-		}
+		service[`image`] = ImageName(svcName)
 		if svcName == `app` {
 			service[`environment`] = map[string]string{`GOENV`: config.Env()}
 		}
@@ -81,17 +74,4 @@ func getDeployScript(svcName string) (string, error) {
 		return ``, err
 	}
 	return buf.String(), nil
-}
-
-func push(svcName string) error {
-	if svcName == `` {
-		return eachServiceDo(push)
-	}
-	config.Log(color.GreenString(`pushing ` + svcName + ` image.`))
-	imageName, err := ImageName(svcName)
-	if err != nil {
-		return err
-	}
-	_, err = cmd.Run(cmd.O{}, `docker`, `push`, imageName)
-	return err
 }

@@ -11,8 +11,7 @@ func Cmd() *cobra.Command {
 		Use:   `app`,
 		Short: `the appserver.`,
 	}
-	cmd.AddCommand(runCmd())
-	cmd.AddCommand(stack.BDPcmds(`app`)...)
+	cmd.AddCommand(stack.Cmds(`app`)...)
 	cmd.AddCommand(deps.Cmd(), SpecCmd())
 	return cmd
 }

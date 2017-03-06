@@ -11,10 +11,13 @@ import (
 )
 
 func init() {
-	stack.ImageBuilders[`app`] = buildImage
+	stack.RegisterImage(`app`, appImage{})
 }
 
-func buildImage(imageName string) error {
+type appImage struct {
+}
+
+func (app appImage) Prepare() error {
 	if err := buildBinary(); err != nil {
 		return err
 	}
@@ -23,10 +26,21 @@ func buildImage(imageName string) error {
 			return err
 		}
 	*/
-	config.Log(color.GreenString(`building app image.`))
-	dir := filepath.Join(config.Root(), `../img-app`)
-	_, err := cmd.Run(cmd.O{Dir: dir}, `docker`, `build`, `--tag=`+imageName, `.`)
-	return err
+	return nil
+}
+
+func (app appImage) BuildDir() string {
+	return config.Root()
+}
+
+func (app appImage) Dockerfile() string {
+	return `Dockerfile`
+}
+
+func (app appImage) RunMapping() []string {
+	return []string{
+		config.Root() + `:/home/ubuntu/` + config.Name(),
+	}
 }
 
 func buildBinary() error {

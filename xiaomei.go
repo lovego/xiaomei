@@ -6,6 +6,7 @@ import (
 
 	"github.com/bughou-go/xiaomei/cli/app"
 	"github.com/bughou-go/xiaomei/cli/project"
+	"github.com/bughou-go/xiaomei/cli/web"
 	"github.com/bughou-go/xiaomei/config"
 	// "github.com/bughou-go/xiaomei/cli/db"
 
@@ -18,7 +19,7 @@ func main() {
 	root := rootCmd()
 
 	root.AddCommand(
-		app.Cmd(), project.Cmd(),
+		app.Cmd(), web.Cmd(), project.Cmd(),
 	)
 	/*
 		root.AddCommand(db.Cmds()...)

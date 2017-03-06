@@ -2,23 +2,30 @@ package stack
 
 import (
 	"errors"
+
+	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/fatih/color"
 )
-
-type imageBuilder func(imageName string) error
-
-var ImageBuilders = make(map[string]imageBuilder)
 
 func Build(svcName string) error {
 	if svcName == `` {
 		return eachServiceDo(Build)
 	}
-	builder, ok := ImageBuilders[svcName]
+	image, ok := imagesMap[svcName]
 	if !ok {
-		return errors.New(`no builder for ` + svcName)
+		return errors.New(`no image registered for ` + svcName)
 	}
-	imageName, err := ImageName(svcName)
-	if err != nil {
+	return image.Build()
+}
+
+func (i Image) Build() error {
+	if err := i.Prepare(); err != nil {
 		return err
 	}
-	return builder(imageName)
+	config.Log(color.GreenString(`building ` + i.svcName + ` image.`))
+	_, err := cmd.Run(cmd.O{Dir: i.BuildDir()}, `docker`, `build`,
+		`--file=`+i.Dockerfile(), `--tag=`+i.Name(), `.`,
+	)
+	return err
 }
