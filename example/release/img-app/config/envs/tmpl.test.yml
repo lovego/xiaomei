@@ -1,7 +1,7 @@
 domain: {{ index .DomainMapping `test` }}
 keepers: [ ]
 
-db:
+dataSource:
   mysql:
     default: root:root@tcp(127.0.0.1:3306)/dbname
   redis:
