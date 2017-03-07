@@ -12,7 +12,8 @@ RUN ln -fs /usr/share/zoneinfo/Asia/Chongqing /etc/localtime \
 
 # install less, wget, net-tools
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends less ca-certificates wget net-tools \
+  && apt-get install -y --no-install-recommends \
+  less wget ca-certificates net-tools iputils-ping dnsutils \
   && rm -rf /var/lib/apt/lists/*
 
 # set rlimit nofile

@@ -26,7 +26,11 @@ func (web webImage) Dockerfile() string {
 	return `Dockerfile`
 }
 
-func (web webImage) RunMapping() []string {
+func (web webImage) RunPorts() []string {
+	return []string{`8080:80`, `8443:443`}
+}
+
+func (web webImage) RunFiles() []string {
 	return []string{
 		filepath.Join(config.Root(), `../img-web/public`) + `:/var/www/` + config.Name(),
 	}

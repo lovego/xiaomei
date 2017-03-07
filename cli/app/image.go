@@ -37,7 +37,11 @@ func (app appImage) Dockerfile() string {
 	return `Dockerfile`
 }
 
-func (app appImage) RunMapping() []string {
+func (app appImage) RunPorts() []string {
+	return []string{`3000:3000`}
+}
+
+func (app appImage) RunFiles() []string {
 	return []string{
 		config.Root() + `:/home/ubuntu/` + config.Name(),
 	}

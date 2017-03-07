@@ -6,6 +6,7 @@ services:
       replicas: 2
     volumes: ["logs:/home/ubuntu/logs"]
   web:
+    depends_on: [ "app" ]
     deploy:
       replicas: 2
     volumes: ["logs:/var/log/nginx"]

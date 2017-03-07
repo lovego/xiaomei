@@ -17,7 +17,8 @@ type image interface {
 	Prepare() error
 	BuildDir() string
 	Dockerfile() string
-	RunMapping() []string
+	RunPorts() []string
+	RunFiles() []string
 }
 
 func RegisterImage(svcName string, img image) {
