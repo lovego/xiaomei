@@ -23,7 +23,7 @@ func RedisDo(name string, work func(redis.Conn)) {
 			IdleTimeout: 600 * time.Second,
 			Dial: func() (redis.Conn, error) {
 				return redis.DialURL(
-					config.DB.Redis(name),
+					config.Config.DataSource(`redis`, name),
 					redis.DialConnectTimeout(time.Second),
 					redis.DialReadTimeout(time.Second),
 					redis.DialWriteTimeout(time.Second),
@@ -41,7 +41,7 @@ func RedisDo(name string, work func(redis.Conn)) {
 
 func RedisSubscribeConn(name string) (redis.Conn, error) {
 	return redis.DialURL(
-		config.DB.Redis(name),
+		config.Config.DataSource(`redis`, name),
 		redis.DialConnectTimeout(time.Second),
 		redis.DialWriteTimeout(time.Second),
 	)
