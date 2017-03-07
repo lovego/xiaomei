@@ -33,7 +33,7 @@ func runCmd(svcName string) *cobra.Command {
 		Use:   `run`,
 		Short: fmt.Sprintf(`run %s image.`, svcName),
 		RunE: z.NoArgCall(func() error {
-			return Build(svcName)
+			return Run(svcName)
 		}),
 	}
 }
