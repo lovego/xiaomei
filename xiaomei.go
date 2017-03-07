@@ -1,11 +1,14 @@
 package main
 
 import (
-	"github.com/bughou-go/xiaomei/cli/db"
-	"github.com/bughou-go/xiaomei/cli/deploy"
-	"github.com/bughou-go/xiaomei/cli/develop"
-	"github.com/bughou-go/xiaomei/cli/oam"
-	"github.com/bughou-go/xiaomei/cli/setup"
+	"os"
+	// "strings"
+
+	"github.com/bughou-go/xiaomei/cli/app"
+	"github.com/bughou-go/xiaomei/cli/project"
+	"github.com/bughou-go/xiaomei/cli/web"
+	"github.com/bughou-go/xiaomei/config"
+	// "github.com/bughou-go/xiaomei/cli/db"
 
 	"github.com/spf13/cobra"
 )
@@ -13,14 +16,31 @@ import (
 func main() {
 	cobra.EnableCommandSorting = false
 
-	root := &cobra.Command{
+	root := rootCmd()
+
+	root.AddCommand(
+		app.Cmd(), web.Cmd(), project.Cmd(),
+	)
+	/*
+		root.AddCommand(db.Cmds()...)
+	*/
+
+	root.Execute()
+}
+
+func rootCmd() *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   `xiaomei`,
 		Short: `be small and beautiful.`,
 	}
-	root.AddCommand(develop.Cmds()...)
-	root.AddCommand(db.Cmds()...)
-	root.AddCommand(oam.Cmds()...)
-	root.AddCommand(deploy.Cmd(), setup.Cmd())
 
-	root.Execute()
+	/*
+		if envs := config.Envs(); len(envs) > 0 {
+			cmd.Use += ` [` + strings.Join(envs, `|`) + `]`
+		}
+	*/
+	if config.Arg1IsEnv() {
+		cmd.SetArgs(os.Args[2:])
+	}
+	return cmd
 }

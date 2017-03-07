@@ -1,6 +1,0 @@
-#!/bin/bash
-shopt -s extglob
-
-fgrep xiaomei !(vendor) -r --exclude-dir=log --exclude=hardcode |
-  fgrep -v github.com/bughou-go/xiaomei/ |
-  fgrep xiaomei --color

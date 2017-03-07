@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd $(dirname $0)
+docker build -t 192.168.202.12:5000/xiaomei/appserver .

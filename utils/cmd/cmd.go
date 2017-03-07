@@ -15,6 +15,7 @@ type O struct {
 	Stdin                       io.Reader
 	Stdout, Stderr              io.Writer
 	NoStdin, NoStdout, NoStderr bool
+	Dir                         string
 	Env                         []string
 	Attr                        *syscall.SysProcAttr
 	Print                       bool
@@ -53,7 +54,12 @@ func Start(o O, name string, args ...string) (cmd *exec.Cmd, err error) {
 
 func State(o O, name string, args ...string) *os.ProcessState {
 	cmd := makeCmd(o, name, args)
-	cmd.Run()
+	err := cmd.Run()
+	if err != nil {
+		if _, ok := err.(*exec.ExitError); !ok {
+			panic(err)
+		}
+	}
 	return cmd.ProcessState
 }
 
@@ -73,6 +79,9 @@ func makeCmd(o O, name string, args []string) *exec.Cmd {
 	}
 
 	cmd := exec.Command(name, args...)
+	if o.Dir != `` {
+		cmd.Dir = o.Dir
+	}
 	if o.Env != nil {
 		cmd.Env = append(os.Environ(), o.Env...)
 	}

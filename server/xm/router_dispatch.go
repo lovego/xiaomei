@@ -5,6 +5,9 @@ import "strings"
 // 处理请求
 func (r *Router) Handle(req *Request, res *Response) bool {
 	method := strings.ToUpper(req.Method)
+	if method == `HEAD` {
+		method = `GET`
+	}
 	path := cleanPath(req.URL.Path)
 	if r.strRoutesMatch(method, path, req, res) || r.regRoutesMatch(method, path, req, res) {
 		return true

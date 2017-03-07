@@ -1,0 +1,2 @@
+domain: {{ index .DomainMapping `production` }}
+secret: {{ .Secret }}

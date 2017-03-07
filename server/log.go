@@ -5,7 +5,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -13,10 +13,19 @@ import (
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/server/xm"
 	"github.com/bughou-go/xiaomei/utils"
+	"github.com/bughou-go/xiaomei/utils/fs"
 )
 
-var accessLog = openFile(`log/app.log`)
-var errLog = openFile(`log/app.err`)
+var accessLog, errLog = setupLogger()
+
+func setupLogger() (*os.File, *os.File) {
+	if config.Env() == `dev` {
+		return os.Stdout, os.Stderr
+	} else {
+		return fs.OpenAppend(filepath.Join(config.Root(), `log/app.log`)),
+			fs.OpenAppend(filepath.Join(config.Root(), `log/app.err`))
+	}
+}
 
 func writeLog(req *xm.Request, res *xm.Response, t time.Time, err interface{}) []byte {
 	line := getLogLine(req, res, t, err)
@@ -59,14 +68,4 @@ func getLogFields(req *xm.Request, res *xm.Response, t time.Time, err interface{
 		slice[i] = v
 	}
 	return slice
-}
-
-func openFile(p string) *os.File {
-	if f, err := os.OpenFile(
-		path.Join(config.App.Root(), p), os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666,
-	); err != nil {
-		panic(err)
-	} else {
-		return f
-	}
 }

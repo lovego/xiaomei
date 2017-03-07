@@ -6,25 +6,36 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bughou-go/xiaomei/utils"
+	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/utils/fs"
 )
 
 func InProject() bool {
-	return detectRoot() != ``
+	return DetectRoot() != ``
+}
+
+var theRootDir interface{}
+
+func DetectRoot() string {
+	if theRootDir == nil {
+		theRootDir = detectRoot()
+	}
+	return theRootDir.(string)
 }
 
 func detectRoot() string {
 	program, cwd := absProgramPath()
-	if program == Fmwk.Bin() /* fmwk ... */ ||
+	fmwkBin, _ := cmd.Run(cmd.O{Output: true}, `which`, `xiaomei`)
+	if program == fmwkBin /* fmwk ... */ ||
 		strings.HasSuffix(program, `.test`) /* go test ... */ ||
 		strings.HasPrefix(program, `/tmp/`) /* go run ... */ {
-		if dir := detectDir(cwd, `release/config/config.yml`); dir == `` {
+		if dir := detectDir(cwd, `release/stack.yml`); dir == `` {
 			return ``
 		} else {
-			return filepath.Join(dir, `release`)
+			return filepath.Join(dir, `release/img-app`)
 		}
 	} else {
-		// binary under project/release/ dir
+		// project binary file
 		return detectDir(filepath.Dir(program), `config/config.yml`)
 	}
 }
@@ -48,7 +59,7 @@ func absProgramPath() (string, string) {
 
 func detectDir(dir, feature string) string {
 	for ; dir != `/`; dir = filepath.Dir(dir) {
-		if utils.Exist(filepath.Join(dir, feature)) {
+		if fs.Exist(filepath.Join(dir, feature)) {
 			return dir
 		}
 	}

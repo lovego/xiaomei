@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"regexp"
@@ -16,9 +17,12 @@ func Log(msg string) {
 	println(time.Now().Format(ISO8601), msg)
 }
 
+func Logf(w io.Writer, msg string) {
+	w.Write([]byte(time.Now().Format(ISO8601) + ` ` + msg + "\n"))
+}
+
 func IsLocalEnv() bool {
-	goenv := os.Getenv(`GOENV`)
-	return goenv == ``
+	return os.Getenv(`GOENV`) == ``
 }
 
 func Debug(name string) bool {
@@ -31,7 +35,7 @@ func Protect(fn func()) {
 		err := recover()
 		if err != nil {
 			errMsg := fmt.Sprintf("PANIC: %s\n%s", err, utils.Stack(4))
-			App.Alarm(`Protect错误`, errMsg)
+			Alarm(`Protect错误`, errMsg)
 			log.Printf(errMsg)
 		}
 	}()
