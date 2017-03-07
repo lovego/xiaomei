@@ -3,8 +3,8 @@ package funcs
 import (
 	"html/template"
 	"io/ioutil"
-	"os"
 	"path"
+	"time"
 
 	"github.com/bughou-go/xiaomei/config"
 	"gopkg.in/yaml.v2"
@@ -26,7 +26,7 @@ func init() {
 func AssetFunc(dev bool) func(string) string {
 	return func(src string) string {
 		if dev {
-			return src + `?` + modificationTime(src)
+			return src + `?` + time.Now().Format(`060102150405`)
 		}
 		if mt, ok := assets[src]; ok {
 			return src + `?` + mt
@@ -34,14 +34,6 @@ func AssetFunc(dev bool) func(string) string {
 			return src
 		}
 	}
-}
-
-func modificationTime(src string) string {
-	info, err := os.Stat(path.Join(config.Root(), `public`, src))
-	if err != nil {
-		panic(err)
-	}
-	return info.ModTime().Format(`060102150405`)
 }
 
 func HtmlSafe(text string) template.HTML {
