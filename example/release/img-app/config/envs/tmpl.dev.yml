@@ -1,4 +1,4 @@
-domain: {{ .ProName }}-dev.com
+domain: {{ index .DomainMapping `dev` }}
 keepers: [ ]
 
 db:

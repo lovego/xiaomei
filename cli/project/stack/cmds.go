@@ -9,21 +9,22 @@ import (
 
 // Run, Build, Push, Deploy and Ps commands
 func Cmds(svcName string) []*cobra.Command {
+	cmds := []*cobra.Command{}
+	if svcName != `` {
+		cmds = append(cmds, runCmd(svcName))
+	}
 	var target, s string
 	if svcName == `` {
 		target, s = `all`, `s`
 	} else {
 		target, s = svcName, ``
 	}
-	cmds := []*cobra.Command{
+	cmds = append(cmds,
 		buildCmd(svcName, target, s),
 		pushCmd(svcName, target, s),
 		deployCmd(svcName, target, s),
 		psCmd(svcName, target, s),
-	}
-	if svcName != `` {
-		cmds = append(cmds, runCmd(svcName))
-	}
+	)
 	return cmds
 }
 

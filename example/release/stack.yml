@@ -2,13 +2,13 @@ version: "3"
 registry: 192.168.202.12:5000
 services:
   app:
-    ports: [ "3000:3000" ]
     deploy:
-      replicas: 1
+      replicas: 2
     volumes: ["logs:/home/ubuntu/logs"]
-# web:
-#   deploy:
-#     replicas: 1
+  web:
+    deploy:
+      replicas: 2
+    volumes: ["logs:/var/log/nginx"]
 
 volumes:
   logs:

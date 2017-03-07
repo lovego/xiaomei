@@ -1,4 +1,4 @@
-domain: {{ .ProName }}-test.com
+domain: {{ index .DomainMapping `test` }}
 keepers: [ ]
 
 db:

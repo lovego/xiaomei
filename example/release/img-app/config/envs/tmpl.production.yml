@@ -1,2 +1,2 @@
-domain: {{ .ProName }}.com
+domain: {{ index .DomainMapping `production` }}
 secret: {{ .Secret }}

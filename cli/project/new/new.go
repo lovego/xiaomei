@@ -26,10 +26,13 @@ func New(proDir string) error {
 }
 
 func execTemplates(exampleDir, proDir, proPath string) error {
+	proName := filepath.Base(proPath)
+	domainMapping, domainList := domainNames(proName)
 	data := struct {
-		ProPath, ProName, Secret string
+		ProPath, ProName, Secret, DomainList string
+		DomainMapping                        map[string]string
 	}{
-		proPath, filepath.Base(proPath), genSecret(),
+		proPath, proName, genSecret(), domainList, domainMapping,
 	}
 
 	return filepath.Walk(exampleDir, func(src string, info os.FileInfo, err error) error {
@@ -43,6 +46,22 @@ func execTemplates(exampleDir, proDir, proPath string) error {
 			return copyFile(src, dst, info, data)
 		}
 	})
+}
+
+func domainNames(proName string) (map[string]string, string) {
+	mapping := map[string]string{}
+	lists := []string{}
+	for _, env := range []string{`dev`, `test`, `qa`, `production`} {
+		var domain string
+		if env == `production` {
+			domain = proName + `.com`
+		} else {
+			domain = proName + `.` + env
+		}
+		mapping[env] = domain
+		lists = append(lists, domain)
+	}
+	return mapping, strings.Join(lists, ` `)
 }
 
 func copyFile(src, dst string, info os.FileInfo, data interface{}) error {

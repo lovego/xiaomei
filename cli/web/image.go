@@ -5,7 +5,6 @@ import (
 
 	"github.com/bughou-go/xiaomei/cli/project/stack"
 	"github.com/bughou-go/xiaomei/config"
-	"github.com/bughou-go/xiaomei/utils/cmd"
 )
 
 func init() {

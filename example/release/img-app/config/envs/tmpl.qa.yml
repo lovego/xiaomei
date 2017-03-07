@@ -1,1 +1,1 @@
-domain: {{ .ProName }}-qa.com
+domain: {{ index .DomainMapping `qa` }}
