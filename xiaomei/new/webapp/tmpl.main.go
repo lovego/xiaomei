@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "github.com/bughou-go/xiaomei/server/a-init" // this package must be the first.
+	_ "github.com/bughou-go/xiaomei/server/init" // this package must be the first.
 
 	"strings"
 

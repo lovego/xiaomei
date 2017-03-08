@@ -1,6 +1,6 @@
 // this package must be imported first,
 // to ensure it is initialized before all the other package.
-package a_init
+package init
 
 import (
 	"os"
@@ -12,20 +12,8 @@ import (
 )
 
 func init() {
-	// redirectStdoutStderr()
 	log(`starting.`)
 	go logSignals()
-}
-
-func redirectStdoutStderr() {
-	fd := int(fs.OpenAppend(`log/appserver.log`).Fd())
-
-	if err := syscall.Dup2(fd, int(os.Stdout.Fd())); err != nil {
-		panic(err)
-	}
-	if err := syscall.Dup2(fd, int(os.Stderr.Fd())); err != nil {
-		panic(err)
-	}
 }
 
 func log(msg string) {
