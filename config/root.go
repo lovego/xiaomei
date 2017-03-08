@@ -25,7 +25,7 @@ func DetectRoot() string {
 
 func detectRoot() string {
 	program, cwd := absProgramPath()
-	fmwkBin, _ := cmd.Run(cmd.O{Output: true}, `which`, `xiaomei`)
+	fmwkBin, _ := cmd.Run(cmd.O{Output: true, NoStderr: true}, `which`, `xiaomei`)
 	if program == fmwkBin /* fmwk ... */ ||
 		strings.HasSuffix(program, `.test`) /* go test ... */ ||
 		strings.HasPrefix(program, `/tmp/`) /* go run ... */ {

@@ -11,7 +11,7 @@ import (
 func Cmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `deps`,
-		Short: `list all dependences pacakge.`,
+		Short: `list all dependence packages.`,
 		Run: func(c *cobra.Command, args []string) {
 			List()
 		},

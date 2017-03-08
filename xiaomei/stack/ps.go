@@ -3,20 +3,10 @@ package stack
 import (
 	"fmt"
 
-	"github.com/bughou-go/xiaomei/cli/cluster"
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
-	"github.com/fatih/color"
+	"github.com/bughou-go/xiaomei/xiaomei/cluster"
 )
-
-func Push(svcName string) error {
-	if svcName == `` {
-		return eachServiceDo(Push)
-	}
-	config.Log(color.GreenString(`pushing ` + svcName + ` image.`))
-	_, err := cmd.Run(cmd.O{}, `docker`, `push`, ImageName(svcName))
-	return err
-}
 
 func Ps(svcName string) error {
 	var typ, name string

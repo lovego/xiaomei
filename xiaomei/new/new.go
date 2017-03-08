@@ -11,7 +11,19 @@ import (
 	"text/template"
 
 	"github.com/bughou-go/xiaomei/utils/fs"
+	"github.com/bughou-go/xiaomei/xiaomei/z"
+	"github.com/spf13/cobra"
 )
+
+func Cmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   `new <project-path>`,
+		Short: `create a new project.`,
+		RunE: z.Arg1Call(``, func(dir string) error {
+			return New(dir)
+		}),
+	}
+}
 
 func New(proDir string) error {
 	proPath, err := getProjectPath(proDir)

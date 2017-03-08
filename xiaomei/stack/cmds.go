@@ -3,7 +3,7 @@ package stack
 import (
 	"fmt"
 
-	"github.com/bughou-go/xiaomei/cli/z"
+	"github.com/bughou-go/xiaomei/xiaomei/z"
 	"github.com/spf13/cobra"
 )
 
@@ -31,9 +31,9 @@ func Cmds(svcName string) []*cobra.Command {
 func runCmd(svcName string) *cobra.Command {
 	return &cobra.Command{
 		Use:   `run`,
-		Short: fmt.Sprintf(`run %s image.`, svcName),
+		Short: fmt.Sprintf(`run    %s image.`, svcName),
 		RunE: z.NoArgCall(func() error {
-			return Run(svcName)
+			return RunImage(svcName)
 		}),
 	}
 }
@@ -41,9 +41,9 @@ func runCmd(svcName string) *cobra.Command {
 func buildCmd(svcName, target, s string) *cobra.Command {
 	return &cobra.Command{
 		Use:   `build`,
-		Short: fmt.Sprintf(`build %s image%s.`, target, s),
+		Short: fmt.Sprintf(`build  %s image%s.`, target, s),
 		RunE: z.NoArgCall(func() error {
-			return Build(svcName)
+			return BuildImage(svcName)
 		}),
 	}
 }
@@ -51,9 +51,9 @@ func buildCmd(svcName, target, s string) *cobra.Command {
 func pushCmd(svcName, target, s string) *cobra.Command {
 	return &cobra.Command{
 		Use:   `push`,
-		Short: fmt.Sprintf(`push %s image%s.`, target, s),
+		Short: fmt.Sprintf(`push   %s image%s.`, target, s),
 		RunE: z.NoArgCall(func() error {
-			return Push(svcName)
+			return PushImage(svcName)
 		}),
 	}
 }

@@ -4,20 +4,15 @@ import (
 	"errors"
 	"path/filepath"
 
-	"github.com/bughou-go/xiaomei/cli/project/stack"
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/fatih/color"
 )
 
-func init() {
-	stack.RegisterImage(`app`, appImage{})
+type Image struct {
 }
 
-type appImage struct {
-}
-
-func (app appImage) Prepare() error {
+func (i Image) Prepare() error {
 	if err := buildBinary(); err != nil {
 		return err
 	}
@@ -29,19 +24,19 @@ func (app appImage) Prepare() error {
 	return nil
 }
 
-func (app appImage) BuildDir() string {
+func (i Image) BuildDir() string {
 	return config.Root()
 }
 
-func (app appImage) Dockerfile() string {
+func (i Image) Dockerfile() string {
 	return `Dockerfile`
 }
 
-func (app appImage) RunPorts() []string {
+func (i Image) RunPorts() []string {
 	return []string{`3000:3000`}
 }
 
-func (app appImage) RunFiles() []string {
+func (i Image) RunFiles() []string {
 	return []string{
 		config.Root() + `:/home/ubuntu/` + config.Name(),
 	}

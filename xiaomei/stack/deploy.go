@@ -5,20 +5,20 @@ import (
 	"gopkg.in/yaml.v2"
 	"text/template"
 
-	"github.com/bughou-go/xiaomei/cli/cluster"
 	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/xiaomei/cluster"
 	"github.com/fatih/color"
 )
 
 func Deploy(svcName string, doBuild, doPush bool) error {
 	if doBuild {
-		if err := Build(svcName); err != nil {
+		if err := BuildImage(svcName); err != nil {
 			return err
 		}
 	}
 	if doPush {
-		if err := Push(svcName); err != nil {
+		if err := PushImage(svcName); err != nil {
 			return err
 		}
 	}
@@ -44,7 +44,6 @@ func getDeployStack(svcName string) ([]byte, error) {
 		stack.Services = map[string]Service{svcName: stack.Services[svcName]}
 	}
 	for svcName, service := range stack.Services {
-		service[`image`] = ImageName(svcName)
 		if svcName == `app` {
 			service[`environment`] = map[string]string{`GOENV`: config.Env()}
 		}
