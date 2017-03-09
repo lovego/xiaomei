@@ -5,27 +5,29 @@ import (
 	"gopkg.in/yaml.v2"
 	"text/template"
 
-	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/bughou-go/xiaomei/xiaomei/cluster"
+	"github.com/bughou-go/xiaomei/xiaomei/images"
+	"github.com/bughou-go/xiaomei/xiaomei/release"
 	"github.com/fatih/color"
 )
 
 func Deploy(svcName string, doBuild, doPush bool) error {
 	if doBuild {
-		if err := BuildImage(svcName); err != nil {
+		if err := images.Build(svcName); err != nil {
 			return err
 		}
 	}
 	if doPush {
-		if err := PushImage(svcName); err != nil {
+		if err := images.Push(svcName); err != nil {
 			return err
 		}
 	}
 	if svcName == `` {
-		config.Log(color.GreenString(`deploying all services.`))
+		utils.Log(color.GreenString(`deploying all services.`))
 	} else {
-		config.Log(color.GreenString(`deploying ` + svcName + ` service.`))
+		utils.Log(color.GreenString(`deploying ` + svcName + ` service.`))
 	}
 	stack, err := getDeployStack(svcName)
 	if err != nil {
@@ -35,33 +37,33 @@ func Deploy(svcName string, doBuild, doPush bool) error {
 	if err != nil {
 		return err
 	}
-	return cluster.Run(cmd.O{Stdin: bytes.NewReader(stack)}, config.Env(), script)
+	return cluster.Run(cmd.O{Stdin: bytes.NewReader(stack)}, script)
 }
 
 func getDeployStack(svcName string) ([]byte, error) {
-	stack := getStack()
+	stack := release.GetStack()
 	if svcName != `` {
-		stack.Services = map[string]Service{svcName: stack.Services[svcName]}
+		stack.Services = map[string]release.Service{svcName: stack.Services[svcName]}
 	}
 	for svcName, service := range stack.Services {
 		if svcName == `app` {
-			service[`environment`] = map[string]string{`GOENV`: config.Env()}
+			service[`environment`] = map[string]string{`GOENV`: release.Env()}
 		}
 	}
 	return yaml.Marshal(stack)
 }
 
 const deployScriptTmpl = `
-	cd && mkdir -p {{ .DeployName }} && cd {{ .DeployName }} &&
+	cd && mkdir -p {{ .DirName }} && cd {{ .DirName }} &&
 	cat - > {{ .FileName }}.yml &&
 	docker stack deploy --compose-file={{ .FileName }}.yml {{ .Name }}
 `
 
 func getDeployScript(svcName string) (string, error) {
 	deployConf := struct {
-		Name, DeployName, FileName string
+		Name, DirName, FileName string
 	}{
-		Name: config.Name(), DeployName: config.DeployName(), FileName: `stack`,
+		Name: release.Name(), DirName: release.Name() + `_` + release.Env(), FileName: `stack`,
 	}
 	if svcName != `` {
 		deployConf.FileName = svcName

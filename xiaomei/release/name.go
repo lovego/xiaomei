@@ -7,12 +7,8 @@ import (
 	"github.com/bughou-go/xiaomei/utils/fs"
 )
 
-var appConf conf.Conf
 var theName string
-
-func App() *conf.Conf {
-	return conf.New(filepath.Join(Root(), `image-app`), Env())
-}
+var appConf *conf.Conf
 
 func Name() string {
 	if theName == `` {
@@ -23,4 +19,11 @@ func Name() string {
 		}
 	}
 	return theName
+}
+
+func App() *conf.Conf {
+	if appConf == nil {
+		appConf = conf.New(filepath.Join(Root(), `image-app`), Env())
+	}
+	return appConf
 }

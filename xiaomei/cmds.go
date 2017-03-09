@@ -1,14 +1,16 @@
-package stack
+package main
 
 import (
 	"fmt"
 
+	"github.com/bughou-go/xiaomei/xiaomei/images"
+	"github.com/bughou-go/xiaomei/xiaomei/stack"
 	"github.com/bughou-go/xiaomei/xiaomei/z"
 	"github.com/spf13/cobra"
 )
 
 // Run, Build, Push, Deploy and Ps commands
-func Cmds(svcName string) []*cobra.Command {
+func commonCmds(svcName string) []*cobra.Command {
 	cmds := []*cobra.Command{}
 	if svcName != `` {
 		cmds = append(cmds, runCmd(svcName))
@@ -33,7 +35,7 @@ func runCmd(svcName string) *cobra.Command {
 		Use:   `run`,
 		Short: fmt.Sprintf(`run    %s image.`, svcName),
 		RunE: z.NoArgCall(func() error {
-			return RunImage(svcName)
+			return images.Run(svcName)
 		}),
 	}
 }
@@ -43,7 +45,7 @@ func buildCmd(svcName, target, s string) *cobra.Command {
 		Use:   `build`,
 		Short: fmt.Sprintf(`build  %s image%s.`, target, s),
 		RunE: z.NoArgCall(func() error {
-			return BuildImage(svcName)
+			return images.Build(svcName)
 		}),
 	}
 }
@@ -53,7 +55,7 @@ func pushCmd(svcName, target, s string) *cobra.Command {
 		Use:   `push`,
 		Short: fmt.Sprintf(`push   %s image%s.`, target, s),
 		RunE: z.NoArgCall(func() error {
-			return PushImage(svcName)
+			return images.Push(svcName)
 		}),
 	}
 }
@@ -64,7 +66,7 @@ func deployCmd(svcName, target, s string) *cobra.Command {
 		Use:   `deploy`,
 		Short: fmt.Sprintf(`deploy %s service%s.`, target, s),
 		RunE: z.NoArgCall(func() error {
-			return Deploy(svcName, *doBuild, *doPush)
+			return stack.Deploy(svcName, *doBuild, *doPush)
 		}),
 	}
 	doBuild = cmd.Flags().BoolP(`build`, `b`, false, fmt.Sprintf(`build the image%s.`, s))
@@ -77,7 +79,7 @@ func psCmd(svcName, target, s string) *cobra.Command {
 		Use:   `ps`,
 		Short: fmt.Sprintf(`list tasks of %s service%s.`, target, s),
 		RunE: z.NoArgCall(func() error {
-			return Ps(svcName)
+			return stack.Ps(svcName)
 		}),
 	}
 }

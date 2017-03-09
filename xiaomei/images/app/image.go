@@ -4,8 +4,9 @@ import (
 	"errors"
 	"path/filepath"
 
-	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/xiaomei/release"
 	"github.com/fatih/color"
 )
 
@@ -25,7 +26,7 @@ func (i Image) Prepare() error {
 }
 
 func (i Image) BuildDir() string {
-	return config.Root()
+	return release.App().Root()
 }
 
 func (i Image) Dockerfile() string {
@@ -38,15 +39,15 @@ func (i Image) RunPorts() []string {
 
 func (i Image) RunFiles() []string {
 	return []string{
-		config.Root() + `:/home/ubuntu/` + config.Name(),
+		release.App().Root() + `:/home/ubuntu/` + release.App().Name(),
 	}
 }
 
 func buildBinary() error {
-	config.Log(color.GreenString(`building app binary.`))
+	utils.Log(color.GreenString(`building app binary.`))
 	if cmd.Ok(cmd.O{
-		Dir: filepath.Join(config.Root(), "../.."),
-		Env: []string{`GOBIN=` + config.Root()},
+		Dir: filepath.Join(release.App().Root(), "../.."),
+		Env: []string{`GOBIN=` + release.App().Root()},
 	}, `go`, `install`) {
 		return nil
 	}

@@ -6,8 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/xiaomei/release"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -27,8 +28,8 @@ func SpecCmd() *cobra.Command {
 }
 
 func Spec(t string) error {
-	config.Log(color.GreenString(`check app code spec.`))
-	if err := os.Chdir(filepath.Join(config.Root(), `..`)); err != nil {
+	utils.Log(color.GreenString(`check app code spec.`))
+	if err := os.Chdir(filepath.Join(release.Root(), `..`)); err != nil {
 		panic(err)
 	}
 

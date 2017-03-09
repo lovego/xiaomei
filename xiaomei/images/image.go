@@ -1,8 +1,9 @@
 package images
 
 import (
-	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/xiaomei/release"
 	"github.com/fatih/color"
 )
 
@@ -23,7 +24,7 @@ func (i Image) Build(imgName string) error {
 	if err := i.Prepare(); err != nil {
 		return err
 	}
-	config.Log(color.GreenString(`building ` + i.svcName + ` image.`))
+	utils.Log(color.GreenString(`building ` + i.svcName + ` image.`))
 	_, err := cmd.Run(cmd.O{Dir: i.BuildDir()}, `docker`, `build`,
 		`--file=`+i.Dockerfile(), `--tag=`+imgName, `.`,
 	)
@@ -34,14 +35,14 @@ func (i Image) Run(imgName string) error {
 	if err := i.PrepareOrBuild(imgName); err != nil {
 		return err
 	}
-	networkName := config.Name() + `_run`
+	networkName := release.Name() + `_run`
 	if err := ensureNetwork(networkName); err != nil {
 		return err
 	}
 
 	args := []string{
 		`run`, `-it`, `--rm`, `--no-healthcheck`,
-		`--name=` + config.Name() + `_` + i.svcName,
+		`--name=` + release.Name() + `_` + i.svcName,
 		`--network=` + networkName,
 	}
 	for _, port := range i.RunPorts() {

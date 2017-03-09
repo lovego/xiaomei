@@ -3,7 +3,7 @@ package images
 import (
 	"errors"
 
-	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/bughou-go/xiaomei/xiaomei/images/app"
 	"github.com/bughou-go/xiaomei/xiaomei/images/web"
@@ -16,34 +16,38 @@ var imagesMap = map[string]Image{
 	`web`: Image{`web`, web.Image{}},
 }
 
-func Run(svcName, imgName string) error {
+func Run(svcName string) error {
 	image, ok := imagesMap[svcName]
 	if !ok {
 		return errors.New(`no image registered for ` + svcName)
 	}
-	return image.Run(imgName)
+	return image.Run(release.ImageNameOf(svcName))
 }
 
-func Build(svcName, imgName string) error {
+func Build(svcName string) error {
+	if svcName == `` {
+		return eachServiceDo(Build)
+	}
 	image, ok := imagesMap[svcName]
 	if !ok {
 		return errors.New(`no image registered for ` + svcName)
 	}
-	return image.Build(imgName)
+	return image.Build(release.ImageNameOf(svcName))
 }
 
-func Push(svcName, imgName string) error {
-	config.Log(color.GreenString(`pushing ` + svcName + ` image.`))
-	_, err := cmd.Run(cmd.O{}, `docker`, `push`, imgName)
+func Push(svcName string) error {
+	if svcName == `` {
+		return eachServiceDo(Push)
+	}
+	utils.Log(color.GreenString(`pushing ` + svcName + ` image.`))
+	_, err := cmd.Run(cmd.O{}, `docker`, `push`, release.ImageNameOf(svcName))
 	return err
 }
 
-func eachServiceDo(work func(svcName, imgName string) error) error {
+func eachServiceDo(work func(svcName string) error) error {
 	for svcName := range release.GetStack().Services {
 		if svcName != `` {
-			if imgName, err := serviceImageName(svcName); err != nil {
-				return err
-			} else if err := work(svcName, imgName); err != nil {
+			if err := work(svcName); err != nil {
 				return err
 			}
 		}

@@ -3,7 +3,7 @@ package web
 import (
 	"path/filepath"
 
-	"github.com/bughou-go/xiaomei/config"
+	"github.com/bughou-go/xiaomei/xiaomei/release"
 )
 
 type Image struct {
@@ -14,7 +14,7 @@ func (i Image) Prepare() error {
 }
 
 func (i Image) BuildDir() string {
-	return filepath.Join(config.Root(), `../img-web`)
+	return filepath.Join(release.Root(), `img-web`)
 }
 
 func (i Image) Dockerfile() string {
@@ -27,6 +27,6 @@ func (i Image) RunPorts() []string {
 
 func (i Image) RunFiles() []string {
 	return []string{
-		filepath.Join(config.Root(), `../img-web/public`) + `:/var/www/` + config.Name(),
+		filepath.Join(release.Root(), `img-web/public`) + `:/var/www/` + release.Name(),
 	}
 }
