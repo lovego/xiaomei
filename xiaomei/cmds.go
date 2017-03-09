@@ -61,16 +61,16 @@ func pushCmd(svcName, target, s string) *cobra.Command {
 }
 
 func deployCmd(svcName, target, s string) *cobra.Command {
-	var doBuild, doPush *bool
+	var build, push bool
 	cmd := &cobra.Command{
 		Use:   `deploy`,
 		Short: fmt.Sprintf(`deploy %s service%s.`, target, s),
 		RunE: z.NoArgCall(func() error {
-			return stack.Deploy(svcName, *doBuild, *doPush)
+			return stack.Deploy(svcName, build, push)
 		}),
 	}
-	doBuild = cmd.Flags().BoolP(`build`, `b`, false, fmt.Sprintf(`build the image%s.`, s))
-	doPush = cmd.Flags().BoolP(`push`, `p`, false, fmt.Sprintf(`push the image%s.`, s))
+	cmd.Flags().BoolVarP(&build, `build`, `b`, false, fmt.Sprintf(`build the image%s.`, s))
+	cmd.Flags().BoolVarP(&push, `push`, `p`, false, fmt.Sprintf(`push the image%s.`, s))
 	return cmd
 }
 

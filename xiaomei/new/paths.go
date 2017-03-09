@@ -4,22 +4,18 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
-
-	"github.com/bughou-go/xiaomei/utils/fs"
 )
 
-const examplePath = `github.com/bughou-go/xiaomei/example`
-
-func getExampleDir() (string, error) {
+func getTmplDir(isAccess bool) (string, error) {
 	srcPath, err := getGoSrcPath()
 	if err != nil {
 		return ``, err
 	}
-	exampleDir := filepath.Join(srcPath, examplePath)
-	if fs.Exist(exampleDir) {
-		return exampleDir, nil
+	tmplDir := filepath.Join(srcPath, `github.com/bughou-go/xiaomei/xiaomei/new`)
+	if isAccess {
+		return filepath.Join(tmplDir, `access`), nil
 	} else {
-		return ``, errors.New(exampleDir + `: not exist.`)
+		return filepath.Join(tmplDir, `webapp`), nil
 	}
 }
 

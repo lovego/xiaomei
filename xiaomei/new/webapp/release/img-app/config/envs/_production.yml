@@ -1,0 +1,2 @@
+domain: {{ .Domain }}.com
+secret: {{ .Secret }}

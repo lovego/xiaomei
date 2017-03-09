@@ -16,42 +16,41 @@ import (
 )
 
 func Cmd() *cobra.Command {
-	return &cobra.Command{
+	var isAccess bool
+	cmd := &cobra.Command{
 		Use:   `new <project-path>`,
 		Short: `create a new project.`,
 		RunE: z.Arg1Call(``, func(dir string) error {
-			return New(dir)
+			return New(dir, isAccess)
 		}),
 	}
+	cmd.Flags().BoolVarP(&isAccess, `access`, `a`, false, `new a access project instead of webapp.`)
+	return cmd
 }
 
-func New(proDir string) error {
+func New(proDir string, isAccess bool) error {
 	proPath, err := getProjectPath(proDir)
 	if err != nil {
 		return err
 	}
-	exampleDir, err := getExampleDir()
+	tmplDir, err := getTmplDir(isAccess)
 	if err != nil {
 		return err
 	}
-	return execTemplates(exampleDir, proDir, proPath)
+	return execTemplates(tmplDir, proDir, proPath)
 }
 
-func execTemplates(exampleDir, proDir, proPath string) error {
+func execTemplates(tmplDir, proDir, proPath string) error {
 	proName := filepath.Base(proPath)
-	domainMapping, domainList := domainNames(proName)
-	data := struct {
-		ProPath, ProName, Secret, DomainList string
-		DomainMapping                        map[string]string
-	}{
-		proPath, proName, genSecret(), domainList, domainMapping,
+	data := struct{ ProPath, ProName, Domain, Secret string }{
+		proPath, proName, strings.Replace(proName, `_`, `-`, -1), genSecret(),
 	}
 
-	return filepath.Walk(exampleDir, func(src string, info os.FileInfo, err error) error {
+	return filepath.Walk(tmplDir, func(src string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		dst := strings.Replace(src, exampleDir, proDir, 1)
+		dst := strings.Replace(src, tmplDir, proDir, 1)
 		if info.IsDir() {
 			return os.Mkdir(dst, 0755)
 		} else {
@@ -78,10 +77,10 @@ func domainNames(proName string) (map[string]string, string) {
 
 func copyFile(src, dst string, info os.FileInfo, data interface{}) error {
 	dir, file := filepath.Split(dst)
-	if !strings.HasPrefix(file, `tmpl.`) {
+	if !strings.HasPrefix(file, `_`) {
 		return fs.Copy(src, dst)
 	}
-	dst = filepath.Join(dir, strings.TrimPrefix(file, `tmpl.`))
+	dst = filepath.Join(dir, strings.TrimPrefix(file, `_`))
 	if content, err := renderTmpl(src, data); err == nil {
 		return ioutil.WriteFile(dst, content, info.Mode())
 	} else {

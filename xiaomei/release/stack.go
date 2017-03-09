@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	"github.com/bughou-go/xiaomei/config"
 	"gopkg.in/yaml.v2"
 )
 
@@ -23,7 +22,7 @@ var theStack *Stack
 
 func GetStack() *Stack {
 	if theStack == nil {
-		content, err := ioutil.ReadFile(filepath.Join(config.Root(), `../stack.yml`))
+		content, err := ioutil.ReadFile(filepath.Join(Root(), `../stack.yml`))
 		if err != nil {
 			panic(err)
 		}

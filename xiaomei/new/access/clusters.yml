@@ -3,5 +3,3 @@ dev:
   managers:
     - addr: 127.0.0.1
   workers:
-qa:
-production:

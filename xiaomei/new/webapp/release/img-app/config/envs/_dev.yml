@@ -1,4 +1,4 @@
-domain: {{ index .DomainMapping `dev` }}
+domain: {{ .Domain }}.dev
 keepers: [ ]
 
 dataSource:

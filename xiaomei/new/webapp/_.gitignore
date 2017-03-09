@@ -1,0 +1,7 @@
+.*.swp
+*.test
+tmp
+/{{ .ProName }}
+/release/img-app/{{ .ProName }}
+/release/img-app/log
+*.exe

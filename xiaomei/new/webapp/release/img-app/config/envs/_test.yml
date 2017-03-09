@@ -1,4 +1,4 @@
-domain: {{ index .DomainMapping `test` }}
+domain: {{ .Domain }}.test
 keepers: [ ]
 
 dataSource:

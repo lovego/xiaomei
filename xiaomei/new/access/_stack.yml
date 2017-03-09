@@ -1,0 +1,10 @@
+version: "3"
+services:
+  access:
+    image: 192.168.202.12:5000/{{ .Domain }}/access
+    deploy:
+      replicas: 2
+    volumes: ["logs:/var/log/nginx"]
+
+volumes:
+  logs:
