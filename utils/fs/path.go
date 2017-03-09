@@ -3,6 +3,7 @@ package fs
 import (
 	"io"
 	"os"
+	"path/filepath"
 )
 
 func Exist(p string) bool {
@@ -32,4 +33,13 @@ func IsEmptyDir(p string) bool {
 
 	_, err = f.Readdirnames(1)
 	return err == io.EOF
+}
+
+func DetectDir(dir, feature string) string {
+	for ; dir != `/`; dir = filepath.Dir(dir) {
+		if Exist(filepath.Join(dir, feature)) {
+			return dir
+		}
+	}
+	return ``
 }

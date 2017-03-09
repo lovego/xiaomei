@@ -18,16 +18,8 @@ func Env() string {
 	return Config.Env()
 }
 
-func Envs() []string {
-	return Config.Envs()
-}
-
 func DeployName() string {
 	return Config.DeployName()
-}
-
-func Bin() string {
-	return Config.Bin()
 }
 
 func Domain() string {

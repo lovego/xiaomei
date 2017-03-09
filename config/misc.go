@@ -21,10 +21,6 @@ func Logf(w io.Writer, msg string) {
 	w.Write([]byte(time.Now().Format(ISO8601) + ` ` + msg + "\n"))
 }
 
-func IsLocalEnv() bool {
-	return os.Getenv(`GOENV`) == ``
-}
-
 func Debug(name string) bool {
 	matched, _ := regexp.MatchString(`\b`+name+`\b`, os.Getenv(`debug`))
 	return matched

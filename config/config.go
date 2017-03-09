@@ -1,131 +1,52 @@
 package config
 
 import (
+	"os"
 	"path/filepath"
-	"sync"
-	"time"
+	"strings"
 
-	"github.com/bughou-go/xiaomei/utils/mailer"
+	"github.com/bughou-go/xiaomei/config/conf"
+	"github.com/bughou-go/xiaomei/utils/fs"
 )
 
-var Config Conf
+var Config = getConfig()
 
-type Conf struct {
-	sync.Mutex
-
-	env      string
-	envs     []string
-	data     *conf
-	timeZone *time.Location
-	mailer   struct {
-		setted bool
-		*mailer.Mailer
-	}
-}
-
-type conf struct {
-	Name   string `yaml:"name"`
-	Domain string `yaml:"domain"`
-	Secret string `yaml:"secret"`
-
-	TimeZone TimeZoneConf    `yaml:"timeZone"`
-	Mailer   MailerConf      `yaml:"mailer"`
-	Keepers  []mailer.People `yaml:"keepers"`
-
-	DataSource map[string]map[string]string `yaml:"dataSource"`
-}
-
-type TimeZoneConf struct {
-	Name   string `yaml:"name"`
-	Offset int    `yaml:"offset"`
-}
-
-type MailerConf struct {
-	Host   string `yaml:"host"`
-	Port   string `yaml:"port"`
-	Sender mailer.People
-	Passwd string `yaml:"passwd"`
-}
-
-func (c *Conf) Root() string {
-	if root := DetectRoot(); root != `` {
-		return root
-	} else {
+func getConfig() conf.Conf {
+	root := detectRoot()
+	if root == `` {
 		panic(`app root not found.`)
 	}
+	return conf.New(root, detectEnv())
 }
 
-func (c *Conf) Name() string {
-	c.Load()
-	return c.data.Name
-}
-
-func (c *Conf) Env() string {
-	if c.env == `` {
-		c.env = detectEnv()
+func detectRoot() string {
+	program, err := filepath.Abs(os.Args[0])
+	if err != nil {
+		panic(err)
 	}
-	return c.env
-}
-
-func (c *Conf) Envs() []string {
-	if c.envs == nil {
-		c.envs = availableEnvs()
+	if strings.HasSuffix(program, `.test`) /* go test ... */ ||
+		strings.HasPrefix(program, `/tmp/`) /* go run ... */ {
+		if cwd, err := os.Getwd(); err != nil {
+			panic(err)
+		} else if dir := fs.DetectDir(cwd, `release/stack.yml`); dir == `` {
+			return ``
+		} else {
+			return filepath.Join(dir, `release/img-app`)
+		}
+	} else { // project binary file
+		return fs.DetectDir(filepath.Dir(program), `config/config.yml`)
 	}
-	return c.envs
 }
 
-func (c *Conf) DeployName() string {
-	return c.Name() + `_` + c.Env()
-}
-
-func (c *Conf) Bin() string {
-	return filepath.Join(c.Root(), c.Name())
-}
-
-func (c *Conf) Domain() string {
-	c.Load()
-	return c.data.Domain
-}
-
-func (c *Conf) Secret() string {
-	c.Load()
-	return c.data.Secret
-}
-
-func (c *Conf) TimeZone() *time.Location {
-	if c.timeZone == nil {
-		c.Load()
-		c.timeZone = time.FixedZone(c.data.TimeZone.Name, c.data.TimeZone.Offset)
+func detectEnv() string {
+	env := os.Getenv(`GOENV`)
+	if env != `` {
+		return env
 	}
-	return c.timeZone
-}
-
-func (c *Conf) Mailer() *mailer.Mailer {
-	c.Lock()
-	defer c.Unlock()
-	if !c.mailer.setted {
-		c.Load()
-		m := c.data.Mailer
-		c.mailer.Mailer = mailer.New(m.Host, m.Port, m.Sender, m.Passwd)
-		c.mailer.setted = true
+	if strings.HasSuffix(os.Args[0], `.test`) {
+		env = `test`
+	} else {
+		env = `dev`
 	}
-	return c.mailer.Mailer
-}
-
-func (c *Conf) Alarm(title, body string) {
-	title = c.DeployName() + ` ` + title
-	c.Mailer().Send(&mailer.Message{Receivers: c.Keepers(), Title: title, Body: body})
-}
-
-func (c *Conf) Keepers() []mailer.People {
-	c.Load()
-	return c.data.Keepers
-}
-
-func (c *Conf) DataSource(typ, key string) string {
-	c.Load()
-	if key == `` {
-		key = `default`
-	}
-	return c.data.DataSource[typ][key]
+	return env
 }
