@@ -7,6 +7,7 @@ import (
 	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/bughou-go/xiaomei/xiaomei/images/app"
 	"github.com/bughou-go/xiaomei/xiaomei/images/web"
+	"github.com/bughou-go/xiaomei/xiaomei/release"
 	"github.com/fatih/color"
 )
 
@@ -35,4 +36,17 @@ func Push(svcName, imgName string) error {
 	config.Log(color.GreenString(`pushing ` + svcName + ` image.`))
 	_, err := cmd.Run(cmd.O{}, `docker`, `push`, imgName)
 	return err
+}
+
+func eachServiceDo(work func(svcName, imgName string) error) error {
+	for svcName := range release.GetStack().Services {
+		if svcName != `` {
+			if imgName, err := serviceImageName(svcName); err != nil {
+				return err
+			} else if err := work(svcName, imgName); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }

@@ -1,14 +1,15 @@
-package cluster
+package setup
 
 import (
 	"encoding/json"
 	"errors"
 
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/xiaomei/release"
 )
 
 type Node struct {
-	Config NodeConf
+	Config release.Node
 	Role   string // current role
 }
 
@@ -54,7 +55,7 @@ func (n Node) addrFlags() []string {
 	return []string{`--advertise-addr`, addr, `--listen-addr`, addr}
 }
 
-func getClusterNodes(clusterConf ClusterConf) ([]*Node, []*Node, error) {
+func getClusterNodes(clusterConf release.Cluster) ([]*Node, []*Node, error) {
 	if managers, workers, err := getNodesInfo(clusterConf); err != nil {
 		return nil, nil, err
 	} else if err = checkIsInOneCluster(managers, workers); err != nil {

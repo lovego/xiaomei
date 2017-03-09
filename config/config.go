@@ -9,9 +9,9 @@ import (
 	"github.com/bughou-go/xiaomei/utils/fs"
 )
 
-var Config = getConfig()
+var theConf = getConf()
 
-func getConfig() conf.Conf {
+func getConf() *conf.Conf {
 	root := detectRoot()
 	if root == `` {
 		panic(`app root not found.`)

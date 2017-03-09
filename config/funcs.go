@@ -7,45 +7,45 @@ import (
 )
 
 func Root() string {
-	return Config.Root()
+	return theConf.Root()
 }
 
 func Name() string {
-	return Config.Name()
+	return theConf.Name()
 }
 
 func Env() string {
-	return Config.Env()
+	return theConf.Env()
 }
 
 func DeployName() string {
-	return Config.DeployName()
+	return theConf.DeployName()
 }
 
 func Domain() string {
-	return Config.Domain()
+	return theConf.Domain()
 }
 
 func Secret() string {
-	return Config.Secret()
+	return theConf.Secret()
 }
 
 func TimeZone() *time.Location {
-	return Config.TimeZone()
+	return theConf.TimeZone()
 }
 
 func Mailer() *mailer.Mailer {
-	return Config.Mailer()
+	return theConf.Mailer()
 }
 
 func Alarm(title, body string) {
-	Config.Alarm(title, body)
+	theConf.Alarm(title, body)
 }
 
 func Keepers() []mailer.People {
-	return Config.Keepers()
+	return theConf.Keepers()
 }
 
 func DataSource(typ, key string) string {
-	return Config.DataSource(typ, key)
+	return theConf.DataSource(typ, key)
 }

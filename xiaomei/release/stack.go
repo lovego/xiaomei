@@ -1,4 +1,4 @@
-package stack
+package release
 
 import (
 	"fmt"
@@ -21,7 +21,7 @@ type Network map[string]interface{}
 
 var theStack *Stack
 
-func getStack() *Stack {
+func GetStack() *Stack {
 	if theStack == nil {
 		content, err := ioutil.ReadFile(filepath.Join(config.Root(), `../stack.yml`))
 		if err != nil {
@@ -36,31 +36,18 @@ func getStack() *Stack {
 	return theStack
 }
 
-func eachServiceDo(work func(svcName, imgName string) error) error {
-	for svcName := range getStack().Services {
-		if svcName != `` {
-			if imgName, err := serviceImageName(svcName); err != nil {
-				return err
-			} else if err := work(svcName, imgName); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
-func serviceImageName(svcName string) (string, error) {
-	service := getStack().Services[svcName]
+func ImageNameOf(svcName string) string {
+	service := GetStack().Services[svcName]
 	if service == nil {
-		return ``, fmt.Errorf(`stack.yml: services.%s: undefined.`, svcName)
+		panic(fmt.Sprintf(`stack.yml: services.%s: undefined.`, svcName))
 	}
 	image := service[`image`]
 	if image == nil {
-		return ``, fmt.Errorf(`stack.yml: services.%s.image: undefined.`, svcName)
+		panic(fmt.Sprintf(`stack.yml: services.%s.image: undefined.`, svcName))
 	}
 	if str, ok := image.(string); ok && str != `` {
-		return str, nil
+		return str
 	} else {
-		return ``, fmt.Errorf(`stack.yml: services.%s.image: should be a string.`, svcName)
+		panic(fmt.Sprintf(`stack.yml: services.%s.image: should be a string.`, svcName))
 	}
 }
