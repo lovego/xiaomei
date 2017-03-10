@@ -19,7 +19,7 @@ import (
 var accessLog, errLog = setupLogger()
 
 func setupLogger() (*os.File, *os.File) {
-	if config.Env() == `dev` {
+	if config.DevMode() {
 		return os.Stdout, os.Stderr
 	} else {
 		return fs.OpenAppend(filepath.Join(config.Root(), `log/app.log`)),

@@ -2,9 +2,14 @@ package config
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/bughou-go/xiaomei/utils"
 )
+
+func DevMode() bool {
+	return os.Getenv(`GODEV`) == `true`
+}
 
 func Protect(fn func()) {
 	defer func() {

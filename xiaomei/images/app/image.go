@@ -34,7 +34,7 @@ func (i Image) Dockerfile() string {
 	return `Dockerfile`
 }
 
-func (i Image) RunFiles() []string {
+func (i Image) FilesForRun() []string {
 	root := release.App().Root()
 	name := release.App().Name()
 	return []string{
@@ -44,7 +44,11 @@ func (i Image) RunFiles() []string {
 	}
 }
 
-func (i Image) RunCmd() []string {
+func (i Image) EnvForRun() []string {
+	return []string{`GODEV=true`}
+}
+
+func (i Image) CmdForRun() []string {
 	return nil
 }
 

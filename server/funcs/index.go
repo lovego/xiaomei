@@ -3,14 +3,13 @@ package funcs
 import (
 	"strings"
 
-	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils/slice"
 	"github.com/bughou-go/xiaomei/utils/strnum"
 )
 
 func Map() map[string]interface{} {
 	return map[string]interface{}{
-		`asset`:        AssetFunc(config.Env() == `dev`),
+		`asset`:        AssetFunc(),
 		`html_safe`:    HtmlSafe,
 		`dict`:         MakeDict,
 		`keys`:         MapKeys,

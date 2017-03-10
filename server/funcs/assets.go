@@ -23,7 +23,8 @@ func init() {
 	}
 }
 
-func AssetFunc(dev bool) func(string) string {
+func AssetFunc() func(string) string {
+	dev := config.DevMode()
 	return func(src string) string {
 		if dev {
 			return src + `?` + time.Now().Format(`060102150405`)

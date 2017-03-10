@@ -22,11 +22,14 @@ func (i Image) Run(publish []string) error {
 	} else {
 		return err
 	}
-	for _, file := range i.RunFiles() {
+	for _, file := range i.FilesForRun() {
 		args = append(args, `-v`, file)
 	}
+	for _, env := range i.EnvForRun() {
+		args = append(args, `-e`, env)
+	}
 	args = append(args, release.ImageNameOf(i.svcName))
-	if cmd := i.RunCmd(); cmd != nil {
+	if cmd := i.CmdForRun(); cmd != nil {
 		args = append(args, cmd...)
 	}
 	_, err := cmd.Run(cmd.O{}, `docker`, args...)

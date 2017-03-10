@@ -19,4 +19,6 @@ RUN apt-get update \
 # set rlimit nofile
 # RUN echo 'ubuntu - nofile unlimited' > /etc/security/limits.d/99-ubuntu.conf
 
+# add user
+RUN useradd -ms /bin/bash ubuntu
 

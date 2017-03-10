@@ -39,7 +39,7 @@ func NewSession() session.Session {
 
 func NewRenderer() *renderer.Renderer {
 	return renderer.New(
-		path.Join(config.Root(), `views`), `layout/default`, config.Env() != `dev`, funcs.Map(),
+		path.Join(config.Root(), `views`), `layout/default`, !config.DevMode(), funcs.Map(),
 	)
 }
 

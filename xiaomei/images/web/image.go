@@ -21,7 +21,7 @@ func (i Image) Dockerfile() string {
 	return `Dockerfile`
 }
 
-func (i Image) RunFiles() []string {
+func (i Image) FilesForRun() []string {
 	root := filepath.Join(release.Root(), `img-web`)
 	return []string{
 		root + `/site.conf:/etc/nginx/sites-enabled/` + release.Name(),
@@ -29,6 +29,10 @@ func (i Image) RunFiles() []string {
 	}
 }
 
-func (i Image) RunCmd() []string {
+func (i Image) EnvForRun() []string {
+	return []string{`GODEV=true`}
+}
+
+func (i Image) CmdForRun() []string {
 	return []string{`sh`, `-c`, `nginx -t && nginx`}
 }
