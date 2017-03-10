@@ -31,15 +31,15 @@ func commonCmds(svcName string) []*cobra.Command {
 }
 
 func runCmd(svcName string) *cobra.Command {
-	var ports []string
+	var publish []string
 	cmd := &cobra.Command{
 		Use:   `run`,
 		Short: fmt.Sprintf(`run    %s image.`, svcName),
 		RunE: z.NoArgCall(func() error {
-			return images.Run(svcName, ports)
+			return images.Run(svcName, publish)
 		}),
 	}
-	cmd.Flags().StringSliceVarP(&ports, `ports`, `p`, nil, `specify ports`)
+	cmd.Flags().StringSliceVarP(&publish, `publish`, `p`, nil, `publish ports for container.`)
 	return cmd
 }
 
