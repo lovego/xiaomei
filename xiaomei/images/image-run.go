@@ -26,6 +26,9 @@ func (i Image) Run(publish []string) error {
 		args = append(args, `-v`, file)
 	}
 	args = append(args, release.ImageNameOf(i.svcName))
+	if cmd := i.RunCmd(); cmd != `` {
+		args = append(args, cmd)
+	}
 	_, err := cmd.Run(cmd.O{}, `docker`, args...)
 	return err
 }

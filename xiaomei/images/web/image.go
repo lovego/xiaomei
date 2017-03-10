@@ -22,7 +22,13 @@ func (i Image) Dockerfile() string {
 }
 
 func (i Image) RunFiles() []string {
+	root := filepath.Join(release.Root(), `img-web`)
 	return []string{
-		filepath.Join(release.Root(), `img-web/public`) + `:/var/www/` + release.Name(),
+		root + `/site.conf:/etc/nginx/sites-enabled/` + release.Name(),
+		root + `/public:/var/www/` + release.Name(),
 	}
+}
+
+func (i Image) RunCmd() string {
+	return `nginx -t && nginx`
 }

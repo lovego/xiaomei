@@ -2,6 +2,7 @@ package app
 
 import (
 	"errors"
+	"fmt"
 	"path/filepath"
 
 	"github.com/bughou-go/xiaomei/utils"
@@ -34,9 +35,17 @@ func (i Image) Dockerfile() string {
 }
 
 func (i Image) RunFiles() []string {
+	root := release.App().Root()
+	name := release.App().Name()
 	return []string{
-		release.App().Root() + `:/home/ubuntu/` + release.App().Name(),
+		fmt.Sprintf(`%s/%s:/home/ubuntu/%s/%s`, root, name, name, name),
+		fmt.Sprintf(`%s/config:/home/ubuntu/%s/config`, root, name),
+		fmt.Sprintf(`%s/views:/home/ubuntu/%s/views`, root, name),
 	}
+}
+
+func (i Image) RunCmd() string {
+	return ``
 }
 
 func buildBinary() error {
