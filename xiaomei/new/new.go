@@ -24,7 +24,7 @@ func Cmd() *cobra.Command {
 			return New(dir, isAccess)
 		}),
 	}
-	cmd.Flags().BoolVarP(&isAccess, `access`, `a`, false, `new a access project instead of webapp.`)
+	cmd.Flags().BoolVarP(&isAccess, `access`, `a`, false, `create a access project instead of webapp.`)
 	return cmd
 }
 

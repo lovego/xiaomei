@@ -12,6 +12,7 @@ import (
 	"github.com/bughou-go/xiaomei/server/xm"
 	"github.com/bughou-go/xiaomei/server/xm/renderer"
 	"github.com/bughou-go/xiaomei/server/xm/session"
+	"github.com/bughou-go/xiaomei/utils"
 	"github.com/fatih/color"
 )
 
@@ -45,7 +46,7 @@ func NewRenderer() *renderer.Renderer {
 func (s *Server) ListenAndServe() {
 	const addr = `:3000`
 	ln := listen(addr)
-	config.Log(color.GreenString(`started. (` + addr + `)`))
+	utils.Log(color.GreenString(`started. (` + addr + `)`))
 
 	svr := http.Server{Handler: s.Handler()}
 	if err := svr.Serve(ln); err != nil {

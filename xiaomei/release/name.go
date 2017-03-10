@@ -12,7 +12,7 @@ var appConf *conf.Conf
 
 func Name() string {
 	if theName == `` {
-		if fs.IsDir(filepath.Join(Root(), `image-app`)) {
+		if fs.IsDir(filepath.Join(Root(), `img-app`)) {
 			theName = App().Name()
 		} else {
 			theName = `cluster`
@@ -23,7 +23,7 @@ func Name() string {
 
 func App() *conf.Conf {
 	if appConf == nil {
-		appConf = conf.New(filepath.Join(Root(), `image-app`), Env())
+		appConf = conf.New(filepath.Join(Root(), `img-app`), Env())
 	}
 	return appConf
 }

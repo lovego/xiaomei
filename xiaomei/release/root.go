@@ -2,6 +2,7 @@ package release
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/bughou-go/xiaomei/utils/fs"
 )
@@ -24,8 +25,11 @@ func detectRoot() string {
 	if theRoot == nil {
 		if cwd, err := os.Getwd(); err != nil {
 			panic(err)
+		} else if dir := fs.DetectDir(cwd, `release/stack.yml`); dir != `` {
+			dir = filepath.Join(dir, `release`)
+			theRoot = &dir
 		} else {
-			dir := fs.DetectDir(cwd, `release/stack.yml`)
+			dir = fs.DetectDir(cwd, `stack.yml`)
 			theRoot = &dir
 		}
 	}

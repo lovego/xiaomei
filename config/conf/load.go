@@ -11,8 +11,8 @@ import (
 
 func New(root, env string) *Conf {
 	conf := &Conf{root: root, env: env}
-	loadFile(conf.data, filepath.Join(conf.root, `config/config.yml`))
-	loadFile(conf.data, filepath.Join(conf.root, `config/envs/`+env+`.yml`))
+	loadFile(&conf.data, filepath.Join(conf.root, `config/config.yml`))
+	loadFile(&conf.data, filepath.Join(conf.root, `config/envs/`+env+`.yml`))
 	if os.Getenv(`debugConf`) != `` {
 		utils.PrintJson(&conf.data)
 	}

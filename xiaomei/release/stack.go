@@ -22,7 +22,7 @@ var theStack *Stack
 
 func GetStack() *Stack {
 	if theStack == nil {
-		content, err := ioutil.ReadFile(filepath.Join(Root(), `../stack.yml`))
+		content, err := ioutil.ReadFile(filepath.Join(Root(), `stack.yml`))
 		if err != nil {
 			panic(err)
 		}

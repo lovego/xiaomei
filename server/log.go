@@ -53,7 +53,7 @@ func getLogLine(req *xm.Request, res *xm.Response, t time.Time, err interface{})
   $session $remote_addr $http_referer $http_user_agent, $error, $stack
 */
 func getLogFields(req *xm.Request, res *xm.Response, t time.Time, err interface{}) []string {
-	slice := []string{t.Format(config.ISO8601), req.Host,
+	slice := []string{t.Format(utils.ISO8601), req.Host,
 		req.Method, req.URL.RequestURI(), strconv.FormatInt(req.ContentLength, 10), req.Proto,
 		strconv.FormatInt(res.Status(), 10), strconv.FormatInt(res.Size(), 10),
 		fmt.Sprintf(`%.6f`, time.Since(t).Seconds()),

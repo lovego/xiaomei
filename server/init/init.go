@@ -6,25 +6,19 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
-	"github.com/bughou-go/xiaomei/utils/fs"
+	"github.com/bughou-go/xiaomei/utils"
 )
 
 func init() {
-	log(`starting.`)
+	utils.Log(`starting.`)
 	go logSignals()
-}
-
-func log(msg string) {
-	const iso8601 = `2006-01-02T15:04:05Z0700`
-	println(time.Now().Format(iso8601), msg)
 }
 
 func logSignals() {
 	c := make(chan os.Signal, 10)
 	signal.Notify(c, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
 	s := <-c
-	log(`stopped. (` + s.String() + `)`)
+	println(`stopped. (` + s.String() + `)`)
 	os.Exit(0)
 }
