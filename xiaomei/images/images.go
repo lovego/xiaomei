@@ -16,12 +16,12 @@ var imagesMap = map[string]Image{
 	`web`: Image{`web`, web.Image{}},
 }
 
-func Run(svcName string) error {
+func Run(svcName string, ports []string) error {
 	image, ok := imagesMap[svcName]
 	if !ok {
 		return errors.New(`no image registered for ` + svcName)
 	}
-	return image.Run(release.ImageNameOf(svcName))
+	return image.Run(ports)
 }
 
 func Build(svcName string) error {
@@ -32,7 +32,7 @@ func Build(svcName string) error {
 	if !ok {
 		return errors.New(`no image registered for ` + svcName)
 	}
-	return image.Build(release.ImageNameOf(svcName))
+	return image.Build()
 }
 
 func Push(svcName string) error {
