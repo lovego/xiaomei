@@ -13,7 +13,7 @@ import (
 type Image struct {
 }
 
-func (i Image) Prepare() error {
+func (i Image) PrepareForBuild() error {
 	if err := buildBinary(); err != nil {
 		return err
 	}
@@ -31,10 +31,6 @@ func (i Image) BuildDir() string {
 
 func (i Image) Dockerfile() string {
 	return `Dockerfile`
-}
-
-func (i Image) RunPorts() []string {
-	return []string{`3000:3000`}
 }
 
 func (i Image) RunFiles() []string {

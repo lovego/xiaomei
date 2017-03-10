@@ -1,6 +1,9 @@
 package images
 
 import (
+	"encoding/json"
+	"strings"
+
 	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/bughou-go/xiaomei/xiaomei/release"
@@ -13,62 +16,95 @@ type Image struct {
 }
 
 type imageDriver interface {
-	Prepare() error
+	PrepareForBuild() error
 	BuildDir() string
 	Dockerfile() string
-	RunPorts() []string
 	RunFiles() []string
 }
 
-func (i Image) Build(imgName string) error {
-	if err := i.Prepare(); err != nil {
+func (i Image) Build() error {
+	if err := i.PrepareForBuild(); err != nil {
 		return err
 	}
 	utils.Log(color.GreenString(`building ` + i.svcName + ` image.`))
 	_, err := cmd.Run(cmd.O{Dir: i.BuildDir()}, `docker`, `build`,
-		`--file=`+i.Dockerfile(), `--tag=`+imgName, `.`,
+		`--file=`+i.Dockerfile(), `--tag=`+release.ImageNameOf(i.svcName), `.`,
 	)
 	return err
 }
 
-func (i Image) Run(imgName string) error {
-	if err := i.PrepareOrBuild(imgName); err != nil {
+func (i Image) Run(publish []string) error {
+	if err := i.prepareForRun(); err != nil {
 		return err
 	}
-	networkName := release.Name() + `_run`
-	if err := ensureNetwork(networkName); err != nil {
+	args := []string{`run`, `-it`, `--rm`, `--no-healthcheck`,
+		`--name=` + release.Name() + `_` + i.svcName, `--network=` + i.networkNameForRun(),
+	}
+	if pubs, err := i.publishForRun(publish); err == nil {
+		for _, pub := range pubs {
+			args = append(args, `-p`, pub)
+		}
+	} else {
 		return err
-	}
-
-	args := []string{
-		`run`, `-it`, `--rm`, `--no-healthcheck`,
-		`--name=` + release.Name() + `_` + i.svcName,
-		`--network=` + networkName,
-	}
-	for _, port := range i.RunPorts() {
-		args = append(args, `-p`, port)
 	}
 	for _, file := range i.RunFiles() {
 		args = append(args, `-v`, file)
 	}
-	args = append(args, imgName)
+	args = append(args, release.ImageNameOf(i.svcName))
 	_, err := cmd.Run(cmd.O{}, `docker`, args...)
 	return err
 }
 
-func (i Image) PrepareOrBuild(imgName string) error {
-	if cmd.Ok(cmd.O{NoStdout: true, NoStderr: true}, `docker`, `image`, `inspect`, imgName) {
-		return i.Prepare()
+func (i Image) prepareForRun() error {
+	if cmd.Ok(cmd.O{NoStdout: true, NoStderr: true},
+		`docker`, `image`, `inspect`, release.ImageNameOf(i.svcName)) {
+		if err := i.PrepareForBuild(); err != nil {
+			return err
+		}
 	} else {
-		return i.Build(imgName)
+		if err := i.Build(); err != nil {
+			return err
+		}
 	}
+	return i.ensureNetworkForRun()
 }
 
-func ensureNetwork(name string) error {
+func (i Image) ensureNetworkForRun() error {
+	name := i.networkNameForRun()
 	if cmd.Ok(cmd.O{NoStdout: true, NoStderr: true}, `docker`, `network`, `inspect`, name) {
 		return nil
 	}
 	_, err := cmd.Run(cmd.O{}, `docker`, `network`, `create`,
 		`--attachable`, `--driver=overlay`, name)
 	return err
+}
+
+func (i Image) networkNameForRun() string {
+	return release.Name() + `_run`
+}
+
+func (i Image) publishForRun(publish []string) ([]string, error) {
+	if len(publish) > 0 {
+		return publish, nil
+	}
+	if publish = release.PortsOf(i.svcName); len(publish) > 0 {
+		return publish, nil
+	}
+	return i.exposedPorts()
+}
+
+func (i Image) exposedPorts() ([]string, error) {
+	var m map[string]interface{}
+	if output, err := cmd.Run(cmd.O{Output: true}, `docker`, `inspect`,
+		`-f`, `{{ json .Config.ExposedPorts }}`, release.ImageNameOf(i.svcName),
+	); err != nil {
+		return nil, err
+	} else if err := json.Unmarshal([]byte(output), &m); err != nil {
+		return nil, err
+	}
+	ports := []string{}
+	for k := range m {
+		ports = append(ports, strings.TrimSuffix(k, `/tcp`))
+	}
+	return ports, nil
 }

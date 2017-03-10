@@ -9,7 +9,7 @@ import (
 type Image struct {
 }
 
-func (i Image) Prepare() error {
+func (i Image) PrepareForBuild() error {
 	return nil
 }
 
@@ -19,10 +19,6 @@ func (i Image) BuildDir() string {
 
 func (i Image) Dockerfile() string {
 	return `Dockerfile`
-}
-
-func (i Image) RunPorts() []string {
-	return []string{`8080:80`, `8443:443`}
 }
 
 func (i Image) RunFiles() []string {

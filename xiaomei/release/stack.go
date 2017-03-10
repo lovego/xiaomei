@@ -35,11 +35,16 @@ func GetStack() *Stack {
 	return theStack
 }
 
-func ImageNameOf(svcName string) string {
+func GetService(svcName string) Service {
 	service := GetStack().Services[svcName]
 	if service == nil {
 		panic(fmt.Sprintf(`stack.yml: services.%s: undefined.`, svcName))
 	}
+	return service
+}
+
+func ImageNameOf(svcName string) string {
+	service := GetService(svcName)
 	image := service[`image`]
 	if image == nil {
 		panic(fmt.Sprintf(`stack.yml: services.%s.image: undefined.`, svcName))
@@ -49,4 +54,10 @@ func ImageNameOf(svcName string) string {
 	} else {
 		panic(fmt.Sprintf(`stack.yml: services.%s.image: should be a string.`, svcName))
 	}
+}
+
+func PortsOf(svcName string) []string {
+	service := GetService(svcName)
+	ports, _ := service[`ports`].([]string)
+	return ports
 }
