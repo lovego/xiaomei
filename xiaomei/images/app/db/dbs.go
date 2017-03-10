@@ -10,10 +10,8 @@ import (
 	"github.com/bughou-go/xiaomei/xiaomei/release"
 )
 
-var appConf = release.App()
-
 func Mysql(key string, printCmd bool) error {
-	flags := dsn.Mysql(appConf.DataSource(`mysql`, key)).Flags()
+	flags := dsn.Mysql(release.App().DataSource(`mysql`, key)).Flags()
 	command := `mysql --pager=less -SX ` + strings.Join(flags, ` `)
 	if printCmd {
 		fmt.Println(command)
@@ -23,7 +21,7 @@ func Mysql(key string, printCmd bool) error {
 }
 
 func MysqlDump(key string, printCmd bool) error {
-	flags := dsn.Mysql(appConf.DataSource(`mysql`, key)).Flags()
+	flags := dsn.Mysql(release.App().DataSource(`mysql`, key)).Flags()
 	command := `mysqldump -t ` + strings.Join(flags, ` `)
 	if printCmd {
 		fmt.Println(command)
@@ -33,7 +31,7 @@ func MysqlDump(key string, printCmd bool) error {
 }
 
 func Mongo(key string, printCmd bool) error {
-	command := `mongo ` + appConf.DataSource(`mongo`, key)
+	command := `mongo ` + release.App().DataSource(`mongo`, key)
 	if printCmd {
 		fmt.Println(command)
 		return nil
@@ -42,7 +40,7 @@ func Mongo(key string, printCmd bool) error {
 }
 
 func Redis(key string, printCmd bool) error {
-	flags := dsn.Redis(appConf.DataSource(`redis`, key)).Flags()
+	flags := dsn.Redis(release.App().DataSource(`redis`, key)).Flags()
 	command := `redis-cli ` + strings.Join(flags, ` `)
 	if printCmd {
 		fmt.Println(command)
