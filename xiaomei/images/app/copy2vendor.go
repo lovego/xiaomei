@@ -1,21 +1,39 @@
-package deps
+package app
 
 import (
 	"errors"
-	"github.com/bughou-go/xiaomei/config"
-	"github.com/bughou-go/xiaomei/utils/cmd"
-	"github.com/bughou-go/xiaomei/utils/fs"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/utils/fs"
+	"github.com/bughou-go/xiaomei/xiaomei/release"
+	"github.com/spf13/cobra"
 )
 
-func Copy2Vendor(pkgDirs []string, noClobber bool) error {
+func copy2vendorCmd() *cobra.Command {
+	var n bool
+	cmd := &cobra.Command{
+		Use:   `copy2vendor <package-path> ...`,
+		Short: `copy the specified packages to vendor dir.`,
+		RunE: func(c *cobra.Command, args []string) error {
+			if len(args) <= 0 {
+				return errors.New(`need at least one package path.`)
+			}
+			return copy2Vendor(args, n)
+		},
+	}
+	cmd.Flags().BoolVarP(&n, `no-clobber`, `n`, false, `do not overwrite an existing file.`)
+	return cmd
+}
+
+func copy2Vendor(pkgDirs []string, noClobber bool) error {
 	for _, pkgDir := range pkgDirs {
 		if err := checkAndCopy(pkgDir, noClobber); err != nil {
 			return err
 		}
-		if err := Copy2Vendor(pkgDeps(pkgDir), noClobber); err != nil {
+		if err := copy2Vendor(pkgDeps(pkgDir), noClobber); err != nil {
 			return err
 		}
 	}
@@ -24,7 +42,7 @@ func Copy2Vendor(pkgDirs []string, noClobber bool) error {
 
 func checkAndCopy(pkgDir string, noClobber bool) error {
 	goPath := os.Getenv(`GOPATH`)
-	vendorDir := path.Join(config.Root(), `../vendor`)
+	vendorDir := path.Join(release.Root(), `../vendor`)
 
 	pkgSrcDir := path.Join(goPath, `src`, pkgDir)
 	// package src dir is exists

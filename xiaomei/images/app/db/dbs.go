@@ -1,41 +1,52 @@
 package db
 
 import (
-	"github.com/bughou-go/xiaomei/config"
+	"fmt"
+	"strings"
+
 	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/bughou-go/xiaomei/utils/dsn"
+	"github.com/bughou-go/xiaomei/xiaomei/cluster"
+	"github.com/bughou-go/xiaomei/xiaomei/release"
 )
 
-func Mysql(key, serverFilter string) error {
-	flags := dsn.Mysql(config.DB.Mysql(key)).Flags()
-	return run(serverFilter, `mysql`, append([]string{`--pager=less -SX`}, flags...)...)
-}
+var appConf = release.App()
 
-func MysqlDump(key, serverFilter string) error {
-	flags := dsn.Mysql(config.DB.Mysql(key)).Flags()
-	return run(serverFilter, `mysqldump`, append([]string{`-t`}, flags...)...)
-}
-
-func Mongo(key, serverFilter string) error {
-	return run(serverFilter, `mongo`, config.DB.Mongo(key))
-}
-
-func Redis(key, serverFilter string) error {
-	flags := dsn.Redis(config.DB.Redis(key)).Flags()
-	return run(serverFilter, `redis-cli`, flags...)
-}
-
-func run(filter, command string, args ...string) error {
-	if config.IsLocalEnv() {
-		_, err := cmd.Run(cmd.O{}, command, args...)
-		return err
-	}
-	servers := config.Servers.Matched2(filter, `appserver`)
-	if len(servers) == 0 {
+func Mysql(key string, printCmd bool) error {
+	flags := dsn.Mysql(appConf.DataSource(`mysql`, key)).Flags()
+	command := `mysql --pager=less -SX ` + strings.Join(flags, ` `)
+	if printCmd {
+		fmt.Println(command)
 		return nil
 	}
-	_, err := cmd.Run(cmd.O{}, `ssh`,
-		append([]string{`-t`, servers[0].SshAddr(), command}, args...)...,
-	)
-	return err
+	return cluster.Run(cmd.O{}, command)
+}
+
+func MysqlDump(key string, printCmd bool) error {
+	flags := dsn.Mysql(appConf.DataSource(`mysql`, key)).Flags()
+	command := `mysqldump -t ` + strings.Join(flags, ` `)
+	if printCmd {
+		fmt.Println(command)
+		return nil
+	}
+	return cluster.Run(cmd.O{}, command)
+}
+
+func Mongo(key string, printCmd bool) error {
+	command := `mongo ` + appConf.DataSource(`mongo`, key)
+	if printCmd {
+		fmt.Println(command)
+		return nil
+	}
+	return cluster.Run(cmd.O{}, command)
+}
+
+func Redis(key string, printCmd bool) error {
+	flags := dsn.Redis(appConf.DataSource(`redis`, key)).Flags()
+	command := `redis-cli ` + strings.Join(flags, ` `)
+	if printCmd {
+		fmt.Println(command)
+		return nil
+	}
+	return cluster.Run(cmd.O{}, command)
 }
