@@ -17,7 +17,7 @@ type imageDriver interface {
 	BuildDir() string
 	Dockerfile() string
 	RunFiles() []string
-	RunCmd() string
+	RunCmd() []string
 }
 
 func (i Image) Build() error {

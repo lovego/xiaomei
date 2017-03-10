@@ -29,6 +29,6 @@ func (i Image) RunFiles() []string {
 	}
 }
 
-func (i Image) RunCmd() string {
-	return `nginx -t && nginx`
+func (i Image) RunCmd() []string {
+	return []string{`sh`, `-c`, `nginx -t && nginx`}
 }

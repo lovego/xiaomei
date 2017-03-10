@@ -44,8 +44,8 @@ func (i Image) RunFiles() []string {
 	}
 }
 
-func (i Image) RunCmd() string {
-	return ``
+func (i Image) RunCmd() []string {
+	return nil
 }
 
 func buildBinary() error {
