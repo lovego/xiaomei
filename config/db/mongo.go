@@ -19,7 +19,7 @@ func Mongo(name string) MongoSession {
 	sess, ok := mongoSessions.m[name]
 	mongoSessions.RUnlock()
 	if !ok {
-		session, err := mgo.Dial(config.Config.DataSource(`mongo`, name))
+		session, err := mgo.Dial(config.DataSource(`mongo`, name))
 		if err != nil {
 			panic(err)
 		}
