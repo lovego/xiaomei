@@ -1,4 +1,4 @@
-package db
+package redis
 
 import (
 	"sync"
@@ -13,7 +13,7 @@ var redisConns = struct {
 	m map[string]*redis.Pool
 }{m: make(map[string]*redis.Pool)}
 
-func RedisDo(name string, work func(redis.Conn)) {
+func Do(name string, work func(redis.Conn)) {
 	redisConns.RLock()
 	redisPool := redisConns.m[name]
 	redisConns.RUnlock()
@@ -39,7 +39,7 @@ func RedisDo(name string, work func(redis.Conn)) {
 	work(conn)
 }
 
-func RedisSubscribeConn(name string) (redis.Conn, error) {
+func SubscribeConn(name string) (redis.Conn, error) {
 	return redis.DialURL(
 		config.DataSource(`redis`, name),
 		redis.DialConnectTimeout(time.Second),
