@@ -13,7 +13,7 @@ type session struct {
 	LoginTime time.Time
 }
 
-func Get() *xm.Router {
+func Routes() *xm.Router {
 	router := xm.NewRouter()
 
 	router.Get(`/`, func(req *xm.Request, res *xm.Response) {
@@ -34,10 +34,6 @@ func Get() *xm.Router {
 
 	router.Get(`/session-delete`, func(req *xm.Request, res *xm.Response) {
 		res.Session(nil)
-	})
-
-	router.Get(`/alive`, func(req *xm.Request, res *xm.Response) {
-		res.Write([]byte(`ok`))
 	})
 
 	return router

@@ -5,6 +5,7 @@ import (
 
 	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/xiaomei/images/access"
 	"github.com/bughou-go/xiaomei/xiaomei/images/app"
 	"github.com/bughou-go/xiaomei/xiaomei/images/web"
 	"github.com/bughou-go/xiaomei/xiaomei/release"
@@ -12,8 +13,9 @@ import (
 )
 
 var imagesMap = map[string]Image{
-	`app`: Image{`app`, app.Image{}},
-	`web`: Image{`web`, web.Image{}},
+	`app`:    Image{`app`, app.Image{}},
+	`web`:    Image{`web`, web.Image{}},
+	`access`: Image{`access`, access.Image{}},
 }
 
 func Run(svcName string, ports []string) error {

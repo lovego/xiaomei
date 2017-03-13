@@ -1,8 +1,6 @@
-package web
+package access
 
 import (
-	"path/filepath"
-
 	"github.com/bughou-go/xiaomei/xiaomei/release"
 )
 
@@ -14,7 +12,7 @@ func (i Image) PrepareForBuild() error {
 }
 
 func (i Image) BuildDir() string {
-	return filepath.Join(release.Root(), `img-web`)
+	return release.Root()
 }
 
 func (i Image) Dockerfile() string {
@@ -22,10 +20,8 @@ func (i Image) Dockerfile() string {
 }
 
 func (i Image) FilesForRun() []string {
-	root := filepath.Join(release.Root(), `img-web`)
 	return []string{
-		root + `/site.conf:/etc/nginx/sites-enabled/` + release.Name(),
-		root + `/public:/var/www/` + release.Name(),
+		release.App().Root() + `/sites:/etc/nginx/sites-enabled`,
 	}
 }
 

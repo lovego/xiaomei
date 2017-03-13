@@ -77,6 +77,9 @@ func (r *Router) Add(method string, p string, handler StrRouteHandler) *Router {
 	if r.strRoutes[method] == nil {
 		r.strRoutes[method] = make(map[string]StrRouteHandler)
 	}
+	if _, ok := r.strRoutes[method][p]; ok {
+		panic(`string route conflict: ` + method + ` ` + p)
+	}
 	r.strRoutes[method][p] = handler
 	return r
 }
@@ -86,9 +89,15 @@ func (r *Router) AddX(method string, reg string, handler RegRouteHandler) *Route
 	if r.regRoutes[method] == nil {
 		r.regRoutes[method] = make(map[string][]RegRoute)
 	}
-	r.regRoutes[method][r.basePath] = append(r.regRoutes[method][r.basePath], RegRoute{
-		regexp.MustCompile(`^` + reg + `$`), handler,
-	})
+	regex := `^` + reg + `$`
+	for _, regRoute := range r.regRoutes[method][r.basePath] {
+		if regRoute.reg.String() == regex {
+			panic(`regexp route conflict: ` + method + ` ` + r.basePath + reg)
+		}
+	}
+	r.regRoutes[method][r.basePath] = append(r.regRoutes[method][r.basePath],
+		RegRoute{regexp.MustCompile(regex), handler},
+	)
 	return r
 }
 

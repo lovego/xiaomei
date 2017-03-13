@@ -7,8 +7,8 @@ import (
 )
 
 type Config struct {
-	Mysql string `yaml:"mysql"`
-	Redis string `yaml:"redis"`
+	CustomKey1 string `yaml:"customKey1"`
+	CustomKey2 string `yaml:"customKey2"`
 }
 
 var data struct {

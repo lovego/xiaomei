@@ -44,6 +44,10 @@ func NewRenderer() *renderer.Renderer {
 }
 
 func (s *Server) ListenAndServe() {
+	s.Router.Get(`/alive`, func(req *xm.Request, res *xm.Response) {
+		res.Write([]byte(`ok`))
+	})
+
 	const addr = `:3000`
 	ln := listen(addr)
 	utils.Log(color.GreenString(`started. (` + addr + `)`))
