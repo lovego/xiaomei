@@ -3,6 +3,7 @@ package xm
 import (
 	"path"
 	"regexp"
+	"strings"
 )
 
 // Group 提供带basePath的路由，代码更简洁，正则匹配更高效。
@@ -70,10 +71,24 @@ func (r *Router) OptionsX(reg string, handler RegRouteHandler) *Router {
 
 // 增加字符串路由
 func (r *Router) Add(method string, p string, handler StrRouteHandler) *Router {
+	method = strings.ToUpper(method)
 	p = cleanPath(p)
 	if r.basePath != `` {
 		p = path.Join(r.basePath, p)
 	}
+	if r.strRoutes[method] == nil {
+		r.strRoutes[method] = make(map[string]StrRouteHandler)
+	}
+	if _, ok := r.strRoutes[method][p]; ok {
+		panic(`string route conflict: ` + method + ` ` + p)
+	}
+	r.strRoutes[method][p] = handler
+	return r
+}
+
+// 增加根路径字符串路由
+func (r *Router) Root(method string, p string, handler StrRouteHandler) *Router {
+	p = cleanPath(p)
 	if r.strRoutes[method] == nil {
 		r.strRoutes[method] = make(map[string]StrRouteHandler)
 	}
