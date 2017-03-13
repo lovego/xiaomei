@@ -1,4 +1,4 @@
-package db
+package mysql
 
 import (
 	"database/sql"
@@ -14,7 +14,7 @@ var mysqlConns = struct {
 	m map[string]*sql.DB
 }{m: make(map[string]*sql.DB)}
 
-func Mysql(name string) *sql.DB {
+func DB(name string) *sql.DB {
 	mysqlConns.RLock()
 	mysql := mysqlConns.m[name]
 	mysqlConns.RUnlock()

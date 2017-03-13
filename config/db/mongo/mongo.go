@@ -1,4 +1,4 @@
-package db
+package mongo
 
 import (
 	"sync"
@@ -14,7 +14,7 @@ var mongoSessions = struct {
 	m: make(map[string]MongoSession),
 }
 
-func Mongo(name string) MongoSession {
+func Session(name string) MongoSession {
 	mongoSessions.RLock()
 	sess, ok := mongoSessions.m[name]
 	mongoSessions.RUnlock()
