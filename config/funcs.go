@@ -3,6 +3,7 @@ package config
 import (
 	"time"
 
+	"github.com/bughou-go/xiaomei/config/conf"
 	"github.com/bughou-go/xiaomei/utils/mailer"
 )
 
@@ -48,4 +49,8 @@ func Keepers() []mailer.People {
 
 func DataSource(typ, key string) string {
 	return theConf.DataSource(typ, key)
+}
+
+func Parse(p interface{}) {
+	conf.Parse(p, Root(), Env())
 }

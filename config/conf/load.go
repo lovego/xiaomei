@@ -11,12 +11,16 @@ import (
 
 func New(root, env string) *Conf {
 	conf := &Conf{root: root, env: env}
-	loadFile(&conf.data, filepath.Join(conf.root, `config/config.yml`))
-	loadFile(&conf.data, filepath.Join(conf.root, `config/envs/`+env+`.yml`))
-	if os.Getenv(`debugConf`) != `` {
-		utils.PrintJson(&conf.data)
-	}
+	Parse(&conf.data, root, env)
 	return conf
+}
+
+func Parse(p interface{}, root, env string) {
+	loadFile(p, filepath.Join(root, `config/config.yml`))
+	loadFile(p, filepath.Join(root, `config/envs/`+env+`.yml`))
+	if os.Getenv(`debugConf`) != `` {
+		utils.PrintJson(p)
+	}
 }
 
 func loadFile(p interface{}, file string) {
