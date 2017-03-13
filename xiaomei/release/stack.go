@@ -20,7 +20,7 @@ type Network map[string]interface{}
 
 var theStack *Stack
 
-func GetStack() *Stack {
+func GetStack() Stack {
 	if theStack == nil {
 		content, err := ioutil.ReadFile(filepath.Join(Root(), `stack.yml`))
 		if err != nil {
@@ -32,7 +32,7 @@ func GetStack() *Stack {
 		}
 		theStack = stack
 	}
-	return theStack
+	return *theStack
 }
 
 func GetService(svcName string) Service {

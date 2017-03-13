@@ -24,16 +24,16 @@ func Deploy(svcName string, doBuild, doPush bool) error {
 			return err
 		}
 	}
-	if svcName == `` {
-		return release.EachServiceDo(deploy)
-	} else {
-		return deploy(svcName)
-	}
+	return deploy(svcName)
 }
 
 func deploy(svcName string) error {
-	utils.Log(color.GreenString(`deploying ` + svcName + ` service.`))
-	stack, err := getDeployStack(svcName)
+	if svcName == `` {
+		utils.Log(color.GreenString(`deploying all services.`))
+	} else {
+		utils.Log(color.GreenString(`deploying ` + svcName + ` service.`))
+	}
+	stackYaml, err := getDeployStack(svcName)
 	if err != nil {
 		return err
 	}
@@ -41,19 +41,18 @@ func deploy(svcName string) error {
 	if err != nil {
 		return err
 	}
-	return cluster.Run(cmd.O{Stdin: bytes.NewReader(stack)}, script)
+	return cluster.Run(cmd.O{Stdin: bytes.NewReader(stackYaml)}, script)
 }
 
 func getDeployStack(svcName string) ([]byte, error) {
 	stack := release.GetStack()
 	if svcName != `` {
-		stack.Services = map[string]release.Service{svcName: stack.Services[svcName]}
+		stack.Services = map[string]release.Service{svcName: release.GetService(svcName)}
 	}
-	for svcName, service := range stack.Services {
-		if svcName == `app` {
-			service[`environment`] = map[string]string{`GOENV`: release.Env()}
-		}
+	if app, ok := stack.Services[`app`]; ok {
+		app[`environment`] = map[string]string{`GOENV`: release.Env()}
 	}
+
 	return yaml.Marshal(stack)
 }
 
