@@ -29,8 +29,7 @@ func detectRoot() string {
 			dir = filepath.Join(dir, `release`)
 			theRoot = &dir
 		} else {
-			dir = fs.DetectDir(cwd, `stack.yml`)
-			theRoot = &dir
+			return ``
 		}
 	}
 	return *theRoot

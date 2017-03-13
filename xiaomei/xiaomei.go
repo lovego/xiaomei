@@ -4,6 +4,7 @@ import (
 	"os"
 	// "strings"
 
+	"github.com/bughou-go/xiaomei/xiaomei/images/access"
 	"github.com/bughou-go/xiaomei/xiaomei/images/app"
 	"github.com/bughou-go/xiaomei/xiaomei/images/web"
 	"github.com/bughou-go/xiaomei/xiaomei/new"
@@ -17,11 +18,13 @@ func main() {
 
 	appCmd := app.Cmd()
 	webCmd := web.Cmd()
+	accessCmd := access.Cmd()
 	appCmd.AddCommand(commonCmds(`app`)...)
 	webCmd.AddCommand(commonCmds(`web`)...)
+	accessCmd.AddCommand(commonCmds(`access`)...)
 
 	root := rootCmd()
-	root.AddCommand(appCmd, webCmd)
+	root.AddCommand(appCmd, webCmd, accessCmd)
 	root.AddCommand(commonCmds(``)...)
 	root.AddCommand(new.Cmd(), versionCmd())
 	root.Execute()

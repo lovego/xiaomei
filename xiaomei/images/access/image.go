@@ -1,6 +1,8 @@
 package access
 
 import (
+	"path/filepath"
+
 	"github.com/bughou-go/xiaomei/xiaomei/release"
 )
 
@@ -12,16 +14,21 @@ func (i Image) PrepareForBuild() error {
 }
 
 func (i Image) BuildDir() string {
-	return release.Root()
+	return filepath.Join(release.Root(), `..`)
 }
 
 func (i Image) Dockerfile() string {
 	return `Dockerfile`
 }
 
-func (i Image) FilesForRun() []string {
-	return []string{
-		release.App().Root() + `/sites:/etc/nginx/sites-enabled`,
+func (i Image) FilesForRun() (result []string) {
+	if confs, err := filepath.Glob(release.Root() + `/../*.conf`); err != nil {
+		panic(err)
+	} else {
+		for _, conf := range confs {
+			result = append(result, conf+`:/etc/nginx/sites-enabled/`+filepath.Base(conf))
+		}
+		return result
 	}
 }
 
