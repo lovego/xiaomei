@@ -25,10 +25,14 @@ func Deploy(svcName string, doBuild, doPush bool) error {
 		}
 	}
 	if svcName == `` {
-		utils.Log(color.GreenString(`deploying all services.`))
+		return release.EachServiceDo(deploy)
 	} else {
-		utils.Log(color.GreenString(`deploying ` + svcName + ` service.`))
+		return deploy(svcName)
 	}
+}
+
+func deploy(svcName string) error {
+	utils.Log(color.GreenString(`deploying ` + svcName + ` service.`))
 	stack, err := getDeployStack(svcName)
 	if err != nil {
 		return err
@@ -63,10 +67,7 @@ func getDeployScript(svcName string) (string, error) {
 	deployConf := struct {
 		Name, DirName, FileName string
 	}{
-		Name: release.Name(), DirName: release.Name() + `_` + release.Env(), FileName: `stack`,
-	}
-	if svcName != `` {
-		deployConf.FileName = svcName
+		Name: release.Name(), DirName: release.Name() + `_` + release.Env(), FileName: svcName,
 	}
 
 	tmpl := template.Must(template.New(``).Parse(deployScriptTmpl))

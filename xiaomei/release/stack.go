@@ -61,3 +61,14 @@ func PortsOf(svcName string) []string {
 	ports, _ := service[`ports`].([]string)
 	return ports
 }
+
+func EachServiceDo(work func(svcName string) error) error {
+	for svcName := range GetStack().Services {
+		if svcName != `` {
+			if err := work(svcName); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}

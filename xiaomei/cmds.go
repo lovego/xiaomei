@@ -27,8 +27,10 @@ func commonCmds(svcName string) []*cobra.Command {
 		pushCmd(svcName, target, s),
 		deployCmd(svcName, target, s),
 		psCmd(svcName, target, s),
-		accessCmd(svcName, target),
 	)
+	if svcName != `access` {
+		cmds = append(cmds, accessCmd(svcName, target))
+	}
 	return cmds
 }
 
@@ -91,7 +93,7 @@ func psCmd(svcName, target, s string) *cobra.Command {
 
 func accessCmd(svcName, target string) *cobra.Command {
 	return &cobra.Command{
-		Use:   `access`,
+		Use:   `access-conf`,
 		Short: fmt.Sprintf(`print access config for %s service.`, target),
 		RunE: z.NoArgCall(func() error {
 			return access.PrintConfig(svcName)

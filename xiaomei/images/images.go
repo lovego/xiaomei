@@ -28,7 +28,7 @@ func Run(svcName string, ports []string) error {
 
 func Build(svcName string) error {
 	if svcName == `` {
-		return eachServiceDo(Build)
+		return release.EachServiceDo(Build)
 	}
 	image, ok := imagesMap[svcName]
 	if !ok {
@@ -39,20 +39,9 @@ func Build(svcName string) error {
 
 func Push(svcName string) error {
 	if svcName == `` {
-		return eachServiceDo(Push)
+		return release.EachServiceDo(Push)
 	}
 	utils.Log(color.GreenString(`pushing ` + svcName + ` image.`))
 	_, err := cmd.Run(cmd.O{}, `docker`, `push`, release.ImageNameOf(svcName))
 	return err
-}
-
-func eachServiceDo(work func(svcName string) error) error {
-	for svcName := range release.GetStack().Services {
-		if svcName != `` {
-			if err := work(svcName); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
 }
