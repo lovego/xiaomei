@@ -7,14 +7,20 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/fatih/color"
 )
+
+func init() {
+	go handleSignals()
+}
 
 func main() {
 	waitBackends()
@@ -114,4 +120,12 @@ func parseBackendAddr(line string) (addr string) {
 		addr += `:http`
 	}
 	return
+}
+
+func handleSignals() {
+	c := make(chan os.Signal, 10)
+	signal.Notify(c, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
+	s := <-c
+	println(` killed by ` + s.String() + ` signal.`)
+	os.Exit(0)
 }
