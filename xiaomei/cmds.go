@@ -81,8 +81,8 @@ func psCmd(svcName, target, s string) *cobra.Command {
 	return &cobra.Command{
 		Use:   `ps`,
 		Short: fmt.Sprintf(`list tasks of %s service%s.`, target, s),
-		RunE: z.NoArgCall(func() error {
-			return stack.Ps(svcName)
-		}),
+		RunE: func(c *cobra.Command, args []string) error {
+			return stack.Ps(svcName, args)
+		},
 	}
 }

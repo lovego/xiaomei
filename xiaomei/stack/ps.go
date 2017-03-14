@@ -2,18 +2,23 @@ package stack
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/bughou-go/xiaomei/xiaomei/cluster"
 	"github.com/bughou-go/xiaomei/xiaomei/release"
 )
 
-func Ps(svcName string) error {
-	var typ, name string
+func Ps(svcName string, options []string) error {
+	var script string
 	if svcName != `` {
-		typ, name = `service`, release.Name()+`_`+svcName
+		script = fmt.Sprintf(`docker service ps %s_%s`, release.Name(), svcName)
 	} else {
-		typ, name = `stack`, release.Name()
+		script = fmt.Sprintf(`docker stack ps %s`, release.Name())
 	}
-	return cluster.Run(cmd.O{}, fmt.Sprintf(`docker %s ps --no-trunc %s`, typ, name))
+	if len(options) > 0 {
+		script += ` ` + strings.Join(options, ` `)
+	}
+
+	return cluster.Run(cmd.O{}, script)
 }
