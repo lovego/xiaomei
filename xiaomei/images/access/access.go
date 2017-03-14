@@ -8,19 +8,18 @@ import (
 	"github.com/bughou-go/xiaomei/xiaomei/release"
 )
 
-func PrintConfig(svcName string) error {
+func Config() (string, error) {
 	var buf bytes.Buffer
 	if err := template.Must(template.New(``).Parse(configTmpl)).Execute(&buf, struct {
 		ServerNames, BackendAddr, ProName string
 	}{
 		ServerNames: getServerNames(),
-		BackendAddr: getBackendAddr(svcName),
+		BackendAddr: getBackendAddr(),
 		ProName:     release.Name(),
 	}); err != nil {
-		return err
+		return ``, err
 	}
-	println(buf.String())
-	return nil
+	return buf.String(), nil
 }
 
 func getServerNames() string {
@@ -31,8 +30,8 @@ func getServerNames() string {
 	return strings.Join(result, ` `)
 }
 
-func getBackendAddr(svcName string) string {
-	svcName = accessSvcName(svcName)
+func getBackendAddr() string {
+	svcName := accessSvcName()
 	if ports := release.PortsOf(svcName); len(ports) > 0 {
 		port := ports[0]
 		port = port[0:strings.IndexByte(port, ':')]
@@ -48,10 +47,7 @@ func getBackendAddr(svcName string) string {
 	}
 }
 
-func accessSvcName(svcName string) string {
-	if svcName != `` {
-		return svcName
-	}
+func accessSvcName() string {
 	stack := release.GetStack()
 	if stack.Services[`web`] != nil {
 		return `web`

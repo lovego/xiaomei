@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/bughou-go/xiaomei/xiaomei/images"
-	"github.com/bughou-go/xiaomei/xiaomei/images/access"
 	"github.com/bughou-go/xiaomei/xiaomei/stack"
 	"github.com/bughou-go/xiaomei/xiaomei/z"
 	"github.com/spf13/cobra"
@@ -28,9 +27,6 @@ func commonCmds(svcName string) []*cobra.Command {
 		deployCmd(svcName, target, s),
 		psCmd(svcName, target, s),
 	)
-	if svcName != `access` {
-		cmds = append(cmds, accessCmd(svcName, target))
-	}
 	return cmds
 }
 
@@ -87,16 +83,6 @@ func psCmd(svcName, target, s string) *cobra.Command {
 		Short: fmt.Sprintf(`list tasks of %s service%s.`, target, s),
 		RunE: z.NoArgCall(func() error {
 			return stack.Ps(svcName)
-		}),
-	}
-}
-
-func accessCmd(svcName, target string) *cobra.Command {
-	return &cobra.Command{
-		Use:   `access-conf`,
-		Short: fmt.Sprintf(`print access config for %s service.`, target),
-		RunE: z.NoArgCall(func() error {
-			return access.PrintConfig(svcName)
 		}),
 	}
 }
