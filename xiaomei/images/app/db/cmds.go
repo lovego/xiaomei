@@ -10,6 +10,7 @@ func Cmds() []*cobra.Command {
 		makeCmd(`mysqldump`, `dump mysql (you can redirect to a file if you need)`, MysqlDump),
 		makeCmd(`mongo`, `enter mongo cli`, Mongo),
 		makeCmd(`redis`, `enter redis cli`, Redis),
+		setupCmd(),
 	}
 }
 
