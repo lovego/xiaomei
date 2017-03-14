@@ -30,3 +30,15 @@ func (c Cluster) SshAddr() string {
 	m := c.Managers[0]
 	return m.SshAddr()
 }
+
+func (c Cluster) List() ([]string, []string) {
+	ms := []string{}
+	for _, m := range c.Managers {
+		ms = append(ms, m.SshAddr())
+	}
+	ws := []string{}
+	for _, w := range c.Workers {
+		ws = append(ws, w.SshAddr())
+	}
+	return ms, ws
+}
