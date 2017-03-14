@@ -2,6 +2,7 @@ package release
 
 import (
 	"os"
+	"path"
 	"path/filepath"
 
 	"github.com/bughou-go/xiaomei/utils/fs"
@@ -33,4 +34,30 @@ func detectRoot() string {
 		}
 	}
 	return *theRoot
+}
+
+// package go path
+func Path() string {
+	proDir := path.Join(Root(), `../`)
+
+	if !filepath.IsAbs(proDir) {
+		var err error
+		if proDir, err = filepath.Abs(proDir); err != nil {
+			panic(err)
+		}
+	}
+
+	srcPath, err := fs.GetGoSrcPath()
+	if err != nil {
+		panic(err)
+	}
+
+	proPath, err := filepath.Rel(srcPath, proDir)
+	if err != nil {
+		panic(err)
+	}
+	if proPath[0] == '.' {
+		panic(`project dir must be under ` + srcPath + "\n")
+	}
+	return proPath
 }

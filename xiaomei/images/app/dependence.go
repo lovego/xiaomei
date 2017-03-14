@@ -1,16 +1,21 @@
 package app
 
 import (
+	"fmt"
+	"path"
 	"strings"
 
 	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/utils/fs"
+	"github.com/bughou-go/xiaomei/utils/slice"
+	"github.com/bughou-go/xiaomei/xiaomei/release"
 	"github.com/spf13/cobra"
 )
 
 func DepsCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `deps`,
-		Short: `list all dependence packages.`,
+		Short: "list dependence packages.",
 		Run: func(c *cobra.Command, args []string) {
 			listDeps()
 		},
@@ -19,13 +24,72 @@ func DepsCmd() *cobra.Command {
 }
 
 func listDeps() {
-	deps, _ := cmd.Run(cmd.O{Output: true}, `go`, `list`, `-e`, `-f`, `'{{join .Deps "\n" }}'`)
+	deps := getAllDeps()
+	vendorDeps := []string{}
+	notVendorDeps := []string{}
+	for _, dep := range deps {
+		i := strings.Index(dep, `vendor/`)
+		if i > -1 {
+			vendorDeps = append(vendorDeps, dep[i+7:]) // 7 = len(`vendor/`)
+		} else {
+			notVendorDeps = append(notVendorDeps, dep)
+		}
+	}
+	cmd.Run(cmd.O{}, `echo`, fmt.Sprintf("\ndependece in vendor:\n%s", strings.Join(vendorDeps, "\n")))
+	cmd.Run(cmd.O{}, `echo`, fmt.Sprintf("\ndependece not in vendor:\n%s", strings.Join(notVendorDeps, "\n")))
+}
+
+func getAllDeps() []string {
+	projectDir := path.Join(release.Root(), `../`)
+	return getDirDeps(projectDir)
+}
+
+var already = make(map[string]bool)
+
+func getDirDeps(dir string) []string {
+	if already[dir] {
+		return []string{}
+	}
+	goSrcPath, err := fs.GetGoSrcPath()
+	if err != nil {
+		panic(err)
+	}
+	result, _ := cmd.Run(cmd.O{Output: true, Dir: dir}, `go`, `list`, `-e`, `-f`, `{{join .Imports "\n"}}`)
+	already[dir] = true
+	deps := filterStandard(strings.Split(result, "\n"))
+	for _, depPath := range deps {
+		if strings.HasPrefix(depPath, release.Path()) {
+			childDeps := filterStandard(getDirDeps(path.Join(goSrcPath, depPath)))
+			for _, childDep := range childDeps {
+				if !slice.ContainsString(deps, childDep) {
+					deps = append(deps, childDep)
+				}
+			}
+		}
+	}
+	return filterDeps(deps)
+}
+
+// 过滤xiaomei和项目内的包
+func filterDeps(deps []string) []string {
 	pkgs := []string{}
-	for _, dep := range strings.Split(deps, "\n") {
-		if strings.Contains(dep, `.`) &&
-			!strings.HasPrefix(dep, `github.com/bughou-go/xiaomei`) {
+	for _, dep := range deps {
+		if strings.HasPrefix(dep, path.Join(release.Path(), `vendor`)) ||
+			!strings.HasPrefix(dep, `github.com/bughou-go/xiaomei`) &&
+				!strings.HasPrefix(dep, release.Path()) {
 			pkgs = append(pkgs, dep)
 		}
 	}
-	cmd.Run(cmd.O{}, `echo`, strings.Join(pkgs, "\n"))
+	return pkgs
+}
+
+// 过滤标准库的包
+func filterStandard(deps []string) []string {
+	pkgs := []string{}
+	for _, dep := range deps {
+		if strings.Contains(dep, `.`) {
+			pkgs = append(pkgs, dep)
+		}
+	}
+	return pkgs
 }
