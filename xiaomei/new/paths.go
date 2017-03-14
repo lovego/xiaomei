@@ -2,12 +2,13 @@ package new
 
 import (
 	"errors"
-	"os"
 	"path/filepath"
+
+	"github.com/bughou-go/xiaomei/utils/fs"
 )
 
 func getTmplDir(isAccess bool) (string, error) {
-	srcPath, err := getGoSrcPath()
+	srcPath, err := fs.GetGoSrcPath()
 	if err != nil {
 		return ``, err
 	}
@@ -31,7 +32,7 @@ func getProjectPath(proDir string) (string, error) {
 		}
 	}
 
-	srcPath, err := getGoSrcPath()
+	srcPath, err := fs.GetGoSrcPath()
 	if err != nil {
 		return ``, err
 	}
@@ -44,12 +45,4 @@ func getProjectPath(proDir string) (string, error) {
 		return ``, errors.New(`project dir must be under ` + srcPath + "\n")
 	}
 	return proPath, nil
-}
-
-func getGoSrcPath() (string, error) {
-	gopath := os.Getenv(`GOPATH`)
-	if gopath == `` {
-		return ``, errors.New(`empty env variable GOPATH.`)
-	}
-	return filepath.Join(gopath, `src`), nil
 }

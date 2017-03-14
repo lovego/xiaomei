@@ -1,6 +1,7 @@
 package fs
 
 import (
+	"errors"
 	"io"
 	"os"
 	"path/filepath"
@@ -42,4 +43,12 @@ func DetectDir(dir, feature string) string {
 		}
 	}
 	return ``
+}
+
+func GetGoSrcPath() (string, error) {
+	gopath := os.Getenv(`GOPATH`)
+	if gopath == `` {
+		return ``, errors.New(`empty env variable GOPATH.`)
+	}
+	return filepath.Join(gopath, `src`), nil
 }
