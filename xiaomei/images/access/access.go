@@ -2,29 +2,50 @@ package access
 
 import (
 	"bytes"
+	"strings"
 	"text/template"
 
 	"github.com/bughou-go/xiaomei/xiaomei/release"
 )
 
 func PrintConfig(svcName string) error {
-	svcName = accessSvcName(svcName)
-	data := struct {
-		ProName, SvcName, BackendPort string
-	}{ProName: release.Name(), SvcName: release.Name() + `_` + svcName}
-	switch svcName {
-	case `app`:
-		data.BackendPort = `3000`
-	case `web`:
-		data.BackendPort = `80`
-	}
-	tmpl := template.Must(template.New(``).Parse(configTmpl))
 	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, data); err != nil {
+	if err := template.Must(template.New(``).Parse(configTmpl)).Execute(&buf, struct {
+		ServerNames, BackendAddr, ProName string
+	}{
+		ServerNames: getServerNames(),
+		BackendAddr: getBackendAddr(svcName),
+		ProName:     release.Name(),
+	}); err != nil {
 		return err
 	}
 	println(buf.String())
 	return nil
+}
+
+func getServerNames() string {
+	result := []string{}
+	for _, env := range release.Envs() {
+		result = append(result, release.AppIn(env).Domain())
+	}
+	return strings.Join(result, ` `)
+}
+
+func getBackendAddr(svcName string) string {
+	svcName = accessSvcName(svcName)
+	if ports := release.PortsOf(svcName); len(ports) > 0 {
+		port := ports[0]
+		port = port[0:strings.IndexByte(port, ':')]
+		return `127.0.0.1:` + port
+	}
+	switch svcName {
+	case `app`:
+		return release.Name() + `_app:3000`
+	case `web`:
+		return release.Name() + `_web:80`
+	default:
+		panic(`unexpected svcName: ` + svcName)
+	}
 }
 
 func accessSvcName(svcName string) string {
@@ -44,9 +65,10 @@ func accessSvcName(svcName string) string {
 const configTmpl = `
 server {
   listen 80;
+  server_name {{ .ServerNames }};
 
   location / {
-    proxy_pass   http://{{ .SvcName }}:{{ .BackendPort }};
+    proxy_pass   http://{{ .BackendAddr }};
     include proxy_params;
   }
 

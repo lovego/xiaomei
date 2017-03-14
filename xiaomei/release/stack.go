@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -56,9 +57,23 @@ func ImageNameOf(svcName string) string {
 	}
 }
 
-func PortsOf(svcName string) []string {
+func PortsOf(svcName string) (ports []string) {
 	service := GetService(svcName)
-	ports, _ := service[`ports`].([]string)
+	iports, _ := service[`ports`].([]interface{})
+	for i, iport := range iports {
+		if port, ok := iport.(string); ok {
+			if index := strings.IndexByte(port, ':'); index < 0 {
+				panic(fmt.Sprintf(
+					`stack.yml: services.%s.ports: random host port is not allowed: %s.`, svcName, port,
+				))
+			}
+			ports = append(ports, port)
+		} else {
+			panic(fmt.Sprintf(
+				`stack.yml: services.%s.ports[%d]: should be a string, got: %s.`, svcName, i, iport,
+			))
+		}
+	}
 	return ports
 }
 

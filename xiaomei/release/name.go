@@ -27,3 +27,7 @@ func App() *conf.Conf {
 	}
 	return appConf
 }
+
+func AppIn(env string) *conf.Conf {
+	return conf.New(filepath.Join(Root(), `img-app`), env)
+}
