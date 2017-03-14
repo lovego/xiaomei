@@ -15,7 +15,7 @@ import (
 func DepsCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `deps`,
-		Short: "list dependence packages.\ndefault list the lack of dependence.",
+		Short: "list dependence packages.",
 		Run: func(c *cobra.Command, args []string) {
 			listDeps()
 		},
