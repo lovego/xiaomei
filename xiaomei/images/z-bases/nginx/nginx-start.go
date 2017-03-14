@@ -12,6 +12,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/fatih/color"
 )
 
 func main() {
@@ -27,6 +29,7 @@ func main() {
 func waitBackends() {
 	start := time.Now()
 	backends := getBackends()
+	fmt.Printf("%d backends: %s.\n", len(backends), strings.Join(backends, `, `))
 	var wg sync.WaitGroup
 	for _, addr := range backends {
 		wg.Add(1)
@@ -36,7 +39,9 @@ func waitBackends() {
 		}(addr)
 	}
 	wg.Wait()
-	fmt.Printf("all %d backends ready(%ds).\n", len(backends), time.Since(start)/time.Second)
+	duration := time.Since(start)
+	duration -= duration % time.Second
+	color.New(color.FgGreen).Printf("%d backends: all ready in %s.\n\n", len(backends), duration)
 }
 
 var debug = os.Getenv(`debug`) != ``
@@ -55,11 +60,13 @@ func waitTcpReady(addr string) {
 			sleep += sleep / 10
 		}
 	}
-	fmt.Printf("%s ready(%ds).\n", addr, time.Since(start)/time.Second)
+	duration := time.Since(start)
+	duration -= duration % time.Second
+	fmt.Printf("%s ready in %s.\n", addr, duration)
 }
 
 func getBackends() (result []string) {
-	if paths, err := filepath.Glob(`/etc/nginx/sites-enabled/*.conf`); err != nil {
+	if paths, err := filepath.Glob(`/etc/nginx/sites-enabled/*`); err != nil {
 		panic(err)
 	} else {
 		for _, p := range paths {

@@ -2,5 +2,5 @@
 
 set -e
 cd $(dirname $0)
-test -x ./nginx-start || go build nginx-start.go
+test nginx-start.go -nt nginx-start && go build nginx-start.go
 docker build -t 192.168.202.12:5000/xiaomei/nginx .

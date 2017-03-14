@@ -34,5 +34,5 @@ func (i Image) EnvForRun() []string {
 }
 
 func (i Image) CmdForRun() []string {
-	return []string{`sh`, `-c`, `nginx -t && nginx`}
+	return nil
 }
