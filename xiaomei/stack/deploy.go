@@ -13,18 +13,21 @@ import (
 	"github.com/fatih/color"
 )
 
-func Deploy(svcName string, doBuild, doPush bool) error {
-	if doBuild {
+func Deploy(svcName string, noBuild, noPush bool) error {
+	if !noBuild {
 		if err := images.Build(svcName); err != nil {
 			return err
 		}
 	}
-	if doPush {
+	if !noPush {
 		if err := images.Push(svcName); err != nil {
 			return err
 		}
 	}
-	return deploy(svcName)
+	if err := deploy(svcName); err != nil {
+		return err
+	}
+	return Ps(svcName, nil)
 }
 
 func deploy(svcName string) error {
