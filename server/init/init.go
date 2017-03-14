@@ -12,13 +12,13 @@ import (
 
 func init() {
 	utils.Log(`starting.`)
-	go logSignals()
+	go handleSignals()
 }
 
-func logSignals() {
+func handleSignals() {
 	c := make(chan os.Signal, 10)
 	signal.Notify(c, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
 	s := <-c
-	println(`stopped. (` + s.String() + `)`)
+	println(` killed by ` + s.String() + ` signal.`)
 	os.Exit(0)
 }
