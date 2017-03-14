@@ -7,7 +7,8 @@ RUN apt-get update \
     /etc/nginx/sites-available/default
 
 COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx-start /usr/local/bin/
 
-CMD ["nginx"]
+CMD ["nginx-start"]
 EXPOSE 80 443
 
