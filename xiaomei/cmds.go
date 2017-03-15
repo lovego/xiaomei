@@ -26,6 +26,7 @@ func commonCmds(svcName string) []*cobra.Command {
 		pushCmd(svcName, target, s),
 		deployCmd(svcName, target, s),
 		psCmd(svcName, target, s),
+		logsCmd(svcName, target, s),
 	)
 	return cmds
 }
@@ -87,5 +88,18 @@ func psCmd(svcName, target, s string) *cobra.Command {
 		},
 	}
 	cmd.Flags().BoolVarP(&watch, `watch`, `w`, false, `watch ps.`)
+	return cmd
+}
+
+func logsCmd(svcName, target, s string) *cobra.Command {
+	var all bool
+	cmd := &cobra.Command{
+		Use:   `logs`,
+		Short: fmt.Sprintf(`list logs of %s service%s.`, target, s),
+		RunE: func(c *cobra.Command, args []string) error {
+			return stack.Logs(svcName, all)
+		},
+	}
+	cmd.Flags().BoolVarP(&all, `all`, `a`, false, `all logs.`)
 	return cmd
 }

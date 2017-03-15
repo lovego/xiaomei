@@ -41,12 +41,16 @@ func shellCmd() *cobra.Command {
 
 func lsClusters() error {
 	managers, workers := release.GetCluster().List()
-	cmd.Run(cmd.O{}, `echo`, fmt.Sprintf("\ncluster managers:\n%s", strings.Join(managers, "\n")))
-	cmd.Run(cmd.O{}, `echo`, fmt.Sprintf("\ncluster workers:\n%s", strings.Join(workers, "\n")))
+	cmd.Run(cmd.O{}, `echo`, fmt.Sprintf("managers: %s", strings.Join(managers, "\t")))
+	cmd.Run(cmd.O{}, `echo`, fmt.Sprintf("workers: %s", strings.Join(workers, "\t")))
 	return nil
 }
 
 func Run(o cmd.O, script string) error {
 	_, err := cmd.SshRun(o, release.GetCluster().SshAddr(), script)
 	return err
+}
+
+func SshRun(o cmd.O, script string) (string, error) {
+	return cmd.SshRun(o, release.GetCluster().SshAddr(), script)
 }
