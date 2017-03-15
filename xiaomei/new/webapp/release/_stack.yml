@@ -9,6 +9,7 @@ services:
     image: 192.168.202.12:5000/{{ .Domain }}/web
     depends_on: [ app ]
     deploy:
+      ports: [ "8001:80" ]
       mode: global
       placement: { constraints: [ hasAccess==true ] }
     volumes: ["logs:/var/log/nginx"]

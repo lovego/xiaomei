@@ -43,8 +43,10 @@ func NewRenderer() *renderer.Renderer {
 	)
 }
 
+const alivePath = `/_alive`
+
 func (s *Server) ListenAndServe() {
-	s.Router.Root(`GET`, `/_alive`, func(req *xm.Request, res *xm.Response) {
+	s.Router.Root(`GET`, alivePath, func(req *xm.Request, res *xm.Response) {
 		res.Write([]byte(`ok`))
 	})
 
@@ -68,7 +70,7 @@ func (s *Server) Handler() http.Handler {
 			defer handleError(time.Now(), req, res, &notFound)
 
 			// 如果返回true，继续交给路由处理
-			if req.Request.URL.Path == `/_alive` || s.FilterFunc == nil || s.FilterFunc(req, res) {
+			if req.Request.URL.Path == alivePath || s.FilterFunc == nil || s.FilterFunc(req, res) {
 				notFound = !s.Router.Handle(req, res)
 			}
 		})

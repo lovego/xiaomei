@@ -16,6 +16,9 @@ func handleError(t time.Time, req *xm.Request, res *xm.Response, notFound *bool)
 	if err != nil {
 		handleServerError(req, res)
 	}
+	if err == nil && req.URL.Path == alivePath {
+		return
+	}
 	log := writeLog(req, res, t, err)
 	if err != nil {
 		go config.Alarm(`500错误`, string(log))

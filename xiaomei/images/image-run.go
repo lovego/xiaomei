@@ -12,7 +12,7 @@ func (i Image) Run(publish []string) error {
 	if err := i.prepareForRun(); err != nil {
 		return err
 	}
-	args := []string{`run`, `-it`, `--rm`, `--no-healthcheck`,
+	args := []string{`run`, `-it`, `--rm`,
 		`--name=` + release.Name() + `_` + i.svcName, `--network=` + i.networkNameForRun(),
 	}
 	if pubs, err := i.publishForRun(publish); err == nil {
