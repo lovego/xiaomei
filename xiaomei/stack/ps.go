@@ -9,7 +9,7 @@ import (
 	"github.com/bughou-go/xiaomei/xiaomei/release"
 )
 
-func Ps(svcName string, options []string) error {
+func Ps(svcName string, options []string, watch bool) error {
 	var script string
 	if svcName != `` {
 		script = fmt.Sprintf(`docker service ps %s_%s`, release.Name(), svcName)
@@ -18,6 +18,9 @@ func Ps(svcName string, options []string) error {
 	}
 	if len(options) > 0 {
 		script += ` ` + strings.Join(options, ` `)
+	}
+	if watch {
+		script = `watch ` + script
 	}
 
 	return cluster.Run(cmd.O{}, script)

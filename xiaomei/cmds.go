@@ -78,11 +78,14 @@ func deployCmd(svcName, target, s string) *cobra.Command {
 }
 
 func psCmd(svcName, target, s string) *cobra.Command {
-	return &cobra.Command{
+	var watch bool
+	cmd := &cobra.Command{
 		Use:   `ps`,
 		Short: fmt.Sprintf(`list tasks of %s service%s.`, target, s),
 		RunE: func(c *cobra.Command, args []string) error {
-			return stack.Ps(svcName, args)
+			return stack.Ps(svcName, args, watch)
 		},
 	}
+	cmd.Flags().BoolVarP(&watch, `watch`, `w`, false, `watch ps.`)
+	return cmd
 }

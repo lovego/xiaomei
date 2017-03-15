@@ -27,7 +27,7 @@ func Deploy(svcName string, noBuild, noPush bool) error {
 	if err := deploy(svcName); err != nil {
 		return err
 	}
-	return Ps(svcName, nil)
+	return Ps(svcName, nil, true)
 }
 
 func deploy(svcName string) error {
