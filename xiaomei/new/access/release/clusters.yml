@@ -1,5 +1,8 @@
 dev:
   user: ubuntu
   managers:
-    - addr: 127.0.0.1
+    - { addr: 127.0.0.1, labels: [ hasAccess=true ] }
   workers:
+qa:
+production:
+
