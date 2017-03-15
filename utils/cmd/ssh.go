@@ -18,7 +18,7 @@ func SshRun(o O, addr, shellScript string) (string, error) {
 	if isLocal {
 		return Run(o, `bash`, `-c`, shellScript)
 	} else {
-		return Run(o, `ssh`, addr, shellScript)
+		return Run(o, `ssh`, `-t`, addr, shellScript)
 	}
 }
 
