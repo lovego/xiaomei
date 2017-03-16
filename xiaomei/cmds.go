@@ -70,7 +70,17 @@ func deployCmd(svcName, target, s string) *cobra.Command {
 		Use:   `deploy`,
 		Short: fmt.Sprintf(`deploy %s service%s.`, target, s),
 		RunE: z.NoArgCall(func() error {
-			return stack.Deploy(svcName, noBuild, noPush)
+			if !noBuild {
+				if err := images.Build(svcName); err != nil {
+					return err
+				}
+			}
+			if !noPush {
+				if err := images.Push(svcName); err != nil {
+					return err
+				}
+			}
+			return stack.Deploy(svcName)
 		}),
 	}
 	cmd.Flags().BoolVarP(&noBuild, `no-build`, `B`, false, fmt.Sprintf(`do not build the image%s.`, s))
@@ -84,7 +94,7 @@ func psCmd(svcName, target, s string) *cobra.Command {
 		Use:   `ps`,
 		Short: fmt.Sprintf(`list tasks of %s service%s.`, target, s),
 		RunE: func(c *cobra.Command, args []string) error {
-			return stack.Ps(svcName, args, watch)
+			return stack.Ps(svcName, watch, args)
 		},
 	}
 	cmd.Flags().BoolVarP(&watch, `watch`, `w`, false, `watch ps.`)

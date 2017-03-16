@@ -1,56 +1,48 @@
 package cluster
 
 import (
-	"fmt"
-	"strings"
-
-	"github.com/bughou-go/xiaomei/utils/cmd"
 	"github.com/bughou-go/xiaomei/xiaomei/release"
-	"github.com/bughou-go/xiaomei/xiaomei/z"
-	"github.com/spf13/cobra"
 )
 
-func Cmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   `cluster`,
-		Short: `cluster operations.`,
+func GetCluster() Cluster {
+	cluster, ok := GetClusters()[release.Env()]
+	if !ok {
+		panic(`empty cluster config for env: ` + release.Env())
 	}
-	cmd.AddCommand(lsCmd(), shellCmd())
-	return cmd
+	return cluster
 }
 
-func lsCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   `ls`,
-		Short: `list all clusters.`,
-		RunE: z.NoArgCall(func() error {
-			return lsClusters()
-		}),
-	}
+type Cluster struct {
+	User     string `yaml:"user"`
+	Managers []Node `yaml:"managers"`
+	Workers  []Node `yaml:"workers"`
 }
 
-func shellCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   `shell`,
-		Short: `ssh into a manager of cluster.`,
-		RunE: z.NoArgCall(func() error {
-			return Run(cmd.O{}, ``)
-		}),
+func (c *Cluster) setNodesUser() {
+	for i := range c.Managers {
+		c.Managers[i].user = c.User
+	}
+	for i := range c.Workers {
+		c.Workers[i].user = c.User
 	}
 }
 
-func lsClusters() error {
-	managers, workers := release.GetCluster().List()
-	cmd.Run(cmd.O{}, `echo`, fmt.Sprintf("managers: %s", strings.Join(managers, "\t")))
-	cmd.Run(cmd.O{}, `echo`, fmt.Sprintf("workers: %s", strings.Join(workers, "\t")))
-	return nil
+func (c Cluster) SshAddr() string {
+	if len(c.Managers) == 0 {
+		panic(`the cluster have no managers.`)
+	}
+	m := c.Managers[0]
+	return m.SshAddr()
 }
 
-func Run(o cmd.O, script string) error {
-	_, err := cmd.SshRun(o, release.GetCluster().SshAddr(), script)
-	return err
-}
-
-func SshRun(o cmd.O, script string) (string, error) {
-	return cmd.SshRun(o, release.GetCluster().SshAddr(), script)
+func (c Cluster) List() ([]string, []string) {
+	ms := []string{}
+	for _, m := range c.Managers {
+		ms = append(ms, m.SshAddr())
+	}
+	ws := []string{}
+	for _, w := range c.Workers {
+		ws = append(ws, w.SshAddr())
+	}
+	return ms, ws
 }

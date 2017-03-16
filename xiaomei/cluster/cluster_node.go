@@ -1,4 +1,4 @@
-package release
+package cluster
 
 type Node struct {
 	user       string

@@ -1,4 +1,4 @@
-package release
+package stack
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/bughou-go/xiaomei/xiaomei/release"
 	"gopkg.in/yaml.v2"
 )
 
@@ -23,7 +24,7 @@ var theStack *Stack
 
 func GetStack() Stack {
 	if theStack == nil {
-		content, err := ioutil.ReadFile(filepath.Join(Root(), `stack.yml`))
+		content, err := ioutil.ReadFile(filepath.Join(release.Root(), `stack.yml`))
 		if err != nil {
 			panic(err)
 		}

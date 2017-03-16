@@ -3,7 +3,7 @@ package images
 import (
 	"github.com/bughou-go/xiaomei/utils"
 	"github.com/bughou-go/xiaomei/utils/cmd"
-	"github.com/bughou-go/xiaomei/xiaomei/release"
+	"github.com/bughou-go/xiaomei/xiaomei/stack"
 	"github.com/fatih/color"
 )
 
@@ -27,7 +27,7 @@ func (i Image) Build() error {
 	}
 	utils.Log(color.GreenString(`building ` + i.svcName + ` image.`))
 	_, err := cmd.Run(cmd.O{Dir: i.BuildDir()}, `docker`, `build`,
-		`--file=`+i.Dockerfile(), `--tag=`+release.ImageNameOf(i.svcName), `.`,
+		`--file=`+i.Dockerfile(), `--tag=`+stack.ImageNameOf(i.svcName), `.`,
 	)
 	return err
 }

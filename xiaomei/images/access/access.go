@@ -5,7 +5,9 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/bughou-go/xiaomei/xiaomei/cluster"
 	"github.com/bughou-go/xiaomei/xiaomei/release"
+	"github.com/bughou-go/xiaomei/xiaomei/stack"
 )
 
 func Config() (string, error) {
@@ -24,7 +26,7 @@ func Config() (string, error) {
 
 func getServerNames() string {
 	result := []string{}
-	for _, env := range release.Envs() {
+	for _, env := range cluster.Envs() {
 		result = append(result, release.AppIn(env).Domain())
 	}
 	return strings.Join(result, ` `)
@@ -32,7 +34,7 @@ func getServerNames() string {
 
 func getBackendAddr() string {
 	svcName := accessSvcName()
-	if ports := release.PortsOf(svcName); len(ports) > 0 {
+	if ports := stack.PortsOf(svcName); len(ports) > 0 {
 		port := ports[0]
 		port = port[0:strings.IndexByte(port, ':')]
 		return `127.0.0.1:` + port
@@ -48,7 +50,7 @@ func getBackendAddr() string {
 }
 
 func accessSvcName() string {
-	stack := release.GetStack()
+	stack := stack.GetStack()
 	if stack.Services[`web`] != nil {
 		return `web`
 	}

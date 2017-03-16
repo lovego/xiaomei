@@ -10,7 +10,7 @@ import (
 )
 
 func Logs(svcName string, all bool) error {
-	ms, ws := release.GetCluster().List()
+	ms, ws := cluster.GetCluster().List()
 	if len(ms) == 0 && len(ws) == 0 {
 		return nil
 	}

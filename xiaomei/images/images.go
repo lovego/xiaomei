@@ -8,7 +8,7 @@ import (
 	"github.com/bughou-go/xiaomei/xiaomei/images/access"
 	"github.com/bughou-go/xiaomei/xiaomei/images/app"
 	"github.com/bughou-go/xiaomei/xiaomei/images/web"
-	"github.com/bughou-go/xiaomei/xiaomei/release"
+	"github.com/bughou-go/xiaomei/xiaomei/stack"
 	"github.com/fatih/color"
 )
 
@@ -28,7 +28,7 @@ func Run(svcName string, ports []string) error {
 
 func Build(svcName string) error {
 	if svcName == `` {
-		return release.EachServiceDo(Build)
+		return stack.EachServiceDo(Build)
 	}
 	image, ok := imagesMap[svcName]
 	if !ok {
@@ -39,9 +39,9 @@ func Build(svcName string) error {
 
 func Push(svcName string) error {
 	if svcName == `` {
-		return release.EachServiceDo(Push)
+		return stack.EachServiceDo(Push)
 	}
 	utils.Log(color.GreenString(`pushing ` + svcName + ` image.`))
-	_, err := cmd.Run(cmd.O{}, `docker`, `push`, release.ImageNameOf(svcName))
+	_, err := cmd.Run(cmd.O{}, `docker`, `push`, stack.ImageNameOf(svcName))
 	return err
 }
