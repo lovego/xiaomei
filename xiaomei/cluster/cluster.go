@@ -1,8 +1,36 @@
 package cluster
 
 import (
+	"strings"
+
+	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/bughou-go/xiaomei/utils/slice"
 	"github.com/bughou-go/xiaomei/xiaomei/release"
 )
+
+func Run(o cmd.O, script string) (string, error) {
+	return GetCluster().Manager().Run(o, script)
+}
+
+func NodesRun(o cmd.O, script string) error {
+	for _, node := range GetCluster().Nodes() {
+		if _, err := node.Run(o, script); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func AccessNodesRun(o cmd.O, script string) error {
+	for _, node := range GetCluster().Nodes() {
+		if slice.ContainsString(node.Labels, `hasAccess=true`) {
+			if _, err := node.Run(o, script); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
 
 func GetCluster() Cluster {
 	cluster, ok := GetClusters()[release.Env()]
@@ -16,6 +44,7 @@ type Cluster struct {
 	User     string `yaml:"user"`
 	Managers []Node `yaml:"managers"`
 	Workers  []Node `yaml:"workers"`
+	nodes    []Node
 }
 
 func (c *Cluster) setNodesUser() {
@@ -27,22 +56,30 @@ func (c *Cluster) setNodesUser() {
 	}
 }
 
-func (c Cluster) SshAddr() string {
+func (c Cluster) Manager() Node {
 	if len(c.Managers) == 0 {
 		panic(`the cluster have no managers.`)
 	}
-	m := c.Managers[0]
-	return m.SshAddr()
+	return c.Managers[0]
 }
 
-func (c Cluster) List() ([]string, []string) {
+func (c Cluster) Nodes() []Node {
+	if c.nodes == nil {
+		c.nodes = append(c.nodes, c.Managers...)
+		c.nodes = append(c.nodes, c.Workers...)
+	}
+	return c.nodes
+}
+
+func (c Cluster) List() {
 	ms := []string{}
 	for _, m := range c.Managers {
 		ms = append(ms, m.SshAddr())
 	}
+	println(`managers: `, strings.Join(ms, " \t"))
 	ws := []string{}
 	for _, w := range c.Workers {
 		ws = append(ws, w.SshAddr())
 	}
-	return ms, ws
+	println(`workers: `, strings.Join(ws, " \t"))
 }
