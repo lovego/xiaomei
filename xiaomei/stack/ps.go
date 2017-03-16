@@ -23,5 +23,6 @@ func Ps(svcName string, watch bool, options []string) error {
 		script = `watch ` + script
 	}
 
-	return cluster.Run(cmd.O{}, script)
+	_, err := cluster.Run(cmd.O{}, script)
+	return err
 }

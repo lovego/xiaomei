@@ -26,7 +26,7 @@ func Deploy(svcName string) error {
 	if err != nil {
 		return err
 	}
-	if err := cluster.Run(cmd.O{Stdin: bytes.NewReader(stackYaml)}, script); err != nil {
+	if _, err := cluster.Run(cmd.O{Stdin: bytes.NewReader(stackYaml)}, script); err != nil {
 		return err
 	}
 	return Ps(svcName, true, nil)

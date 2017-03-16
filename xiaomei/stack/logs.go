@@ -111,5 +111,6 @@ func printLog(svcName, container string) error {
 	} else {
 		cmd.Run(cmd.O{}, `echo`, fmt.Sprintf("service %s container %s log:", svcName, container))
 	}
-	return cluster.Run(cmd.O{}, fmt.Sprintf(`docker logs %s`, container))
+	_, err := cluster.Run(cmd.O{}, fmt.Sprintf(`docker logs %s`, container))
+	return err
 }
