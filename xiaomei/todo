@@ -1,5 +1,7 @@
 docker logs
 
+nginx no upstream问题: nginx-start: wait until host available，not good. may be use ip is better.
+
 docker constraint
 
 rolling-update 测试
@@ -16,7 +18,6 @@ DONE:
 access 子命令 新建及命令测试
 app dev开发环境 日志行为不一致问题：引入GODEV, GOENV与行为无关。
 服务容器来不及看logs就被移除的问题: docker swarm update --task-history-limit。
-nginx no upstream问题: nginx-start: wait until host available.
 
 cluster ls
 cluster shell

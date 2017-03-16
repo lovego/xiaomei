@@ -56,5 +56,5 @@ func setupConf(conf string) error {
 	sudo nginx -t &&
 	sudo service nginx restart
 	`, release.Name(), release.Name())
-	return cluster.Run(cmd.O{Stdin: strings.NewReader(conf)}, script)
+	return cluster.AccessNodeRun(cmd.O{Stdin: strings.NewReader(conf)}, script)
 }
