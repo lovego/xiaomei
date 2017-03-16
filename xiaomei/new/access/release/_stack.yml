@@ -3,7 +3,8 @@ services:
   access:
     image: 192.168.202.12:5000/{{ .Domain }}/access
     deploy:
-      replicas: 2
+      mode: global
+      placement: { constraints: [ hasAccess==true ] }
     volumes: ["logs:/var/log/nginx"]
 
 volumes:
