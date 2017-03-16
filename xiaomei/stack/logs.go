@@ -10,14 +10,26 @@ import (
 )
 
 func Logs(svcName string, all bool) error {
+	if all {
+		return logService(svcName, allLogs)
+	}
+	if svcName == `` {
+		for _, s := range getService() {
+			err := logService(s, oneLog)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return logService(svcName, oneLog)
+}
+
+func logService(svcName string, logFunc func(svcName string, ms, ws []string) error) error {
 	ms, ws := release.GetCluster().List()
 	if len(ms) == 0 && len(ws) == 0 {
 		return nil
 	}
-	if all {
-		return allLogs(svcName, ms, ws)
-	}
-	return oneLog(svcName, ms, ws)
+	return logFunc(svcName, ms, ws)
 }
 
 func oneLog(svcName string, ms, ws []string) error {
@@ -27,7 +39,7 @@ func oneLog(svcName string, ms, ws []string) error {
 			return err
 		}
 		if len(containers) > 0 {
-			return printLog(containers[0])
+			return printLog(svcName, containers[0])
 		}
 	}
 	for _, w := range ws {
@@ -36,7 +48,7 @@ func oneLog(svcName string, ms, ws []string) error {
 			return err
 		}
 		if len(containers) > 0 {
-			return printLog(containers[0])
+			return printLog(svcName, containers[0])
 		}
 	}
 	return nil
@@ -49,7 +61,7 @@ func allLogs(svcName string, ms, ws []string) error {
 			return err
 		}
 		for _, container := range containers {
-			err := printLog(container)
+			err := printLog(svcName, container)
 			if err != nil {
 				return err
 			}
@@ -61,13 +73,21 @@ func allLogs(svcName string, ms, ws []string) error {
 			return err
 		}
 		for _, container := range containers {
-			err := printLog(container)
+			err := printLog(svcName, container)
 			if err != nil {
 				return err
 			}
 		}
 	}
 	return nil
+}
+
+func getService() []string {
+	services := []string{}
+	for s, _ := range release.GetStack().Services {
+		services = append(services, s)
+	}
+	return services
 }
 
 func getContainers(svcName, addr string) ([]string, error) {
@@ -85,7 +105,11 @@ func getContainers(svcName, addr string) ([]string, error) {
 	return containers, nil
 }
 
-func printLog(container string) error {
-	cmd.Run(cmd.O{}, `echo`, fmt.Sprintf("container %s log:", container))
+func printLog(svcName, container string) error {
+	if svcName == `` {
+		cmd.Run(cmd.O{}, `echo`, fmt.Sprintf("container %s log:", container))
+	} else {
+		cmd.Run(cmd.O{}, `echo`, fmt.Sprintf("service %s container %s log:", svcName, container))
+	}
 	return cluster.Run(cmd.O{}, fmt.Sprintf(`docker logs %s`, container))
 }
