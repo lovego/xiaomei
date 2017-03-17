@@ -24,7 +24,7 @@ func (i Image) Dockerfile() string {
 func (i Image) FilesForRun() []string {
 	root := filepath.Join(release.Root(), `img-web`)
 	return []string{
-		root + `/site.conf:/etc/nginx/sites-enabled/` + release.Name(),
+		root + `/site.conf:/etc/nginx/sites-enabled/` + release.Name() + `.conf`,
 		root + `/public:/var/www/` + release.Name(),
 	}
 }

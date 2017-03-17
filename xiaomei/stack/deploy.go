@@ -56,6 +56,9 @@ func getDeployScript(svcName string) (string, error) {
 	}{
 		Name: release.Name(), DirName: release.Name() + `_` + release.Env(), FileName: svcName,
 	}
+	if svcName == `` {
+		deployConf.FileName = `stack`
+	}
 
 	tmpl := template.Must(template.New(``).Parse(deployScriptTmpl))
 	var buf bytes.Buffer
