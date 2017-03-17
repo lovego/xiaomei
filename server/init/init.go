@@ -3,15 +3,17 @@
 package init
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/bughou-go/xiaomei/config"
 	"github.com/bughou-go/xiaomei/utils"
 )
 
 func init() {
-	utils.Log(`starting.`)
+	utils.Log(fmt.Sprintf(`starting.(%s)`, config.Env()))
 	go handleSignals()
 }
 

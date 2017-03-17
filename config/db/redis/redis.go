@@ -19,7 +19,8 @@ func Do(name string, work func(redis.Conn)) {
 	redisConns.RUnlock()
 	if redisPool == nil {
 		redisPool = &redis.Pool{
-			MaxIdle:     3,
+			MaxIdle:     32,
+			MaxActive:   32,
 			IdleTimeout: 600 * time.Second,
 			Dial: func() (redis.Conn, error) {
 				return redis.DialURL(
