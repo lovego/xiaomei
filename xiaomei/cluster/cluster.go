@@ -12,24 +12,17 @@ func Run(o cmd.O, script string) (string, error) {
 	return GetCluster().Manager().Run(o, script)
 }
 
-func NodesRun(o cmd.O, script string) error {
-	for _, node := range GetCluster().Nodes() {
-		if _, err := node.Run(o, script); err != nil {
-			return err
-		}
-	}
-	return nil
+func Nodes() []Node {
+	return GetCluster().Nodes()
 }
 
-func AccessNodesRun(o cmd.O, script string) error {
+func AccessNodes() (result []Node) {
 	for _, node := range GetCluster().Nodes() {
 		if slice.ContainsString(node.Labels, `hasAccess=true`) {
-			if _, err := node.Run(o, script); err != nil {
-				return err
-			}
+			result = append(result, node)
 		}
 	}
-	return nil
+	return
 }
 
 func GetCluster() Cluster {

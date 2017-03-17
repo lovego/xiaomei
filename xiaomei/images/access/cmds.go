@@ -55,6 +55,12 @@ func setupConf(conf string) error {
 	sudo mkdir -p /var/log/nginx/%s &&
 	sudo nginx -t &&
 	sudo service nginx restart
-	`, release.Name(), release.Name())
-	return cluster.AccessNodesRun(cmd.O{Stdin: strings.NewReader(conf)}, script)
+	`, release.Name(), release.Name(),
+	)
+	for _, node := range cluster.AccessNodes() {
+		if _, err := node.Run(cmd.O{Stdin: strings.NewReader(conf)}, script); err != nil {
+			return err
+		}
+	}
+	return nil
 }
