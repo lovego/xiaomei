@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/bughou-go/xiaomei/xiaomei/images"
 	"github.com/bughou-go/xiaomei/xiaomei/stack"
 	"github.com/bughou-go/xiaomei/xiaomei/z"
@@ -11,31 +9,31 @@ import (
 
 // Run, Build, Push, Deploy and Ps commands
 func commonCmds(svcName string) []*cobra.Command {
-	cmds := []*cobra.Command{}
-	if svcName != `` {
-		cmds = append(cmds, runCmd(svcName))
-	}
-	var target, s string
 	if svcName == `` {
-		target, s = `all`, `s`
+		return []*cobra.Command{
+			buildCmd(svcName, `all images`),
+			pushCmd(svcName, `all images`),
+			deployCmd(svcName, `stack`),
+			psCmd(svcName, `stack`),
+			logsCmd(svcName, `stack`),
+		}
 	} else {
-		target, s = svcName, ``
+		return []*cobra.Command{
+			runCmd(svcName),
+			buildCmd(svcName, `the `+svcName+` image`),
+			pushCmd(svcName, `the `+svcName+` image`),
+			deployCmd(svcName, svcName+` service`),
+			psCmd(svcName, svcName+` service`),
+			logsCmd(svcName, svcName+` service`),
+		}
 	}
-	cmds = append(cmds,
-		buildCmd(svcName, target, s),
-		pushCmd(svcName, target, s),
-		deployCmd(svcName, target, s),
-		psCmd(svcName, target, s),
-		logsCmd(svcName, target, s),
-	)
-	return cmds
 }
 
 func runCmd(svcName string) *cobra.Command {
 	var publish []string
 	cmd := &cobra.Command{
 		Use:   `run`,
-		Short: fmt.Sprintf(`run    %s image.`, svcName),
+		Short: `run    the ` + svcName + ` image.`,
 		RunE: z.NoArgCall(func() error {
 			return images.Run(svcName, publish)
 		}),
@@ -43,32 +41,29 @@ func runCmd(svcName string) *cobra.Command {
 	cmd.Flags().StringSliceVarP(&publish, `publish`, `p`, nil, `publish ports for container.`)
 	return cmd
 }
-
-func buildCmd(svcName, target, s string) *cobra.Command {
+func buildCmd(svcName, desc string) *cobra.Command {
 	return &cobra.Command{
 		Use:   `build`,
-		Short: fmt.Sprintf(`build  %s image%s.`, target, s),
+		Short: `build  ` + desc + `.`,
 		RunE: z.NoArgCall(func() error {
 			return images.Build(svcName)
 		}),
 	}
 }
-
-func pushCmd(svcName, target, s string) *cobra.Command {
+func pushCmd(svcName, desc string) *cobra.Command {
 	return &cobra.Command{
 		Use:   `push`,
-		Short: fmt.Sprintf(`push   %s image%s.`, target, s),
+		Short: `push   ` + desc + `.`,
 		RunE: z.NoArgCall(func() error {
 			return images.Push(svcName)
 		}),
 	}
 }
-
-func deployCmd(svcName, target, s string) *cobra.Command {
-	var noBuild, noPush bool
+func deployCmd(svcName, desc string) *cobra.Command {
+	var noBuild, noPush, rmCurrent bool
 	cmd := &cobra.Command{
 		Use:   `deploy`,
-		Short: fmt.Sprintf(`deploy %s service%s.`, target, s),
+		Short: `deploy the ` + desc + `.`,
 		RunE: z.NoArgCall(func() error {
 			if !noBuild {
 				if err := images.Build(svcName); err != nil {
@@ -80,19 +75,20 @@ func deployCmd(svcName, target, s string) *cobra.Command {
 					return err
 				}
 			}
-			return stack.Deploy(svcName)
+			return stack.Deploy(svcName, rmCurrent)
 		}),
 	}
-	cmd.Flags().BoolVarP(&noBuild, `no-build`, `B`, false, fmt.Sprintf(`do not build the image%s.`, s))
-	cmd.Flags().BoolVarP(&noPush, `no-push`, `P`, false, fmt.Sprintf(`do not push the image%s.`, s))
+	cmd.Flags().BoolVarP(&noBuild, `no-build`, `B`, false, `do not build the images.`)
+	cmd.Flags().BoolVarP(&noPush, `no-push`, `P`, false, `do not push the images.`)
+	cmd.Flags().BoolVar(&rmCurrent, `rm-current`, false, `remove the current running `+desc+`.`)
 	return cmd
 }
 
-func psCmd(svcName, target, s string) *cobra.Command {
+func psCmd(svcName, desc string) *cobra.Command {
 	var watch bool
 	cmd := &cobra.Command{
 		Use:   `ps`,
-		Short: fmt.Sprintf(`list tasks of %s service%s.`, target, s),
+		Short: `list tasks of the ` + desc + `.`,
 		RunE: func(c *cobra.Command, args []string) error {
 			return stack.Ps(svcName, watch, args)
 		},
@@ -101,15 +97,15 @@ func psCmd(svcName, target, s string) *cobra.Command {
 	return cmd
 }
 
-func logsCmd(svcName, target, s string) *cobra.Command {
+func logsCmd(svcName, desc string) *cobra.Command {
 	var all bool
 	cmd := &cobra.Command{
 		Use:   `logs`,
-		Short: fmt.Sprintf(`list logs of %s service%s.`, target, s),
+		Short: `list logs  of the ` + desc + `.`,
 		RunE: func(c *cobra.Command, args []string) error {
 			return stack.Logs(svcName, all)
 		},
 	}
-	cmd.Flags().BoolVarP(&all, `all`, `a`, false, `all logs.`)
+	cmd.Flags().BoolVarP(&all, `all`, `a`, false, `list logs of all containers.`)
 	return cmd
 }

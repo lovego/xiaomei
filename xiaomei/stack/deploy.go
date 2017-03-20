@@ -12,7 +12,7 @@ import (
 	"github.com/fatih/color"
 )
 
-func Deploy(svcName string) error {
+func Deploy(svcName string, rmCurrent bool) error {
 	if svcName == `` {
 		utils.Log(color.GreenString(`deploying all services.`))
 	} else {
@@ -22,7 +22,7 @@ func Deploy(svcName string) error {
 	if err != nil {
 		return err
 	}
-	script, err := getDeployScript(svcName)
+	script, err := getDeployScript(svcName, rmCurrent)
 	if err != nil {
 		return err
 	}
@@ -47,17 +47,25 @@ func getDeployStack(svcName string) ([]byte, error) {
 const deployScriptTmpl = `
 	cd && mkdir -p {{ .DirName }} && cd {{ .DirName }} &&
 	cat - > {{ .FileName }}.yml &&
+	{{ .BeforeDeploy }}
 	docker stack deploy --compose-file={{ .FileName }}.yml {{ .Name }}
 `
 
-func getDeployScript(svcName string) (string, error) {
+func getDeployScript(svcName string, rmCurrent bool) (string, error) {
 	deployConf := struct {
-		Name, DirName, FileName string
+		Name, DirName, FileName, BeforeDeploy string
 	}{
 		Name: release.Name(), DirName: release.Name() + `_` + release.Env(), FileName: svcName,
 	}
 	if svcName == `` {
 		deployConf.FileName = `stack`
+	}
+	if rmCurrent {
+		if svcName == `` {
+			deployConf.BeforeDeploy = `docker stack rm ` + release.Name() + waitUntilNetworkRemoved()
+		} else {
+			deployConf.BeforeDeploy = `docker service rm ` + release.Name() + `_` + svcName
+		}
 	}
 
 	tmpl := template.Must(template.New(``).Parse(deployScriptTmpl))
@@ -66,4 +74,12 @@ func getDeployScript(svcName string) (string, error) {
 		return ``, err
 	}
 	return buf.String(), nil
+}
+
+func waitUntilNetworkRemoved() string {
+	return `
+	until test -z "$(docker network ls -qf label=com.docker.stack.namespace=` + release.Name() + `)"; do
+	sleep 0.1
+	done
+	`
 }

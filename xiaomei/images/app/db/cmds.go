@@ -6,10 +6,10 @@ import (
 
 func Cmds() []*cobra.Command {
 	return []*cobra.Command{
-		makeCmd(`mysql`, `enter mysql cli`, Mysql),
-		makeCmd(`mysqldump`, `dump mysql (you can redirect to a file if you need)`, MysqlDump),
-		makeCmd(`mongo`, `enter mongo cli`, Mongo),
-		makeCmd(`redis`, `enter redis cli`, Redis),
+		makeCmd(`mysql`, `enter mysql cli.`, Mysql),
+		makeCmd(`mysqldump`, `mysqldump to stdout.`, MysqlDump),
+		makeCmd(`mongo`, `enter mongo cli.`, Mongo),
+		makeCmd(`redis`, `enter redis cli.`, Redis),
 		setupCmd(),
 	}
 }
@@ -23,6 +23,6 @@ func makeCmd(name, short string, fun func(key string, p bool) error) *cobra.Comm
 			return fun(c.Flags().Arg(0), p)
 		},
 	}
-	cmd.Flags().BoolVarP(&p, `print`, `p`, false, `print the commands but do not run them.`)
+	cmd.Flags().BoolVarP(&p, `print`, `p`, false, `only print the command.`)
 	return cmd
 }
