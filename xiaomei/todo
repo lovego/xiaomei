@@ -1,8 +1,8 @@
-docker logs
+alarm mailer 合并
+
+docker logs优化
 
 nginx no upstream问题: nginx-start: wait until host available，not good. may be use ip is better.
-
-docker constraint
 
 rolling-update 测试
 
@@ -15,12 +15,8 @@ stack首次本地deploy未锁定image问题：在QA环境跟踪。
 web run 无日志问题: exec tail
 
 DONE:
-access 子命令 新建及命令测试
-app dev开发环境 日志行为不一致问题：引入GODEV, GOENV与行为无关。
+access使用replicas模式，外部接入使用所有accessNode。
 服务容器来不及看logs就被移除的问题: docker swarm update --task-history-limit。
-
-cluster ls
-cluster shell
-
+app dev开发环境 日志行为不一致问题：引入GODEV, GOENV与行为无关。
 
 

@@ -10,7 +10,7 @@ services:
     depends_on: [ app ]
     image: 192.168.202.12:5000/{{ .Domain }}/web
     deploy:
-      mode: global
+      replicas: 2
       placement: { constraints: [ node.labels.hasAccess==true ] }
     volumes: ["logs:/var/log/nginx"]
 
