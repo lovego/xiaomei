@@ -15,6 +15,13 @@ func (n Node) SshAddr() string {
 	return n.user + `@` + n.Addr
 }
 
+func (n Node) GetListenAddr() string {
+	if n.ListenAddr != `` {
+		return n.ListenAddr
+	}
+	return n.Addr
+}
+
 func (n Node) Run(o cmd.O, script string) (string, error) {
 	return cmd.SshRun(o, n.SshAddr(), script)
 }

@@ -11,17 +11,31 @@ import (
 )
 
 func Config() (string, error) {
+	tmpl := template.Must(template.New(``).Parse(configTmpl))
 	var buf bytes.Buffer
-	if err := template.Must(template.New(``).Parse(configTmpl)).Execute(&buf, struct {
-		ServerNames, BackendAddr, ProName string
-	}{
-		ServerNames: getServerNames(),
-		BackendAddr: getBackendAddr(),
-		ProName:     release.Name(),
-	}); err != nil {
+	if err := tmpl.Execute(&buf, getConfigData()); err != nil {
 		return ``, err
 	}
 	return buf.String(), nil
+}
+
+func getConfigData() interface{} {
+	data := struct {
+		ProName, ServerNames, BackendAddr, UpstreamName string
+		UpstreamAddrs                                   []string
+	}{
+		ProName:     release.Name(),
+		ServerNames: getServerNames(),
+	}
+	svcName := getBackendSvcName()
+	backendName := release.Name() + `_` + svcName
+	if port := publicPort(svcName); port == `` {
+		data.BackendAddr = backendName + `:` + portOfService(svcName)
+	} else {
+		data.UpstreamName = backendName
+		data.UpstreamAddrs = getBackendAddrs(port)
+	}
+	return data
 }
 
 func getServerNames() string {
@@ -32,24 +46,7 @@ func getServerNames() string {
 	return strings.Join(result, ` `)
 }
 
-func getBackendAddr() string {
-	svcName := accessSvcName()
-	if ports := stack.PortsOf(svcName); len(ports) > 0 {
-		port := ports[0]
-		port = port[0:strings.IndexByte(port, ':')]
-		return `127.0.0.1:` + port
-	}
-	switch svcName {
-	case `app`:
-		return release.Name() + `_app:3000`
-	case `web`:
-		return release.Name() + `_web:80`
-	default:
-		panic(`unexpected svcName: ` + svcName)
-	}
-}
-
-func accessSvcName() string {
+func getBackendSvcName() string {
 	stack := stack.GetStack()
 	if stack.Services[`web`] != nil {
 		return `web`
@@ -57,16 +54,50 @@ func accessSvcName() string {
 	if stack.Services[`app`] != nil {
 		return `app`
 	}
-	panic(`no app service found in stack.yml.`)
+	panic(`no backend service found in stack.yml.`)
+}
+
+func publicPort(svcName string) string {
+	if ports := stack.PortsOf(svcName); len(ports) > 0 {
+		port := ports[0]
+		return port[:strings.IndexByte(port, ':')]
+	}
+	return ``
+}
+
+func getBackendAddrs(port string) (addrs []string) {
+	for _, node := range cluster.AccessNodes() {
+		addrs = append(addrs, node.GetListenAddr()+`:`+port)
+	}
+	return
+}
+
+func portOfService(svcName string) string {
+	switch svcName {
+	case `app`:
+		return `3000`
+	case `web`:
+		return `80`
+	default:
+		panic(`unexpected svcName: ` + svcName)
+	}
 }
 
 const configTmpl = `
+{{ if .UpstreamName -}}
+upstream {{ .UpstreamName }} {
+  {{- range .UpstreamAddrs }}
+  server {{ . }};
+  {{- end }}
+}
+{{- end }}
+
 server {
   listen 80;
   server_name {{ .ServerNames }};
 
   location / {
-    proxy_pass   http://{{ .BackendAddr }};
+    proxy_pass   http://{{ or .BackendAddr .UpstreamName }};
     include proxy_params;
   }
 
