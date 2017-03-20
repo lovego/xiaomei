@@ -27,24 +27,14 @@ func handleError(t time.Time, req *xm.Request, res *xm.Response, notFound *bool)
 
 func handleNotFound(req *xm.Request, res *xm.Response) {
 	res.WriteHeader(404)
-	if res.Size() > 0 {
-		return
-	}
-	if req.Header.Get("X-Requested-With") != "" {
-		res.Write([]byte(`{ "message": "404" }`))
-	} else {
-		res.Render(`error/404`, nil)
+	if res.Size() <= 0 {
+		res.Json(map[string]string{"code": "404", "message": "Not Found."})
 	}
 }
 
 func handleServerError(req *xm.Request, res *xm.Response) {
 	res.WriteHeader(500)
-	if res.Size() > 0 {
-		return
-	}
-	if req.Header.Get("X-Requested-With") != "" {
-		res.Write([]byte(`{ "message": "500" }`))
-	} else {
-		res.Render(`error/500`, nil)
+	if res.Size() <= 0 {
+		res.Json(map[string]string{"code": "500", "message": "Application Server Error."})
 	}
 }
