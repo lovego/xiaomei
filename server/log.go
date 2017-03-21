@@ -57,7 +57,7 @@ func getLogFields(req *xm.Request, res *xm.Response, t time.Time, err interface{
 		req.Method, req.URL.RequestURI(), strconv.FormatInt(req.ContentLength, 10), req.Proto,
 		strconv.FormatInt(res.Status(), 10), strconv.FormatInt(res.Size(), 10),
 		fmt.Sprintf(`%.6f`, time.Since(t).Seconds()),
-		fmt.Sprint(req.Session), req.ClientAddr(), req.Referer(), req.UserAgent(),
+		getSession(req), req.ClientAddr(), req.Referer(), req.UserAgent(),
 	}
 	if err != nil {
 		slice = append(slice, fmt.Sprint(err), string(utils.Stack(6)))
@@ -70,4 +70,15 @@ func getLogFields(req *xm.Request, res *xm.Response, t time.Time, err interface{
 		slice[i] = v
 	}
 	return slice
+}
+
+func getSession(req *xm.Request) string {
+	var sess interface{}
+	req.Session(&sess)
+	str := fmt.Sprint(sess)
+	if strings.HasPrefix(str, `map[`) && strings.HasSuffix(str, `]`) {
+		str = strings.TrimPrefix(str, `map[`)
+		str = strings.TrimSuffix(str, `]`)
+	}
+	return str
 }

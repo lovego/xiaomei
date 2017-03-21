@@ -1,15 +1,15 @@
 package session
 
 import (
-	"log"
 	"net/http"
 	"time"
 
+	"github.com/bughou-go/xiaomei/utils"
 	"github.com/gorilla/securecookie"
 )
 
 type Session interface {
-	Get(req *http.Request, p interface{})
+	Get(req *http.Request, p interface{}) bool
 	Set(res http.ResponseWriter, data interface{})
 }
 
@@ -23,17 +23,20 @@ func NewCookieSession(c http.Cookie, secret string) *CookieSession {
 	c.HttpOnly = true
 	return &CookieSession{
 		cookie: c,
-		secure: securecookie.New([]byte(secret), nil),
+		secure: securecookie.New([]byte(secret), nil).SetSerializer(securecookie.JSONEncoder{}),
 	}
 }
 
-func (cs *CookieSession) Get(req *http.Request, p interface{}) {
+func (cs *CookieSession) Get(req *http.Request, p interface{}) bool {
 	ck, _ := req.Cookie(cs.cookie.Name)
 	if ck != nil && ck.Value != `` {
 		if err := cs.secure.Decode(ck.Name, ck.Value, p); err != nil {
-			log.Println(err)
+			utils.Log(err)
+		} else {
+			return true
 		}
 	}
+	return false
 }
 
 func (cs *CookieSession) Set(res http.ResponseWriter, data interface{}) {
@@ -45,7 +48,7 @@ func (cs *CookieSession) Set(res http.ResponseWriter, data interface{}) {
 		if encoded, err := cs.secure.Encode(cs.cookie.Name, data); err == nil {
 			ck.Value = encoded
 		} else {
-			log.Println(err)
+			utils.Log(err)
 			return
 		}
 	}
