@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/bughou-go/xiaomei/utils"
+	"github.com/lovego/xiaomei/utils"
 	"gopkg.in/yaml.v2"
 )
 

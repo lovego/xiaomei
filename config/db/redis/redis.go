@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bughou-go/xiaomei/config"
+	"github.com/lovego/xiaomei/config"
 	"github.com/garyburd/redigo/redis"
 )
 

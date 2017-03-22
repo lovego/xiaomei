@@ -3,9 +3,9 @@ package cluster
 import (
 	"strings"
 
-	"github.com/bughou-go/xiaomei/utils/cmd"
-	"github.com/bughou-go/xiaomei/utils/slice"
-	"github.com/bughou-go/xiaomei/xiaomei/release"
+	"github.com/lovego/xiaomei/utils/cmd"
+	"github.com/lovego/xiaomei/utils/slice"
+	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
 func Run(o cmd.O, script string) (string, error) {

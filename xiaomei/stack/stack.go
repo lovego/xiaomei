@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bughou-go/xiaomei/xiaomei/release"
+	"github.com/lovego/xiaomei/xiaomei/release"
 	"gopkg.in/yaml.v2"
 )
 

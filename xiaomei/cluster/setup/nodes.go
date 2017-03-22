@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/bughou-go/xiaomei/utils/cmd"
-	"github.com/bughou-go/xiaomei/xiaomei/release"
+	"github.com/lovego/xiaomei/utils/cmd"
+	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
 type Node struct {

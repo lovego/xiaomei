@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bughou-go/xiaomei/utils"
+	"github.com/lovego/xiaomei/utils"
 )
 
 func DevMode() bool {

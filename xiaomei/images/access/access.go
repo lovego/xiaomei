@@ -5,9 +5,9 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/bughou-go/xiaomei/xiaomei/cluster"
-	"github.com/bughou-go/xiaomei/xiaomei/release"
-	"github.com/bughou-go/xiaomei/xiaomei/stack"
+	"github.com/lovego/xiaomei/xiaomei/cluster"
+	"github.com/lovego/xiaomei/xiaomei/release"
+	"github.com/lovego/xiaomei/xiaomei/stack"
 )
 
 func Config() (string, error) {

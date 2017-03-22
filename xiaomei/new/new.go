@@ -10,8 +10,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/bughou-go/xiaomei/utils/fs"
-	"github.com/bughou-go/xiaomei/xiaomei/z"
+	"github.com/lovego/xiaomei/utils/fs"
+	"github.com/lovego/xiaomei/xiaomei/z"
 	"github.com/spf13/cobra"
 )
 

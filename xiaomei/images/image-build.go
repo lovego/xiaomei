@@ -1,9 +1,9 @@
 package images
 
 import (
-	"github.com/bughou-go/xiaomei/utils"
-	"github.com/bughou-go/xiaomei/utils/cmd"
-	"github.com/bughou-go/xiaomei/xiaomei/stack"
+	"github.com/lovego/xiaomei/utils"
+	"github.com/lovego/xiaomei/utils/cmd"
+	"github.com/lovego/xiaomei/xiaomei/stack"
 	"github.com/fatih/color"
 )
 

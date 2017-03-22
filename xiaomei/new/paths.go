@@ -4,7 +4,7 @@ import (
 	"errors"
 	"path/filepath"
 
-	"github.com/bughou-go/xiaomei/utils/fs"
+	"github.com/lovego/xiaomei/utils/fs"
 )
 
 func getTmplDir(isAccess bool) (string, error) {
@@ -12,7 +12,7 @@ func getTmplDir(isAccess bool) (string, error) {
 	if err != nil {
 		return ``, err
 	}
-	tmplDir := filepath.Join(srcPath, `github.com/bughou-go/xiaomei/xiaomei/new`)
+	tmplDir := filepath.Join(srcPath, `github.com/lovego/xiaomei/xiaomei/new`)
 	if isAccess {
 		return filepath.Join(tmplDir, `access`), nil
 	} else {

@@ -4,7 +4,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bughou-go/xiaomei/utils/slice"
+	"github.com/lovego/xiaomei/utils/slice"
 )
 
 var theEnv string

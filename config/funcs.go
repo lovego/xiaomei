@@ -3,8 +3,8 @@ package config
 import (
 	"time"
 
-	"github.com/bughou-go/xiaomei/config/conf"
-	"github.com/bughou-go/xiaomei/utils/mailer"
+	"github.com/lovego/xiaomei/config/conf"
+	"github.com/lovego/xiaomei/utils/mailer"
 )
 
 func Root() string {

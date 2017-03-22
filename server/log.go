@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bughou-go/xiaomei/config"
-	"github.com/bughou-go/xiaomei/server/xm"
-	"github.com/bughou-go/xiaomei/utils"
-	"github.com/bughou-go/xiaomei/utils/fs"
+	"github.com/lovego/xiaomei/config"
+	"github.com/lovego/xiaomei/server/xm"
+	"github.com/lovego/xiaomei/utils"
+	"github.com/lovego/xiaomei/utils/fs"
 )
 
 var accessLog, errLog = setupLogger()

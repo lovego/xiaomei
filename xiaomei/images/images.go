@@ -3,12 +3,12 @@ package images
 import (
 	"errors"
 
-	"github.com/bughou-go/xiaomei/utils"
-	"github.com/bughou-go/xiaomei/utils/cmd"
-	"github.com/bughou-go/xiaomei/xiaomei/images/access"
-	"github.com/bughou-go/xiaomei/xiaomei/images/app"
-	"github.com/bughou-go/xiaomei/xiaomei/images/web"
-	"github.com/bughou-go/xiaomei/xiaomei/stack"
+	"github.com/lovego/xiaomei/utils"
+	"github.com/lovego/xiaomei/utils/cmd"
+	"github.com/lovego/xiaomei/xiaomei/images/access"
+	"github.com/lovego/xiaomei/xiaomei/images/app"
+	"github.com/lovego/xiaomei/xiaomei/images/web"
+	"github.com/lovego/xiaomei/xiaomei/stack"
 	"github.com/fatih/color"
 )
 

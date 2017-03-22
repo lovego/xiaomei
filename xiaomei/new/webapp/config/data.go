@@ -3,7 +3,7 @@ package config
 import (
 	"sync"
 
-	"github.com/bughou-go/xiaomei/config"
+	"github.com/lovego/xiaomei/config"
 )
 
 type Config struct {

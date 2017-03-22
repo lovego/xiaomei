@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/bughou-go/xiaomei/xiaomei/images"
-	"github.com/bughou-go/xiaomei/xiaomei/stack"
-	"github.com/bughou-go/xiaomei/xiaomei/z"
+	"github.com/lovego/xiaomei/xiaomei/images"
+	"github.com/lovego/xiaomei/xiaomei/stack"
+	"github.com/lovego/xiaomei/xiaomei/z"
 	"github.com/spf13/cobra"
 )
 

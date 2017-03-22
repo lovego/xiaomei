@@ -3,7 +3,7 @@ package setup
 import (
 	"errors"
 
-	"github.com/bughou-go/xiaomei/xiaomei/release"
+	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
 type Cluster struct {

@@ -6,7 +6,7 @@ import (
 	"path"
 	"time"
 
-	"github.com/bughou-go/xiaomei/config"
+	"github.com/lovego/xiaomei/config"
 	"gopkg.in/yaml.v2"
 )
 

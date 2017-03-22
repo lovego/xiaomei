@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bughou-go/xiaomei/utils"
-	"github.com/bughou-go/xiaomei/utils/cmd"
-	"github.com/bughou-go/xiaomei/xiaomei/release"
+	"github.com/lovego/xiaomei/utils"
+	"github.com/lovego/xiaomei/utils/cmd"
+	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -42,7 +42,7 @@ func Spec(t string) error {
 	}
 
 	if !cmd.Ok(cmd.O{NoStdout: true}, `which`, `gospec`) {
-		cmd.Run(cmd.O{Panic: true}, `go`, `get`, `-v`, `github.com/bughou-go/spec/gospec`)
+		cmd.Run(cmd.O{Panic: true}, `go`, `get`, `-v`, `github.com/lovego/spec/gospec`)
 	}
 
 	if cmd.Ok(cmd.O{}, `gospec`, targets...) {

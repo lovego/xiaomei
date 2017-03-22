@@ -7,7 +7,7 @@ import (
 	"os/user"
 	"strings"
 
-	"github.com/bughou-go/xiaomei/utils/slice"
+	"github.com/lovego/xiaomei/utils/slice"
 )
 
 func SshRun(o O, addr, shellScript string) (string, error) {

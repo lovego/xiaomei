@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/bughou-go/xiaomei/xiaomei/images/app/db"
+	"github.com/lovego/xiaomei/xiaomei/images/app/db"
 	"github.com/spf13/cobra"
 )
 

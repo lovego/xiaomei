@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bughou-go/xiaomei/config"
+	"github.com/lovego/xiaomei/config"
 	_ "github.com/go-sql-driver/mysql"
 )
 

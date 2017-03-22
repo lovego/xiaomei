@@ -3,7 +3,7 @@ package mongo
 import (
 	"sync"
 
-	"github.com/bughou-go/xiaomei/config"
+	"github.com/lovego/xiaomei/config"
 	"gopkg.in/mgo.v2"
 )
 

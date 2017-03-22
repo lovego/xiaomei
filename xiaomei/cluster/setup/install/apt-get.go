@@ -4,7 +4,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/lovego/xiaomei/utils/cmd"
 )
 
 var aptGetNeedUpdate = true

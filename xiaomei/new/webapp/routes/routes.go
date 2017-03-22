@@ -3,8 +3,8 @@ package routes
 import (
 	"time"
 
-	"github.com/bughou-go/xiaomei/config"
-	"github.com/bughou-go/xiaomei/server/xm"
+	"github.com/lovego/xiaomei/config"
+	"github.com/lovego/xiaomei/server/xm"
 )
 
 type session struct {

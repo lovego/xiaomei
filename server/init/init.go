@@ -8,8 +8,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/bughou-go/xiaomei/config"
-	"github.com/bughou-go/xiaomei/utils"
+	"github.com/lovego/xiaomei/config"
+	"github.com/lovego/xiaomei/utils"
 )
 
 func init() {

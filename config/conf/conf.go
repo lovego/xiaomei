@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bughou-go/xiaomei/utils/mailer"
+	"github.com/lovego/xiaomei/utils/mailer"
 )
 
 type Conf struct {

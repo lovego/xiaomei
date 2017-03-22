@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/bughou-go/xiaomei/utils"
-	"github.com/bughou-go/xiaomei/utils/cmd"
-	"github.com/bughou-go/xiaomei/xiaomei/release"
+	"github.com/lovego/xiaomei/utils"
+	"github.com/lovego/xiaomei/utils/cmd"
+	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/fatih/color"
 )
 

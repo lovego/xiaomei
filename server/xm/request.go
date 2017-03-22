@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"reflect"
 
-	"github.com/bughou-go/xiaomei/server/xm/session"
+	"github.com/lovego/xiaomei/server/xm/session"
 )
 
 type Request struct {

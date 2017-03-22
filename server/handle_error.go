@@ -3,8 +3,8 @@ package server
 import (
 	"time"
 
-	"github.com/bughou-go/xiaomei/config"
-	"github.com/bughou-go/xiaomei/server/xm"
+	"github.com/lovego/xiaomei/config"
+	"github.com/lovego/xiaomei/server/xm"
 )
 
 func handleError(t time.Time, req *xm.Request, res *xm.Response, notFound *bool) {

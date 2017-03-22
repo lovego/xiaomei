@@ -7,7 +7,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/bughou-go/xiaomei/utils/cmd"
+	"github.com/lovego/xiaomei/utils/cmd"
 )
 
 const WaitStep = 100 * time.Millisecond

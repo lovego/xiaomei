@@ -3,7 +3,7 @@ package web
 import (
 	"path/filepath"
 
-	"github.com/bughou-go/xiaomei/xiaomei/release"
+	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
 type Image struct {

@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/bughou-go/xiaomei/utils/cmd"
-	"github.com/bughou-go/xiaomei/xiaomei/release"
-	"github.com/bughou-go/xiaomei/xiaomei/stack"
+	"github.com/lovego/xiaomei/utils/cmd"
+	"github.com/lovego/xiaomei/xiaomei/release"
+	"github.com/lovego/xiaomei/xiaomei/stack"
 )
 
 func (i Image) Run(publish []string) error {

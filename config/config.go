@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bughou-go/xiaomei/config/conf"
-	"github.com/bughou-go/xiaomei/utils/fs"
+	"github.com/lovego/xiaomei/config/conf"
+	"github.com/lovego/xiaomei/utils/fs"
 )
 
 var theConf = getConf()

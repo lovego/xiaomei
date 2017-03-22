@@ -1,14 +1,14 @@
 package main
 
 import (
-	_ "github.com/bughou-go/xiaomei/server/init" // this package must be the first.
+	_ "github.com/lovego/xiaomei/server/init" // this package must be the first.
 
 	"strings"
 
 	"{{ .ProPath }}/filter"
 	"{{ .ProPath }}/routes"
-	"github.com/bughou-go/xiaomei/server"
-	"github.com/bughou-go/xiaomei/server/xm"
+	"github.com/lovego/xiaomei/server"
+	"github.com/lovego/xiaomei/server/xm"
 )
 
 func main() {

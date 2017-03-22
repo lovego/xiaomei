@@ -3,8 +3,8 @@ package funcs
 import (
 	"strings"
 
-	"github.com/bughou-go/xiaomei/utils/slice"
-	"github.com/bughou-go/xiaomei/utils/strnum"
+	"github.com/lovego/xiaomei/utils/slice"
+	"github.com/lovego/xiaomei/utils/strnum"
 )
 
 func Map() map[string]interface{} {
