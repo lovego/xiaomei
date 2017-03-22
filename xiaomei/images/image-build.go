@@ -26,7 +26,7 @@ func (i Image) Build() error {
 		return err
 	}
 	utils.Log(color.GreenString(`building ` + i.svcName + ` image.`))
-	_, err := cmd.Run(cmd.O{Dir: i.BuildDir()}, `docker`, `build`,
+	_, err := cmd.Run(cmd.O{Dir: i.BuildDir()}, `docker`, `build`, `--pull`,
 		`--file=`+i.Dockerfile(), `--tag=`+stack.ImageNameOf(i.svcName), `.`,
 	)
 	return err
