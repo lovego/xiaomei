@@ -1,0 +1,7 @@
+FROM 192.168.202.12:5000/xiaomei/appserver
+
+RUN mkdir -p /home/ubuntu/logc/log 
+WORKDIR /home/ubuntu/logc
+
+ENTRYPOINT [ "logc" ]
+

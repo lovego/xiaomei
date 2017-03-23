@@ -1,3 +1,11 @@
+access 改为infra
+
+server timeout handle.
+
+spec 默认文件名风格修改
+
+docker logs优化
+
 alarm mailer 合并
 
 nginx no upstream问题: nginx-start: wait until host available，not good. may be use ip is better.
@@ -5,8 +13,6 @@ nginx no upstream问题: nginx-start: wait until host available，not good. may 
 rolling-update 测试
 
 rollback
-
-docker logs优化
 
 stack首次本地deploy未锁定image问题：在QA环境跟踪。
 

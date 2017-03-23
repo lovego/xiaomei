@@ -14,7 +14,7 @@ func (i Image) PrepareForBuild() error {
 }
 
 func (i Image) BuildDir() string {
-	return filepath.Join(release.Root(), `..`)
+	return filepath.Join(release.Root(), `img-access`)
 }
 
 func (i Image) Dockerfile() string {
@@ -22,7 +22,7 @@ func (i Image) Dockerfile() string {
 }
 
 func (i Image) FilesForRun() (result []string) {
-	if confs, err := filepath.Glob(release.Root() + `/../*.conf`); err != nil {
+	if confs, err := filepath.Glob(release.Root() + `img-access/*.conf`); err != nil {
 		panic(err)
 	} else {
 		for _, conf := range confs {
@@ -37,5 +37,5 @@ func (i Image) EnvForRun() []string {
 }
 
 func (i Image) CmdForRun() []string {
-	return []string{`sh`, `-c`, `nginx -t && nginx`}
+	return nil
 }
