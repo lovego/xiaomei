@@ -42,13 +42,16 @@ func runCmd(svcName string) *cobra.Command {
 	return cmd
 }
 func buildCmd(svcName, desc string) *cobra.Command {
-	return &cobra.Command{
+	var pull bool
+	cmd := &cobra.Command{
 		Use:   `build`,
 		Short: `build  ` + desc + `.`,
 		RunE: z.NoArgCall(func() error {
-			return images.Build(svcName)
+			return images.Build(svcName, pull)
 		}),
 	}
+	cmd.Flags().BoolVarP(&pull, `pull`, `p`, true, `pull base image.`)
+	return cmd
 }
 func pushCmd(svcName, desc string) *cobra.Command {
 	return &cobra.Command{
@@ -66,7 +69,7 @@ func deployCmd(svcName, desc string) *cobra.Command {
 		Short: `deploy the ` + desc + `.`,
 		RunE: z.NoArgCall(func() error {
 			if !noBuild {
-				if err := images.Build(svcName); err != nil {
+				if err := images.Build(svcName, true); err != nil {
 					return err
 				}
 			}

@@ -44,7 +44,7 @@ func (i Image) prepareForRun() error {
 			return err
 		}
 	} else {
-		if err := i.Build(); err != nil {
+		if err := i.Build(true); err != nil {
 			return err
 		}
 	}

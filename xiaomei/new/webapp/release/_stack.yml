@@ -4,7 +4,7 @@ services:
     image: 192.168.202.12:5000/{{ .Domain }}/app
     deploy:
       replicas: 2
-    volumes: ["logs:/home/ubuntu/logs"]
+    volumes: ["logs:/home/{{ .ProName }}/log"]
   web:
     ports: [ "8001:80" ]
     depends_on: [ app ]

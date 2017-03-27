@@ -1,7 +1,6 @@
 FROM 192.168.202.12:5000/xiaomei/appserver
 
-RUN mkdir /home/ubuntu/{{ .ProName }} /home/ubuntu/logs/{{ .ProName }} && \
-    ln -s /home/ubuntu/logs/{{ .ProName }} /home/ubuntu/{{ .ProName }}/log
+RUN mkdir -p /home/ubuntu/{{ .ProName }}/log
 WORKDIR /home/ubuntu/{{ .ProName }}
 
 CMD [ "./{{ .ProName }}" ]
