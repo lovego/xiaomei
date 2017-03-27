@@ -18,14 +18,20 @@ func commonCmds(svcName string) []*cobra.Command {
 			logsCmd(svcName, `stack`),
 		}
 	} else {
-		return []*cobra.Command{
-			runCmd(svcName),
-			buildCmd(svcName, `the `+svcName+` image`),
-			pushCmd(svcName, `the `+svcName+` image`),
+		cmds := []*cobra.Command{}
+		if images.Has(svcName) {
+			cmds = append(cmds,
+				runCmd(svcName),
+				buildCmd(svcName, `the `+svcName+` image`),
+				pushCmd(svcName, `the `+svcName+` image`),
+			)
+		}
+		cmds = append(cmds,
 			deployCmd(svcName, svcName+` service`),
 			psCmd(svcName, svcName+` service`),
 			logsCmd(svcName, svcName+` service`),
-		}
+		)
+		return cmds
 	}
 }
 

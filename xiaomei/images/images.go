@@ -16,6 +16,11 @@ var imagesMap = map[string]Image{
 	`access`: Image{`access`, access.Image{}},
 }
 
+func Has(svcName string) bool {
+	_, ok := imagesMap[svcName]
+	return ok
+}
+
 func Run(svcName string, ports []string) error {
 	image, ok := imagesMap[svcName]
 	if !ok {

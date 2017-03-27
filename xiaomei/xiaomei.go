@@ -5,10 +5,10 @@ import (
 	"io/ioutil"
 	"os"
 
-	// "github.com/lovego/xiaomei/utils"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/images/access"
 	"github.com/lovego/xiaomei/xiaomei/images/app"
+	"github.com/lovego/xiaomei/xiaomei/images/logc"
 	"github.com/lovego/xiaomei/xiaomei/images/web"
 	"github.com/lovego/xiaomei/xiaomei/new"
 	"github.com/lovego/xiaomei/xiaomei/release"
@@ -23,13 +23,15 @@ func main() {
 	appCmd := app.Cmd()
 	webCmd := web.Cmd()
 	accessCmd := access.Cmd()
-	clusterCmd := cluster.Cmd()
+	logcCmd := logc.Cmd()
+
 	appCmd.AddCommand(commonCmds(`app`)...)
 	webCmd.AddCommand(commonCmds(`web`)...)
 	accessCmd.AddCommand(commonCmds(`access`)...)
+	logcCmd.AddCommand(commonCmds(`logc`)...)
 
 	root := rootCmd()
-	root.AddCommand(appCmd, webCmd, accessCmd, clusterCmd)
+	root.AddCommand(appCmd, webCmd, accessCmd, logcCmd, cluster.Cmd())
 	root.AddCommand(commonCmds(``)...)
 	root.AddCommand(new.Cmd(), yamlCmd(), versionCmd())
 	root.Execute()
