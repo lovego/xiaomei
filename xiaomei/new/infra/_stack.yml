@@ -3,14 +3,22 @@ services:
   access:
     image: 192.168.202.12:5000/{{ .Domain }}/access
     deploy:
-      replicas: 2
+      mode: global
       placement: { constraints: [ node.labels.hasAccess==true ] }
-    volumes: ["logs:/var/log/nginx"]
+    volumes: [ "logs:/var/log/nginx" ]
     ports: ["80:80"]
   logc:
-    image: 192.168.202.12:5000/{{ .Domain }}/logc
+    image: 192.168.202.12:5000/xiaomei/logc
+    command: [ "org-name" ]
     deploy:
-      replicas: 2
-    volumes: ["logs:/"]
+      mode: global
+    volumes: 
+      - "logs:/"
+      - "project1_logs:/logs/project1"
+      - "project2_logs:/logs/project2"
 volumes:
   logs:
+  project1_logs:
+    external: true
+  project2_logs:
+    external: true
