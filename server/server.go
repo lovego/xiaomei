@@ -1,19 +1,20 @@
 package server
 
 import (
+	"fmt"
 	"net"
 	"net/http"
 	"path"
 	"runtime"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/lovego/xiaomei/config"
 	"github.com/lovego/xiaomei/server/funcs"
 	"github.com/lovego/xiaomei/server/xm"
 	"github.com/lovego/xiaomei/server/xm/renderer"
 	"github.com/lovego/xiaomei/server/xm/session"
 	"github.com/lovego/xiaomei/utils"
-	"github.com/fatih/color"
 )
 
 func init() {
@@ -23,6 +24,8 @@ func init() {
 }
 
 type Server struct {
+	*http.Server
+	HandleTimeout  time.Duration
 	FilterFunc     func(req *xm.Request, res *xm.Response) bool
 	Router         *xm.Router
 	Session        session.Session
@@ -50,18 +53,22 @@ func (s *Server) ListenAndServe() {
 		res.Write([]byte(`ok`))
 	})
 
+	if s.Server == nil {
+		s.Server = &http.Server{}
+	}
+	s.Server.Handler = s.Handler()
+
 	const addr = `:3000`
-	ln := listen(addr)
+	listener := listen(addr)
 	utils.Log(color.GreenString(`started. (` + addr + `)`))
 
-	svr := http.Server{Handler: s.Handler()}
-	if err := svr.Serve(ln); err != nil {
+	if err := s.Server.Serve(listener); err != nil {
 		panic(err)
 	}
 }
 
-func (s *Server) Handler() http.Handler {
-	return http.HandlerFunc(
+func (s *Server) Handler() (handler http.Handler) {
+	handler = http.HandlerFunc(
 		func(response http.ResponseWriter, request *http.Request) {
 			req := xm.NewRequest(request, s.Session)
 			res := xm.NewResponse(response, req, s.Session, s.Renderer, s.LayoutDataFunc)
@@ -74,6 +81,12 @@ func (s *Server) Handler() http.Handler {
 				notFound = !s.Router.Handle(req, res)
 			}
 		})
+	if s.HandleTimeout > 0 {
+		handler = http.TimeoutHandler(handler, s.HandleTimeout,
+			fmt.Sprintf(`ServeHTTP timeout after %s.`, s.HandleTimeout),
+		)
+	}
+	return
 }
 
 func listen(addr string) net.Listener {

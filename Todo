@@ -1,0 +1,8 @@
+alarm mailer 合并
+handle timeout 日志记录、监控问题。
+
+DONE:
+
+app dev开发环境 日志行为不一致问题：引入GODEV, GOENV与行为无关。
+error 返回方式处理，去掉模板，始终用json。
+session日志记录fix

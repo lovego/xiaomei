@@ -97,11 +97,21 @@ func (res *Response) Redirect(path string) {
 }
 
 func (res *Response) Status() int64 {
-	return reflect.ValueOf(res.ResponseWriter).Elem().FieldByName(`status`).Int()
+	s := reflect.ValueOf(res.ResponseWriter).Elem().FieldByName(`status`)
+	if s.IsValid() {
+		return s.Int()
+	} else {
+		return 0
+	}
 }
 
 func (res *Response) Size() int64 {
-	return reflect.ValueOf(res.ResponseWriter).Elem().FieldByName(`written`).Int()
+	s := reflect.ValueOf(res.ResponseWriter).Elem().FieldByName(`written`)
+	if s.IsValid() {
+		return s.Int()
+	} else {
+		return 0
+	}
 }
 
 func (res *Response) Hijack() (net.Conn, *bufio.ReadWriter, error) {
