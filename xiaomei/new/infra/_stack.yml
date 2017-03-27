@@ -13,12 +13,9 @@ services:
     deploy:
       mode: global
     volumes: 
-      - "logs:/"
-      - "project1_logs:/logs/project1"
-      - "project2_logs:/logs/project2"
+      - "logs:/home/ubuntu/logc/log"
+      - "example_logs:/logs/example"
 volumes:
   logs:
-  project1_logs:
-    external: true
-  project2_logs:
+  example_logs:
     external: true
