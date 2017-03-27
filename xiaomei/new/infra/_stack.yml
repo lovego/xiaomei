@@ -6,6 +6,11 @@ services:
       replicas: 2
       placement: { constraints: [ node.labels.hasAccess==true ] }
     volumes: ["logs:/var/log/nginx"]
-
+    ports: ["80:80"]
+  logc:
+    image: 192.168.202.12:5000/{{ .Domain }}/logc
+    deploy:
+      replicas: 2
+    volumes: ["logs:/"]
 volumes:
   logs:

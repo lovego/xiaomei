@@ -16,24 +16,24 @@ import (
 )
 
 func Cmd() *cobra.Command {
-	var isAccess bool
+	var isInfra bool
 	cmd := &cobra.Command{
 		Use:   `new <project-path>`,
 		Short: `create a new project.`,
 		RunE: z.Arg1Call(``, func(dir string) error {
-			return New(dir, isAccess)
+			return New(dir, isInfra)
 		}),
 	}
-	cmd.Flags().BoolVarP(&isAccess, `access`, `a`, false, `create a access project instead of webapp.`)
+	cmd.Flags().BoolVarP(&isInfra, `infra`, `i`, false, `create a infrastructures project.`)
 	return cmd
 }
 
-func New(proDir string, isAccess bool) error {
+func New(proDir string, isInfra bool) error {
 	proPath, err := getProjectPath(proDir)
 	if err != nil {
 		return err
 	}
-	tmplDir, err := getTmplDir(isAccess)
+	tmplDir, err := getTmplDir(isInfra)
 	if err != nil {
 		return err
 	}

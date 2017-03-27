@@ -7,14 +7,14 @@ import (
 	"github.com/lovego/xiaomei/utils/fs"
 )
 
-func getTmplDir(isAccess bool) (string, error) {
+func getTmplDir(isInfra bool) (string, error) {
 	srcPath, err := fs.GetGoSrcPath()
 	if err != nil {
 		return ``, err
 	}
 	tmplDir := filepath.Join(srcPath, `github.com/lovego/xiaomei/xiaomei/new`)
-	if isAccess {
-		return filepath.Join(tmplDir, `access`), nil
+	if isInfra {
+		return filepath.Join(tmplDir, `infra`), nil
 	} else {
 		return filepath.Join(tmplDir, `webapp`), nil
 	}

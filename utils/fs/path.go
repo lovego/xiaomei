@@ -36,13 +36,22 @@ func IsEmptyDir(p string) bool {
 	return err == io.EOF
 }
 
-func DetectDir(dir, feature string) string {
+func DetectDir(dir string, features ...string) string {
 	for ; dir != `/`; dir = filepath.Dir(dir) {
-		if Exist(filepath.Join(dir, feature)) {
+		if hasAllFeatures(dir, features) {
 			return dir
 		}
 	}
 	return ``
+}
+
+func hasAllFeatures(dir string, features []string) bool {
+	for _, feature := range features {
+		if !Exist(filepath.Join(dir, feature)) {
+			return false
+		}
+	}
+	return true
 }
 
 func GetGoSrcPath() (string, error) {
