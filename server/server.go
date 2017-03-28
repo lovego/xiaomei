@@ -67,28 +67,6 @@ func (s *Server) ListenAndServe() {
 	}
 }
 
-func (s *Server) Handler() (handler http.Handler) {
-	handler = http.HandlerFunc(
-		func(response http.ResponseWriter, request *http.Request) {
-			req := xm.NewRequest(request, s.Session)
-			res := xm.NewResponse(response, req, s.Session, s.Renderer, s.LayoutDataFunc)
-
-			var notFound bool
-			defer handleError(time.Now(), req, res, &notFound)
-
-			// 如果返回true，继续交给路由处理
-			if req.Request.URL.Path == alivePath || s.FilterFunc == nil || s.FilterFunc(req, res) {
-				notFound = !s.Router.Handle(req, res)
-			}
-		})
-	if s.HandleTimeout > 0 {
-		handler = http.TimeoutHandler(handler, s.HandleTimeout,
-			fmt.Sprintf(`ServeHTTP timeout after %s.`, s.HandleTimeout),
-		)
-	}
-	return
-}
-
 func listen(addr string) net.Listener {
 	if ln, err := net.Listen(`tcp`, addr); err != nil {
 		panic(err)

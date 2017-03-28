@@ -9,72 +9,93 @@ import (
 	"strings"
 )
 
-type Tmpl struct {
-	*template.Template
-	loaded map[string]bool
-}
-
 type Renderer struct {
-	Root   string
-	Layout string
-	Tmpls  map[string]*Tmpl
-	Funcs  template.FuncMap
+	Root      string
+	Layout    string
+	Templates map[string]*template.Template
+
+	Funcs template.FuncMap
 }
 
 func New(root, layout string, cache bool, funcs template.FuncMap) *Renderer {
-	var tmpls map[string]*Tmpl
-	if cache {
-		tmpls = make(map[string]*Tmpl)
-	}
-	return &Renderer{
+	r := &Renderer{
 		Root:   path.Clean(root),
 		Layout: path.Clean(layout),
-		Tmpls:  tmpls,
 		Funcs:  funcs,
 	}
+	if cache {
+		r.Templates = make(map[string]*template.Template)
+	}
+	return r
 }
 
 func (r *Renderer) Render(wr io.Writer, name string, data interface{}, option O) {
 	option = option.Process(r)
-	tmpl := r.getTemplate(name, option)
+	tmpl := r.getTarget(name, option)
 	var err error
 	if option.HasLayout() {
-		err = tmpl.Template.ExecuteTemplate(wr, option.Layout, option.LayoutData(data))
+		err = tmpl.ExecuteTemplate(wr, option.Layout, option.LayoutData(data))
 	} else {
-		err = tmpl.Template.Execute(wr, data)
+		err = tmpl.Execute(wr, data)
 	}
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (r *Renderer) getTemplate(name string, option O) *Tmpl {
+func (r *Renderer) getTarget(name string, option O) *template.Template {
 	name = cleanName(name)
-	tmpl := r.Tmpls[name]
+	key := name
+	if option.HasLayout() {
+		key += `@` + option.Layout
+	}
+	tmpl := r.Templates[key]
 	if tmpl == nil {
-		tmpl = &Tmpl{template.New(``), make(map[string]bool)}
+		if option.HasLayout() {
+			tmpl = r.getTemplateWithLayout(name, option)
+			if r.Templates != nil {
+				r.Templates[key] = tmpl
+			}
+		} else {
+			tmpl = r.getTemplate(name, name, option.Funcs)
+		}
+	}
+	return tmpl
+}
+func (r *Renderer) getTemplateWithLayout(name string, option O) *template.Template {
+	layoutTmpl, err := r.getTemplate(option.Layout, option.Layout, option.Funcs).Clone()
+	if err != nil {
+		panic(err)
+	}
+	for _, t := range r.getTemplate(name, ``, option.Funcs).Templates() {
+		if _, err := layoutTmpl.AddParseTree(t.Name(), t.Tree); err != nil {
+			panic(err)
+		}
+	}
+	return layoutTmpl
+}
+
+// 针对同一个模板使用不同的funcs，因为缓存的原因，会得到非预期的结果。
+func (r *Renderer) getTemplate(name, _name string, funcs template.FuncMap) *template.Template {
+	tmpl := r.Templates[name]
+	if tmpl == nil {
+		tmpl = template.New(_name)
 		if r.Funcs != nil {
 			tmpl.Funcs(r.Funcs)
 		}
-		if option.Funcs != nil {
-			tmpl.Funcs(option.Funcs)
+		if funcs != nil {
+			tmpl.Funcs(funcs)
 		}
-		parseTemplate(tmpl.Template, name, r.Root, r.Root, tmpl.loaded)
-		if r.Tmpls != nil {
-			r.Tmpls[name] = tmpl
-		}
-	}
-	if option.HasLayout() {
-		layout := option.Layout
-		if tmpl.Lookup(layout) == nil {
-			parseTemplate(tmpl.Template.New(layout), layout, r.Root, r.Root, tmpl.loaded)
+		parseTemplate(tmpl, name, r.Root, r.Root, make(map[string]bool))
+		if r.Templates != nil {
+			r.Templates[name] = tmpl
 		}
 	}
 	return tmpl
 }
 
 // 关联模板中不能含有同名模板
-func parseTemplate(templ *template.Template, name, base, root string, loaded map[string]bool) {
+func parseTemplate(tmpl *template.Template, name, base, root string, loaded map[string]bool) {
 	var p string
 	if path.IsAbs(name) {
 		p = path.Join(root, name)
@@ -85,10 +106,10 @@ func parseTemplate(templ *template.Template, name, base, root string, loaded map
 	if err != nil {
 		panic(err)
 	}
-	template.Must(templ.Parse(string(content)))
+	template.Must(tmpl.Parse(string(content)))
 
 	var new []string
-	for _, t := range templ.Templates() { // 所有已关联的模板，包括自己
+	for _, t := range tmpl.Templates() { // 所有已关联的模板，包括自己
 		nam := t.Name()
 		if nam != name && strings.IndexByte(nam, '/') >= 0 && !loaded[nam] {
 			loaded[nam] = true
@@ -98,7 +119,7 @@ func parseTemplate(templ *template.Template, name, base, root string, loaded map
 
 	base = path.Dir(p)
 	for _, nam := range new {
-		parseTemplate(templ.New(nam), nam, base, root, loaded)
+		parseTemplate(tmpl.New(nam), nam, base, root, loaded)
 	}
 }
 
