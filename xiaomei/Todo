@@ -1,5 +1,3 @@
-access 改为infra
-
 spec 默认文件名风格修改
 
 docker logs优化
@@ -15,6 +13,7 @@ stack首次本地deploy未锁定image问题：在QA环境跟踪。
 web run 无日志问题: exec tail
 
 DONE:
+access 改为infra
 web使用replicas模式，外部接入使用所有accessNode。
 pull base images when build
 服务容器来不及看logs就被移除的问题: docker swarm update --task-history-limit。
