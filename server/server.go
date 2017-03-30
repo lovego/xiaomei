@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net"
 	"net/http"
 	"path"
@@ -46,13 +45,7 @@ func NewRenderer() *renderer.Renderer {
 	)
 }
 
-const alivePath = `/_alive`
-
 func (s *Server) ListenAndServe() {
-	s.Router.Root(`GET`, alivePath, func(req *xm.Request, res *xm.Response) {
-		res.Write([]byte(`ok`))
-	})
-
 	if s.Server == nil {
 		s.Server = &http.Server{}
 	}

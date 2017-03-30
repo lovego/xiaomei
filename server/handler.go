@@ -1,6 +1,8 @@
 package server
 
 import (
+	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/lovego/xiaomei/config"
@@ -8,25 +10,29 @@ import (
 )
 
 func (s *Server) Handler() (handler http.Handler) {
-	handler = http.HandlerFunc(
-		func(response http.ResponseWriter, request *http.Request) {
-			req := xm.NewRequest(request, s.Session)
-			res := xm.NewResponse(response, req, s.Session, s.Renderer, s.LayoutDataFunc)
+	sysRoutes(s.Router)
 
-			var notFound bool
-			defer handleError(time.Now(), req, res, &notFound)
-
-			// 如果返回true，继续交给路由处理
-			if req.Request.URL.Path == alivePath || s.FilterFunc == nil || s.FilterFunc(req, res) {
-				notFound = !s.Router.Handle(req, res)
-			}
-		})
+	handler = s
 	if s.HandleTimeout > 0 {
 		handler = http.TimeoutHandler(handler, s.HandleTimeout,
 			fmt.Sprintf(`ServeHTTP timeout after %s.`, s.HandleTimeout),
 		)
 	}
 	return
+}
+
+func (s *Server) ServeHTTP(response http.ResponseWriter, request *http.Request) {
+	startTime := time.Now()
+	req := xm.NewRequest(request, s.Session)
+	res := xm.NewResponse(response, req, s.Session, s.Renderer, s.LayoutDataFunc)
+
+	var notFound bool
+	defer handleError(startTime, req, res, &notFound)
+
+	// 如果返回true，继续交给路由处理
+	if req.Request.URL.Path == alivePath || s.FilterFunc == nil || s.FilterFunc(req, res) {
+		notFound = !s.Router.Handle(req, res)
+	}
 }
 
 func handleError(t time.Time, req *xm.Request, res *xm.Response, notFound *bool) {
