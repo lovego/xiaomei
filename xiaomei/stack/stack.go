@@ -62,14 +62,17 @@ func PortsOf(svcName string) (ports []string) {
 	service := GetService(svcName)
 	iports, _ := service[`ports`].([]interface{})
 	for i, iport := range iports {
-		if port, ok := iport.(string); ok {
+		switch port := iport.(type) {
+		case string:
 			if index := strings.IndexByte(port, ':'); index < 0 {
 				panic(fmt.Sprintf(
 					`stack.yml: services.%s.ports: random host port is not allowed: %s.`, svcName, port,
 				))
 			}
 			ports = append(ports, port)
-		} else {
+		case map[interface{}]interface{}:
+			ports = append(ports, fmt.Sprint(port[`published`])+`:`+fmt.Sprint(port[`target`]))
+		default:
 			panic(fmt.Sprintf(
 				`stack.yml: services.%s.ports[%d]: should be a string, got: %s.`, svcName, i, iport,
 			))

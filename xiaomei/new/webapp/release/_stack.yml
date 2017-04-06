@@ -6,7 +6,7 @@ services:
       replicas: 2
       update_config:
         monitor: 1m
-    volumes: ["logs:/home/{{ .ProName }}/log"]
+    volumes: ["logs:/home/ubuntu/{{ .ProName }}/log"]
   web:
     ports: [ "8001:80" ]
     depends_on: [ app ]
