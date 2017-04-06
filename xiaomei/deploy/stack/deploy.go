@@ -5,14 +5,18 @@ import (
 	"gopkg.in/yaml.v2"
 	"text/template"
 
+	"github.com/fatih/color"
 	"github.com/lovego/xiaomei/utils"
 	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/release"
-	"github.com/fatih/color"
 )
 
-func Deploy(svcName string, rmCurrent bool) error {
+var Driver driver
+
+type driver struct{}
+
+func (d driver) Deploy(svcName string, rmCurrent bool) error {
 	if svcName == `` {
 		utils.Log(color.GreenString(`deploying all services.`))
 	} else {
@@ -29,13 +33,13 @@ func Deploy(svcName string, rmCurrent bool) error {
 	if _, err := cluster.Run(cmd.O{Stdin: bytes.NewReader(stackYaml)}, script); err != nil {
 		return err
 	}
-	return Ps(svcName, true, nil)
+	return d.Ps(svcName, true, nil)
 }
 
 func getDeployStack(svcName string) ([]byte, error) {
-	stack := GetStack()
+	stack := release.GetStack()
 	if svcName != `` {
-		stack.Services = map[string]Service{svcName: GetService(svcName)}
+		stack.Services = map[string]release.Service{svcName: release.GetService(svcName)}
 	}
 	if app, ok := stack.Services[`app`]; ok {
 		app[`environment`] = map[string]string{`GOENV`: release.Env()}

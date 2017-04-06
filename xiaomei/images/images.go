@@ -7,7 +7,7 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/images/access"
 	"github.com/lovego/xiaomei/xiaomei/images/app"
 	"github.com/lovego/xiaomei/xiaomei/images/web"
-	"github.com/lovego/xiaomei/xiaomei/stack"
+	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
 var imagesMap = map[string]Image{
@@ -31,7 +31,7 @@ func Run(svcName string, ports []string) error {
 
 func Build(svcName string, pull bool) error {
 	if svcName == `` {
-		return stack.EachServiceDo(func(svcName string) error {
+		return release.EachServiceDo(func(svcName string) error {
 			return Build(svcName, pull)
 		})
 	}
@@ -44,12 +44,12 @@ func Build(svcName string, pull bool) error {
 
 func Push(svcName string) error {
 	if svcName == `` {
-		return stack.EachServiceDo(Push)
+		return release.EachServiceDo(Push)
 	}
 	if _, ok := imagesMap[svcName]; !ok {
 		return nil
 	}
 	utils.Log(color.GreenString(`pushing ` + svcName + ` image.`))
-	_, err := cmd.Run(cmd.O{}, `docker`, `push`, stack.ImageNameOf(svcName))
+	_, err := cmd.Run(cmd.O{}, `docker`, `push`, release.ImageNameOf(svcName))
 	return err
 }

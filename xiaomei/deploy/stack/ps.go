@@ -9,7 +9,7 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-func Ps(svcName string, watch bool, options []string) error {
+func (d driver) Ps(svcName string, watch bool, options []string) error {
 	var script string
 	if svcName != `` {
 		script = fmt.Sprintf(`docker service ps %s_%s`, release.Name(), svcName)

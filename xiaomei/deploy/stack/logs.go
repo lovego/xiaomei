@@ -3,17 +3,17 @@ package stack
 import (
 	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/release"
-	"github.com/fatih/color"
 )
 
-func Logs(svcName string, all bool) error {
+func (d driver) Logs(svcName string, all bool) error {
 	if svcName != `` {
 		return serviceLog(svcName, all)
 	}
-	for svcName, _ = range GetStack().Services {
+	for svcName, _ = range release.GetStack().Services {
 		if err := serviceLog(svcName, all); err != nil {
 			return err
 		}

@@ -6,7 +6,6 @@ import (
 
 	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/release"
-	"github.com/lovego/xiaomei/xiaomei/stack"
 )
 
 func (i Image) Run(publish []string) error {
@@ -29,7 +28,7 @@ func (i Image) Run(publish []string) error {
 	for _, env := range i.EnvForRun() {
 		args = append(args, `-e`, env)
 	}
-	args = append(args, stack.ImageNameOf(i.svcName))
+	args = append(args, release.ImageNameOf(i.svcName))
 	if cmd := i.CmdForRun(); cmd != nil {
 		args = append(args, cmd...)
 	}
@@ -39,7 +38,7 @@ func (i Image) Run(publish []string) error {
 
 func (i Image) prepareForRun() error {
 	if cmd.Ok(cmd.O{NoStdout: true, NoStderr: true},
-		`docker`, `image`, `inspect`, stack.ImageNameOf(i.svcName)) {
+		`docker`, `image`, `inspect`, release.ImageNameOf(i.svcName)) {
 		if err := i.PrepareForBuild(); err != nil {
 			return err
 		}
@@ -67,7 +66,7 @@ func (i Image) networkNameForRun() string {
 
 func (i Image) publishForRun(publish []string) ([]string, error) {
 	if len(publish) == 0 {
-		if publish = stack.PortsOf(i.svcName); len(publish) == 0 {
+		if publish = release.PortsOf(i.svcName); len(publish) == 0 {
 			var err error
 			if publish, err = i.exposedPorts(); err != nil {
 				return nil, err
@@ -87,7 +86,7 @@ func (i Image) publishForRun(publish []string) ([]string, error) {
 func (i Image) exposedPorts() ([]string, error) {
 	var m map[string]interface{}
 	if output, err := cmd.Run(cmd.O{Output: true}, `docker`, `inspect`,
-		`-f`, `{{ json .Config.ExposedPorts }}`, stack.ImageNameOf(i.svcName),
+		`-f`, `{{ json .Config.ExposedPorts }}`, release.ImageNameOf(i.svcName),
 	); err != nil {
 		return nil, err
 	} else if err := json.Unmarshal([]byte(output), &m); err != nil {

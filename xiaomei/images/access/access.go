@@ -7,7 +7,6 @@ import (
 
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/release"
-	"github.com/lovego/xiaomei/xiaomei/stack"
 )
 
 func Config() (string, error) {
@@ -47,7 +46,7 @@ func getServerNames() string {
 }
 
 func getBackendSvcName() string {
-	stack := stack.GetStack()
+	stack := release.GetStack()
 	if stack.Services[`web`] != nil {
 		return `web`
 	}
@@ -58,7 +57,7 @@ func getBackendSvcName() string {
 }
 
 func publicPort(svcName string) string {
-	if ports := stack.PortsOf(svcName); len(ports) > 0 {
+	if ports := release.PortsOf(svcName); len(ports) > 0 {
 		port := ports[0]
 		return port[:strings.IndexByte(port, ':')]
 	}

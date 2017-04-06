@@ -4,7 +4,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/lovego/xiaomei/utils"
 	"github.com/lovego/xiaomei/utils/cmd"
-	"github.com/lovego/xiaomei/xiaomei/stack"
+	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
 type Image struct {
@@ -30,7 +30,7 @@ func (i Image) Build(pull bool) error {
 	if pull {
 		args = append(args, `--pull`)
 	}
-	args = append(args, `--file=`+i.Dockerfile(), `--tag=`+stack.ImageNameOf(i.svcName), `.`)
+	args = append(args, `--file=`+i.Dockerfile(), `--tag=`+release.ImageNameOf(i.svcName), `.`)
 	_, err := cmd.Run(cmd.O{Dir: i.BuildDir()}, `docker`, args...)
 	return err
 }
