@@ -35,18 +35,6 @@ func commonCmds(svcName string) []*cobra.Command {
 	}
 }
 
-func runCmd(svcName string) *cobra.Command {
-	var publish []string
-	cmd := &cobra.Command{
-		Use:   `run`,
-		Short: `run    the ` + svcName + ` image.`,
-		RunE: z.NoArgCall(func() error {
-			return images.Run(svcName, publish)
-		}),
-	}
-	cmd.Flags().StringSliceVarP(&publish, `publish`, `p`, nil, `publish ports for container.`)
-	return cmd
-}
 func buildCmd(svcName, desc string) *cobra.Command {
 	var pull bool
 	cmd := &cobra.Command{
@@ -59,6 +47,7 @@ func buildCmd(svcName, desc string) *cobra.Command {
 	cmd.Flags().BoolVarP(&pull, `pull`, `p`, true, `pull base image.`)
 	return cmd
 }
+
 func pushCmd(svcName, desc string) *cobra.Command {
 	return &cobra.Command{
 		Use:   `push`,
@@ -67,6 +56,19 @@ func pushCmd(svcName, desc string) *cobra.Command {
 			return images.Push(svcName)
 		}),
 	}
+}
+
+func runCmd(svcName string) *cobra.Command {
+	// var publish []string
+	cmd := &cobra.Command{
+		Use:   `run`,
+		Short: `run    the ` + svcName + ` image.`,
+		RunE: z.NoArgCall(func() error {
+			return deploy.Run(svcName, images.Get(svcName))
+		}),
+	}
+	// cmd.Flags().StringSliceVarP(&publish, `publish`, `p`, nil, `publish ports for container.`)
+	return cmd
 }
 func deployCmd(svcName, desc string) *cobra.Command {
 	var noBuild, noPush, rmCurrent bool
@@ -84,12 +86,12 @@ func deployCmd(svcName, desc string) *cobra.Command {
 					return err
 				}
 			}
-			return deploy.Deploy(svcName, rmCurrent)
+			return deploy.Deploy(svcName) // , rmCurrent)
 		}),
 	}
 	cmd.Flags().BoolVarP(&noBuild, `no-build`, `B`, false, `do not build the images.`)
 	cmd.Flags().BoolVarP(&noPush, `no-push`, `P`, false, `do not push the images.`)
-	cmd.Flags().BoolVar(&rmCurrent, `rm-current`, false, `remove the current running `+desc+`.`)
+	// cmd.Flags().BoolVar(&rmCurrent, `rm-current`, false, `remove the current running `+desc+`.`)
 	return cmd
 }
 

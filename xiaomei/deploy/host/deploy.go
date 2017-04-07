@@ -7,7 +7,7 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 )
 
-func (d driver) Deploy(svcName string, rmCurrent bool) error {
+func (d driver) Deploy(svcName string) error {
 	serviceNames := []string{}
 	if svcName != `` {
 		serviceNames = append(serviceNames, svcName)

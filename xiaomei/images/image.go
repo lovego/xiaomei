@@ -16,9 +16,7 @@ type imageDriver interface {
 	PrepareForBuild() error
 	BuildDir() string
 	Dockerfile() string
-	FilesForRun() []string
-	EnvForRun() []string
-	CmdForRun() []string
+	deploy.Runnable
 }
 
 func (i Image) Build(pull bool) error {
@@ -33,4 +31,13 @@ func (i Image) Build(pull bool) error {
 	args = append(args, `--file=`+i.Dockerfile(), `--tag=`+deploy.ImageNameOf(i.svcName), `.`)
 	_, err := cmd.Run(cmd.O{Dir: i.BuildDir()}, `docker`, args...)
 	return err
+}
+
+func (i Image) PrepareOrBuild(i Image) error {
+	if cmd.Ok(cmd.O{NoStdout: true, NoStderr: true},
+		`docker`, `image`, `inspect`, deploy.ImageNameOf(i.svcName)) {
+		return i.PrepareForBuild()
+	} else {
+		return i.Build(true)
+	}
 }

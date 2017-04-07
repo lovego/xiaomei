@@ -21,12 +21,12 @@ func Has(svcName string) bool {
 	return ok
 }
 
-func Run(svcName string, ports []string) error {
-	image, ok := imagesMap[svcName]
-	if !ok {
-		return nil
+func Get(svcName string) Image {
+	if img, ok := imagesMap[svcName]; !ok {
+		panic(`no image for: ` + svcName)
+	} else {
+		return img
 	}
-	return image.Run(ports)
 }
 
 func Build(svcName string, pull bool) error {
