@@ -8,9 +8,9 @@ services:
         monitor: 1m
     volumes: ["logs:/home/ubuntu/{{ .ProName }}/log"]
   web:
+    image: 192.168.202.12:5000/{{ .Domain }}/web
     ports: [ "8001:80" ]
     depends_on: [ app ]
-    image: 192.168.202.12:5000/{{ .Domain }}/web
     deploy:
       replicas: 2
       placement: { constraints: [ node.labels.hasAccess==true ] }

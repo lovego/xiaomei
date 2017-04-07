@@ -1,4 +1,4 @@
-package stack
+package host
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ func (d driver) Logs(svcName string, all bool) error {
 	if svcName != `` {
 		return serviceLog(svcName, all)
 	}
-	for svcName, _ = range release.GetStack().Services {
+	for svcName = range d.ServiceNames() {
 		if err := serviceLog(svcName, all); err != nil {
 			return err
 		}

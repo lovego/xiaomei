@@ -1,4 +1,4 @@
-package stack
+package swarm
 
 import (
 	"bytes"
@@ -11,10 +11,6 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
-
-var Driver driver
-
-type driver struct{}
 
 func (d driver) Deploy(svcName string, rmCurrent bool) error {
 	if svcName == `` {
@@ -37,9 +33,9 @@ func (d driver) Deploy(svcName string, rmCurrent bool) error {
 }
 
 func getDeployStack(svcName string) ([]byte, error) {
-	stack := release.GetStack()
+	stack := getStack()
 	if svcName != `` {
-		stack.Services = map[string]release.Service{svcName: release.GetService(svcName)}
+		stack.Services = map[string]service{svcName: getService(svcName)}
 	}
 	if app, ok := stack.Services[`app`]; ok {
 		app[`environment`] = map[string]string{`GOENV`: release.Env()}

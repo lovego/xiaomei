@@ -84,7 +84,7 @@ func deployCmd(svcName, desc string) *cobra.Command {
 					return err
 				}
 			}
-			return deploy.Driver.Deploy(svcName, rmCurrent)
+			return deploy.Deploy(svcName, rmCurrent)
 		}),
 	}
 	cmd.Flags().BoolVarP(&noBuild, `no-build`, `B`, false, `do not build the images.`)
@@ -99,7 +99,7 @@ func psCmd(svcName, desc string) *cobra.Command {
 		Use:   `ps`,
 		Short: `list tasks of the ` + desc + `.`,
 		RunE: func(c *cobra.Command, args []string) error {
-			return deploy.Driver.Ps(svcName, watch, args)
+			return deploy.Ps(svcName, watch, args)
 		},
 	}
 	cmd.Flags().BoolVarP(&watch, `watch`, `w`, false, `watch ps.`)
@@ -112,7 +112,7 @@ func logsCmd(svcName, desc string) *cobra.Command {
 		Use:   `logs`,
 		Short: `list logs  of the ` + desc + `.`,
 		RunE: func(c *cobra.Command, args []string) error {
-			return deploy.Driver.Logs(svcName, all)
+			return deploy.Logs(svcName, all)
 		},
 	}
 	cmd.Flags().BoolVarP(&all, `all`, `a`, false, `list logs of all containers.`)

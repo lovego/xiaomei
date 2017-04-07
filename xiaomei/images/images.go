@@ -4,10 +4,10 @@ import (
 	"github.com/fatih/color"
 	"github.com/lovego/xiaomei/utils"
 	"github.com/lovego/xiaomei/utils/cmd"
+	"github.com/lovego/xiaomei/xiaomei/deploy"
 	"github.com/lovego/xiaomei/xiaomei/images/access"
 	"github.com/lovego/xiaomei/xiaomei/images/app"
 	"github.com/lovego/xiaomei/xiaomei/images/web"
-	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
 var imagesMap = map[string]Image{
@@ -31,7 +31,7 @@ func Run(svcName string, ports []string) error {
 
 func Build(svcName string, pull bool) error {
 	if svcName == `` {
-		return release.EachServiceDo(func(svcName string) error {
+		return eachServiceDo(func(svcName string) error {
 			return Build(svcName, pull)
 		})
 	}
@@ -44,12 +44,23 @@ func Build(svcName string, pull bool) error {
 
 func Push(svcName string) error {
 	if svcName == `` {
-		return release.EachServiceDo(Push)
+		return eachServiceDo(Push)
 	}
 	if _, ok := imagesMap[svcName]; !ok {
 		return nil
 	}
 	utils.Log(color.GreenString(`pushing ` + svcName + ` image.`))
-	_, err := cmd.Run(cmd.O{}, `docker`, `push`, release.ImageNameOf(svcName))
+	_, err := cmd.Run(cmd.O{}, `docker`, `push`, deploy.ImageNameOf(svcName))
 	return err
+}
+
+func eachServiceDo(work func(svcName string) error) error {
+	for svcName := range deploy.ServiceNames() {
+		if svcName != `` {
+			if err := work(svcName); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }

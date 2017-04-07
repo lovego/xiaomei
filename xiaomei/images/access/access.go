@@ -6,6 +6,7 @@ import (
 	"text/template"
 
 	"github.com/lovego/xiaomei/xiaomei/cluster"
+	"github.com/lovego/xiaomei/xiaomei/deploy"
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
@@ -28,7 +29,7 @@ func getConfigData() interface{} {
 	}
 	svcName := getBackendSvcName()
 	backendName := release.Name() + `_` + svcName
-	if port := publicPort(svcName); port == `` {
+	if port := publicPorts(svcName); port == `` {
 		data.BackendAddr = backendName + `:` + portOfService(svcName)
 	} else {
 		data.UpstreamName = backendName
@@ -46,18 +47,18 @@ func getServerNames() string {
 }
 
 func getBackendSvcName() string {
-	stack := release.GetStack()
-	if stack.Services[`web`] != nil {
+	services := deploy.ServiceNames()
+	if services[`web`] {
 		return `web`
 	}
-	if stack.Services[`app`] != nil {
+	if services[`app`] {
 		return `app`
 	}
-	panic(`no backend service found in stack.yml.`)
+	panic(`no backend service found in release.yml.`)
 }
 
-func publicPort(svcName string) string {
-	if ports := release.PortsOf(svcName); len(ports) > 0 {
+func publicPorts(svcName string) string {
+	if ports := deploy.PortsOf(svcName); len(ports) > 0 {
 		port := ports[0]
 		return port[:strings.IndexByte(port, ':')]
 	}
