@@ -2,16 +2,11 @@ package deploy
 
 import (
 	"github.com/lovego/xiaomei/utils/cmd"
+	"github.com/lovego/xiaomei/xiaomei/images"
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-type Runnable interface {
-	FilesForRun() []string
-	EnvForRun() []string
-	CmdForRun() []string
-}
-
-func Run(svcName string, img Runnable) error {
+func Run(svcName string, img images.Image) error {
 	args := []string{`run`, `-it`, `--rm`,
 		`--name=` + release.Name() + `_` + svcName,
 	}

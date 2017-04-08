@@ -9,18 +9,12 @@ type driver interface {
 	Deploy(svcName string) error
 	Logs(svcName string, all bool) error
 	Ps(svcName string, watch bool, options []string) error
-	// called by images package
+	// register to release package
 	ImageNameOf(svcName string) string
 	PortsOf(svcName string) []string
 	ServiceNames() map[string]bool
 	// called by Run
 	FlagsForRun(svcName string) ([]string, error)
-}
-
-var driversMap = make(map[string]driver)
-
-func RegisterDriver(file string, d driver) {
-	driversMap[file] = d
 }
 
 var theDriver driver

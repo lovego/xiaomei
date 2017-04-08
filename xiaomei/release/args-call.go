@@ -1,4 +1,4 @@
-package z
+package release
 
 import (
 	"errors"

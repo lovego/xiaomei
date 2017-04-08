@@ -7,7 +7,6 @@ import (
 	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/release"
-	"github.com/lovego/xiaomei/xiaomei/z"
 	"github.com/spf13/cobra"
 )
 
@@ -24,7 +23,7 @@ func printCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   `print`,
 		Short: `print access config for the project.`,
-		RunE: z.NoArgCall(func() error {
+		RunE: release.NoArgCall(func() error {
 			if conf, err := Config(); err != nil {
 				return err
 			} else {
@@ -39,7 +38,7 @@ func setupCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   `setup`,
 		Short: `setup access config for the project.`,
-		RunE: z.NoArgCall(func() error {
+		RunE: release.NoArgCall(func() error {
 			if conf, err := Config(); err != nil {
 				return err
 			} else {

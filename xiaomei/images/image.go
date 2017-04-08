@@ -4,7 +4,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/lovego/xiaomei/utils"
 	"github.com/lovego/xiaomei/utils/cmd"
-	"github.com/lovego/xiaomei/xiaomei/deploy"
 )
 
 type Image struct {
@@ -16,10 +15,17 @@ type imageDriver interface {
 	PrepareForBuild() error
 	BuildDir() string
 	Dockerfile() string
-	deploy.Runnable
+
+	Runnable
 }
 
-func (i Image) Build(pull bool) error {
+type Runnable interface {
+	FilesForRun() []string
+	EnvForRun() []string
+	CmdForRun() []string
+}
+
+func (i Image) Build(imgName string, pull bool) error {
 	if err := i.PrepareForBuild(); err != nil {
 		return err
 	}
@@ -28,16 +34,16 @@ func (i Image) Build(pull bool) error {
 	if pull {
 		args = append(args, `--pull`)
 	}
-	args = append(args, `--file=`+i.Dockerfile(), `--tag=`+deploy.ImageNameOf(i.svcName), `.`)
+	args = append(args, `--file=`+i.Dockerfile(), `--tag=`+imgName, `.`)
 	_, err := cmd.Run(cmd.O{Dir: i.BuildDir()}, `docker`, args...)
 	return err
 }
 
-func (i Image) PrepareOrBuild(i Image) error {
+func (i Image) PrepareOrBuild(imgName string) error {
 	if cmd.Ok(cmd.O{NoStdout: true, NoStderr: true},
-		`docker`, `image`, `inspect`, deploy.ImageNameOf(i.svcName)) {
+		`docker`, `image`, `inspect`, imgName) {
 		return i.PrepareForBuild()
 	} else {
-		return i.Build(true)
+		return i.Build(imgName, true)
 	}
 }

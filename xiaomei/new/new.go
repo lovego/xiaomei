@@ -11,7 +11,7 @@ import (
 	"text/template"
 
 	"github.com/lovego/xiaomei/utils/fs"
-	"github.com/lovego/xiaomei/xiaomei/z"
+	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +20,7 @@ func Cmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `new <project-path>`,
 		Short: `create a new project.`,
-		RunE: z.Arg1Call(``, func(dir string) error {
+		RunE: release.Arg1Call(``, func(dir string) error {
 			return New(dir, isInfra)
 		}),
 	}
