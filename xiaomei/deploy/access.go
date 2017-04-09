@@ -90,13 +90,13 @@ func getServiceToAccess() string {
 }
 
 const accessConfTmpl = `
-{{ if .UpstreamName -}}
+{{- if .UpstreamName -}}
 upstream {{ .UpstreamName }} {
   {{- range .UpstreamAddrs }}
   server {{ . }};
   {{- end }}
 }
-{{- end }}
+{{ end -}}
 
 server {
   listen 80;

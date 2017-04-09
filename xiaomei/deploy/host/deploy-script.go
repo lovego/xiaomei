@@ -17,7 +17,7 @@ deploy() {
   docker run --name=$name -e {{.PortEnv}}=$1 \
 	{{ range .Envs }} -e {{ . }}{{ end }} \
 	{{ range .Volumes}} -v {{ . }}{{ end }} \
-	--network=host --restart=always {{.Image}}
+	--network=host --restart=always -d {{.Image}}
 }
 {{ range .VolumesToCreate }}
 docker volume create {{ .Volume }}

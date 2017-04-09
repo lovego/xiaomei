@@ -21,11 +21,11 @@ func Run(svcName string) error {
 		args = append(args, flags...)
 	}
 
-	for _, file := range img.FilesForRun() {
-		args = append(args, `-v`, file)
-	}
 	for _, env := range img.EnvsForRun() {
 		args = append(args, `-e`, env)
+	}
+	for _, file := range img.FilesForRun() {
+		args = append(args, `-v`, file)
 	}
 	args = append(args, ImageNameOf(svcName))
 	if cmd := img.CmdForRun(); cmd != nil {
