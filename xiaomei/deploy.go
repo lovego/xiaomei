@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/lovego/xiaomei/xiaomei/deploy"
-	"github.com/lovego/xiaomei/xiaomei/images"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/spf13/cobra"
 )
@@ -14,7 +13,7 @@ func runCmdFor(svcName string) *cobra.Command {
 		Use:   `run`,
 		Short: `run    the ` + deployDesc(svcName) + `.`,
 		RunE: release.NoArgCall(func() error {
-			return deploy.Run(svcName, images.Get(svcName))
+			return deploy.Run(svcName)
 		}),
 	}
 	// cmd.Flags().StringSliceVarP(&publish, `publish`, `p`, nil, `publish ports for container.`)

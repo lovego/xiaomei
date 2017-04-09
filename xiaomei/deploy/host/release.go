@@ -11,32 +11,37 @@ import (
 
 const ConfigFile = `release.yml`
 
-type service struct {
-	Image, Ports             string
-	VolumesToCreate, Volumes []string
+type releaseConf struct {
+	Services        map[string]service
+	VolumesToCreate []string
 }
 
-var theRelease map[string]service
+type service struct {
+	Image, Ports string
+	Volumes      []string
+}
 
-func getRelease() map[string]service {
+var theRelease *releaseConf
+
+func getRelease() *releaseConf {
 	if theRelease == nil {
 		content, err := ioutil.ReadFile(filepath.Join(release.Root(), ConfigFile))
 		if err != nil {
 			panic(err)
 		}
-		release := make(map[string]service)
-		if err := yaml.Unmarshal(content, release); err != nil {
+		conf := &releaseConf{}
+		if err := yaml.Unmarshal(content, conf); err != nil {
 			panic(err)
 		}
-		theRelease = release
+		theRelease = conf
 	}
 	return theRelease
 }
 
 func getService(svcName string) service {
-	svc, ok := getRelease()[svcName]
+	svc, ok := getRelease().Services[svcName]
 	if !ok {
-		panic(fmt.Sprintf(`release.yml: %s: undefined.`, svcName))
+		panic(fmt.Sprintf(`release.yml: services.%s: undefined.`, svcName))
 	}
 	return svc
 }

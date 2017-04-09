@@ -19,7 +19,9 @@ deploy() {
 	{{ range .Volumes}} -v {{ . }}{{ end }} \
 	--network=host --restart=always {{.Image}}
 }
-docker volume create {{ .LogsVolume }}
+{{ range .VolumesToCreate }}
+docker volume create {{ .Volume }}
+{{ end }}
 for port in {{ .Ports }}; do deploy $port; done
 `
 
@@ -45,7 +47,7 @@ func getDeployConfig(svcName string) deployConf {
 		Ports:           strings.Join(portsOf(svcName), ` `),
 		PortEnv:         portEnvName(svcName),
 		Envs:            images.Get(svcName).EnvsForDeploy(),
-		VolumesToCreate: getService(svcName).VolumesToCreate,
+		VolumesToCreate: getRelease().VolumesToCreate,
 		Volumes:         getService(svcName).Volumes,
 	}
 }

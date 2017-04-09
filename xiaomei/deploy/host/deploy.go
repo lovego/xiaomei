@@ -12,7 +12,7 @@ func (d driver) Deploy(svcName string) error {
 	if svcName != `` {
 		serviceNames = append(serviceNames, svcName)
 	} else {
-		services := getRelease()
+		services := Driver.ServiceNames()
 		if _, ok := services[`app`]; ok {
 			serviceNames = append(serviceNames, `app`)
 		}

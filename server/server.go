@@ -3,6 +3,7 @@ package server
 import (
 	"net"
 	"net/http"
+	"os"
 	"path"
 	"runtime"
 	"time"
@@ -51,7 +52,11 @@ func (s *Server) ListenAndServe() {
 	}
 	s.Server.Handler = s.Handler()
 
-	const addr = `:3000`
+	port := os.Getenv(`GOPORT`)
+	if port == `` {
+		port = `3000`
+	}
+	addr := `:` + port
 	listener := listen(addr)
 	utils.Log(color.GreenString(`started. (` + addr + `)`))
 

@@ -10,7 +10,7 @@ type driver struct{}
 
 func (d driver) ServiceNames() map[string]bool {
 	m := make(map[string]bool)
-	for svcName := range getRelease() {
+	for svcName := range getRelease().Services {
 		m[svcName] = true
 	}
 	return m

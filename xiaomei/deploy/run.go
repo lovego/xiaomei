@@ -6,7 +6,12 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-func Run(svcName string, img images.Image) error {
+func Run(svcName string) error {
+	img := images.Get(svcName)
+	if err := img.PrepareOrBuild(getDriver().ImageNameOf(svcName)); err != nil {
+		return err
+	}
+
 	args := []string{`run`, `-it`, `--rm`,
 		`--name=` + release.Name() + `_` + svcName,
 	}
