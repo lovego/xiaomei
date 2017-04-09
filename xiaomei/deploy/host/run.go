@@ -5,10 +5,13 @@ import (
 )
 
 func (d driver) FlagsForRun(svcName string) ([]string, error) {
-	return []string{
-		`--network=host`,
-		fmt.Sprintf(`-e=%s=%s`, portEnvName(svcName), portsOf(svcName)[0]),
-	}, nil
+	flags := []string{`--network=host`}
+	portEnv := portEnvName(svcName)
+	ports := portsOf(svcName)
+	if portEnv != `` && len(ports) > 0 {
+		flags = append(flags, fmt.Sprintf(`-e=%s=%s`, ports[0]))
+	}
+	return ports, nil
 }
 
 func portEnvName(svcName string) string {
@@ -18,6 +21,6 @@ func portEnvName(svcName string) string {
 	case `web`, `access`:
 		return `NGPORT`
 	default:
-		panic(`unexpected svcName: ` + svcName)
+		return ``
 	}
 }

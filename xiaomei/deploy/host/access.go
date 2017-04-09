@@ -23,6 +23,9 @@ var rePorts = regexp.MustCompile(`^(\d+)-(\d+)$`)
 
 func portsOf(svcName string) (ports []string) {
 	svc := getService(svcName)
+	if svc.Ports == `` {
+		return
+	}
 	if rePort.MatchString(svc.Ports) {
 		ports = append(ports, svc.Ports)
 	} else if m := rePorts.FindStringSubmatch(svc.Ports); len(m) == 3 {
@@ -39,9 +42,6 @@ func portsOf(svcName string) (ports []string) {
 		}
 	} else {
 		panic(fmt.Sprintf(`release.yml: %s.ports: illegal format.`, svcName))
-	}
-	if len(ports) == 0 {
-		panic(fmt.Sprintf(`release.yml: %s.ports: can't be empty.`, svcName))
 	}
 	return
 }

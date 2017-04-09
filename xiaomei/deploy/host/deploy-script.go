@@ -9,23 +9,31 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
+// TODO: keep container history, wait until healthy
 const deployScriptTmpl = `
 set -e
 deploy() {
+  {{ if .Ports }}
 	name={{.Name}}.$1
+	{{ else }}
+	name={{.Name}}
+	{{ end }}
 	docker stop $name >/dev/null 2>&1 && docker rm $name
-  docker run --name=$name -e {{.PortEnv}}=$1 \
+  docker run --name=$name {{ if .Ports }} -e {{.PortEnv}}=$1{{ end }}\
 	{{ range .Envs }} -e {{ . }}{{ end }} \
 	{{ range .Volumes}} -v {{ . }}{{ end }} \
-	--network=host --restart=always -d {{.Image}}
+	-d --network=host --restart=always {{.Image}}
 }
 {{ range .VolumesToCreate }}
-docker volume create {{ .Volume }}
+docker volume create {{ . }}
 {{ end }}
+{{ if .Ports }}
 for port in {{ .Ports }}; do deploy $port; done
+{{ else }}
+deploy
+{{ end }}
 `
 
-// TODO: keep container history
 func getDeployScript(svcName string) (string, error) {
 	tmpl := template.Must(template.New(``).Parse(deployScriptTmpl))
 	var buf bytes.Buffer
@@ -36,18 +44,21 @@ func getDeployScript(svcName string) (string, error) {
 }
 
 type deployConf struct {
-	Name, Image, Ports, PortEnv    string
+	Name, Image, PortEnv, Ports    string
 	Envs, VolumesToCreate, Volumes []string
 }
 
 func getDeployConfig(svcName string) deployConf {
-	return deployConf{
+	conf := deployConf{
 		Name:            release.Name() + `_` + svcName,
 		Image:           Driver.ImageNameOf(svcName),
-		Ports:           strings.Join(portsOf(svcName), ` `),
 		PortEnv:         portEnvName(svcName),
 		Envs:            images.Get(svcName).EnvsForDeploy(),
 		VolumesToCreate: getRelease().VolumesToCreate,
 		Volumes:         getService(svcName).Volumes,
 	}
+	if conf.PortEnv != `` {
+		conf.Ports = strings.Join(portsOf(svcName), ` `)
+	}
+	return conf
 }
