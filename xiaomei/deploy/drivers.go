@@ -6,15 +6,14 @@ import (
 )
 
 type driver interface {
+	ServiceNames() map[string]bool
+	ImageNameOf(svcName string) string
+
+	FlagsForRun(svcName string) ([]string, error)
+	AccessAddrs(svcName string) []string
 	Deploy(svcName string) error
 	Logs(svcName string, all bool) error
 	Ps(svcName string, watch bool, options []string) error
-	// register to release package
-	ImageNameOf(svcName string) string
-	PortsOf(svcName string) []string
-	ServiceNames() map[string]bool
-	// called by Run
-	FlagsForRun(svcName string) ([]string, error)
 }
 
 var theDriver driver
@@ -24,6 +23,15 @@ func getDriver() driver {
 		theDriver = host.Driver
 	}
 	return theDriver
+}
+
+var theConfigFile string
+
+func getConfigFile() string {
+	if theConfigFile == `` {
+		theConfigFile = host.ConfigFile
+	}
+	return theConfigFile
 }
 
 func Deploy(svcName string) error {
@@ -40,10 +48,6 @@ func Ps(svcName string, watch bool, options []string) error {
 
 func ImageNameOf(svcName string) string {
 	return getDriver().ImageNameOf(svcName)
-}
-
-func PortsOf(svcName string) []string {
-	return getDriver().PortsOf(svcName)
 }
 
 func ServiceNames() map[string]bool {

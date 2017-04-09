@@ -19,7 +19,7 @@ func Run(svcName string, img images.Image) error {
 	for _, file := range img.FilesForRun() {
 		args = append(args, `-v`, file)
 	}
-	for _, env := range img.EnvForRun() {
+	for _, env := range img.EnvsForRun() {
 		args = append(args, `-e`, env)
 	}
 	args = append(args, ImageNameOf(svcName))

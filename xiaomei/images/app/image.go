@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/fatih/color"
 	"github.com/lovego/xiaomei/utils"
 	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/release"
-	"github.com/fatih/color"
 )
 
 type Image struct {
@@ -34,6 +34,10 @@ func (i Image) Dockerfile() string {
 	return `Dockerfile`
 }
 
+func (i Image) EnvsForDeploy() []string {
+	return []string{`GOENV=` + release.Env()}
+}
+
 func (i Image) FilesForRun() []string {
 	root := release.App().Root()
 	name := release.App().Name()
@@ -44,7 +48,7 @@ func (i Image) FilesForRun() []string {
 	}
 }
 
-func (i Image) EnvForRun() []string {
+func (i Image) EnvsForRun() []string {
 	return []string{`GODEV=true`}
 }
 

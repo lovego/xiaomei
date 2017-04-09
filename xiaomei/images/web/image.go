@@ -21,6 +21,10 @@ func (i Image) Dockerfile() string {
 	return `Dockerfile`
 }
 
+func (i Image) EnvsForDeploy() []string {
+	return nil
+}
+
 func (i Image) FilesForRun() []string {
 	root := filepath.Join(release.Root(), `img-web`)
 	return []string{
@@ -29,7 +33,7 @@ func (i Image) FilesForRun() []string {
 	}
 }
 
-func (i Image) EnvForRun() []string {
+func (i Image) EnvsForRun() []string {
 	return nil
 }
 

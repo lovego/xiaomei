@@ -21,6 +21,10 @@ func (i Image) Dockerfile() string {
 	return `Dockerfile`
 }
 
+func (i Image) EnvsForDeploy() []string {
+	return nil
+}
+
 func (i Image) FilesForRun() (result []string) {
 	if confs, err := filepath.Glob(release.Root() + `img-access/*.conf`); err != nil {
 		panic(err)
@@ -32,7 +36,7 @@ func (i Image) FilesForRun() (result []string) {
 	}
 }
 
-func (i Image) EnvForRun() []string {
+func (i Image) EnvsForRun() []string {
 	return nil
 }
 

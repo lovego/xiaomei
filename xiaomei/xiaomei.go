@@ -4,8 +4,8 @@ import (
 	"os"
 
 	"github.com/lovego/xiaomei/xiaomei/cluster"
-	// "github.com/lovego/xiaomei/xiaomei/images/access"
 	"github.com/lovego/xiaomei/xiaomei/images"
+	"github.com/lovego/xiaomei/xiaomei/images/access"
 	"github.com/lovego/xiaomei/xiaomei/images/app"
 	"github.com/lovego/xiaomei/xiaomei/images/logc"
 	"github.com/lovego/xiaomei/xiaomei/images/web"
@@ -18,17 +18,20 @@ func main() {
 	cobra.EnableCommandSorting = false
 
 	appCmd := app.Cmd()
-	webCmd := web.Cmd()
-	// accessCmd := access.Cmd()
-	logcCmd := logc.Cmd()
-
 	appCmd.AddCommand(commonCmds(`app`)...)
+
+	webCmd := web.Cmd()
 	webCmd.AddCommand(commonCmds(`web`)...)
-	// accessCmd.AddCommand(commonCmds(`access`)...)
+
+	accessCmd := access.Cmd()
+	accessCmd.AddCommand(accessPrintCmd(), accessSetupCmd())
+	accessCmd.AddCommand(commonCmds(`access`)...)
+
+	logcCmd := logc.Cmd()
 	logcCmd.AddCommand(commonCmds(`logc`)...)
 
 	root := rootCmd()
-	root.AddCommand(appCmd, webCmd /*accessCmd,*/, logcCmd, cluster.Cmd())
+	root.AddCommand(appCmd, webCmd, accessCmd, logcCmd, cluster.Cmd())
 	root.AddCommand(
 		buildCmdFor(``),
 		pushCmdFor(``),

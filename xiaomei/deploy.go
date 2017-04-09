@@ -79,3 +79,19 @@ func deployDesc(svcName string) string {
 		return svcName + ` service`
 	}
 }
+
+func accessPrintCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   `print`,
+		Short: `print access config for the project.`,
+		RunE:  release.NoArgCall(deploy.AccessPrint),
+	}
+}
+
+func accessSetupCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   `setup`,
+		Short: `setup access config for the project.`,
+		RunE:  release.NoArgCall(deploy.AccessSetup),
+	}
+}

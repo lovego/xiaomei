@@ -12,8 +12,8 @@ import (
 const ConfigFile = `release.yml`
 
 type service struct {
-	Image, Ports string
-	Volumes      []string
+	Image, Ports             string
+	VolumesToCreate, Volumes []string
 }
 
 var theRelease map[string]service

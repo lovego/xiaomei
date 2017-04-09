@@ -15,13 +15,14 @@ type imageDriver interface {
 	PrepareForBuild() error
 	BuildDir() string
 	Dockerfile() string
+	EnvsForDeploy() []string
 
 	Runnable
 }
 
 type Runnable interface {
 	FilesForRun() []string
-	EnvForRun() []string
+	EnvsForRun() []string
 	CmdForRun() []string
 }
 

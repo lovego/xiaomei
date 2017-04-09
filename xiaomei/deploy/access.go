@@ -1,16 +1,26 @@
-package access
+package deploy
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"text/template"
 
+	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
-	"github.com/lovego/xiaomei/xiaomei/deploy"
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-func setupConf(conf string) error {
+func AccessPrint() error {
+	conf, err := getAccessConf()
+	if err != nil {
+		return err
+	}
+	print(conf)
+	return nil
+}
+
+func AccessSetup() error {
 	script := fmt.Sprintf(`
 	sudo tee /etc/nginx/sites-enabled/%s.conf > /dev/null &&
 	sudo mkdir -p /var/log/nginx/%s &&
@@ -18,16 +28,22 @@ func setupConf(conf string) error {
 	sudo service nginx restart
 	`, release.Name(), release.Name(),
 	)
+	conf, err := getAccessConf()
+	if err != nil {
+		return err
+	}
 	for _, node := range cluster.AccessNodes() {
-		if _, err := node.Run(cmd.O{Stdin: strings.NewReader(conf)}, script); err != nil {
+		if _, err := node.Run(
+			cmd.O{Stdin: strings.NewReader(conf)}, script,
+		); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func Config() (string, error) {
-	tmpl := template.Must(template.New(``).Parse(configTmpl))
+func getAccessConf() (string, error) {
+	tmpl := template.Must(template.New(``).Parse(accessConfTmpl))
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, getConfigData()); err != nil {
 		return ``, err
@@ -43,13 +59,13 @@ func getConfigData() interface{} {
 		ProName:     release.Name(),
 		ServerNames: getServerNames(),
 	}
-	svcName := getBackendSvcName()
-	backendName := release.Name() + `_` + svcName
-	if port := publicPorts(svcName); port == `` {
-		data.BackendAddr = backendName + `:` + portOfService(svcName)
+	svcName := getServiceToAccess()
+	addrs := getDriver().AccessAddrs(svcName)
+	if len(addrs) == 1 {
+		data.BackendAddr = addrs[0]
 	} else {
-		data.UpstreamName = backendName
-		data.UpstreamAddrs = getBackendAddrs(port)
+		data.UpstreamName = release.Name() + `_` + svcName
+		data.UpstreamAddrs = addrs
 	}
 	return data
 }
@@ -62,44 +78,18 @@ func getServerNames() string {
 	return strings.Join(result, ` `)
 }
 
-func getBackendSvcName() string {
-	services := deploy.ServiceNames()
+func getServiceToAccess() string {
+	services := ServiceNames()
 	if services[`web`] {
 		return `web`
 	}
 	if services[`app`] {
 		return `app`
 	}
-	panic(`no backend service found in release.yml.`)
+	panic(`no backend service found in ` + getConfigFile() + `.`)
 }
 
-func publicPorts(svcName string) string {
-	if ports := deploy.PortsOf(svcName); len(ports) > 0 {
-		port := ports[0]
-		return port[:strings.IndexByte(port, ':')]
-	}
-	return ``
-}
-
-func getBackendAddrs(port string) (addrs []string) {
-	for _, node := range cluster.AccessNodes() {
-		addrs = append(addrs, node.GetListenAddr()+`:`+port)
-	}
-	return
-}
-
-func portOfService(svcName string) string {
-	switch svcName {
-	case `app`:
-		return `3000`
-	case `web`:
-		return `80`
-	default:
-		panic(`unexpected svcName: ` + svcName)
-	}
-}
-
-const configTmpl = `
+const accessConfTmpl = `
 {{ if .UpstreamName -}}
 upstream {{ .UpstreamName }} {
   {{- range .UpstreamAddrs }}
