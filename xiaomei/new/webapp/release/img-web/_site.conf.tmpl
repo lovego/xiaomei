@@ -1,7 +1,11 @@
 # vim: set ft=nginx:
 
+upstream app {
+{{ "{{ range .AppAddrs }}\n  server {{ . }};\n{{ end }}" }}
+}
+
 server {
-  listen 8001 default_server;
+  listen {{ `{{ .ListenPort }}` }} default_server;
   root /var/www/{{ .ProName }};
 
   location = / {
@@ -11,7 +15,7 @@ server {
     try_files $uri @app;
   }
   location @app {
-    proxy_pass   http://127.0.0.1:3001;
+    proxy_pass   http://app;
     include proxy_params;
   }
 
