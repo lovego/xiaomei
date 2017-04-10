@@ -12,28 +12,25 @@ import (
 )
 
 // TODO: keep container history, wait until healthy
-const deployScriptTmpl = `
-set -e
+const deployScriptTmpl = `set -e
 deploy() {
-  {{ if .Ports }}
-	name={{.Name}}.$1
-	{{ else }}
-	name={{.Name}}
-	{{ end }}
-	docker stop $name >/dev/null 2>&1 && docker rm $name
-  docker run --name=$name {{ if .Ports }} -e {{.PortEnv}}=$1{{ end }}\
+  name={{.Name}}{{ if .Ports }}.$1{{ end }}
+  docker stop $name >/dev/null 2>&1 && docker rm $name
+  docker run --name=$name {{ if .Ports }}-e {{.PortEnv}}=$1{{ end }} \
 	{{ range .Envs }} -e {{ . }}{{ end }} \
-	{{ range .Volumes}} -v {{ . }}{{ end }} \
-	-d --network=host --restart=always {{.Image}}
+  {{ range .Volumes}} -v {{ . }}{{ end }} \
+  -d --network=host --restart=always \
+	{{.Image}}
 }
-{{ range .VolumesToCreate }}
+{{ range .VolumesToCreate -}}
 docker volume create {{ . }}
 {{ end }}
-{{ if .Ports }}
+{{ if .Ports -}}
 for port in {{ .Ports }}; do deploy $port; done
-{{ else }}
+{{ else -}}
 deploy
 {{ end }}
+exit
 `
 
 func getDeployScript(svcName string) (string, error) {

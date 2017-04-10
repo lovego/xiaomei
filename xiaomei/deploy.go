@@ -59,15 +59,13 @@ func psCmdFor(svcName string) *cobra.Command {
 }
 
 func logsCmdFor(svcName string) *cobra.Command {
-	var all bool
 	cmd := &cobra.Command{
 		Use:   `logs`,
 		Short: `list logs  of the ` + deployDesc(svcName) + `.`,
 		RunE: func(c *cobra.Command, args []string) error {
-			return deploy.Logs(svcName, all)
+			return deploy.Logs(svcName)
 		},
 	}
-	cmd.Flags().BoolVarP(&all, `all`, `a`, false, `list logs of all containers.`)
 	return cmd
 }
 

@@ -3,46 +3,28 @@ package host
 import (
 	"fmt"
 
-	"github.com/fatih/color"
 	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-func (d driver) Logs(svcName string, all bool) error {
-	if svcName != `` {
-		return serviceLog(svcName, all)
-	}
-	for svcName = range d.ServiceNames() {
-		if err := serviceLog(svcName, all); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func serviceLog(svcName string, all bool) error {
+func (d driver) Logs(svcName string) error {
 	for _, node := range cluster.GetCluster().Nodes() {
-		if nodeLog(svcName, all, node) && !all {
+		if nodeLog(svcName, node) {
 			return nil
 		}
 	}
 	return nil
 }
 
-func nodeLog(svcName string, all bool, node cluster.Node) bool {
-	var head string
-	if !all {
-		head = "| head -n1"
-	}
+func nodeLog(svcName string, node cluster.Node) bool {
 	script := fmt.Sprintf(`
-ids=$(docker ps -aqf name=%s_%s.)
-if test -n "$ids"; then
-	echo "$ids" %s | xargs -rn1 sh -c 'echo %s $0; docker logs $0'
-fi
-	`,
-		release.Name(), svcName, head, color.GreenString(svcName),
-	)
+for name in $(docker ps -af name=%s_%s. --format '{{.Names}}'); do
+	echo -e "\033[32m$name\033[0m"
+	docker logs $name
+	echo
+done
+`, release.Name(), svcName)
 	_, err := node.Run(cmd.O{}, script)
 	return err == nil
 }

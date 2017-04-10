@@ -12,7 +12,7 @@ type driver interface {
 	FlagsForRun(svcName string) ([]string, error)
 	AccessAddrs(svcName string) []string
 	Deploy(svcName string) error
-	Logs(svcName string, all bool) error
+	Logs(svcName string) error
 	Ps(svcName string, watch bool, options []string) error
 }
 
@@ -38,8 +38,8 @@ func Deploy(svcName string) error {
 	return getDriver().Deploy(svcName)
 }
 
-func Logs(svcName string, all bool) error {
-	return getDriver().Logs(svcName, all)
+func Logs(svcName string) error {
+	return getDriver().Logs(svcName)
 }
 
 func Ps(svcName string, watch bool, options []string) error {

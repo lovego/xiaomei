@@ -20,8 +20,8 @@ func (d driver) Deploy(svcName string) error {
 			serviceNames = append(serviceNames, `web`)
 		}
 	}
-	for _, svcName := range serviceNames {
-		if err := deployService(svcName); err != nil {
+	for _, thisSvcName := range serviceNames {
+		if err := deployService(thisSvcName); err != nil {
 			return err
 		}
 	}
