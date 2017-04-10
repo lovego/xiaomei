@@ -9,9 +9,9 @@ func (d driver) FlagsForRun(svcName string) ([]string, error) {
 	portEnv := portEnvName(svcName)
 	ports := portsOf(svcName)
 	if portEnv != `` && len(ports) > 0 {
-		flags = append(flags, fmt.Sprintf(`-e=%s=%s`, ports[0]))
+		flags = append(flags, fmt.Sprintf(`-e=%s=%s`, portEnv, ports[0]))
 	}
-	return ports, nil
+	return flags, nil
 }
 
 func portEnvName(svcName string) string {

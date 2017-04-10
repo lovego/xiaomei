@@ -2,6 +2,8 @@ package host
 
 import (
 	"bytes"
+	"net/http"
+	"net/url"
 	"strings"
 	"text/template"
 
@@ -51,7 +53,7 @@ type deployConf struct {
 func getDeployConfig(svcName string) deployConf {
 	conf := deployConf{
 		Name:            release.Name() + `_` + svcName,
-		Image:           Driver.ImageNameOf(svcName),
+		Image:           imageNameWithSha256Of(svcName),
 		PortEnv:         portEnvName(svcName),
 		Envs:            images.Get(svcName).EnvsForDeploy(),
 		VolumesToCreate: getRelease().VolumesToCreate,
@@ -61,4 +63,26 @@ func getDeployConfig(svcName string) deployConf {
 		conf.Ports = strings.Join(portsOf(svcName), ` `)
 	}
 	return conf
+}
+
+// TODO: https or http check.
+// TODO: https://registry.hub.docker.com/v2/
+func imageNameWithSha256Of(svcName string) string {
+	imgName := Driver.ImageNameOf(svcName)
+	uri, err := url.Parse(`http://` + imgName + `/manifests/latest`)
+	if err != nil {
+		panic(err)
+	}
+	uri.Path = `/v2` + uri.Path
+	req, err := http.NewRequest(http.MethodGet, uri.String(), nil)
+	if err != nil {
+		panic(err)
+	}
+	req.Header.Set(`Accept`, `application/vnd.docker.distribution.manifest.v2+json`)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	digest := resp.Header.Get(`Docker-Content-Digest`)
+	return imgName + `@` + digest
 }
