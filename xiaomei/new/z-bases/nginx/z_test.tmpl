@@ -1,12 +1,14 @@
 # vim: set ft=nginx:
 
 upstream app {
-{{ "{{ range .BackendAddrs }}\n  server {{ . }};\n{{ end }}" }}
+{{ range .BackendAddrs }}
+  server {{ . }};
+{{ end }}
 }
 
 server {
-  listen {{ `{{ or .ListenPort "8000" }}` }} default_server;
-  root /var/www/{{ .ProName }};
+  listen {{ or .ListenPort `8000` }} default_server;
+  root /var/www/example;
 
   location = / {
     try_files /index.html @app;

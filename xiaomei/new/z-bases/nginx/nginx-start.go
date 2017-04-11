@@ -1,18 +1,18 @@
 package main
 
 import (
-	"bufio"
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net"
-	"net/url"
 	"os"
 	"os/exec"
 	"os/signal"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"sync"
 	"syscall"
+	"text/template"
 	"time"
 
 	"github.com/fatih/color"
@@ -23,7 +23,13 @@ func init() {
 }
 
 func main() {
-	waitBackends()
+	confData := getConfData()
+	if n := generateConf(confData); n > 0 {
+		if names := getNamesFromAddrs(confData.BackendAddrs); len(names) > 0 {
+			waitUntilNamesResolved(names)
+		}
+	}
+	log(color.GreenString(`started. (:%s)`, confData.ListenPort))
 	cmd := exec.Command(`nginx`)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -32,31 +38,85 @@ func main() {
 	}
 }
 
-func waitBackends() {
+type configData struct {
+	ListenPort   string
+	BackendAddrs []string
+}
+
+func getConfData() configData {
+	port := os.Getenv(`NGPORT`)
+	if port == `` {
+		port = `8000`
+	}
+	var addrs []string
+	if addrsStr := os.Getenv(`NGBackendAddrs`); addrsStr != `` {
+		addrs = strings.Split(addrsStr, ` `)
+	}
+	return configData{
+		ListenPort:   port,
+		BackendAddrs: addrs,
+	}
+}
+
+func generateConf(confData configData) int {
+	tmplFiles, err := filepath.Glob(`/etc/nginx/sites-available/*.conf.tmpl`)
+	if err != nil {
+		panic(err)
+	}
+	for _, tmplFile := range tmplFiles {
+		confFile := strings.Replace(tmplFile, `available`, `enabled`, 1)
+		if err := ioutil.WriteFile(confFile, makeConf(tmplFile, confData), 0644); err != nil {
+			panic(err)
+		}
+	}
+	return len(tmplFiles)
+}
+
+func makeConf(file string, confData configData) []byte {
+	var buf bytes.Buffer
+	if err := template.Must(template.ParseFiles(file)).Execute(&buf, confData); err != nil {
+		panic(err)
+	}
+	return buf.Bytes()
+}
+
+func getNamesFromAddrs(addrs []string) (names []string) {
+	for _, addr := range addrs {
+		if host, _, err := net.SplitHostPort(addr); err != nil {
+			panic(err)
+		} else if net.ParseIP(host) == nil {
+			names = append(names, host)
+		}
+	}
+	return
+}
+
+func waitUntilNamesResolved(names []string) {
+	fmt.Printf("%d names: %s.\n", len(names), strings.Join(names, `, `))
+
 	start := time.Now()
-	backends := getBackends()
-	fmt.Printf("%d backends: %s.\n", len(backends), strings.Join(backends, `, `))
 	var wg sync.WaitGroup
-	for _, addr := range backends {
+	for _, name := range names {
 		wg.Add(1)
-		go func(addr string) {
-			waitTcpReady(addr)
+		go func(name string) {
+			waitNameResolved(name)
 			wg.Done()
-		}(addr)
+		}(name)
 	}
 	wg.Wait()
+
 	duration := time.Since(start)
 	duration -= duration % time.Second
-	color.New(color.FgGreen).Printf("%d backends: all ready in %s.\n\n", len(backends), duration)
+	color.Green("%d names: all ready in %s.\n\n", len(names), duration)
 }
 
 var debug = os.Getenv(`debug`) != ``
 
-func waitTcpReady(addr string) {
-	sleep := time.Second
+func waitNameResolved(host string) {
 	start := time.Now()
+	sleep := time.Second
 	for {
-		if _, err := net.Dial(`tcp`, addr); err == nil {
+		if _, err := net.LookupHost(host); err == nil {
 			break
 		} else {
 			if debug {
@@ -68,58 +128,7 @@ func waitTcpReady(addr string) {
 	}
 	duration := time.Since(start)
 	duration -= duration % time.Second
-	fmt.Printf("%s ready in %s.\n", addr, duration)
-}
-
-func getBackends() (result []string) {
-	if paths, err := filepath.Glob(`/etc/nginx/sites-enabled/*`); err != nil {
-		panic(err)
-	} else {
-		for _, p := range paths {
-			if addrs := backendAddrs(p); len(addrs) > 0 {
-				result = append(result, addrs...)
-			}
-		}
-	}
-	return result
-}
-
-func backendAddrs(p string) (result []string) {
-	f, err := os.Open(p)
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		if addr := parseBackendAddr(scanner.Text()); addr != `` {
-			result = append(result, addr)
-		}
-	}
-	if err := scanner.Err(); err != nil {
-		panic(err)
-	}
-	return
-}
-
-var reProxyPass = regexp.MustCompile(`^\s*proxy_pass\s+(http://\S+)\s*;`)
-
-func parseBackendAddr(line string) (addr string) {
-	matches := reProxyPass.FindStringSubmatch(line)
-	if len(matches) < 2 {
-		return ``
-	}
-
-	if uri, err := url.Parse(matches[1]); err != nil {
-		panic(err)
-	} else {
-		addr = uri.Host
-	}
-	if strings.IndexByte(addr, ':') < 0 {
-		addr += `:http`
-	}
-	return
+	fmt.Printf("%s ready in %s.\n", host, duration)
 }
 
 func handleSignals() {
@@ -128,4 +137,10 @@ func handleSignals() {
 	s := <-c
 	println(` killed by ` + s.String() + ` signal.`)
 	os.Exit(0)
+}
+
+const ISO8601 = `2006-01-02T15:04:05Z0700`
+
+func log(msg interface{}) {
+	fmt.Println(time.Now().Format(ISO8601), msg)
 }
