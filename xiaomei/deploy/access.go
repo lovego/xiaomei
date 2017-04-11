@@ -8,15 +8,16 @@ import (
 
 	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
+	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
 func AccessPrint() error {
-	conf, err := getAccessConf()
+	accessConf, err := getAccessConf()
 	if err != nil {
 		return err
 	}
-	print(conf)
+	print(accessConf)
 	return nil
 }
 
@@ -28,13 +29,13 @@ func AccessSetup() error {
 	sudo service nginx restart
 	`, release.Name(), release.Name(),
 	)
-	conf, err := getAccessConf()
+	accessConf, err := getAccessConf()
 	if err != nil {
 		return err
 	}
 	for _, node := range cluster.AccessNodes() {
 		if _, err := node.Run(
-			cmd.O{Stdin: strings.NewReader(conf)}, script,
+			cmd.O{Stdin: strings.NewReader(accessConf)}, script,
 		); err != nil {
 			return err
 		}
@@ -79,14 +80,14 @@ func getServerNames() string {
 }
 
 func getServiceToAccess() string {
-	services := ServiceNames()
+	services := conf.ServiceNames()
 	if services[`web`] {
 		return `web`
 	}
 	if services[`app`] {
 		return `app`
 	}
-	panic(`no backend service found in ` + getConfigFile() + `.`)
+	panic(`no backend service found in ` + conf.File() + `.`)
 }
 
 const accessConfTmpl = `

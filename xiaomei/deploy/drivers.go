@@ -6,9 +6,6 @@ import (
 )
 
 type driver interface {
-	ServiceNames() map[string]bool
-	ImageNameOf(svcName string) string
-
 	FlagsForRun(svcName string) ([]string, error)
 	AccessAddrs(svcName string) []string
 	Deploy(svcName string) error
@@ -26,15 +23,6 @@ func getDriver() driver {
 	return theDriver
 }
 
-var theConfigFile string
-
-func getConfigFile() string {
-	if theConfigFile == `` {
-		theConfigFile = deploy.ConfigFile
-	}
-	return theConfigFile
-}
-
 func Deploy(svcName string) error {
 	return getDriver().Deploy(svcName)
 }
@@ -49,12 +37,4 @@ func Logs(svcName string) error {
 
 func Ps(svcName string, watch bool, options []string) error {
 	return getDriver().Ps(svcName, watch, options)
-}
-
-func ImageNameOf(svcName string) string {
-	return getDriver().ImageNameOf(svcName)
-}
-
-func ServiceNames() map[string]bool {
-	return getDriver().ServiceNames()
 }

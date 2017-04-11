@@ -2,13 +2,14 @@ package deploy
 
 import (
 	"github.com/lovego/xiaomei/utils/cmd"
+	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/images"
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
 func Run(svcName string) error {
 	img := images.Get(svcName)
-	if err := img.PrepareOrBuild(getDriver().ImageNameOf(svcName)); err != nil {
+	if err := img.PrepareOrBuild(conf.ImageNameOf(svcName)); err != nil {
 		return err
 	}
 
@@ -27,7 +28,7 @@ func Run(svcName string) error {
 	for _, file := range img.FilesForRun() {
 		args = append(args, `-v`, file)
 	}
-	args = append(args, ImageNameOf(svcName))
+	args = append(args, conf.ImageNameOf(svcName))
 	if cmd := img.CmdForRun(); cmd != nil {
 		args = append(args, cmd...)
 	}
