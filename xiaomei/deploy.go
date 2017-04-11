@@ -45,6 +45,17 @@ func deployCmdFor(svcName string) *cobra.Command {
 	return cmd
 }
 
+func rmDeployCmdFor(svcName string) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   `rm-deploy`,
+		Short: `remove deployment of the ` + deployDesc(svcName) + `.`,
+		RunE: release.NoArgCall(func() error {
+			return deploy.RmDeploy(svcName)
+		}),
+	}
+	return cmd
+}
+
 func psCmdFor(svcName string) *cobra.Command {
 	var watch bool
 	cmd := &cobra.Command{

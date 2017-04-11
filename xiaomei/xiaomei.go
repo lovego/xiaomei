@@ -36,6 +36,7 @@ func main() {
 		buildCmdFor(``),
 		pushCmdFor(``),
 		deployCmdFor(``),
+		rmDeployCmdFor(``),
 		psCmdFor(``),
 		logsCmdFor(``),
 	)
@@ -65,6 +66,7 @@ func commonCmds(svcName string) (cmds []*cobra.Command) {
 	}
 	cmds = append(cmds,
 		deployCmdFor(svcName),
+		rmDeployCmdFor(svcName),
 		psCmdFor(svcName),
 		logsCmdFor(svcName),
 	)

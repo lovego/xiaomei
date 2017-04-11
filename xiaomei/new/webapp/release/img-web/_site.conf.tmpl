@@ -5,7 +5,7 @@ upstream app {
 }
 
 server {
-  listen {{ `{{ or .ListenPort "8000" }}` }} default_server;
+  listen {{ `{{ .ListenPort }}` }} default_server;
   root /var/www/{{ .ProName }};
 
   location = / {

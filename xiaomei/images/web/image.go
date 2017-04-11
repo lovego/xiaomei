@@ -28,7 +28,7 @@ func (i Image) EnvsForDeploy() []string {
 func (i Image) FilesForRun() []string {
 	root := filepath.Join(release.Root(), `img-web`)
 	return []string{
-		root + `/site.conf:/etc/nginx/sites-enabled/` + release.Name() + `.conf`,
+		root + `/site.conf.tmpl:/etc/nginx/sites-available/` + release.Name() + `.conf.tmpl`,
 		root + `/public:/var/www/` + release.Name(),
 	}
 }
