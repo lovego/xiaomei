@@ -1,4 +1,4 @@
-package host
+package simple
 
 import (
 	"bytes"
@@ -7,6 +7,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/lovego/xiaomei/xiaomei/deploy/conf/simpleconf"
 	"github.com/lovego/xiaomei/xiaomei/images"
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
@@ -53,8 +54,8 @@ func getDeployConfig(svcName string) deployConf {
 		Image:           imageNameWithSha256Of(svcName),
 		PortEnv:         portEnvName(svcName),
 		Envs:            images.Get(svcName).EnvsForDeploy(),
-		VolumesToCreate: getRelease().VolumesToCreate,
-		Volumes:         getService(svcName).Volumes,
+		VolumesToCreate: simpleconf.Get().VolumesToCreate,
+		Volumes:         simpleconf.GetService(svcName).Volumes,
 	}
 	if conf.PortEnv != `` {
 		conf.Ports = strings.Join(portsOf(svcName), ` `)
@@ -65,7 +66,7 @@ func getDeployConfig(svcName string) deployConf {
 // TODO: https or http check.
 // TODO: https://registry.hub.docker.com/v2/
 func imageNameWithSha256Of(svcName string) string {
-	imgName := Driver.ImageNameOf(svcName)
+	imgName := simpleconf.ImageNameOf(svcName)
 	uri, err := url.Parse(`http://` + imgName + `/manifests/latest`)
 	if err != nil {
 		panic(err)

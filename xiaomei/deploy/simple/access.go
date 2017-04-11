@@ -1,4 +1,4 @@
-package host
+package simple
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/lovego/xiaomei/xiaomei/cluster"
+	"github.com/lovego/xiaomei/xiaomei/deploy/conf/simpleconf"
 )
 
 func (d driver) AccessAddrs(svcName string) (addrs []string) {
@@ -22,7 +23,7 @@ var rePort = regexp.MustCompile(`^\d+$`)
 var rePorts = regexp.MustCompile(`^(\d+)-(\d+)$`)
 
 func portsOf(svcName string) (ports []string) {
-	svc := getService(svcName)
+	svc := simpleconf.GetService(svcName)
 	if svc.Ports == `` {
 		return
 	}

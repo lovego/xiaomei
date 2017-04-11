@@ -1,7 +1,7 @@
 package deploy
 
 import (
-	"github.com/lovego/xiaomei/xiaomei/deploy/host"
+	"github.com/lovego/xiaomei/xiaomei/deploy/simple"
 	// "github.com/lovego/xiaomei/xiaomei/deploy/swarm"
 )
 
@@ -21,7 +21,7 @@ var theDriver driver
 
 func getDriver() driver {
 	if theDriver == nil {
-		theDriver = host.Driver
+		theDriver = simple.Driver
 	}
 	return theDriver
 }
@@ -30,7 +30,7 @@ var theConfigFile string
 
 func getConfigFile() string {
 	if theConfigFile == `` {
-		theConfigFile = host.ConfigFile
+		theConfigFile = deploy.ConfigFile
 	}
 	return theConfigFile
 }

@@ -1,18 +1,23 @@
-package host
+package simple
 
 import (
 	"github.com/fatih/color"
 	"github.com/lovego/xiaomei/utils"
 	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
+	"github.com/lovego/xiaomei/xiaomei/deploy/conf/simpleconf"
 )
+
+var Driver driver
+
+type driver struct{}
 
 func (d driver) Deploy(svcName string) error {
 	serviceNames := []string{}
 	if svcName != `` {
 		serviceNames = append(serviceNames, svcName)
 	} else {
-		services := Driver.ServiceNames()
+		services := simpleconf.ServiceNames()
 		if _, ok := services[`app`]; ok {
 			serviceNames = append(serviceNames, `app`)
 		}
