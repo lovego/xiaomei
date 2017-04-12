@@ -22,19 +22,3 @@ func getDriver() driver {
 	}
 	return theDriver
 }
-
-func Deploy(svcName string) error {
-	return getDriver().Deploy(svcName)
-}
-
-func RmDeploy(svcName string) error {
-	return getDriver().RmDeploy(svcName)
-}
-
-func Logs(svcName string) error {
-	return getDriver().Logs(svcName)
-}
-
-func Ps(svcName string, watch bool, options []string) error {
-	return getDriver().Ps(svcName, watch, options)
-}

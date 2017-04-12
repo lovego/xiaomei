@@ -27,7 +27,6 @@ func main() {
 	webCmd.AddCommand(deploy.Cmds(`web`)...)
 
 	accessCmd := access.Cmd()
-	accessCmd.AddCommand(accessPrintCmd(), accessSetupCmd())
 	accessCmd.AddCommand(images.Cmds(`access`)...)
 	accessCmd.AddCommand(deploy.Cmds(`access`)...)
 
@@ -38,7 +37,7 @@ func main() {
 	root := rootCmd()
 	root.AddCommand(appCmd, webCmd, accessCmd, logcCmd, cluster.Cmd())
 	root.AddCommand(images.Cmds(``)...)
-	root.AddCommand(deploy.Cmds(``))
+	root.AddCommand(deploy.Cmds(``)...)
 	root.AddCommand(new.Cmd(), yamlCmd(), versionCmd())
 	root.Execute()
 }

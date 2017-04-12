@@ -7,9 +7,9 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-func Run(svcName string) error {
+func run(svcName string) error {
 	img := images.Get(svcName)
-	if err := img.PrepareOrBuild(conf.ImageNameOf(svcName)); err != nil {
+	if err := img.PrepareOrBuild(); err != nil {
 		return err
 	}
 
@@ -21,7 +21,9 @@ func Run(svcName string) error {
 	} else {
 		args = append(args, flags...)
 	}
-
+	for _, env := range img.Envs() {
+		args = append(args, `-e`, env)
+	}
 	for _, env := range img.EnvsForRun() {
 		args = append(args, `-e`, env)
 	}
@@ -29,9 +31,6 @@ func Run(svcName string) error {
 		args = append(args, `-v`, file)
 	}
 	args = append(args, conf.ImageNameOf(svcName))
-	if cmd := img.CmdForRun(); cmd != nil {
-		args = append(args, cmd...)
-	}
 	_, err := cmd.Run(cmd.O{}, `docker`, args...)
 	return err
 }

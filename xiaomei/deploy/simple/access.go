@@ -6,7 +6,7 @@ import (
 )
 
 func (d driver) AccessAddrs(svcName string) (addrs []string) {
-	ports := simpleconf.portsOf(svcName)
+	ports := simpleconf.PortsOf(svcName)
 	for _, node := range cluster.Nodes() {
 		for _, port := range ports {
 			addrs = append(addrs, node.GetListenAddr()+`:`+port)

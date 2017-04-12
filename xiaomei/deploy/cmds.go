@@ -52,7 +52,7 @@ func deployCmdFor(svcName string) *cobra.Command {
 					return err
 				}
 			}
-			return deploy(svcName) // , rmCurrent)
+			return getDriver().Deploy(svcName) // , rmCurrent)
 		}),
 	}
 	cmd.Flags().BoolVarP(&noBuild, `no-build`, `B`, false, `do not build the images.`)
@@ -66,7 +66,7 @@ func rmDeployCmdFor(svcName string) *cobra.Command {
 		Use:   `rm-deploy`,
 		Short: `remove deployment of the ` + deployDesc(svcName) + `.`,
 		RunE: release.NoArgCall(func() error {
-			return rmDeploy(svcName)
+			return getDriver().RmDeploy(svcName)
 		}),
 	}
 	return cmd
@@ -78,7 +78,7 @@ func psCmdFor(svcName string) *cobra.Command {
 		Use:   `ps`,
 		Short: `list tasks of the ` + deployDesc(svcName) + `.`,
 		RunE: func(c *cobra.Command, args []string) error {
-			return ps(svcName, watch, args)
+			return getDriver().Ps(svcName, watch, args)
 		},
 	}
 	cmd.Flags().BoolVarP(&watch, `watch`, `w`, false, `watch ps.`)
@@ -90,7 +90,7 @@ func logsCmdFor(svcName string) *cobra.Command {
 		Use:   `logs`,
 		Short: `list logs  of the ` + deployDesc(svcName) + `.`,
 		RunE: func(c *cobra.Command, args []string) error {
-			return logs(svcName)
+			return getDriver().Logs(svcName)
 		},
 	}
 	return cmd

@@ -57,7 +57,7 @@ func getDeployConfig(svcName string) deployConf {
 		Volumes:         simpleconf.GetService(svcName).Volumes,
 	}
 	if conf.PortEnv != `` {
-		conf.Ports = strings.Join(portsOf(svcName), ` `)
+		conf.Ports = strings.Join(simpleconf.PortsOf(svcName), ` `)
 	}
 	return conf
 }
