@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/lovego/xiaomei/xiaomei/cluster"
+	"github.com/lovego/xiaomei/xiaomei/deploy"
 	"github.com/lovego/xiaomei/xiaomei/images"
 	"github.com/lovego/xiaomei/xiaomei/images/access"
 	"github.com/lovego/xiaomei/xiaomei/images/app"
@@ -18,28 +19,26 @@ func main() {
 	cobra.EnableCommandSorting = false
 
 	appCmd := app.Cmd()
-	appCmd.AddCommand(commonCmds(`app`)...)
+	appCmd.AddCommand(images.Cmds(`app`)...)
+	appCmd.AddCommand(deploy.Cmds(`app`)...)
 
 	webCmd := web.Cmd()
-	webCmd.AddCommand(commonCmds(`web`)...)
+	webCmd.AddCommand(images.Cmds(`web`)...)
+	webCmd.AddCommand(deploy.Cmds(`web`)...)
 
 	accessCmd := access.Cmd()
 	accessCmd.AddCommand(accessPrintCmd(), accessSetupCmd())
-	accessCmd.AddCommand(commonCmds(`access`)...)
+	accessCmd.AddCommand(images.Cmds(`access`)...)
+	accessCmd.AddCommand(deploy.Cmds(`access`)...)
 
 	logcCmd := logc.Cmd()
-	logcCmd.AddCommand(commonCmds(`logc`)...)
+	logcCmd.AddCommand(images.Cmds(`logc`)...)
+	logcCmd.AddCommand(deploy.Cmds(`logc`)...)
 
 	root := rootCmd()
 	root.AddCommand(appCmd, webCmd, accessCmd, logcCmd, cluster.Cmd())
-	root.AddCommand(
-		buildCmdFor(``),
-		pushCmdFor(``),
-		deployCmdFor(``),
-		rmDeployCmdFor(``),
-		psCmdFor(``),
-		logsCmdFor(``),
-	)
+	root.AddCommand(images.Cmds(``)...)
+	root.AddCommand(deploy.Cmds(``))
 	root.AddCommand(new.Cmd(), yamlCmd(), versionCmd())
 	root.Execute()
 }
@@ -54,21 +53,4 @@ func rootCmd() *cobra.Command {
 		cmd.SetArgs(os.Args[2:])
 	}
 	return cmd
-}
-
-func commonCmds(svcName string) (cmds []*cobra.Command) {
-	if images.Has(svcName) {
-		cmds = append(cmds,
-			buildCmdFor(svcName),
-			pushCmdFor(svcName),
-			runCmdFor(svcName),
-		)
-	}
-	cmds = append(cmds,
-		deployCmdFor(svcName),
-		rmDeployCmdFor(svcName),
-		psCmdFor(svcName),
-		logsCmdFor(svcName),
-	)
-	return
 }

@@ -1,19 +1,35 @@
-package main
+package deploy
 
 import (
-	"github.com/lovego/xiaomei/xiaomei/deploy"
+	"github.com/lovego/xiaomei/xiaomei/images"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/spf13/cobra"
 )
 
 // Run, Deploy, Ps, Logs commands
+func Cmds(svcName string) (cmds []*cobra.Command) {
+	if svcName == `access` {
+		cmds = append(cmds, accessPrintCmd(), accessSetupCmd())
+	}
+	if svcName != `` {
+		cmds = append(cmds, runCmdFor(svcName))
+	}
+	cmds = append(cmds,
+		deployCmdFor(svcName),
+		rmDeployCmdFor(svcName),
+		psCmdFor(svcName),
+		logsCmdFor(svcName),
+	)
+	return
+}
+
 func runCmdFor(svcName string) *cobra.Command {
 	// var publish []string
 	cmd := &cobra.Command{
 		Use:   `run`,
 		Short: `run    the ` + deployDesc(svcName) + `.`,
 		RunE: release.NoArgCall(func() error {
-			return deploy.Run(svcName)
+			return run(svcName)
 		}),
 	}
 	// cmd.Flags().StringSliceVarP(&publish, `publish`, `p`, nil, `publish ports for container.`)
@@ -27,16 +43,16 @@ func deployCmdFor(svcName string) *cobra.Command {
 		Short: `deploy the ` + deployDesc(svcName) + `.`,
 		RunE: release.NoArgCall(func() error {
 			if !noBuild {
-				if err := buildImage(svcName, true); err != nil {
+				if err := images.Build(svcName, true); err != nil {
 					return err
 				}
 			}
 			if !noPush {
-				if err := pushImage(svcName); err != nil {
+				if err := images.Push(svcName); err != nil {
 					return err
 				}
 			}
-			return deploy.Deploy(svcName) // , rmCurrent)
+			return deploy(svcName) // , rmCurrent)
 		}),
 	}
 	cmd.Flags().BoolVarP(&noBuild, `no-build`, `B`, false, `do not build the images.`)
@@ -50,7 +66,7 @@ func rmDeployCmdFor(svcName string) *cobra.Command {
 		Use:   `rm-deploy`,
 		Short: `remove deployment of the ` + deployDesc(svcName) + `.`,
 		RunE: release.NoArgCall(func() error {
-			return deploy.RmDeploy(svcName)
+			return rmDeploy(svcName)
 		}),
 	}
 	return cmd
@@ -62,7 +78,7 @@ func psCmdFor(svcName string) *cobra.Command {
 		Use:   `ps`,
 		Short: `list tasks of the ` + deployDesc(svcName) + `.`,
 		RunE: func(c *cobra.Command, args []string) error {
-			return deploy.Ps(svcName, watch, args)
+			return ps(svcName, watch, args)
 		},
 	}
 	cmd.Flags().BoolVarP(&watch, `watch`, `w`, false, `watch ps.`)
@@ -74,7 +90,7 @@ func logsCmdFor(svcName string) *cobra.Command {
 		Use:   `logs`,
 		Short: `list logs  of the ` + deployDesc(svcName) + `.`,
 		RunE: func(c *cobra.Command, args []string) error {
-			return deploy.Logs(svcName)
+			return logs(svcName)
 		},
 	}
 	return cmd
@@ -92,7 +108,7 @@ func accessPrintCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   `print`,
 		Short: `print access config for the project.`,
-		RunE:  release.NoArgCall(deploy.AccessPrint),
+		RunE:  release.NoArgCall(accessPrint),
 	}
 }
 
@@ -100,6 +116,6 @@ func accessSetupCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   `setup`,
 		Short: `setup access config for the project.`,
-		RunE:  release.NoArgCall(deploy.AccessSetup),
+		RunE:  release.NoArgCall(accessSetup),
 	}
 }

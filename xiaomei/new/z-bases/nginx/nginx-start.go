@@ -50,7 +50,7 @@ func getConfData() configData {
 	}
 	var addrs []string
 	if addrsStr := os.Getenv(`NGBackendAddrs`); addrsStr != `` {
-		addrs = strings.Split(addrsStr, ` `)
+		addrs = strings.Split(addrsStr, `,`)
 	}
 	return configData{
 		ListenPort:   port,

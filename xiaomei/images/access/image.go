@@ -9,22 +9,6 @@ import (
 type Image struct {
 }
 
-func (i Image) PrepareForBuild() error {
-	return nil
-}
-
-func (i Image) BuildDir() string {
-	return filepath.Join(release.Root(), `img-access`)
-}
-
-func (i Image) Dockerfile() string {
-	return `Dockerfile`
-}
-
-func (i Image) EnvsForDeploy() []string {
-	return nil
-}
-
 func (i Image) FilesForRun() (result []string) {
 	if confs, err := filepath.Glob(release.Root() + `img-access/*.conf`); err != nil {
 		panic(err)
@@ -34,12 +18,4 @@ func (i Image) FilesForRun() (result []string) {
 		}
 		return result
 	}
-}
-
-func (i Image) EnvsForRun() []string {
-	return nil
-}
-
-func (i Image) CmdForRun() []string {
-	return nil
 }

@@ -12,7 +12,7 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-func AccessPrint() error {
+func accessPrint() error {
 	accessConf, err := getAccessConf()
 	if err != nil {
 		return err
@@ -21,7 +21,7 @@ func AccessPrint() error {
 	return nil
 }
 
-func AccessSetup() error {
+func accessSetup() error {
 	script := fmt.Sprintf(`
 	sudo tee /etc/nginx/sites-enabled/%s.conf > /dev/null &&
 	sudo mkdir -p /var/log/nginx/%s &&
