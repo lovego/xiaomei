@@ -5,7 +5,7 @@ services:
     volumes: [ "{{ .ProName }}_logs:/home/ubuntu/{{ .ProName }}/log" ]
   web:
     image: 192.168.202.12:5000/{{ .Domain }}/web
-    ports: "8001" 
+    ports: "8001"
     volumes: [ "{{ .ProName }}_logs:/var/log/nginx" ]
 
 volumesToCreate: [ "{{ .ProName }}_logs" ]

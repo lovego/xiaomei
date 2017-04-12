@@ -1,7 +1,7 @@
 # vim: set ft=nginx:
 
 upstream app {
-{{ "{{ range .BackendAddrs }}\n  server {{ . }};\n{{ end }}" }}
+{{ "{{- range .BackendAddrs }}\n  server {{ . }};\n{{- end }}" }}
 }
 
 server {

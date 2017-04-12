@@ -2,26 +2,24 @@ package simple
 
 import (
 	"fmt"
+
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf/simpleconf"
+	"github.com/lovego/xiaomei/xiaomei/images"
+	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
 func (d driver) FlagsForRun(svcName string) ([]string, error) {
-	flags := []string{`--network=host`}
-	portEnv := portEnvName(svcName)
-	ports := simpleconf.PortsOf(svcName)
-	if portEnv != `` && len(ports) > 0 {
-		flags = append(flags, fmt.Sprintf(`-e=%s=%s`, portEnv, ports[0]))
+	name := release.Name() + `_` + svcName
+	portEnv := ``
+	if portEnvName := images.Get(svcName).PortEnvName(); portEnvName != `` {
+		if ports := simpleconf.PortsOf(svcName); len(ports) > 0 {
+			name += `.` + ports[0]
+			portEnv = fmt.Sprintf(`-e=%s=%s`, portEnvName, ports[0])
+		}
+	}
+	flags := []string{`--network=host`, `--name=` + name}
+	if portEnv != `` {
+		flags = append(flags, portEnv)
 	}
 	return flags, nil
-}
-
-func portEnvName(svcName string) string {
-	switch svcName {
-	case `app`:
-		return `GOPORT`
-	case `web`, `access`:
-		return `NGPORT`
-	default:
-		return ``
-	}
 }

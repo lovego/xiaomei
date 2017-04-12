@@ -4,7 +4,6 @@ import (
 	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/images"
-	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
 func run(svcName string) error {
@@ -13,9 +12,7 @@ func run(svcName string) error {
 		return err
 	}
 
-	args := []string{`run`, `-it`, `--rm`,
-		`--name=` + release.Name() + `_` + svcName,
-	}
+	args := []string{`run`, `-it`, `--rm`}
 	if flags, err := getDriver().FlagsForRun(svcName); err != nil {
 		return err
 	} else {
