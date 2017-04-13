@@ -24,9 +24,9 @@ type conf struct {
 	Domain string `yaml:"domain"`
 	Secret string `yaml:"secret"`
 
-	TimeZone TimeZoneConf    `yaml:"timeZone"`
-	Mailer   MailerConf      `yaml:"mailer"`
-	Keepers  []mailer.People `yaml:"keepers"`
+	TimeZone TimeZoneConf `yaml:"timeZone"`
+	Mailer   MailerConf   `yaml:"mailer"`
+	Keepers  []string     `yaml:"keepers"`
 
 	DataSource map[string]map[string]string `yaml:"dataSource"`
 }
@@ -38,8 +38,8 @@ type TimeZoneConf struct {
 
 type MailerConf struct {
 	Host   string `yaml:"host"`
-	Port   string `yaml:"port"`
-	Sender mailer.People
+	Port   int    `yaml:"port"`
+	Sender string `yaml:"sender"`
 	Passwd string `yaml:"passwd"`
 }
 
@@ -79,7 +79,7 @@ func (c *Conf) Mailer() *mailer.Mailer {
 	defer c.Unlock()
 	if !c.mailer.setted {
 		m := c.data.Mailer
-		c.mailer.Mailer = mailer.New(m.Host, m.Port, m.Sender, m.Passwd)
+		c.mailer.Mailer = mailer.New(m.Host, m.Port, m.Passwd, m.Sender) //host string, port int, password string, from string
 		c.mailer.setted = true
 	}
 	return c.mailer.Mailer

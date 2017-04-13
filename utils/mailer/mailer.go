@@ -1,138 +1,98 @@
 package mailer
 
 import (
-	"bytes"
-	"encoding/base64"
-	"mime"
-	"net/smtp"
-	"path/filepath"
-	"strings"
-	"time"
+	"log"
+	"net/mail"
+	"os"
+
+	"gopkg.in/gomail.v2"
 )
 
 type Mailer struct {
-	smtp.Auth
-	Addr, SenderNameAddr, SenderAddr string
+	Sender     *mail.Address
+	Dialer     *gomail.Dialer
+	SendCloser gomail.SendCloser
 }
 
 type Message struct {
-	Receivers   []People // [ name1, address1@example.com ], [ name2, address2@example.com ]
-	ContentType string
-	Title, Body string
-	Attaches    map[string]string // { `filename.ext`: `content`, ... }
+	*gomail.Message
 }
 
-type People struct {
-	Name, Addr string
-}
-
-func New(host, port string, sender People, password string) *Mailer {
-	if host == `` || port == `` || sender.Addr == `` {
+func New(host string, port int, password string, from string) *Mailer {
+	if host == `` || password == `` || from == `` {
 		return nil
 	}
-
-	mailer := Mailer{Addr: host + `:` + port}
-	mailer.SenderNameAddr = encodeNameAddr(sender.Name, sender.Addr)
-	mailer.SenderAddr = sender.Addr
-	mailer.Auth = smtp.PlainAuth(``, sender.Addr, password, host)
-
-	return &mailer
-}
-
-func (m *Mailer) Send(msg *Message) error {
-	if m == nil || msg == nil || len(msg.Receivers) == 0 {
+	sender, err := mail.ParseAddress(from)
+	if err != nil {
+		log.Println(err)
 		return nil
 	}
-	if msg.ContentType == `` {
-		msg.ContentType = `text/plain; charset=UTF-8`
+	dialer := gomail.NewDialer(host, port, sender.Address, password)
+	s, err := dialer.Dial()
+	if err != nil {
+		panic(err)
 	}
-	rcvrAddrs := make([]string, len(msg.Receivers))
-	for i, people := range msg.Receivers {
-		rcvrAddrs[i] = people.Addr
+	m := Mailer{
+		sender, dialer, s,
 	}
-	return smtp.SendMail(m.Addr, m.Auth, m.SenderAddr, rcvrAddrs, m.makeMessage(msg))
+	return &m
 }
 
-const boundary = `f46d043c813270fc6b04c2d223da`
-
-func (m *Mailer) makeMessage(msg *Message) []byte {
-	var buf bytes.Buffer
-	multipart := len(msg.Attaches) > 0
-	buf.WriteString(m.makeHeaders(msg, multipart))
-	buf.WriteString(m.makeBody(msg, multipart))
-	return buf.Bytes()
+func (self *Mailer) Send(msg Message) error {
+	return gomail.Send(self.SendCloser, msg.Message)
 }
 
-func (m *Mailer) makeHeaders(msg *Message, multipart bool) string {
-	headers := "From: " + m.SenderNameAddr + "\r\n" +
-		"To: " + encodeNameAddrs(msg.Receivers) + "\r\n" +
-		"Date: " + time.Now().Format(time.RFC1123Z) + "\r\n" +
-		"Subject: " + mime.BEncoding.Encode(`utf-8`, msg.Title) + "\r\n" +
-		"MIME-Version: 1.0\r\n"
+func (self *Mailer) NewMessage(receivers, cc []string, title, body, contentType string) Message {
+	m := Message{gomail.NewMessage( /*gomail.SetCharset("UTF-8")*/ )}
+	m.setHeaders(self.Sender, parseAdderss(receivers), parseAdderss(cc), title)
+	m.setBody(contentType, body)
+	return m
+}
 
-	if multipart {
-		headers += "Content-Type: multipart/mixed; boundary=\"" + boundary + "\"\r\n"
+func (m *Message) setHeaders(from *mail.Address, to, cc []*mail.Address, subject string) {
+	m.Message.SetAddressHeader("From", from.Address, from.Name)
+	recievers := []string{}
+	for _, t := range to {
+		recievers = append(recievers, m.Message.FormatAddress(t.Address, t.Name))
+	}
+	m.SetHeaders(map[string][]string{"To": recievers})
+	m.Message.SetHeader("To", recievers...)
+	if len(cc) > 0 {
+		ccReceivers := []string{}
+		for _, c := range cc {
+			ccReceivers = append(ccReceivers, m.Message.FormatAddress(c.Address, c.Name))
+		}
+		m.Message.SetHeader("Cc", ccReceivers...)
+	}
+	m.Message.SetHeader("Subject", subject)
+}
+
+func (m *Message) setBody(contentType, body string) {
+	if contentType == `` {
+		m.Message.SetBody("text/plain", body)
 	} else {
-		headers += "Content-Type: " + msg.ContentType + "\r\n"
+		m.Message.SetBody(contentType, body)
 	}
-	return headers
 }
 
-func (m *Mailer) makeBody(msg *Message, multipart bool) string {
-	if !multipart {
-		return "\r\n" + msg.Body + "\r\n"
+func (m *Message) AddAttachs(files ...string) {
+	for _, filename := range files {
+		if f, err := os.Stat(filename); err != nil {
+			log.Printf("WARNING: %s does not exists.\n", filename)
+		} else {
+			if f.IsDir() {
+				log.Printf("WARNING: %s is not a file.\n", filename)
+			}
+		}
+		m.Attach(filename)
 	}
-	return makeMultipartBody(msg)
 }
 
-func makeMultipartBody(msg *Message) string {
-	result := "\r\n--" + boundary + "\r\n" +
-		"Content-Type: " + msg.ContentType + "\r\n" +
-		"\r\n" + msg.Body + "\r\n"
-
-	for name, content := range msg.Attaches {
-		result += makeAttach(name, content)
-	}
-	result += "\r\n--" + boundary + "--\r\n"
-	return result
-}
-
-func makeAttach(name, content string) string {
-	return "\r\n--" + boundary + "\r\n" +
-		"Content-Type: " + mime.TypeByExtension(filepath.Ext(name)) + "\r\n" +
-		"Content-Disposition: attachment; filename=\"" + name + "\"\r\n" +
-		"Content-Transfer-Encoding: base64\r\n" +
-		"\r\n" + base64Encode(content) + "\r\n"
-}
-
-func base64Encode(content string) string {
-	buf := make([]byte, base64.StdEncoding.EncodedLen(len(content)))
-	base64.StdEncoding.Encode(buf, []byte(content))
-
-	var result bytes.Buffer
-	// devide base64 content in lines of 78 chars
-	for i, l := 0, len(buf); i < l; i++ {
-		result.WriteByte(buf[i])
-		if (i+1)%78 == 0 {
-			result.WriteString("\r\n")
+func parseAdderss(addrs []string) (result []*mail.Address) {
+	for _, addr := range addrs {
+		if r, err := mail.ParseAddress(addr); err == nil {
+			result = append(result, r)
 		}
 	}
-	return result.String()
-}
-
-func encodeNameAddrs(people []People) string {
-	var slice []string
-	for _, p := range people {
-		slice = append(slice, encodeNameAddr(p.Name, p.Addr))
-	}
-	return strings.Join(slice, `,`)
-}
-
-func encodeNameAddr(name, addr string) string {
-	if name == `` {
-		if i := strings.IndexByte(addr, '@'); i >= 0 {
-			name = addr[0:i]
-		}
-	}
-	return mime.BEncoding.Encode(`utf-8`, name) + `<` + addr + `>`
+	return
 }
