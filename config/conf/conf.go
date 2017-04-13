@@ -79,7 +79,7 @@ func (c *Conf) Mailer() *mailer.Mailer {
 	defer c.Unlock()
 	if !c.mailer.setted {
 		m := c.data.Mailer
-		c.mailer.Mailer = mailer.New(m.Host, m.Port, m.Passwd, m.Sender) //host string, port int, password string, from string
+		c.mailer.Mailer = mailer.New(m.Host, m.Port, m.Passwd, m.Sender)
 		c.mailer.setted = true
 	}
 	return c.mailer.Mailer
@@ -87,10 +87,11 @@ func (c *Conf) Mailer() *mailer.Mailer {
 
 func (c *Conf) Alarm(title, body string) {
 	title = c.DeployName() + ` ` + title
-	c.Mailer().Send(&mailer.Message{Receivers: c.Keepers(), Title: title, Body: body})
+	msg := c.Mailer().NewMessage(c.Keepers(), nil, title, body, ``)
+	c.Mailer().Send(msg)
 }
 
-func (c *Conf) Keepers() []mailer.People {
+func (c *Conf) Keepers() []string {
 	return c.data.Keepers
 }
 
