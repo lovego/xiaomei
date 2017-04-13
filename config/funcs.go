@@ -43,7 +43,7 @@ func Alarm(title, body string) {
 	theConf.Alarm(title, body)
 }
 
-func Keepers() []mailer.People {
+func Keepers() []string {
 	return theConf.Keepers()
 }
 

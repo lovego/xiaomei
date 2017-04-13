@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"log"
 	"sync"
 	"time"
 
@@ -24,9 +25,9 @@ type conf struct {
 	Domain string `yaml:"domain"`
 	Secret string `yaml:"secret"`
 
-	TimeZone TimeZoneConf    `yaml:"timeZone"`
-	Mailer   MailerConf      `yaml:"mailer"`
-	Keepers  []mailer.People `yaml:"keepers"`
+	TimeZone TimeZoneConf `yaml:"timeZone"`
+	Mailer   MailerConf   `yaml:"mailer"`
+	Keepers  []string     `yaml:"keepers"`
 
 	DataSource map[string]map[string]string `yaml:"dataSource"`
 }
@@ -38,8 +39,8 @@ type TimeZoneConf struct {
 
 type MailerConf struct {
 	Host   string `yaml:"host"`
-	Port   string `yaml:"port"`
-	Sender mailer.People
+	Port   int    `yaml:"port"`
+	Sender string `yaml:"sender"`
 	Passwd string `yaml:"passwd"`
 }
 
@@ -79,7 +80,11 @@ func (c *Conf) Mailer() *mailer.Mailer {
 	defer c.Unlock()
 	if !c.mailer.setted {
 		m := c.data.Mailer
-		c.mailer.Mailer = mailer.New(m.Host, m.Port, m.Sender, m.Passwd)
+		mail, err := mailer.New(m.Host, m.Port, m.Passwd, m.Sender)
+		if err != nil {
+			log.Println(err)
+		}
+		c.mailer.Mailer = mail
 		c.mailer.setted = true
 	}
 	return c.mailer.Mailer
@@ -87,10 +92,11 @@ func (c *Conf) Mailer() *mailer.Mailer {
 
 func (c *Conf) Alarm(title, body string) {
 	title = c.DeployName() + ` ` + title
-	c.Mailer().Send(&mailer.Message{Receivers: c.Keepers(), Title: title, Body: body})
+	msg := c.Mailer().NewMessage(c.Keepers(), nil, title, body, ``)
+	c.Mailer().Send(msg)
 }
 
-func (c *Conf) Keepers() []mailer.People {
+func (c *Conf) Keepers() []string {
 	return c.data.Keepers
 }
 
