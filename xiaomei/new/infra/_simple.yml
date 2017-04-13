@@ -1,0 +1,10 @@
+services:
+  access:
+    image: 192.168.202.12:5000/{{ .Domain }}/access
+    volumes: [ "{{ .ProName }}_logs:/var/log/nginx" ]
+  logc:
+    image: 192.168.202.12:5000/xiaomei/logc
+    volumes:
+      - "{{ .ProName }}_logs:/home/ubuntu/logc/log"
+
+volumesToCreate: [ "{{ .ProName }}_logs" ]

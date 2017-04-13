@@ -26,10 +26,10 @@ func detectRoot() string {
 	if theRoot == nil {
 		if cwd, err := os.Getwd(); err != nil {
 			panic(err)
-		} else if dir := fs.DetectDir(cwd, `release/stack.yml`, `release/clusters.yml`); dir != `` {
+		} else if dir := fs.DetectDir(cwd, `release/clusters.yml`); dir != `` {
 			dir = filepath.Join(dir, `release`)
 			theRoot = &dir
-		} else if dir := fs.DetectDir(cwd, `stack.yml`, `clusters.yml`); dir != `` {
+		} else if dir := fs.DetectDir(cwd, `clusters.yml`); dir != `` {
 			theRoot = &dir
 		} else {
 			return ``
