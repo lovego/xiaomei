@@ -64,7 +64,7 @@ func generateConf(confData configData) int {
 		panic(err)
 	}
 	for _, tmplFile := range tmplFiles {
-		confFile := strings.Replace(tmplFile, `available`, `enabled`, 1)
+		confFile := `/etc/nginx/sites-enabled/` + strings.TrimSuffix(filepath.Base(tmplFile), `.tmpl`)
 		if err := ioutil.WriteFile(confFile, makeConf(tmplFile, confData), 0644); err != nil {
 			panic(err)
 		}
