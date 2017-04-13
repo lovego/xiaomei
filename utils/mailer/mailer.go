@@ -18,31 +18,36 @@ type Message struct {
 	*gomail.Message
 }
 
-func New(host string, port int, password string, from string) *Mailer {
+func New(host string, port int, password string, from string) (*Mailer, error) {
 	if host == `` || password == `` || from == `` {
-		return nil
+		return nil, nil
 	}
 	sender, err := mail.ParseAddress(from)
 	if err != nil {
-		log.Println(err)
-		return nil
+		return nil, err
 	}
 	dialer := gomail.NewDialer(host, port, sender.Address, password)
 	s, err := dialer.Dial()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	m := Mailer{
 		sender, dialer, s,
 	}
-	return &m
+	return &m, nil
 }
 
 func (self *Mailer) Send(msg Message) error {
+	if self == nil {
+		return nil
+	}
 	return gomail.Send(self.SendCloser, msg.Message)
 }
 
 func (self *Mailer) NewMessage(receivers, cc []string, title, body, contentType string) Message {
+	if self == nil {
+		return Message{}
+	}
 	m := Message{gomail.NewMessage( /*gomail.SetCharset("UTF-8")*/ )}
 	m.setHeaders(self.Sender, parseAdderss(receivers), parseAdderss(cc), title)
 	m.setBody(contentType, body)

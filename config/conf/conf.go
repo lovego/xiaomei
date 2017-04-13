@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"log"
 	"sync"
 	"time"
 
@@ -79,7 +80,11 @@ func (c *Conf) Mailer() *mailer.Mailer {
 	defer c.Unlock()
 	if !c.mailer.setted {
 		m := c.data.Mailer
-		c.mailer.Mailer = mailer.New(m.Host, m.Port, m.Passwd, m.Sender)
+		mail, err := mailer.New(m.Host, m.Port, m.Passwd, m.Sender)
+		if err != nil {
+			log.Println(err)
+		}
+		c.mailer.Mailer = mail
 		c.mailer.setted = true
 	}
 	return c.mailer.Mailer
