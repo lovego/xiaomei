@@ -7,8 +7,8 @@ import (
 )
 
 func run(svcName string) error {
-	img := images.Get(svcName)
-	if err := img.PrepareOrBuild(); err != nil {
+	image := images.Get(svcName)
+	if err := image.PrepareOrBuild(); err != nil {
 		return err
 	}
 
@@ -18,16 +18,20 @@ func run(svcName string) error {
 	} else {
 		args = append(args, flags...)
 	}
-	for _, env := range img.Envs() {
+	for _, env := range image.Envs() {
 		args = append(args, `-e`, env)
 	}
-	for _, env := range img.EnvsForRun() {
+	for _, env := range image.EnvsForRun() {
 		args = append(args, `-e`, env)
 	}
-	for _, file := range img.FilesForRun() {
+	for _, file := range image.FilesForRun() {
+		args = append(args, `-v`, file)
+	}
+	for _, file := range conf.VolumesFor(svcName) {
 		args = append(args, `-v`, file)
 	}
 	args = append(args, conf.ImageNameOf(svcName))
-	_, err := cmd.Run(cmd.O{}, `docker`, args...)
+	args = append(args, conf.CommandFor(svcName)...)
+	_, err := cmd.Run(cmd.O{Print: true}, `docker`, args...)
 	return err
 }

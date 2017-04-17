@@ -4,6 +4,7 @@ services:
     volumes: [ "{{ .ProName }}_logs:/var/log/nginx" ]
   logc:
     image: 192.168.202.12:5000/xiaomei/logc
+    command: [ "org-name" ]
     volumes:
       - "{{ .ProName }}_logs:/home/ubuntu/logc/log"
 

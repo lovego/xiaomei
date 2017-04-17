@@ -20,3 +20,11 @@ func ServiceNames() map[string]bool {
 func ImageNameOf(svcName string) string {
 	return simpleconf.ImageNameOf(svcName)
 }
+
+func VolumesFor(svcName string) []string {
+	return simpleconf.VolumesFor(svcName)
+}
+
+func CommandFor(svcName string) []string {
+	return simpleconf.CommandFor(svcName)
+}

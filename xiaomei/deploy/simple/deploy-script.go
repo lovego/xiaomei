@@ -19,7 +19,7 @@ deploy() {
 	{{ range .Envs }} -e {{ . }}{{ end }} \
   {{ range .Volumes}} -v {{ . }}{{ end }} \
   -d --network=host --restart=always \
-	{{.Image}}
+	{{.Image}} {{.Command}}
 }
 {{ range .VolumesToCreate -}}
 docker volume create {{ . }}
@@ -29,7 +29,6 @@ for port in {{ .Ports }}; do deploy $port; done
 {{ else -}}
 deploy
 {{ end }}
-exit
 `
 
 func getDeployScript(svcName string) (string, error) {
@@ -42,19 +41,21 @@ func getDeployScript(svcName string) (string, error) {
 }
 
 type deployConf struct {
-	Name, Image, PortEnv, Ports    string
-	Envs, VolumesToCreate, Volumes []string
+	Name, Image, PortEnv, Ports, Command string
+	Envs, VolumesToCreate, Volumes       []string
 }
 
 func getDeployConfig(svcName string) deployConf {
 	image := images.Get(svcName)
+	service := simpleconf.GetService(svcName)
 	conf := deployConf{
 		Name:            release.Name() + `_` + svcName,
 		Image:           image.NameWithDigestInRegistry(),
 		PortEnv:         image.PortEnvName(),
 		Envs:            image.Envs(),
+		Command:         strings.Join(service.Command, ` `),
 		VolumesToCreate: simpleconf.Get().VolumesToCreate,
-		Volumes:         simpleconf.GetService(svcName).Volumes,
+		Volumes:         service.Volumes,
 	}
 	if conf.PortEnv != `` {
 		conf.Ports = strings.Join(simpleconf.PortsOf(svcName), ` `)

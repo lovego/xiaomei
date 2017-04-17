@@ -20,8 +20,8 @@ type Conf struct {
 }
 
 type Service struct {
-	Image, Ports string
-	Volumes      []string
+	Image, Ports     string
+	Command, Volumes []string
 }
 
 var theConf *Conf
@@ -91,4 +91,12 @@ func PortsOf(svcName string) (ports []string) {
 		panic(fmt.Sprintf(`%s: %s.ports: illegal format.`, File, svcName))
 	}
 	return
+}
+
+func CommandFor(svcName string) []string {
+	return GetService(svcName).Command
+}
+
+func VolumesFor(svcName string) []string {
+	return GetService(svcName).Volumes
 }
