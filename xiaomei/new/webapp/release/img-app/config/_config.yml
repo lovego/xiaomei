@@ -3,7 +3,7 @@ timeZone: { name: China, offset: 28800 }
 mailer:
   host: imap.exmail.qq.com
   port: 25
-  sender: { name: xiaomei, addr: xiaomei-go@qq.com }
+  sender: "xiaomei<xiaomei-go@qq.com>"
   passwd: abc123
-keepers: [ { name: xiaomei, addr: xiaomei-go@qq.com } ]
+keepers: [ "xiaomei<xiaomei-go@qq.com>" ]
 

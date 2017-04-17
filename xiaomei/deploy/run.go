@@ -32,6 +32,6 @@ func run(svcName string) error {
 	}
 	args = append(args, conf.ImageNameOf(svcName))
 	args = append(args, conf.CommandFor(svcName)...)
-	_, err := cmd.Run(cmd.O{Print: true}, `docker`, args...)
+	_, err := cmd.Run(cmd.O{}, `docker`, args...)
 	return err
 }
