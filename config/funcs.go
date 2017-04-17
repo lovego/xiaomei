@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/lovego/xiaomei/config/conf"
-	"github.com/lovego/xiaomei/utils/mailer"
 )
 
 func Root() string {
@@ -33,14 +32,6 @@ func Secret() string {
 
 func TimeZone() *time.Location {
 	return theConf.TimeZone()
-}
-
-func Mailer() *mailer.Mailer {
-	return theConf.Mailer()
-}
-
-func Alarm(title, body string) {
-	theConf.Alarm(title, body)
 }
 
 func Keepers() []string {

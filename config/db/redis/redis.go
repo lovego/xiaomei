@@ -4,19 +4,19 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lovego/xiaomei/config"
 	"github.com/garyburd/redigo/redis"
+	"github.com/lovego/xiaomei/config"
 )
 
-var redisConns = struct {
+var pools = struct {
 	sync.RWMutex
 	m map[string]*redis.Pool
 }{m: make(map[string]*redis.Pool)}
 
 func Do(name string, work func(redis.Conn)) {
-	redisConns.RLock()
-	redisPool := redisConns.m[name]
-	redisConns.RUnlock()
+	pools.RLock()
+	redisPool := pools.m[name]
+	pools.RUnlock()
 	if redisPool == nil {
 		redisPool = &redis.Pool{
 			MaxIdle:     32,
@@ -31,9 +31,9 @@ func Do(name string, work func(redis.Conn)) {
 				)
 			},
 		}
-		redisConns.Lock()
-		redisConns.m[name] = redisPool
-		redisConns.Unlock()
+		pools.Lock()
+		pools.m[name] = redisPool
+		pools.Unlock()
 	}
 	conn := redisPool.Get()
 	defer conn.Close()

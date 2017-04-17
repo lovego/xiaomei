@@ -1,103 +1,55 @@
 package mailer
 
 import (
-	"log"
 	"net/mail"
-	"os"
+	"net/smtp"
+	"net/url"
+	"strconv"
+	"time"
 
-	"gopkg.in/gomail.v2"
+	"github.com/jordan-wright/email"
 )
 
 type Mailer struct {
-	Sender     *mail.Address
-	Dialer     *gomail.Dialer
-	SendCloser gomail.SendCloser
+	Sender *mail.Address
+	Pool   *email.Pool
 }
 
-type Message struct {
-	*gomail.Message
-}
-
-func New(host string, port int, password string, from string) (*Mailer, error) {
-	if host == `` || password == `` || from == `` {
-		return nil, nil
-	}
-	sender, err := mail.ParseAddress(from)
+func New(mailerUrl string) (*Mailer, error) {
+	mailer, err := url.Parse(mailerUrl)
 	if err != nil {
 		return nil, err
 	}
-	dialer := gomail.NewDialer(host, port, sender.Address, password)
-	s, err := dialer.Dial()
+	query := mailer.Query()
+
+	poolSize := 10
+	if size := query.Get(`poolSize`); size != `` {
+		if sizeInt, err := strconv.Atoi(size); err != nil {
+			return nil, err
+		} else if sizeInt > 0 {
+			poolSize = sizeInt
+		}
+	}
+
+	sender, err := mail.ParseAddress(query.Get(`user`))
 	if err != nil {
 		return nil, err
 	}
-	m := Mailer{
-		sender, dialer, s,
-	}
-	return &m, nil
+
+	pool := email.NewPool(
+		mailer.Host, poolSize,
+		smtp.PlainAuth(``, sender.Address, query.Get(`pass`), mailer.Hostname()),
+	)
+
+	return &Mailer{sender, pool}, nil
 }
 
-func (self *Mailer) Send(msg Message) error {
-	if self == nil {
+func (m *Mailer) Send(e *email.Email, timeout time.Duration) error {
+	if m == nil {
 		return nil
 	}
-	return gomail.Send(self.SendCloser, msg.Message)
-}
-
-func (self *Mailer) NewMessage(receivers, cc []string, title, body, contentType string) Message {
-	if self == nil {
-		return Message{}
+	if e.From == `` && m.Sender != nil {
+		e.From = m.Sender.String()
 	}
-	m := Message{gomail.NewMessage( /*gomail.SetCharset("UTF-8")*/ )}
-	m.setHeaders(self.Sender, parseAdderss(receivers), parseAdderss(cc), title)
-	m.setBody(contentType, body)
-	return m
-}
-
-func (m *Message) setHeaders(from *mail.Address, to, cc []*mail.Address, subject string) {
-	m.Message.SetAddressHeader("From", from.Address, from.Name)
-	recievers := []string{}
-	for _, t := range to {
-		recievers = append(recievers, m.Message.FormatAddress(t.Address, t.Name))
-	}
-	m.SetHeaders(map[string][]string{"To": recievers})
-	m.Message.SetHeader("To", recievers...)
-	if len(cc) > 0 {
-		ccReceivers := []string{}
-		for _, c := range cc {
-			ccReceivers = append(ccReceivers, m.Message.FormatAddress(c.Address, c.Name))
-		}
-		m.Message.SetHeader("Cc", ccReceivers...)
-	}
-	m.Message.SetHeader("Subject", subject)
-}
-
-func (m *Message) setBody(contentType, body string) {
-	if contentType == `` {
-		m.Message.SetBody("text/plain", body)
-	} else {
-		m.Message.SetBody(contentType, body)
-	}
-}
-
-func (m *Message) AddAttachs(files ...string) {
-	for _, filename := range files {
-		if f, err := os.Stat(filename); err != nil {
-			log.Printf("WARNING: %s does not exists.\n", filename)
-		} else {
-			if f.IsDir() {
-				log.Printf("WARNING: %s is not a file.\n", filename)
-			}
-		}
-		m.Attach(filename)
-	}
-}
-
-func parseAdderss(addrs []string) (result []*mail.Address) {
-	for _, addr := range addrs {
-		if r, err := mail.ParseAddress(addr); err == nil {
-			result = append(result, r)
-		}
-	}
-	return
+	return m.Pool.Send(e, timeout)
 }
