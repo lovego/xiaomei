@@ -19,6 +19,7 @@ type conf struct {
 	Secret string `yaml:"secret"`
 
 	TimeZone TimeZoneConf `yaml:"timeZone"`
+	Mailer   string       `yaml:"mailer"`
 	Keepers  []string     `yaml:"keepers"`
 
 	DataSource map[string]map[string]string `yaml:"dataSource"`
@@ -58,6 +59,10 @@ func (c *Conf) TimeZone() *time.Location {
 		c.timeZone = time.FixedZone(c.data.TimeZone.Name, c.data.TimeZone.Offset)
 	}
 	return c.timeZone
+}
+
+func (c *Conf) Mailer() string {
+	return c.data.Mailer
 }
 
 func (c *Conf) Keepers() []string {

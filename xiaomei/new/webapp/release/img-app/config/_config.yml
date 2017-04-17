@@ -1,9 +1,5 @@
 name: {{ .ProName }}
 timeZone: { name: China, offset: 28800 }
-mailer:
-  host: imap.exmail.qq.com
-  port: 25
-  sender: "xiaomei<xiaomei-go@qq.com>"
-  passwd: abc123
+mailer: "mailer://imap.exmail.qq.com:25?user=xiaomei<xiaomei-go@qq.com>&pass=abc123"
 keepers: [ "xiaomei<xiaomei-go@qq.com>" ]
 

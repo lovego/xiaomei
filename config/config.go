@@ -7,9 +7,11 @@ import (
 
 	"github.com/lovego/xiaomei/config/conf"
 	"github.com/lovego/xiaomei/utils/fs"
+	"github.com/lovego/xiaomei/utils/mailer"
 )
 
 var theConf = getConf()
+var Mailer = getMailer()
 
 func getConf() *conf.Conf {
 	root := detectRoot()
@@ -17,6 +19,14 @@ func getConf() *conf.Conf {
 		panic(`app root not found.`)
 	}
 	return conf.New(root, detectEnv())
+}
+
+func getMailer() *mailer.Mailer {
+	m, err := mailer.New(theConf.Mailer())
+	if err != nil {
+		panic(err)
+	}
+	return m
 }
 
 func detectRoot() string {
