@@ -17,12 +17,10 @@ func (d driver) Deploy(svcName string) error {
 	if svcName != `` {
 		serviceNames = append(serviceNames, svcName)
 	} else {
-		services := simpleconf.ServiceNames()
-		if _, ok := services[`app`]; ok {
-			serviceNames = append(serviceNames, `app`)
-		}
-		if _, ok := services[`web`]; ok {
-			serviceNames = append(serviceNames, `web`)
+		for service, toDeploy := range simpleconf.ServiceNames() {
+			if toDeploy {
+				serviceNames = append(serviceNames, service)
+			}
 		}
 	}
 	for _, thisSvcName := range serviceNames {
