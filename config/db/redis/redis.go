@@ -13,12 +13,12 @@ var pools = struct {
 	m map[string]*redis.Pool
 }{m: make(map[string]*redis.Pool)}
 
-func Do(name string, work func(redis.Conn)) {
+func Pool(name string) *redis.Pool {
 	pools.RLock()
-	redisPool := pools.m[name]
+	p := pools.m[name]
 	pools.RUnlock()
-	if redisPool == nil {
-		redisPool = &redis.Pool{
+	if p == nil {
+		p = &redis.Pool{
 			MaxIdle:     32,
 			MaxActive:   32,
 			IdleTimeout: 600 * time.Second,
@@ -32,10 +32,14 @@ func Do(name string, work func(redis.Conn)) {
 			},
 		}
 		pools.Lock()
-		pools.m[name] = redisPool
+		pools.m[name] = p
 		pools.Unlock()
 	}
-	conn := redisPool.Get()
+	return p
+}
+
+func Do(name string, work func(redis.Conn)) {
+	conn := Pool(name).Get()
 	defer conn.Close()
 	work(conn)
 }
