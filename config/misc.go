@@ -32,7 +32,7 @@ func Protect(fn func()) {
 		if err != nil {
 			errMsg := fmt.Sprintf("PANIC: %s\n%s", err, utils.Stack(4))
 			Alarm(`Protect错误`, errMsg)
-			println(errMsg)
+			utils.Log(errMsg)
 		}
 	}()
 	fn()
