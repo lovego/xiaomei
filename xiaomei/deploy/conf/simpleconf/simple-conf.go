@@ -3,10 +3,13 @@ package simpleconf
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 
+	"github.com/lovego/xiaomei/utils"
+	"github.com/lovego/xiaomei/utils/fs"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"gopkg.in/yaml.v2"
 )
@@ -14,9 +17,8 @@ import (
 const File = `simple.yml`
 
 type Conf struct {
-	loaded          bool
 	Services        map[string]Service
-	VolumesToCreate []string
+	VolumesToCreate []string `yaml:"volumesToCreate"`
 }
 
 type Service struct {
@@ -28,13 +30,13 @@ var theConf *Conf
 
 func Get() *Conf {
 	if theConf == nil {
-		content, err := ioutil.ReadFile(filepath.Join(release.Root(), File))
-		if err != nil {
-			panic(err)
-		}
 		conf := &Conf{}
-		if err := yaml.Unmarshal(content, conf); err != nil {
-			panic(err)
+		loadFile(conf, filepath.Join(release.Root(), File))
+		if envConf := filepath.Join(release.Root(), `simple/`+release.Env()+`.yml`); fs.Exist(envConf) {
+			loadFile(conf, envConf)
+		}
+		if os.Getenv(`debugSimpleConf`) != `` {
+			utils.PrintJson(conf)
 		}
 		theConf = conf
 	}
@@ -99,4 +101,15 @@ func CommandFor(svcName string) []string {
 
 func VolumesFor(svcName string) []string {
 	return GetService(svcName).Volumes
+}
+
+func loadFile(p interface{}, file string) {
+	content, err := ioutil.ReadFile(file)
+	if err != nil {
+		panic(err)
+	}
+	err = yaml.Unmarshal(content, p)
+	if err != nil {
+		panic(err)
+	}
 }

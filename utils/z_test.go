@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"reflect"
 	"syscall"
 	"testing"
 )
@@ -23,4 +24,9 @@ func printNOFILE() {
 
 func TestStack(t *testing.T) {
 	fmt.Printf("%s\n", Stack(1))
+}
+
+func TestReflect(t *testing.T) {
+	v := reflect.ValueOf(``)
+	fmt.Println(v.IsValid(), v)
 }
