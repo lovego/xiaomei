@@ -22,15 +22,15 @@ type Consume struct {
 }
 
 func (c *Consume) Start() {
-	partitions, err := c.Consumer.Partitions(c.Topic)
-	if err != nil {
-		panic(err)
-	}
 	if err := os.MkdirAll(c.LogDir, 0755); err != nil {
 		panic(err)
 	}
 	if c.OffsetsKey == `` {
 		c.OffsetsKey = `kafka-offsets-` + c.Topic
+	}
+	partitions, err := c.Consumer.Partitions(c.Topic)
+	if err != nil {
+		panic(err)
 	}
 	for _, n := range partitions {
 		go c.StartPartition(n)
@@ -52,7 +52,7 @@ func (c *Consume) StartPartition(n int32) {
 	for message := range pc.Messages() {
 		fmt.Fprintf(logFile, "%s %d %d %d\n", time.Now().Format(utils.ISO8601),
 			pc.HighWaterMarkOffset(), message.Offset, len(message.Value))
-		c.Handler(message, logFile)
+		c.Handle(message, logFile)
 		c.SetPartitionOffset(n, message.Offset, logFile)
 	}
 }
