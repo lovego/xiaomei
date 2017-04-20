@@ -28,7 +28,7 @@ func (d driver) Deploy(svcName string) error {
 			return err
 		}
 	}
-	return d.Ps(svcName, true, nil)
+	return d.Ps(svcName, false, nil)
 }
 
 func deployService(svcName string) error {

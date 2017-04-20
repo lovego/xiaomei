@@ -20,11 +20,11 @@ func ServiceNames() map[string]bool {
 	return simpleconf.ServiceNames()
 }
 
-var reImageName = regexp.MustCompile(`^(.*):([\w.-]+)$`)
+var reImageName = regexp.MustCompile(`^(.+):([\w.-]+)$`)
 
 func ImageNameOf(svcName string) string {
 	name := simpleconf.ImageNameOf(svcName)
-	if reImageName.MatchString(name) {
+	if !reImageName.MatchString(name) {
 		name += `:` + release.Env()
 	}
 	return name

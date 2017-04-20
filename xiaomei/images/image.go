@@ -29,7 +29,7 @@ func (i Image) Build(pull bool) error {
 		args = append(args, `--pull`)
 	}
 	args = append(args, `--file=`+i.dockerfile(), `--tag=`+conf.ImageNameOf(i.svcName), `.`)
-	_, err := cmd.Run(cmd.O{Dir: i.buildDir()}, `docker`, args...)
+	_, err := cmd.Run(cmd.O{Dir: i.buildDir(), Print: true}, `docker`, args...)
 	return err
 }
 
@@ -38,7 +38,7 @@ func (i Image) Push() error {
 		return nil
 	}
 	utils.Log(color.GreenString(`pushing ` + i.svcName + ` image.`))
-	_, err := cmd.Run(cmd.O{}, `docker`, `push`, conf.ImageNameOf(i.svcName))
+	_, err := cmd.Run(cmd.O{Print: true}, `docker`, `push`, conf.ImageNameOf(i.svcName))
 	return err
 }
 
@@ -73,5 +73,8 @@ func (i Image) NameWithDigestInRegistry() string {
 		panic(err)
 	}
 	digest := resp.Header.Get(`Docker-Content-Digest`)
+	if digest == `` {
+		panic(`get image digest faild for: ` + imgName + `:` + tag)
+	}
 	return imgName + `@` + digest
 }

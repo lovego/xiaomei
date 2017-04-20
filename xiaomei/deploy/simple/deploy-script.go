@@ -16,27 +16,27 @@ deploy() {
   name={{.Name}}{{ if .Ports }}.$1{{ end }}
   docker stop $name >/dev/null 2>&1 && docker rm $name
   id=$(
-		docker run --name=$name -d --network=host --restart=always {{ if .Ports -}}
-		-e {{.PortEnv}}=$1 {{ end }} {{ range .Envs -}} -e {{ . }} {{ end }} {{ range .Volumes -}}
-		-v {{ . }} {{ end -}} {{.Image}} {{.Command}}
-	)
-	while status=$(docker ps -f id="$id" --format {{ "'{{.Status}}'" }}); do
-	  echo "$name: $status"
-		case "$status" in
-		"Up "*" (health: starting)" ) sleep 1 ;;
-		"Up "* ) break ;;
-		* ) exit 1;;
-		esac
-	done
+    docker run --name=$name -d --network=host --restart=always {{ if .Ports -}}
+    -e {{.PortEnv}}=$1 {{ end }} {{ range .Envs -}} -e {{ . }} {{ end }} {{ range .Volumes -}}
+    -v {{ . }} {{ end -}} {{.Image}} {{.Command}}
+  )
+  while status=$(docker ps -f id="$id" --format {{ "'{{.Status}}'" }}); do
+    echo "$name: $status"
+    case "$status" in
+      "Up "*" (health: starting)" ) sleep 1 ;;
+      "Up "*                      ) break ;;
+           *                      ) exit 1;;
+    esac
+  done
 }
 {{ range .VolumesToCreate -}}
 docker volume create {{ . }}
-{{ end }}
+{{ end -}}
 {{ if .Ports -}}
 for port in {{ .Ports }}; do deploy $port; done
 {{ else -}}
 deploy
-{{ end }}
+{{ end -}}
 `
 
 func getDeployScript(svcName string) (string, error) {
