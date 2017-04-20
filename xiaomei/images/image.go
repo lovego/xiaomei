@@ -3,13 +3,11 @@ package images
 import (
 	"net/http"
 	"net/url"
-	"regexp"
 
 	"github.com/fatih/color"
 	"github.com/lovego/xiaomei/utils"
 	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
-	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
 type Image struct {
@@ -59,7 +57,7 @@ func (i Image) PrepareOrBuild() error {
 // TODO: https or http check.
 // TODO: https://registry.hub.docker.com/v2/
 func (i Image) NameWithDigestInRegistry() string {
-	imgName, tag := splitNameAndTag(conf.ImageNameOf(i.svcName))
+	imgName, tag := conf.ImageNameAndTagOf(i.svcName)
 	uri, err := url.Parse(`http://` + imgName + `/manifests/` + tag)
 	if err != nil {
 		panic(err)
@@ -76,12 +74,4 @@ func (i Image) NameWithDigestInRegistry() string {
 	}
 	digest := resp.Header.Get(`Docker-Content-Digest`)
 	return imgName + `@` + digest
-}
-
-func splitNameAndTag(nameWithTag string) (name, tag string) {
-	if m := regexp.MustCompile(`^(.*):([\w.-]+)$`).FindStringSubmatch(nameWithTag); len(m) == 3 {
-		return m[1], m[2]
-	} else {
-		return nameWithTag, release.Env()
-	}
 }
