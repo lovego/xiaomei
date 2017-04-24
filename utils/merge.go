@@ -2,6 +2,7 @@ package utils
 
 import (
 	"reflect"
+	"strings"
 )
 
 func Merge(a, b interface{}) {
@@ -22,21 +23,34 @@ func mergeMap(a, b reflect.Value, keys string) {
 		if bv.Kind() == reflect.Interface {
 			bv = bv.Elem()
 		}
+		if key.Kind() == reflect.Interface {
+			key = key.Elem()
+		}
 		if bv.Kind() == reflect.Map {
 			switch a.Kind() {
 			case reflect.Map:
 				mergeMap(a.MapIndex(key), bv, keys+`.`+key.String())
 			case reflect.Struct:
-				mergeMap(a.FieldByName(key.String()), bv, keys+`.`+key.String())
+				keyStr := strings.Title(key.String())
+				mergeMap(a.FieldByName(keyStr), bv, keys+`.`+keyStr)
 			default:
 				panic(`a` + keys + ` should be a map or struct`)
 			}
 		} else {
 			switch a.Kind() {
 			case reflect.Map:
+				if key.Kind() == reflect.Interface {
+					key = key.Elem()
+				}
 				a.SetMapIndex(key, bv)
 			case reflect.Struct:
-				a.FieldByName(key.String()).Set(bv)
+				keyStr := strings.Title(key.String())
+				if av := a.FieldByName(keyStr); av.IsValid() {
+					println(keyStr)
+					av.Set(bv)
+				} else {
+					panic(`no such field: ` + keyStr)
+				}
 			default:
 				panic(`a` + keys + ` should be a map or struct`)
 			}
