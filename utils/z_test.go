@@ -30,3 +30,23 @@ func TestReflect(t *testing.T) {
 	v := reflect.ValueOf(``)
 	fmt.Println(v.IsValid(), v)
 }
+
+func TestMerge(t *testing.T) {
+	type s struct {
+		E int
+		F string
+	}
+	a := struct {
+		A, B string
+		C, D int
+		S    s
+	}{A: `A`, C: 3, S: s{E: 5}}
+
+	b := map[string]interface{}{
+		`B`: `B`, `D`: 4,
+		`S`: map[string]interface{}{`F`: `F`},
+	}
+
+	Merge(&a, b)
+	fmt.Printf("%+v, %+v\n", a, b)
+}
