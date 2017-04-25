@@ -42,11 +42,11 @@ func TestMerge(t *testing.T) {
 		S    s
 	}{A: `A`, C: 3, S: s{E: 5}}
 
-	b := map[string]interface{}{
+	b := map[interface{}]interface{}{
 		`B`: `B`, `D`: 4,
-		`S`: map[string]interface{}{`F`: `F`},
+		`S`: map[interface{}]interface{}{`F`: `F`},
 	}
 
-	Merge(&a, b)
-	fmt.Printf("%+v, %+v\n", a, b)
+	m := Merge(a, b)
+	fmt.Printf("%+v, %+v, %+v\n", a, b, m)
 }
