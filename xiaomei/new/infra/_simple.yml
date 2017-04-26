@@ -9,3 +9,9 @@ services:
       - "{{ .ProName }}_logs:/home/ubuntu/logc/log"
 
 volumesToCreate: [ "{{ .ProName }}_logs" ]
+environments:
+  dev:
+  qa:
+  production:
+
+

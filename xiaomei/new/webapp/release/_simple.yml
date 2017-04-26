@@ -9,10 +9,3 @@ services:
     volumes: [ "{{ .ProName }}_logs:/var/log/nginx" ]
 
 volumesToCreate: [ "{{ .ProName }}_logs" ]
-
-environments:
-  dev:
-  qa:
-  production:
-
-
