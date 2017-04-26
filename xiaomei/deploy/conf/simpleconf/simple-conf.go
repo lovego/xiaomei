@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/lovego/xiaomei/utils"
+	"github.com/lovego/xiaomei/utils/merge"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"gopkg.in/yaml.v2"
 )
@@ -15,7 +15,7 @@ import (
 const File = `simple.yml`
 
 type Conf struct {
-	Services        map[string]*Service
+	Services        map[string]Service
 	VolumesToCreate []string `yaml:"volumesToCreate"`
 	Environments    map[string]map[string]interface{}
 }
@@ -37,7 +37,7 @@ func Get() *Conf {
 				panic(err)
 			}
 		}
-		mergedConf := utils.Merge(conf, conf.Environments[release.Env()]).(Conf)
+		mergedConf := merge.Merge(conf, conf.Environments[release.Env()]).(Conf)
 		// utils.PrintJson(conf.Services)
 		theConf = &mergedConf
 	}
@@ -49,7 +49,7 @@ func GetService(svcName string) Service {
 	if !ok {
 		panic(fmt.Sprintf(`simple.yml: services.%s: undefined.`, svcName))
 	}
-	return *svc
+	return svc
 }
 
 func ServiceNames() map[string]bool {
