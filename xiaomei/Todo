@@ -14,6 +14,8 @@ stack首次本地deploy未锁定image问题：在QA环境跟踪。
 
 web run 无日志问题: exec tail
 
+尝试引入kubernetes，不要想只使用简单部署，不尝试就放弃k8s，不科学。
+
 DONE:
 access 改为infra
 web使用replicas模式，外部接入使用所有accessNode。

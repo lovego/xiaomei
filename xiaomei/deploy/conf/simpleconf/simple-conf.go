@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/lovego/xiaomei/utils/merge"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"gopkg.in/yaml.v2"
 )
@@ -14,9 +15,9 @@ import (
 const File = `simple.yml`
 
 type Conf struct {
-	loaded          bool
 	Services        map[string]Service
-	VolumesToCreate []string
+	VolumesToCreate []string `yaml:"volumesToCreate"`
+	Environments    map[string]map[string]interface{}
 }
 
 type Service struct {
@@ -28,15 +29,17 @@ var theConf *Conf
 
 func Get() *Conf {
 	if theConf == nil {
-		content, err := ioutil.ReadFile(filepath.Join(release.Root(), File))
-		if err != nil {
-			panic(err)
-		}
 		conf := &Conf{}
-		if err := yaml.Unmarshal(content, conf); err != nil {
+		if content, err := ioutil.ReadFile(filepath.Join(release.Root(), File)); err != nil {
 			panic(err)
+		} else {
+			if err = yaml.Unmarshal(content, &conf); err != nil {
+				panic(err)
+			}
 		}
-		theConf = conf
+		mergedConf := merge.Merge(conf, conf.Environments[release.Env()]).(Conf)
+		// utils.PrintJson(conf.Services)
+		theConf = &mergedConf
 	}
 	return theConf
 }
