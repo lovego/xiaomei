@@ -37,9 +37,9 @@ func Get() *Conf {
 				panic(err)
 			}
 		}
-		utils.Merge(conf, conf.Environments[release.Env()])
+		mergedConf := utils.Merge(conf, conf.Environments[release.Env()]).(Conf)
 		// utils.PrintJson(conf.Services)
-		theConf = conf
+		theConf = &mergedConf
 	}
 	return theConf
 }

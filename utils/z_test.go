@@ -31,7 +31,7 @@ func TestReflect(t *testing.T) {
 	fmt.Println(v.IsValid(), v)
 }
 
-func TestMerge(t *testing.T) {
+func TestMerge1(t *testing.T) {
 	type s struct {
 		E int
 		F string
@@ -49,4 +49,34 @@ func TestMerge(t *testing.T) {
 
 	m := Merge(a, b)
 	fmt.Printf("%+v, %+v, %+v\n", a, b, m)
+}
+
+func TestMerge2(t *testing.T) {
+	type Service struct {
+		Image, Ports     string
+		Command, Volumes []string
+	}
+	config := struct {
+		Services        map[string]Service
+		VolumesToCreate []string `yaml:"volumesToCreate"`
+		Environments    map[string]map[string]interface{}
+	}{
+		Services: map[string]Service{`app`: {
+			Image:   `example/app`,
+			Ports:   `3001~3003`,
+			Volumes: []string{`example_logs:/home/ubuntu/example/log`},
+		}},
+		VolumesToCreate: []string{`example_logs`},
+		Environments: map[string]map[string]interface{}{
+			`dev`: map[string]interface{}{
+				`services`: map[interface{}]interface{}{
+					`app`: map[interface{}]interface{}{
+						`ports`: `3001`,
+					},
+				},
+			},
+		},
+	}
+	newConfig := Merge(config, config.Environments[`dev`])
+	fmt.Printf("%+v\n", newConfig)
 }
