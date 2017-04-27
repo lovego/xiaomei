@@ -33,11 +33,13 @@ func accessSetup() error {
 	if err != nil {
 		return err
 	}
-	for _, node := range cluster.AccessNodes() {
-		if _, err := node.Run(
-			cmd.O{Stdin: strings.NewReader(accessConf)}, script,
-		); err != nil {
-			return err
+	for _, node := range cluster.Nodes() {
+		if node.Labels[`access`] == `true` {
+			if _, err := node.Run(
+				cmd.O{Stdin: strings.NewReader(accessConf)}, script,
+			); err != nil {
+				return err
+			}
 		}
 	}
 	return nil

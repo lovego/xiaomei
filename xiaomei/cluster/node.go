@@ -6,9 +6,9 @@ import (
 
 type Node struct {
 	user       string
-	Addr       string   `yaml:"addr"`
-	Labels     []string `yaml:"labels"`
-	ListenAddr string   `yaml:"listenAddr"` // only for manager
+	Addr       string            `yaml:"addr"`
+	Labels     map[string]string `yaml:"labels"`
+	ListenAddr string            `yaml:"listenAddr"` // only for manager
 }
 
 func (n Node) SshAddr() string {
@@ -24,4 +24,13 @@ func (n Node) GetListenAddr() string {
 
 func (n Node) Run(o cmd.O, script string) (string, error) {
 	return cmd.SshRun(o, n.SshAddr(), script)
+}
+
+func (n Node) Match(labels map[string]string) bool {
+	for key, value := range labels {
+		if nodeValue, ok := n.Labels[key]; !ok || nodeValue != value {
+			return false
+		}
+	}
+	return true
 }

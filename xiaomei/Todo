@@ -1,5 +1,3 @@
-simple deploy 增加nodes 过滤
-
 spec 默认文件名风格修改
 
 docker logs优化
@@ -17,8 +15,4 @@ web run 无日志问题: exec tail
 尝试引入kubernetes，不要想只使用简单部署，不尝试就放弃k8s，不科学。
 
 DONE:
-access 改为infra
-web使用replicas模式，外部接入使用所有accessNode。
-pull base images when build
-服务容器来不及看logs就被移除的问题: docker swarm update --task-history-limit。
 

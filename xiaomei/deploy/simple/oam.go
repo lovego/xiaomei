@@ -29,15 +29,19 @@ done
 }
 
 func (d driver) Ps(svcName string, watch bool, options []string) error {
+	return eachNodeRun(getPsScript(svcName, watch))
+}
+
+func getPsScript(svcName string, watch bool) string {
 	script := fmt.Sprintf(`docker ps -f name=%s_%s`, release.Name(), svcName)
 	if watch {
 		script = `watch ` + script
 	}
-	return eachNodeRun(script)
+	return script
 }
 
 func eachNodeRun(script string) error {
-	for _, node := range cluster.GetCluster().Nodes() {
+	for _, node := range cluster.Nodes() {
 		if _, err := node.Run(cmd.O{}, script); err != nil {
 			return err
 		}

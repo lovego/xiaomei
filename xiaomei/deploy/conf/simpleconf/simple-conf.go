@@ -22,6 +22,7 @@ type Conf struct {
 
 type Service struct {
 	Image, Ports     string
+	Labels           map[string]string
 	Command, Volumes []string
 }
 

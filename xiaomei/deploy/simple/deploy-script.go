@@ -10,63 +10,79 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-// TODO: keep container history, wait until healthy
+// TODO: keep container history
 const deployScriptTmpl = `set -e
+{{ range .VolumesToCreate }}
+docker volume create {{ . }}
+{{- end }}
+
 deploy() {
-  name={{.Name}}{{ if .Ports }}.$1{{ end }}
+  name=$1
+  args=$2
   docker stop $name >/dev/null 2>&1 && docker rm $name
-  id=$(
-    docker run --name=$name -d --network=host --restart=always {{ if .Ports -}}
-    -e {{.PortEnv}}=$1 {{ end }} {{ range .Envs -}} -e {{ . }} {{ end }} {{ range .Volumes -}}
-    -v {{ . }} {{ end -}} {{.Image}} {{.Command}}
-  )
+  id=$(docker run --name=$name -d --network=host --restart=always $args)
   while status=$(docker ps -f id="$id" --format {{ "'{{.Status}}'" }}); do
     echo "$name: $status"
     case "$status" in
       "Up "*" (health: starting)" ) sleep 1 ;;
-      "Up "*                      ) break ;;
-           *                      ) exit 1;;
+      "Up "*                      ) break   ;;
+           *                      ) exit  1 ;;
     esac
   done
 }
-{{ range .VolumesToCreate -}}
-docker volume create {{ . }}
-{{ end -}}
-{{ if .Ports -}}
-for port in {{ .Ports }}; do deploy $port; done
+
+{{ range .Services -}}
+args='{{range .Envs}}-e {{.}} {{end}}{{range .Volumes}}-v {{.}}{{end}} {{.Image}} {{.Command}}'
+{{ $svc := . -}}
+{{ range .Ports -}}
+deploy {{$svc.Name}}.{{.}} "-e {{$svc.PortEnv}}={{.}} $args"
 {{ else -}}
-deploy
+deploy {{.Name}} "$args"
+{{ end }}
 {{ end -}}
 `
 
-func getDeployScript(svcName string) (string, error) {
+func getDeployScript(svcNames []string) (string, error) {
 	tmpl := template.Must(template.New(``).Parse(deployScriptTmpl))
 	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, getDeployConfig(svcName)); err != nil {
+	if err := tmpl.Execute(&buf, getDeployConf(svcNames)); err != nil {
 		return ``, err
 	}
 	return buf.String(), nil
 }
 
 type deployConf struct {
-	Name, Image, PortEnv, Ports, Command string
-	Envs, VolumesToCreate, Volumes       []string
+	VolumesToCreate []string
+	Services        []serviceConf
+}
+type serviceConf struct {
+	Name, Image, PortEnv, Command string
+	Ports, Envs, Volumes          []string
 }
 
-func getDeployConfig(svcName string) deployConf {
+func getDeployConf(svcNames []string) deployConf {
+	conf := deployConf{
+		VolumesToCreate: simpleconf.Get().VolumesToCreate,
+	}
+	for _, svcName := range svcNames {
+		conf.Services = append(conf.Services, getServiceConf(svcName))
+	}
+	return conf
+}
+
+func getServiceConf(svcName string) serviceConf {
 	image := images.Get(svcName)
 	service := simpleconf.GetService(svcName)
-	conf := deployConf{
-		Name:            release.Name() + `_` + svcName,
-		Image:           image.NameWithDigestInRegistry(),
-		PortEnv:         image.PortEnvName(),
-		Envs:            image.Envs(),
-		Command:         strings.Join(service.Command, ` `),
-		VolumesToCreate: simpleconf.Get().VolumesToCreate,
-		Volumes:         service.Volumes,
+	conf := serviceConf{
+		Name:    release.Name() + `_` + svcName,
+		Image:   image.NameWithDigestInRegistry(),
+		PortEnv: image.PortEnvName(),
+		Envs:    image.Envs(),
+		Command: strings.Join(service.Command, ` `),
+		Volumes: service.Volumes,
 	}
 	if conf.PortEnv != `` {
-		conf.Ports = strings.Join(simpleconf.PortsOf(svcName), ` `)
+		conf.Ports = simpleconf.PortsOf(svcName)
 	}
 	return conf
 }
