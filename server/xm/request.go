@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/url"
 	"reflect"
+	"strings"
 
 	"github.com/lovego/xiaomei/server/xm/session"
 )
@@ -20,8 +21,10 @@ func NewRequest(request *http.Request, sess session.Session) *Request {
 }
 
 func (req *Request) ClientAddr() string {
-	addr := req.Header.Get("X-Real-IP")
-	if addr != `` {
+	if addrs := req.Header.Get("X-Forwarded-For"); addrs != `` {
+		return strings.SplitN(addrs, `, `, 2)[0]
+	}
+	if addr := req.Header.Get("X-Real-IP"); addr != `` {
 		return addr
 	}
 	return req.RemoteAddr
