@@ -22,6 +22,13 @@ func main() {
 	appCmd.AddCommand(images.Cmds(`app`)...)
 	appCmd.AddCommand(deploy.Cmds(`app`)...)
 
+	tasksCmd := &cobra.Command{
+		Use:   `tasks`,
+		Short: `the tasks.`,
+	}
+	tasksCmd.AddCommand(images.Cmds(`tasks`)...)
+	tasksCmd.AddCommand(deploy.Cmds(`tasks`)...)
+
 	webCmd := web.Cmd()
 	webCmd.AddCommand(images.Cmds(`web`)...)
 	webCmd.AddCommand(deploy.Cmds(`web`)...)
@@ -35,7 +42,7 @@ func main() {
 	logcCmd.AddCommand(deploy.Cmds(`logc`)...)
 
 	root := rootCmd()
-	root.AddCommand(appCmd, webCmd, accessCmd, logcCmd, cluster.Cmd())
+	root.AddCommand(appCmd, tasksCmd, webCmd, accessCmd, logcCmd, cluster.Cmd())
 	root.AddCommand(images.Cmds(``)...)
 	root.AddCommand(deploy.Cmds(``)...)
 	root.AddCommand(new.Cmd(), yamlCmd(), versionCmd())

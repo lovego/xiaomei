@@ -10,6 +10,7 @@ import (
 
 var imagesMap = map[string]Image{
 	`app`:    Image{svcName: `app`, image: app.Image{}},
+	`tasks`:  Image{svcName: `tasks`, image: app.Image{}},
 	`web`:    Image{svcName: `web`, image: web.Image{}},
 	`access`: Image{svcName: `access`, image: access.Image{}},
 	`logc`:   Image{svcName: `logc`, image: logc.Image{}, external: true},
@@ -25,8 +26,14 @@ func Get(svcName string) Image {
 
 func Build(svcName string, pull bool) error {
 	if svcName == `` {
+		done := map[string]bool{}
 		return eachServiceDo(func(svcName string) error {
-			return Build(svcName, pull)
+			if imgName := conf.ImageNameOf(svcName); done[imgName] {
+				return nil
+			} else {
+				done[imgName] = true
+				return Build(svcName, pull)
+			}
 		})
 	}
 	return imagesMap[svcName].Build(pull)
@@ -34,7 +41,15 @@ func Build(svcName string, pull bool) error {
 
 func Push(svcName string) error {
 	if svcName == `` {
-		return eachServiceDo(Push)
+		done := map[string]bool{}
+		return eachServiceDo(func(svcName string) error {
+			if imgName := conf.ImageNameOf(svcName); done[imgName] {
+				return nil
+			} else {
+				done[imgName] = true
+				return Push(svcName)
+			}
+		})
 	}
 	return imagesMap[svcName].Push()
 }

@@ -3,6 +3,11 @@ services:
     image: 192.168.202.12:5000/{{ .Domain }}/app
     ports: "3001-3002"
     volumes: [ "{{ .ProName }}_logs:/home/ubuntu/{{ .ProName }}/log" ]
+# tasks:
+#   image: 192.168.202.12:5000/{{ .Domain }}/app
+#   labels: { tasks: true }
+#   command: { "./{{ .ProName }}", "tasks" }
+#   volumes: [ "{{ .ProName }}_logs:/home/ubuntu/{{ .ProName }}/log" ]
   web:
     image: 192.168.202.12:5000/{{ .Domain }}/web
     ports: "8001"
