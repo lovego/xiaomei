@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path"
+	"strings"
 
 	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/utils/dsn"
+	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/spf13/cobra"
 )
@@ -45,5 +47,5 @@ func createDbAndTables(options []string) {
 	}
 	sqls := bytes.NewBufferString(createDB + string(createTbs))
 
-	cmd.Run(cmd.O{Stdin: sqls, Panic: true}, `mysql`, options[:l-1]...)
+	cluster.Run(cmd.O{Stdin: sqls, Panic: true}, `mysql `+strings.Join(options[:l-1], ` `))
 }
