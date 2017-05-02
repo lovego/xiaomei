@@ -17,8 +17,8 @@ docker volume create {{ . }}
 {{- end }}
 
 deploy() {
-  name=$1
-  args=$2
+  local name=$1
+  local args=$2
   docker stop $name >/dev/null 2>&1 && docker rm $name
   id=$(docker run --name=$name -d --network=host --restart=always $args)
   while status=$(docker ps -f id="$id" --format {{ "'{{.Status}}'" }}); do
