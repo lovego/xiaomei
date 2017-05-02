@@ -27,9 +27,7 @@ func run(svcName string) error {
 	for _, file := range image.FilesForRun() {
 		args = append(args, `-v`, file)
 	}
-	for _, file := range conf.VolumesFor(svcName) {
-		args = append(args, `-v`, file)
-	}
+	args = append(args, conf.OptionsFor(svcName)...)
 	args = append(args, conf.ImageNameOf(svcName))
 	args = append(args, conf.CommandFor(svcName)...)
 	_, err := cmd.Run(cmd.O{}, `docker`, args...)

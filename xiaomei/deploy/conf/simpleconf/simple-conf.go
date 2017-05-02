@@ -21,9 +21,9 @@ type Conf struct {
 }
 
 type Service struct {
-	Image, Ports     string
-	Labels           map[string]string
-	Command, Volumes []string
+	Nodes            map[string]string
+	Ports, Image     string
+	Command, Options []string
 }
 
 var theConf *Conf
@@ -101,6 +101,6 @@ func CommandFor(svcName string) []string {
 	return GetService(svcName).Command
 }
 
-func VolumesFor(svcName string) []string {
-	return GetService(svcName).Volumes
+func OptionsFor(svcName string) []string {
+	return GetService(svcName).Options
 }

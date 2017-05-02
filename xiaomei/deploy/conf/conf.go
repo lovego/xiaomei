@@ -39,8 +39,8 @@ func ImageNameAndTagOf(svcName string) (name, tag string) {
 	}
 }
 
-func VolumesFor(svcName string) []string {
-	return simpleconf.VolumesFor(svcName)
+func OptionsFor(svcName string) []string {
+	return simpleconf.OptionsFor(svcName)
 }
 
 func CommandFor(svcName string) []string {

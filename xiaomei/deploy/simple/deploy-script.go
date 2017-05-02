@@ -32,7 +32,7 @@ deploy() {
 }
 
 {{ range .Services -}}
-args='{{range .Envs}}-e {{.}} {{end}}{{range .Volumes}}-v {{.}}{{end}} {{.Image}} {{.Command}}'
+args='{{range .Envs}}-e {{.}} {{end}}{{.Options}} {{.Image}} {{.Command}}'
 {{ $svc := . -}}
 {{ range .Ports -}}
 deploy {{$svc.Name}}.{{.}} "-e {{$svc.PortEnv}}={{.}} $args"
@@ -56,8 +56,8 @@ type deployConf struct {
 	Services        []serviceConf
 }
 type serviceConf struct {
-	Name, Image, PortEnv, Command string
-	Ports, Envs, Volumes          []string
+	Name, Image, PortEnv, Command, Options string
+	Ports, Envs                            []string
 }
 
 func getDeployConf(svcNames []string) deployConf {
@@ -79,7 +79,7 @@ func getServiceConf(svcName string) serviceConf {
 		PortEnv: image.PortEnvName(),
 		Envs:    image.Envs(),
 		Command: strings.Join(service.Command, ` `),
-		Volumes: service.Volumes,
+		Options: strings.Join(service.Options, ` `),
 	}
 	if conf.PortEnv != `` {
 		conf.Ports = simpleconf.PortsOf(svcName)

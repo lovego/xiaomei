@@ -33,7 +33,7 @@ func deployNode(svcs []string, node cluster.Node, psScript string) error {
 	if err != nil {
 		return err
 	}
-	_, err = node.Run(cmd.O{Print: true}, deployScript+psScript)
+	_, err = node.Run(cmd.O{}, deployScript+psScript)
 	return err
 }
 
@@ -53,7 +53,7 @@ func getNodeServices(svcNames []string, node cluster.Node) []string {
 	svcs := []string{}
 	for _, svcName := range svcNames {
 		service := simpleconf.GetService(svcName)
-		if node.Match(service.Labels) {
+		if node.Match(service.Nodes) {
 			svcs = append(svcs, svcName)
 		}
 	}

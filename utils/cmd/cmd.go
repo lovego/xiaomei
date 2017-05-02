@@ -74,7 +74,7 @@ func Fail(o O, name string, args ...string) bool {
 }
 
 func makeCmd(o O, name string, args []string) *exec.Cmd {
-	if o.Print {
+	if o.Print || os.Getenv(`PrintCmd`) == `true` {
 		fmt.Println(name, strings.Join(args, ` `))
 	}
 
