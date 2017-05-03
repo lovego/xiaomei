@@ -1,6 +1,7 @@
 package tasks
 
 import (
+	"github.com/fatih/color"
 	"github.com/lovego/xiaomei/utils"
 	"github.com/robfig/cron"
 )
@@ -11,6 +12,7 @@ func Run() {
 		panic(err)
 	}
 	c.Start()
+	utils.Log(color.GreenString(`started.`))
 	select {}
 }
 
