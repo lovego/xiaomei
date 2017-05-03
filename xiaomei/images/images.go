@@ -10,7 +10,7 @@ import (
 
 var imagesMap = map[string]Image{
 	`app`:    Image{svcName: `app`, image: app.Image{}},
-	`tasks`:  Image{svcName: `tasks`, image: app.Image{}},
+	`tasks`:  Image{svcName: `app`, image: app.Image{}},
 	`web`:    Image{svcName: `web`, image: web.Image{}},
 	`access`: Image{svcName: `access`, image: access.Image{}},
 	`logc`:   Image{svcName: `logc`, image: logc.Image{}, external: true},
