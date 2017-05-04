@@ -35,12 +35,6 @@ func (r *Router) regRoutesMatch(method string, path string, req *Request, res *R
 		return false
 	}
 	for p := path; p != ``; {
-		// 上一层路径
-		if i := strings.LastIndexByte(p, '/'); i > 0 {
-			p = p[:i]
-		} else {
-			p = ``
-		}
 		if slice := routes[p]; slice != nil {
 			mp := path[len(p):]
 			for _, route := range slice {
@@ -49,6 +43,12 @@ func (r *Router) regRoutesMatch(method string, path string, req *Request, res *R
 					return true
 				}
 			}
+		}
+		// 上一层路径
+		if i := strings.LastIndexByte(p, '/'); i > 0 {
+			p = p[:i]
+		} else {
+			p = ``
 		}
 	}
 	return false

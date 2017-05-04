@@ -23,6 +23,9 @@ func (s *Server) Handler() (handler http.Handler) {
 
 func (s *Server) ServeHTTP(response http.ResponseWriter, request *http.Request) {
 	startTime := time.Now()
+	psData.Add(request.Method, request.URL.Path, startTime)
+	defer psData.Remove(request.Method, request.URL.Path, startTime)
+
 	req := xm.NewRequest(request, s.Session)
 	res := xm.NewResponse(response, req, s.Session, s.Renderer, s.LayoutDataFunc)
 
