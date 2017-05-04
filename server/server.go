@@ -58,7 +58,7 @@ func (s *Server) ListenAndServe() {
 	}
 	addr := `:` + port
 	listener := listen(addr)
-	utils.Log(color.GreenString(`started. (` + addr + `)`))
+	utils.Log(color.GreenString(`started.(` + addr + `)`))
 
 	if err := s.Server.Serve(listener); err != nil {
 		panic(err)

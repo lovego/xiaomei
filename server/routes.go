@@ -3,10 +3,10 @@ package server
 import (
 	"bytes"
 	"fmt"
+	"html/template"
 	"runtime"
 	"runtime/pprof"
 	"strconv"
-	"text/template"
 
 	"github.com/lovego/xiaomei/server/xm"
 )
@@ -20,31 +20,19 @@ func sysRoutes(router *xm.Router) {
 		Get(alivePath, func(req *xm.Request, res *xm.Response) {
 			res.Write([]byte(`ok`))
 		}).
-		Group(pprofPath).
-		Get(`/`, func(req *xm.Request, res *xm.Response) {
-			res.Write(getPprofIndex())
+		// 当前正在处理的请求列表
+		Get(`_ps`, func(req *xm.Request, res *xm.Response) {
+			res.Write(psData.ToJson())
 		}).
-		GetX(`/(.+)`, func(req *xm.Request, res *xm.Response, params []string) {
-			res.Header().Set("Content-Type", "text/plain; charset=utf-8")
-			p := pprof.Lookup(params[1])
-			if p == nil {
-				res.WriteHeader(404)
-				fmt.Fprintf(res, "Unknown profile: %s\n", params[1])
-				return
-			}
-			if params[1] == "heap" && req.FormValue("gc") != `` {
-				runtime.GC()
-			}
-			debug, _ := strconv.Atoi(req.FormValue("debug"))
-			p.WriteTo(res, debug)
-		})
+		// 性能分析
+		Group(pprofPath).Get(`/`, routePprofIndex).GetX(`/(.+)`, routePprofGet)
 }
 
 var pprofIndexHtml []byte
 
-func getPprofIndex() []byte {
+func routePprofIndex(req *xm.Request, res *xm.Response) {
 	if pprofIndexHtml == nil {
-		var tmpl = template.Must(template.New("index").Parse(`<html>
+		var tmpl = template.Must(template.New(``).Parse(`<html>
 <head>
 <title>pprof/</title>
 </head>
@@ -69,5 +57,20 @@ profiles:<br>
 		}
 		pprofIndexHtml = buf.Bytes()
 	}
-	return pprofIndexHtml
+	res.Write(pprofIndexHtml)
+}
+
+func routePprofGet(req *xm.Request, res *xm.Response, params []string) {
+	res.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	p := pprof.Lookup(params[1])
+	if p == nil {
+		res.WriteHeader(404)
+		fmt.Fprintf(res, "Unknown profile: %s\n", params[1])
+		return
+	}
+	if params[1] == "heap" && req.FormValue("gc") != `` {
+		runtime.GC()
+	}
+	debug, _ := strconv.Atoi(req.FormValue("debug"))
+	p.WriteTo(res, debug)
 }
