@@ -21,6 +21,14 @@ func (r *Router) Group(p string) *Router {
 	}
 }
 
+// 获取路由的根
+func (r *Router) Root() *Router {
+	return &Router{
+		strRoutes: r.strRoutes,
+		regRoutes: r.regRoutes,
+	}
+}
+
 func (r *Router) Get(p string, handler StrRouteHandler) *Router {
 	return r.Add(`GET`, p, handler)
 }
@@ -76,19 +84,6 @@ func (r *Router) Add(method string, p string, handler StrRouteHandler) *Router {
 	if r.basePath != `` {
 		p = path.Join(r.basePath, p)
 	}
-	if r.strRoutes[method] == nil {
-		r.strRoutes[method] = make(map[string]StrRouteHandler)
-	}
-	if _, ok := r.strRoutes[method][p]; ok {
-		panic(`string route conflict: ` + method + ` ` + p)
-	}
-	r.strRoutes[method][p] = handler
-	return r
-}
-
-// 增加根路径字符串路由
-func (r *Router) Root(method string, p string, handler StrRouteHandler) *Router {
-	p = cleanPath(p)
 	if r.strRoutes[method] == nil {
 		r.strRoutes[method] = make(map[string]StrRouteHandler)
 	}
