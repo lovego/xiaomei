@@ -7,6 +7,7 @@ import (
 
 	"github.com/lovego/xiaomei/config"
 	"github.com/lovego/xiaomei/server/xm"
+	"github.com/lovego/xiaomei/utils"
 )
 
 func (s *Server) Handler() (handler http.Handler) {
@@ -44,15 +45,18 @@ func handleError(t time.Time, req *xm.Request, res *xm.Response, notFound *bool)
 	}
 
 	err := recover()
+	var errStr, stack string
 	if err != nil {
 		handleServerError(req, res)
+		errStr = fmt.Sprint(err)
+		stack = string(utils.Stack(3))
 	}
 	if err == nil && req.URL.Path == alivePath {
 		return
 	}
-	log := writeLog(req, res, t, err)
+	log := writeLog(req, res, t, err != nil, errStr, stack)
 	if err != nil {
-		go config.Alarm(`500错误`, string(log))
+		go config.Alarm(`500错误`, string(log), errStr+` `+stack)
 	}
 }
 

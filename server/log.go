@@ -27,9 +27,9 @@ func setupLogger() (*os.File, *os.File) {
 	}
 }
 
-func writeLog(req *xm.Request, res *xm.Response, t time.Time, err interface{}) []byte {
-	line := getLogLine(req, res, t, err)
-	if err != nil {
+func writeLog(req *xm.Request, res *xm.Response, t time.Time, err bool, errStr, stack string) []byte {
+	line := getLogLine(req, res, t, err, errStr, stack)
+	if err {
 		errLog.Write(line)
 	} else {
 		accessLog.Write(line)
@@ -37,11 +37,11 @@ func writeLog(req *xm.Request, res *xm.Response, t time.Time, err interface{}) [
 	return line
 }
 
-func getLogLine(req *xm.Request, res *xm.Response, t time.Time, err interface{}) []byte {
+func getLogLine(req *xm.Request, res *xm.Response, t time.Time, err bool, errStr, stack string) []byte {
 	var buf bytes.Buffer
 	writer := csv.NewWriter(&buf)
 	writer.Comma = ' '
-	writer.Write(getLogFields(req, res, t, err))
+	writer.Write(getLogFields(req, res, t, err, errStr, stack))
 	writer.Flush()
 	return buf.Bytes()
 }
@@ -52,15 +52,15 @@ func getLogLine(req *xm.Request, res *xm.Response, t time.Time, err interface{})
   $request_time
   $session $remote_addr $http_referer $http_user_agent, $error, $stack
 */
-func getLogFields(req *xm.Request, res *xm.Response, t time.Time, err interface{}) []string {
+func getLogFields(req *xm.Request, res *xm.Response, t time.Time, err bool, errStr, stack string) []string {
 	slice := []string{t.Format(utils.ISO8601), req.Host,
 		req.Method, req.URL.RequestURI(), strconv.FormatInt(req.ContentLength, 10), req.Proto,
 		strconv.FormatInt(res.Status(), 10), strconv.FormatInt(res.Size(), 10),
 		fmt.Sprintf(`%.6f`, time.Since(t).Seconds()),
 		getSession(req), req.ClientAddr(), req.Referer(), req.UserAgent(),
 	}
-	if err != nil {
-		slice = append(slice, fmt.Sprint(err), string(utils.Stack(6)))
+	if err {
+		slice = append(slice, errStr, stack)
 	}
 	for i, v := range slice {
 		v = strings.TrimSpace(v)
