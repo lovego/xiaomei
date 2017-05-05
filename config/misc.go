@@ -19,11 +19,12 @@ func Alarm(title, body string) {
 		return
 	}
 	title = DeployName() + ` ` + title
-	Mailer.Send(&email.Email{
+	err := Mailer.Send(&email.Email{
 		To:      keepers,
 		Subject: title,
 		Text:    []byte(body),
 	}, time.Minute)
+	utils.Log(err.Error())
 }
 
 func Protect(fn func()) {
