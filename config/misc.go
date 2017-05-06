@@ -19,11 +19,11 @@ func Alarm(title, body, mergeKey string) {
 		return
 	}
 	title = DeployName() + ` ` + title
-	Mailer.Send(&email.Email{
+	Mailer.Alarm(&email.Email{
 		To:      keepers,
 		Subject: title,
 		Text:    []byte(body),
-	}, time.Minute)
+	}, mergeKey)
 }
 
 func Protect(fn func()) {
@@ -32,7 +32,7 @@ func Protect(fn func()) {
 		if err != nil {
 			errStack := fmt.Sprintf("PANIC: %s\n%s", err, utils.Stack(4))
 			errMsg := time.Now().Format(utils.ISO8601) + ` ` + errStack
-			Alarm(`Protect错误`, errMsg, errStack)
+			go Alarm(`Protect错误`, errMsg, errStack)
 			utils.Log(errMsg)
 		}
 	}()
