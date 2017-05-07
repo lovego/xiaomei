@@ -24,7 +24,9 @@ func Alarm(title, body string) {
 		Subject: title,
 		Text:    []byte(body),
 	}, time.Minute)
-	utils.Log(err.Error())
+	if err != nil {
+		utils.Log(err.Error())
+	}
 }
 
 func Protect(fn func()) {
