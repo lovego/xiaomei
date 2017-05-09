@@ -7,18 +7,19 @@
 
 #### 使用
 ```
-  xiaomei new example
-  xiaomei app run # 启动app服务器
-  xiaomei web run # 启动web服务器
-  xiaomei deploy  # 部署到开发环境
-  xiaomei qa deploy # 部署到QA环境
+  xiaomei new example       # 生成项目
+  xiaomei app run           # 启动app服务器
+  xiaomei web run           # 启动web服务器
+  xiaomei deploy            # 部署到开发环境
+  xiaomei qa deploy         # 部署到QA环境
   xiaomei production deploy # 部署到生产环境
+  xiaomei --help            # 完整的xiaomei命令文档
 ```
 
-### 介绍
+## 介绍
   xiaomei包含两个部分：1. app服务器，2. 基于docker的开发、部署工具。
 
-#### 一、app服务器
+### 一、app服务器
 
 1. Router 支持基于字符串和正则表达式的路由（express风格）。
 
@@ -26,7 +27,7 @@
 
 3. Request、Response 它们封装了http.Request、http.ResponseWriter、以及Renderer，以提供模板渲染等功能。
 
-#### 二、基于docker的开发、部署工具
+### 二、基于docker的开发、部署工具
 
 xiaomei包含一个名为xiaomei工具，用来支持开发、部署、运维。
 
