@@ -1,10 +1,24 @@
-# xm 小而美的go语言web开发包。
+# xiaomei 小而美的go语言web框架。
 
-为什么在已经存在http包，Martini、Gorrila等web框架的情况下，我们还要再重复造轮子？http包很粗糙：不支持正则路由，ResponseWriter拿不到状态码和返回大小。Martini（包括express）的路由采用扁平数组结构，循环去匹配路由，我们觉得这样是很低效的。采用树状的Map结构，通过hash查找，能直接找到字符串路由，缩小正则路由的匹配范围，会更高效。路由数量越多，这种扁平数组结构就越低效，这种树状Map结构就越高效。另外Martini的依赖注入的方式，也不是我们喜欢的，我们还是喜欢express固定的req、res两参数形式，简单且强大。
+## 安装
+```
+  go get github.com/lovego/xiaomei
+```
 
-所以我们打算自己动手实现一个极简的web开发包。它不是框架，它不会尝试封装一切。它只提供最基本的组件，将装配组件的工作留给应用层代码。以实现这些目标：最大的灵活性，最大的透明性，最简洁的代码。并且，除了标准库，不依赖任何外部包。
+## 使用
+```
+  xiaomei new example
+  xiaomei app run # 启动app服务器
+  xiaomei web run # 启动web服务器
+  xiaomei deploy  # 部署到开发环境
+  xiaomei qa deploy # 部署到QA环境
+  xiaomei production deploy # 部署到生产环境
+```
 
-## 小美包含3个组件：
+## 介绍
+  xiaomei包含两个部分：1. app服务器，2. 基于docker的开发、部署工具。
+
+## app服务器
 
 1. Router 支持基于字符串和正则表达式的路由（express风格）。
 
@@ -12,4 +26,21 @@
 
 3. Request、Response 它们封装了http.Request、http.ResponseWriter、以及Renderer，以提供模板渲染等功能。
 
-## 小美一定会尊敬我，崇拜我，爱上我，对我欲罢不能。
+## 基于docker的开发、部署工具
+
+xiaomei包含一个名为xiaomei工具，用来支持开发、部署、运维。
+
+xiaomei包含一个默认的项目模板，使用xiaomei new来生成。它包含了一个可立即运行、立即部署的"hello world"项目，基于这个基础来增加自己的功能即可。
+
+xiaomei所有的运行环境都是基于docker的，在开发环境的产出都是docker镜像，然后再将这些镜像部署到其他环境来提供服务。
+
+现在xiaomei包含了这些镜像：
+1. app镜像运行xiaomei编译出来的二进制执行文件，用来服务动态内容或者运行定时任务等。 
+2. web镜像运行nginx，它提供静态文件，并把其他请求转发给后端的app服务器。
+3. godoc镜像运行godoc工具，从golang源码提供文档。
+4. access镜像运行nginx，根据域名将请求转发到不同项目的服务。
+5. logc镜像运行logc工具，收集服务的日志，存储到ElasticSearch，供可视化展现。
+
+
+
+
