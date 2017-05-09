@@ -21,6 +21,10 @@ var alarmEmails = struct {
 }
 
 func (m *Mailer) Alarm(e *email.Email, mergeKey string) error {
+	if mergeKey == `` {
+		return m.Send(e, time.Minute)
+	}
+
 	alarmEmails.Lock()
 	ae := alarmEmails.m[mergeKey]
 	if ae == nil {
