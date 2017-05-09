@@ -10,7 +10,7 @@ import (
 
 func (d driver) Logs(svcName string) error {
 	script := fmt.Sprintf(`
-for name in $(docker ps -af name=%s_%s. --format '{{.Names}}'); do
+for name in $(docker ps -af name=%s_%s --format '{{.Names}}'); do
 	echo -e "\033[32m$name\033[0m"
 	docker logs $name
 	echo

@@ -25,7 +25,7 @@ func Alarm(title, body string) {
 		Text:    []byte(body),
 	}, time.Minute)
 	if err != nil {
-		utils.Log(err.Error())
+		utils.Log(`send alarm mail failed: ` + err.Error())
 	}
 }
 
