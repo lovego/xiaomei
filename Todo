@@ -1,12 +1,5 @@
-alarm mailer 合并
-
+app.log使用毫秒代替秒。
 renderer解决现有限制。
-xm移动到xiaomei
+xm移动到xiaomei。
 
 DONE:
-增加tasks模式
-server request process list
-app dev开发环境 日志行为不一致问题：引入GODEV, GOENV与行为无关。
-error 返回方式处理，去掉模板，始终用json。
-session日志记录fix
-remote ip记录错误
