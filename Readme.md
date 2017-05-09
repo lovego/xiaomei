@@ -1,11 +1,11 @@
 # xiaomei 小而美的go语言web框架。
 
-## 安装
+#### 安装
 ```
   go get github.com/lovego/xiaomei
 ```
 
-## 使用
+### 使用
 ```
   xiaomei new example
   xiaomei app run # 启动app服务器
@@ -15,7 +15,7 @@
   xiaomei production deploy # 部署到生产环境
 ```
 
-## 介绍
+### 介绍
   xiaomei包含两个部分：1. app服务器，2. 基于docker的开发、部署工具。
 
 ## app服务器
