@@ -10,7 +10,7 @@ import (
 
 func TestSend(t *testing.T) {
 	mailer, err := New(
-		`mailer://imap.exmail.qq.com:25/?user=大数据<name@qq.com>&pass=password`,
+		`mailer://smtp.qq.com:25/?user=小美<xiaomei-go@qq.com>&pass=gtrqcegfgtqwebga`, // abc123
 	)
 	if err != nil {
 		panic(err)
