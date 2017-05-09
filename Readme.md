@@ -5,7 +5,7 @@
   go get github.com/lovego/xiaomei
 ```
 
-### 使用
+#### 使用
 ```
   xiaomei new example
   xiaomei app run # 启动app服务器
@@ -15,7 +15,7 @@
   xiaomei production deploy # 部署到生产环境
 ```
 
-### 介绍
+#### 介绍
   xiaomei包含两个部分：1. app服务器，2. 基于docker的开发、部署工具。
 
 ## app服务器
@@ -26,7 +26,7 @@
 
 3. Request、Response 它们封装了http.Request、http.ResponseWriter、以及Renderer，以提供模板渲染等功能。
 
-## 基于docker的开发、部署工具
+#### 基于docker的开发、部署工具
 
 xiaomei包含一个名为xiaomei工具，用来支持开发、部署、运维。
 
@@ -40,7 +40,4 @@ xiaomei所有的运行环境都是基于docker的，在开发环境的产出都�
 3. godoc镜像运行godoc工具，从golang源码提供文档。
 4. access镜像运行nginx，根据域名将请求转发到不同项目的服务。
 5. logc镜像运行logc工具，收集服务的日志，存储到ElasticSearch，供可视化展现。
-
-
-
 
