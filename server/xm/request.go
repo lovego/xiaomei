@@ -52,3 +52,14 @@ func (req *Request) Session(p interface{}) {
 	}
 	req.sessParsed = true
 }
+
+func (req *Request) SetSession(i interface{}) {
+	v := reflect.ValueOf(i)
+	if v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface {
+		v = v.Elem()
+	}
+	if v.IsValid() {
+		req.sessData = v
+		req.sessParsed = true
+	}
+}
