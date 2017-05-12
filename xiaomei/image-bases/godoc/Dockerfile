@@ -1,4 +1,4 @@
-FROM 192.168.202.12:5000/xiaomei/baseimage
+FROM 192.168.202.12:5000/xiaomei/base
 
 COPY godoc /usr/local/bin/
 RUN mkdir -p /usr/local/go/doc /usr/local/go/lib /usr/local/go/project /usr/local/go/help

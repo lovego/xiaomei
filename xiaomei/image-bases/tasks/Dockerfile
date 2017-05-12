@@ -1,4 +1,4 @@
-FROM 192.168.202.12:5000/xiaomei/baseimage
+FROM 192.168.202.12:5000/xiaomei/base
 
 USER ubuntu
 
