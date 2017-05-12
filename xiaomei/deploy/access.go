@@ -12,8 +12,8 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-func accessPrint() error {
-	accessConf, err := getAccessConf()
+func accessPrint(svcName string) error {
+	accessConf, err := getAccessConf(svcName)
 	if err != nil {
 		return err
 	}
@@ -21,7 +21,7 @@ func accessPrint() error {
 	return nil
 }
 
-func accessSetup() error {
+func accessSetup(svcName string) error {
 	script := fmt.Sprintf(`
 	sudo tee /etc/nginx/sites-enabled/%s.conf > /dev/null &&
 	sudo mkdir -p /var/log/nginx/%s &&
@@ -29,7 +29,7 @@ func accessSetup() error {
 	sudo service nginx reload
 	`, release.Name(), release.Name(),
 	)
-	accessConf, err := getAccessConf()
+	accessConf, err := getAccessConf(svcName)
 	if err != nil {
 		return err
 	}
@@ -45,24 +45,26 @@ func accessSetup() error {
 	return nil
 }
 
-func getAccessConf() (string, error) {
+func getAccessConf(svcName string) (string, error) {
 	tmpl := template.Must(template.New(``).Parse(accessConfTmpl))
 	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, getConfigData()); err != nil {
+	if err := tmpl.Execute(&buf, getConfigData(svcName)); err != nil {
 		return ``, err
 	}
 	return buf.String(), nil
 }
 
-func getConfigData() interface{} {
+func getConfigData(svcName string) interface{} {
 	data := struct {
 		ProName, ServerNames, BackendAddr, UpstreamName string
 		UpstreamAddrs                                   []string
 	}{
 		ProName:     release.Name(),
-		ServerNames: getServerNames(),
+		ServerNames: getServerNames(svcName),
 	}
-	svcName := getServiceToAccess()
+	if svcName == `` {
+		svcName = getServiceToAccess()
+	}
 	addrs := getDriver().AccessAddrs(svcName)
 	if len(addrs) == 1 {
 		data.BackendAddr = addrs[0]
@@ -73,12 +75,25 @@ func getConfigData() interface{} {
 	return data
 }
 
-func getServerNames() string {
+func getServerNames(svcName string) string {
 	result := []string{}
 	for _, env := range cluster.Envs() {
-		result = append(result, release.AppIn(env).Domain())
+		domain := release.AppIn(env).Domain()
+		if svcName == `godoc` {
+			domain = godocDomain(domain)
+		}
+		result = append(result, domain)
 	}
 	return strings.Join(result, ` `)
+}
+
+func godocDomain(domain string) string {
+	parts := strings.SplitN(domain, `.`, 2)
+	if len(parts) == 2 {
+		return parts[0] + `-godoc.` + parts[1]
+	} else {
+		return domain + `-godoc`
+	}
 }
 
 func getServiceToAccess() string {
