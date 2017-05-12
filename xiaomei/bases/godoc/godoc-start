@@ -1,0 +1,3 @@
+#!/bin/sh
+
+godoc -http=:${GODOCPORT:-7000} -index_interval=-1s

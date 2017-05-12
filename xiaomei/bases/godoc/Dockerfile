@@ -1,8 +1,8 @@
 FROM 192.168.202.12:5000/xiaomei/base
 
-COPY godoc /usr/local/bin/
-RUN mkdir -p /usr/local/go/doc /usr/local/go/lib /usr/local/go/project /usr/local/go/help
+COPY godoc godoc-start /usr/local/bin/
 COPY pkg.png /usr/local/go/doc/gopher/
+RUN mkdir -p /usr/local/go/lib /usr/local/go/project /usr/local/go/help
 
 USER ubuntu
 RUN mkdir -p /home/ubuntu/go/src
@@ -12,4 +12,4 @@ WORKDIR /home/ubuntu/go/src
 RUN mkdir z && echo 'package z' > /home/ubuntu/go/src/z/z.go
 
 ENV GOPATH=/home/ubuntu/go
-CMD godoc -http=:${GODOCPORT:-7000} -index_interval=-1s
+CMD [ "godoc-start" ]
