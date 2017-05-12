@@ -28,7 +28,7 @@ func buildBinary() error {
 	utils.Log(color.GreenString(`building tasks binary.`))
 	if cmd.Ok(cmd.O{
 		Dir: filepath.Join(release.Root(), "../tasks"),
-		Env: []string{`GOBIN=` + filepath.Join(release.Root(), `img-tasks`)},
+		Env: []string{`GOBIN=` + filepath.Join(release.Root(), `img-app`)},
 	}, `go`, `install`) {
 		return nil
 	}

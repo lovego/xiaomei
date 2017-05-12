@@ -14,8 +14,16 @@ func (i Image) Envs() []string {
 	return []string{`GOENV=` + release.Env()}
 }
 
+func (i Image) BuildDir() string {
+	return filepath.Join(release.Root(), `img-app`)
+}
+
+func (i Image) Dockerfile() string {
+	return `tasksDockerfile`
+}
+
 func (i Image) FilesForRun() []string {
-	root := filepath.Join(release.Root(), `img-tasks`)
+	root := filepath.Join(release.Root(), `img-app`)
 	name := release.App().Name()
 	return []string{
 		fmt.Sprintf(`%s/tasks:/home/ubuntu/%s/%s-tasks`, root, name, name),
