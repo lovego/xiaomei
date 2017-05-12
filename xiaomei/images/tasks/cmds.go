@@ -29,7 +29,7 @@ func buildBinary() error {
 	if cmd.Ok(cmd.O{
 		Dir: filepath.Join(release.Root(), "../tasks"),
 		Env: []string{`GOBIN=` + filepath.Join(release.Root(), `img-app`)},
-	}, `go`, `install`) {
+	}, `go`, `install`, `-v`) {
 		return nil
 	}
 	return errors.New(`building tasks binary failed.`)

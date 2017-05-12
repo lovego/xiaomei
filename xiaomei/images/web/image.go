@@ -13,7 +13,7 @@ type Image struct {
 }
 
 func (i Image) PortEnvName() string {
-	return `NGPORT`
+	return `NGINXPORT`
 }
 
 func (i Image) Envs() []string {

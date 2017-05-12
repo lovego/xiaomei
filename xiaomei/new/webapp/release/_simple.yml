@@ -10,6 +10,7 @@ services:
 # godoc:
 #   nodes: { godoc: true }
 #   image: 192.168.202.12:5000/{{ .Domain }}/godoc
+#   ports: "7001"
   web:
     ports: "8001"
     image: 192.168.202.12:5000/{{ .Domain }}/web

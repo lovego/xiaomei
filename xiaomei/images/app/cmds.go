@@ -32,7 +32,7 @@ func buildBinary() error {
 	if cmd.Ok(cmd.O{
 		Dir: filepath.Join(release.Root(), `..`),
 		Env: []string{`GOBIN=` + release.App().Root()},
-	}, `go`, `install`) {
+	}, `go`, `install`, `-v`) {
 		return nil
 	}
 	return errors.New(`building app binary failed.`)
