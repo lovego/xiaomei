@@ -11,20 +11,16 @@ import (
 	"github.com/lovego/xiaomei/server/xm"
 )
 
-const alivePath = `/_alive`
-const psPath = `/_ps`
 const pprofPath = `/_pprof`
-
-var sysPaths = map[string]bool{alivePath: true, psPath: true, pprofPath: true}
 
 func sysRoutes(router *xm.Router) {
 	router.Root().
 		// 存活检测
-		Get(alivePath, func(req *xm.Request, res *xm.Response) {
+		Get(`/_alive`, func(req *xm.Request, res *xm.Response) {
 			res.Write([]byte(`ok`))
 		}).
 		// 当前正在处理的请求列表
-		Get(psPath, func(req *xm.Request, res *xm.Response) {
+		Get(`/_ps`, func(req *xm.Request, res *xm.Response) {
 			res.Write(psData.ToJson())
 		}).
 		// 性能分析

@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/lovego/xiaomei/config"
@@ -34,7 +35,7 @@ func (s *Server) ServeHTTP(response http.ResponseWriter, request *http.Request) 
 	defer handleError(startTime, req, res, &notFound)
 
 	// 如果返回true，继续交给路由处理
-	if sysPaths[req.Request.URL.Path] || s.FilterFunc == nil || s.FilterFunc(req, res) {
+	if strings.HasPrefix(req.URL.Path, `/_`) || s.FilterFunc == nil || s.FilterFunc(req, res) {
 		notFound = !s.Router.Handle(req, res)
 	}
 }
@@ -51,7 +52,7 @@ func handleError(t time.Time, req *xm.Request, res *xm.Response, notFound *bool)
 		errStr = fmt.Sprint(err)
 		stack = string(utils.Stack(3))
 	}
-	if err == nil && req.URL.Path == alivePath {
+	if err == nil && strings.HasPrefix(req.URL.Path, `/_`) {
 		return
 	}
 	log := writeLog(req, res, t, err != nil, errStr, stack)
