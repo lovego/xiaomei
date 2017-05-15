@@ -44,7 +44,7 @@ type configData struct {
 }
 
 func getConfData() configData {
-	port := os.Getenv(`NGPORT`)
+	port := os.Getenv(`NGINXPORT`)
 	if port == `` {
 		port = `8000`
 	}

@@ -9,7 +9,7 @@ import (
 func Cmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `cluster`,
-		Short: `cluster operations.`,
+		Short: `the clusters.`,
 	}
 	cmd.AddCommand(lsCmd(), shellCmd())
 	return cmd

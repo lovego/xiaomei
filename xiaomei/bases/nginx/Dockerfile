@@ -1,4 +1,4 @@
-FROM 192.168.202.12:5000/xiaomei/baseimage
+FROM 192.168.202.12:5000/xiaomei/base
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends nginx \
@@ -9,6 +9,6 @@ RUN apt-get update \
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY nginx-start /usr/local/bin/
 
-CMD ["nginx-start"]
+CMD [ "nginx-start" ]
 EXPOSE 80 443
 

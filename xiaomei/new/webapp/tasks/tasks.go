@@ -1,4 +1,4 @@
-package tasks
+package main
 
 import (
 	"github.com/fatih/color"
@@ -6,7 +6,7 @@ import (
 	"github.com/robfig/cron"
 )
 
-func Run() {
+func main() {
 	c := cron.New()
 	if err := c.AddFunc("0 * * * * *", hello); err != nil {
 		panic(err)

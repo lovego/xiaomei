@@ -4,14 +4,17 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/images/access"
 	"github.com/lovego/xiaomei/xiaomei/images/app"
+	"github.com/lovego/xiaomei/xiaomei/images/godoc"
 	"github.com/lovego/xiaomei/xiaomei/images/logc"
+	"github.com/lovego/xiaomei/xiaomei/images/tasks"
 	"github.com/lovego/xiaomei/xiaomei/images/web"
 )
 
 var imagesMap = map[string]Image{
 	`app`:    Image{svcName: `app`, image: app.Image{}},
-	`tasks`:  Image{svcName: `app`, image: app.Image{}},
 	`web`:    Image{svcName: `web`, image: web.Image{}},
+	`tasks`:  Image{svcName: `tasks`, image: tasks.Image{}},
+	`godoc`:  Image{svcName: `godoc`, image: godoc.Image{}},
 	`access`: Image{svcName: `access`, image: access.Image{}},
 	`logc`:   Image{svcName: `logc`, image: logc.Image{}, external: true},
 }

@@ -1,0 +1,9 @@
+FROM 192.168.202.12:5000/xiaomei/tasks
+
+RUN mkdir -p /home/ubuntu/{{ .ProName }}/log
+WORKDIR /home/ubuntu/{{ .ProName }}
+
+CMD [ "./{{ .ProName }}-tasks" ]
+
+COPY tasks ./{{ .ProName }}-tasks
+COPY config  ./config
