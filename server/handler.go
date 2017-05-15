@@ -34,7 +34,7 @@ func (s *Server) ServeHTTP(response http.ResponseWriter, request *http.Request) 
 	defer handleError(startTime, req, res, &notFound)
 
 	// 如果返回true，继续交给路由处理
-	if req.Request.URL.Path == alivePath || s.FilterFunc == nil || s.FilterFunc(req, res) {
+	if sysPaths[req.Request.URL.Path] || s.FilterFunc == nil || s.FilterFunc(req, res) {
 		notFound = !s.Router.Handle(req, res)
 	}
 }

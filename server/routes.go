@@ -12,7 +12,10 @@ import (
 )
 
 const alivePath = `/_alive`
+const psPath = `/_ps`
 const pprofPath = `/_pprof`
+
+var sysPaths = map[string]bool{alivePath: true, psPath: true, pprofPath: true}
 
 func sysRoutes(router *xm.Router) {
 	router.Root().
@@ -21,7 +24,7 @@ func sysRoutes(router *xm.Router) {
 			res.Write([]byte(`ok`))
 		}).
 		// 当前正在处理的请求列表
-		Get(`_ps`, func(req *xm.Request, res *xm.Response) {
+		Get(psPath, func(req *xm.Request, res *xm.Response) {
 			res.Write(psData.ToJson())
 		}).
 		// 性能分析
