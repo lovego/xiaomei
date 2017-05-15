@@ -39,6 +39,15 @@ func mergeMap2MapOrStruct(a, b reflect.Value) (result reflect.Value) {
 			keyStr := strings.Title(key.String())
 			result.FieldByName(keyStr).Set(mergeMap2MapOrStruct(a.FieldByName(keyStr), b.MapIndex(key)))
 		}
+	case reflect.Slice:
+		result = shallowCopySlice(a)
+		for i, l := 0, b.Len(); i < l; i++ {
+			v := b.Index(i)
+			if v.Kind() == reflect.Interface {
+				v = v.Elem()
+			}
+			result = reflect.Append(result, v)
+		}
 	default:
 		return b
 	}
@@ -59,6 +68,16 @@ func shallowCopyStruct(v reflect.Value) reflect.Value {
 	dup := reflect.New(v.Type()).Elem()
 	for i, l := 0, v.NumField(); i < l; i++ {
 		dup.Field(i).Set(v.Field(i))
+	}
+	return dup
+}
+
+// 浅拷贝，所以返回值并不能保证和入参完全独立
+func shallowCopySlice(v reflect.Value) reflect.Value {
+	l := v.Len()
+	dup := reflect.MakeSlice(v.Type(), l, l)
+	for i := 0; i < l; i++ {
+		dup.Index(i).Set(v.Index(i))
 	}
 	return dup
 }
