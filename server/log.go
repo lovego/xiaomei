@@ -27,7 +27,9 @@ func setupLogger() (*os.File, *os.File) {
 	}
 }
 
-func writeLog(req *xm.Request, res *xm.Response, t time.Time, err bool, errStr, stack string) []byte {
+func writeLog(
+	req *xm.Request, res *xm.Response, t time.Time, err bool, errStr, stack string,
+) []byte {
 	line := getLogLine(req, res, t, err, errStr, stack)
 	if err {
 		errLog.Write(line)
@@ -37,7 +39,9 @@ func writeLog(req *xm.Request, res *xm.Response, t time.Time, err bool, errStr, 
 	return line
 }
 
-func getLogLine(req *xm.Request, res *xm.Response, t time.Time, err bool, errStr, stack string) []byte {
+func getLogLine(
+	req *xm.Request, res *xm.Response, t time.Time, err bool, errStr, stack string,
+) []byte {
 	var buf bytes.Buffer
 	writer := csv.NewWriter(&buf)
 	writer.Comma = ' '
@@ -52,7 +56,9 @@ func getLogLine(req *xm.Request, res *xm.Response, t time.Time, err bool, errStr
   $request_time
   $session $remote_addr $http_referer $http_user_agent, $error, $stack
 */
-func getLogFields(req *xm.Request, res *xm.Response, t time.Time, err bool, errStr, stack string) []string {
+func getLogFields(
+	req *xm.Request, res *xm.Response, t time.Time, err bool, errStr, stack string,
+) []string {
 	slice := []string{t.Format(utils.ISO8601), req.Host,
 		req.Method, req.URL.RequestURI(), strconv.FormatInt(req.ContentLength, 10), req.Proto,
 		strconv.FormatInt(res.Status(), 10), strconv.FormatInt(res.Size(), 10),

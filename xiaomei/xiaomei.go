@@ -20,6 +20,27 @@ import (
 func main() {
 	cobra.EnableCommandSorting = false
 
+	root := rootCmd()
+	root.AddCommand(manageCmds()...)
+	root.AddCommand(images.Cmds(``)...)
+	root.AddCommand(deploy.Cmds(``)...)
+	root.AddCommand(new.Cmd(), yamlCmd(), versionCmd())
+	root.Execute()
+}
+
+func rootCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   `xiaomei`,
+		Short: `be small and beautiful.`,
+	}
+
+	if release.Arg1IsEnv() {
+		cmd.SetArgs(os.Args[2:])
+	}
+	return cmd
+}
+
+func manageCmds() []*cobra.Command {
 	appCmd := app.Cmd()
 	appCmd.AddCommand(images.Cmds(`app`)...)
 	appCmd.AddCommand(deploy.Cmds(`app`)...)
@@ -43,22 +64,5 @@ func main() {
 	logcCmd := logc.Cmd()
 	logcCmd.AddCommand(deploy.Cmds(`logc`)...)
 
-	root := rootCmd()
-	root.AddCommand(appCmd, tasksCmd, godocCmd, webCmd, accessCmd, logcCmd, cluster.Cmd())
-	root.AddCommand(images.Cmds(``)...)
-	root.AddCommand(deploy.Cmds(``)...)
-	root.AddCommand(new.Cmd(), yamlCmd(), versionCmd())
-	root.Execute()
-}
-
-func rootCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   `xiaomei`,
-		Short: `be small and beautiful.`,
-	}
-
-	if release.Arg1IsEnv() {
-		cmd.SetArgs(os.Args[2:])
-	}
-	return cmd
+	return []*cobra.Command{appCmd, tasksCmd, godocCmd, webCmd, accessCmd, logcCmd, cluster.Cmd()}
 }

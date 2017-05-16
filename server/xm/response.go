@@ -58,7 +58,9 @@ func (res *Response) Render(path string, data interface{}, options ...renderer.O
 	res.Write(buf.Bytes())
 }
 
-func (res *Response) RenderToBuffer(path string, data interface{}, options ...renderer.O) bytes.Buffer {
+func (res *Response) RenderToBuffer(
+	path string, data interface{}, options ...renderer.O,
+) bytes.Buffer {
 	var option renderer.O
 	if len(options) > 0 {
 		option = options[0]

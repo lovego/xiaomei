@@ -76,10 +76,10 @@ func (r *Renderer) getTemplateWithLayout(name string, option O) *template.Templa
 }
 
 // 针对同一个模板使用不同的funcs，因为缓存的原因，会得到非预期的结果。
-func (r *Renderer) getTemplate(name, _name string, funcs template.FuncMap) *template.Template {
+func (r *Renderer) getTemplate(name, tmplName string, funcs template.FuncMap) *template.Template {
 	tmpl := r.Templates[name]
 	if tmpl == nil {
-		tmpl = template.New(_name)
+		tmpl = template.New(tmplName)
 		if r.Funcs != nil {
 			tmpl.Funcs(r.Funcs)
 		}

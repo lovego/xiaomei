@@ -11,10 +11,10 @@ func Merge(a, b interface{}) interface{} {
 	if bv.Kind() != reflect.Map {
 		panic(`b must be a map.`)
 	}
-	return mergeMap2MapOrStruct(av, bv).Interface()
+	return merge(av, bv).Interface()
 }
 
-func mergeMap2MapOrStruct(a, b reflect.Value) (result reflect.Value) {
+func merge(a, b reflect.Value) reflect.Value {
 	if a.Kind() == reflect.Ptr {
 		a = a.Elem()
 	}
@@ -23,33 +23,47 @@ func mergeMap2MapOrStruct(a, b reflect.Value) (result reflect.Value) {
 	}
 	switch a.Kind() {
 	case reflect.Map:
-		result = shallowCopyMap(a)
-		for _, key := range b.MapKeys() {
-			if key.Kind() == reflect.Interface {
-				key = key.Elem()
-			}
-			result.SetMapIndex(key, mergeMap2MapOrStruct(a.MapIndex(key), b.MapIndex(key)))
-		}
+		return mergeMap2Map(a, b)
 	case reflect.Struct:
-		result = shallowCopyStruct(a)
-		for _, key := range b.MapKeys() {
-			if key.Kind() == reflect.Interface {
-				key = key.Elem()
-			}
-			keyStr := strings.Title(key.String())
-			result.FieldByName(keyStr).Set(mergeMap2MapOrStruct(a.FieldByName(keyStr), b.MapIndex(key)))
-		}
+		return mergeMap2Struct(a, b)
 	case reflect.Slice:
-		result = shallowCopySlice(a)
-		for i, l := 0, b.Len(); i < l; i++ {
-			v := b.Index(i)
-			if v.Kind() == reflect.Interface {
-				v = v.Elem()
-			}
-			result = reflect.Append(result, v)
-		}
+		return mergeSlice2Slice(a, b)
 	default:
 		return b
+	}
+}
+
+func mergeMap2Map(a, b reflect.Value) reflect.Value {
+	result := shallowCopyMap(a)
+	for _, key := range b.MapKeys() {
+		if key.Kind() == reflect.Interface {
+			key = key.Elem()
+		}
+		result.SetMapIndex(key, merge(a.MapIndex(key), b.MapIndex(key)))
+	}
+	return result
+}
+
+func mergeMap2Struct(a, b reflect.Value) reflect.Value {
+	result := shallowCopyStruct(a)
+	for _, key := range b.MapKeys() {
+		if key.Kind() == reflect.Interface {
+			key = key.Elem()
+		}
+		keyStr := strings.Title(key.String())
+		result.FieldByName(keyStr).Set(merge(a.FieldByName(keyStr), b.MapIndex(key)))
+	}
+	return result
+}
+
+func mergeSlice2Slice(a, b reflect.Value) reflect.Value {
+	result := shallowCopySlice(a)
+	for i, l := 0, b.Len(); i < l; i++ {
+		v := b.Index(i)
+		if v.Kind() == reflect.Interface {
+			v = v.Elem()
+		}
+		result = reflect.Append(result, v)
 	}
 	return result
 }
@@ -63,7 +77,6 @@ func shallowCopyMap(v reflect.Value) reflect.Value {
 	return dup
 }
 
-// 浅拷贝，所以返回值并不能保证和入参完全独立
 func shallowCopyStruct(v reflect.Value) reflect.Value {
 	dup := reflect.New(v.Type()).Elem()
 	for i, l := 0, v.NumField(); i < l; i++ {
@@ -72,7 +85,6 @@ func shallowCopyStruct(v reflect.Value) reflect.Value {
 	return dup
 }
 
-// 浅拷贝，所以返回值并不能保证和入参完全独立
 func shallowCopySlice(v reflect.Value) reflect.Value {
 	l := v.Len()
 	dup := reflect.MakeSlice(v.Type(), l, l)

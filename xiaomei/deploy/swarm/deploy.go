@@ -77,8 +77,9 @@ func getDeployScript(svcName string, rmCurrent bool) (string, error) {
 }
 
 func waitUntilNetworkRemoved() string {
+	lsNetworkCmd := `docker network ls -qf label=com.docker.stack.namespace=` + release.Name()
 	return `
-	until test -z "$(docker network ls -qf label=com.docker.stack.namespace=` + release.Name() + `)"; do
+	until test -z "$(` + lsNetworkCmd + `)"; do
 	sleep 0.1
 	done
 	`

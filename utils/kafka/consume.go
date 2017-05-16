@@ -60,7 +60,9 @@ func (c *Consume) StartPartition(n int32) {
 func (c *Consume) Handle(message *sarama.ConsumerMessage, logFile *os.File) {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Fprintf(logFile, "%s PANIC: %s\n%s", time.Now().Format(utils.ISO8601), err, utils.Stack(4))
+			fmt.Fprintf(logFile, "%s PANIC: %s\n%s",
+				time.Now().Format(utils.ISO8601), err, utils.Stack(4),
+			)
 		}
 	}()
 	c.Handler(message, logFile)
@@ -85,6 +87,8 @@ func (c *Consume) SetPartitionOffset(n int32, offset int64, logFile *os.File) {
 	defer conn.Close()
 	_, err := conn.Do(`HSET`, c.OffsetsKey, n, offset)
 	if err != nil {
-		fmt.Fprintf(logFile, "%s set offset error: %s (offset: %d)\n", time.Now().Format(utils.ISO8601), err, offset)
+		fmt.Fprintf(logFile, "%s set offset error: %s (offset: %d)\n",
+			time.Now().Format(utils.ISO8601), err, offset,
+		)
 	}
 }

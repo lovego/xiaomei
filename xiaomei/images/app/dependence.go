@@ -35,8 +35,8 @@ func listDeps() {
 			notVendorDeps = append(notVendorDeps, dep)
 		}
 	}
-	cmd.Run(cmd.O{}, `echo`, fmt.Sprintf("\ndependece in vendor:\n%s", strings.Join(vendorDeps, "\n")))
-	cmd.Run(cmd.O{}, `echo`, fmt.Sprintf("\ndependece not in vendor:\n%s", strings.Join(notVendorDeps, "\n")))
+	fmt.Printf("\ndependece in vendor:\n%s\n", strings.Join(vendorDeps, "\n"))
+	fmt.Printf("\ndependece not in vendor:\n%s\n", strings.Join(notVendorDeps, "\n"))
 }
 
 func getAllDeps() []string {
@@ -54,7 +54,9 @@ func getDirDeps(dir string) []string {
 	if err != nil {
 		panic(err)
 	}
-	result, _ := cmd.Run(cmd.O{Output: true, Dir: dir}, `go`, `list`, `-e`, `-f`, `{{join .Imports "\n"}}`)
+	result, _ := cmd.Run(
+		cmd.O{Output: true, Dir: dir}, `go`, `list`, `-e`, `-f`, `{{join .Imports "\n"}}`,
+	)
 	already[dir] = true
 	deps := filterStandard(strings.Split(result, "\n"))
 	for _, depPath := range deps {

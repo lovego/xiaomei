@@ -38,14 +38,15 @@ func TestMerge2(t *testing.T) {
 		Services: map[string]Service{`app`: {
 			Image:   `example/app`,
 			Ports:   `3001~3003`,
-			Volumes: []string{`example_logs:/home/ubuntu/example/log`},
+			Volumes: []string{`-v`, `example_logs:/home/ubuntu/example/log`},
 		}},
 		VolumesToCreate: []string{`example_logs`},
 		Environments: map[string]map[string]interface{}{
 			`dev`: map[string]interface{}{
 				`services`: map[interface{}]interface{}{
 					`app`: map[interface{}]interface{}{
-						`ports`: `3001`,
+						`ports`:   `3001`,
+						`volumes`: []interface{}{`--appendix`},
 					},
 				},
 			},

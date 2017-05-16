@@ -10,7 +10,9 @@ import (
 )
 
 func TestConsume(t *testing.T) {
-	c, err := sarama.NewConsumer([]string{"10.13.3.25:9092", "10.13.3.26:9092", "10.13.3.30:9092"}, nil)
+	c, err := sarama.NewConsumer([]string{
+		"10.13.3.25:9092", "10.13.3.26:9092", "10.13.3.30:9092",
+	}, nil)
 	if err != nil {
 		panic(err)
 	}
