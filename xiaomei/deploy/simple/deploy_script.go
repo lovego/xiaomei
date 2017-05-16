@@ -26,7 +26,7 @@ deploy() {
     case "$status" in
       "Up "*" (health: starting)" ) sleep 1 ;;
       "Up "*                      ) break   ;;
-           *                      ) exit  1 ;;
+           *                      ) docker logs "$id"; exit  1 ;;
     esac
   done
 }
