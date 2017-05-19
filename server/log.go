@@ -1,13 +1,10 @@
 package server
 
 import (
-	"bytes"
-	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/lovego/xiaomei/config"
@@ -28,10 +25,15 @@ func setupLogger() (*os.File, *os.File) {
 }
 
 func writeLog(
-	req *xm.Request, res *xm.Response, t time.Time, err bool, errStr, stack string,
+	req *xm.Request, res *xm.Response, t time.Time, hasErr bool, errStr, stack string,
 ) []byte {
-	line := getLogLine(req, res, t, err, errStr, stack)
-	if err {
+	line, err := json.Marshal(getLogFields(req, res, t, hasErr, errStr, stack))
+	if err != nil {
+		utils.Log(`writeLog:` + err.Error())
+		return nil
+	}
+	line = append(line, '\n')
+	if hasErr {
 		errLog.Write(line)
 	} else {
 		accessLog.Write(line)
@@ -39,52 +41,21 @@ func writeLog(
 	return line
 }
 
-func getLogLine(
-	req *xm.Request, res *xm.Response, t time.Time, err bool, errStr, stack string,
-) []byte {
-	var buf bytes.Buffer
-	writer := csv.NewWriter(&buf)
-	writer.Comma = ' '
-	writer.Write(getLogFields(req, res, t, err, errStr, stack))
-	writer.Flush()
-	return buf.Bytes()
-}
-
-/*
-  $time_iso8601 $host $request_method $request_uri $content_length $server_protocol
-  $status $body_bytes_sent
-  $request_time
-  $session $remote_addr $http_referer $http_user_agent, $error, $stack
-*/
 func getLogFields(
-	req *xm.Request, res *xm.Response, t time.Time, err bool, errStr, stack string,
-) []string {
-	slice := []string{t.Format(utils.ISO8601), req.Host,
-		req.Method, req.URL.RequestURI(), strconv.FormatInt(req.ContentLength, 10), req.Proto,
-		strconv.FormatInt(res.Status(), 10), strconv.FormatInt(res.Size(), 10),
-		fmt.Sprintf(`%.6f`, time.Since(t).Seconds()),
-		getSession(req), req.ClientAddr(), req.Referer(), req.UserAgent(),
-	}
-	if err {
-		slice = append(slice, errStr, stack)
-	}
-	for i, v := range slice {
-		v = strings.TrimSpace(v)
-		if v == `` {
-			v = `-`
-		}
-		slice[i] = v
-	}
-	return slice
-}
-
-func getSession(req *xm.Request) string {
+	req *xm.Request, res *xm.Response, t time.Time, hasErr bool, errStr, stack string,
+) map[string]interface{} {
 	var sess interface{}
 	req.Session(&sess)
-	str := fmt.Sprint(sess)
-	if strings.HasPrefix(str, `map[`) && strings.HasSuffix(str, `]`) {
-		str = strings.TrimPrefix(str, `map[`)
-		str = strings.TrimSuffix(str, `]`)
+	m := map[string]interface{}{
+		`at`: t.Format(utils.ISO8601), `time`: fmt.Sprintf(`%.6f`, time.Since(t).Seconds()),
+		`host`: req.Host, `method`: req.Method, `path`: req.URL.Path, `query`: req.URL.RawQuery,
+		`status`: res.Status(), `req_body`: req.ContentLength, `res_body`: res.Size(),
+		`session`: sess, `ip`: req.ClientAddr(),
+		`refer`: req.Referer(), `agent`: req.UserAgent(), `proto`: req.Proto,
 	}
-	return str
+	if hasErr {
+		m[`err`] = errStr
+		m[`stack`] = stack
+	}
+	return m
 }
