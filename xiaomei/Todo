@@ -1,3 +1,4 @@
+ls-deploy、 rollback 命令开发
 web run 无日志问题: exec tail
 
 swarm特有问题：
