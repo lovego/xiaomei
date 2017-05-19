@@ -21,9 +21,9 @@ server {
 
   location ~ \.html$ {
   }
-	location ~ \.(js|css|png|gif|jpg|svg|ico|woff|woff2|ttf|eot|map|json)$ {
-		expires max;
-	}
+  location ~ \.(js|css|png|gif|jpg|svg|ico|woff|woff2|ttf|eot|map|json)$ {
+    expires max;
+  }
 
   access_log /var/log/nginx/web.log std;
   error_log  /var/log/nginx/web.err;
