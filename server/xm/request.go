@@ -1,6 +1,7 @@
 package xm
 
 import (
+	"net"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -14,6 +15,7 @@ type Request struct {
 	sess       session.Session
 	sessParsed bool
 	sessData   reflect.Value
+	Log        map[string]interface{}
 }
 
 func NewRequest(request *http.Request, sess session.Session) *Request {
@@ -27,7 +29,8 @@ func (req *Request) ClientAddr() string {
 	if addr := req.Header.Get("X-Real-IP"); addr != `` {
 		return addr
 	}
-	return req.RemoteAddr
+	host, _, _ := net.SplitHostPort(req.RemoteAddr)
+	return host
 }
 
 func (req *Request) Query() url.Values {

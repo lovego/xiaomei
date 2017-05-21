@@ -57,5 +57,8 @@ func getLogFields(
 		m[`err`] = errStr
 		m[`stack`] = stack
 	}
+	for k, v := range req.Log {
+		m[k] = v
+	}
 	return m
 }
