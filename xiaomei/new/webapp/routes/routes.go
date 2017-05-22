@@ -18,6 +18,7 @@ func Routes() *xm.Router {
 
 	router.Get(`/`, func(req *xm.Request, res *xm.Response) {
 		res.Json(map[string]string{`hello`: config.DeployName()})
+		req.Log = map[string]interface{}{`hello`: `world`, `i'm`: `xiaomei`}
 	})
 
 	router.Get(`/session-get`, func(req *xm.Request, res *xm.Response) {
