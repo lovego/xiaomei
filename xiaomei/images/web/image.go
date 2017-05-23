@@ -31,6 +31,10 @@ func (i Image) Envs() []string {
 	return []string{`NGBackendAddrs=` + strings.Join(addrs, `,`)}
 }
 
+func (i Image) EnvsForRun() []string {
+	return []string{`SendfileOff=true`}
+}
+
 func (i Image) FilesForRun() []string {
 	root := filepath.Join(release.Root(), `img-web`)
 	return []string{
