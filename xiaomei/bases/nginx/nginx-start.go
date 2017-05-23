@@ -41,6 +41,7 @@ func main() {
 type configData struct {
 	ListenPort   string
 	BackendAddrs []string
+	SendfileOff  bool
 }
 
 func getConfData() configData {
@@ -55,6 +56,7 @@ func getConfData() configData {
 	return configData{
 		ListenPort:   port,
 		BackendAddrs: addrs,
+		SendfileOff:  os.Getenv(`SendfileOff`) == `true`,
 	}
 }
 
