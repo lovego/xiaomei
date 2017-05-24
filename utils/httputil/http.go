@@ -23,13 +23,13 @@ func Http(method, url string, headers map[string]string, body io.Reader, data in
 		panic(err)
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		panic(`HTTP ` + method + `: ` + url + "\n" + `Response Status: ` + resp.Status)
-	}
-
 	content, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		panic(`HTTP POST: ` + url + "\n" + err.Error())
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		panic(`HTTP ` + method + `: ` + url + "\n" + `Response Status: ` + resp.Status + "\n" + string(content))
 	}
 
 	if err := json.Unmarshal(content, &data); err != nil {
