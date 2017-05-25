@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func Http(method, url string, headers map[string]string, body io.Reader, data interface{}) []byte {
+func Do(method, url string, headers map[string]string, body io.Reader) *Response {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		panic(err)
@@ -15,43 +15,43 @@ func Http(method, url string, headers map[string]string, body io.Reader, data in
 	for k, v := range headers {
 		req.Header.Set(k, v)
 	}
-	resp, err := http.DefaultClient.Do(req)
-	if resp != nil {
-		defer resp.Body.Close()
-	}
-	if err != nil {
+	if resp, err := http.DefaultClient.Do(req); err != nil {
 		panic(err)
+	} else {
+		return &Response{Response: resp}
 	}
-
-	content, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		panic(`HTTP POST: ` + url + "\n" + err.Error())
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		panic(`HTTP ` + method + `: ` + url + "\n" + `Response Status: ` + resp.Status + "\n" + string(content))
-	}
-
-	if err := json.Unmarshal(content, &data); err != nil {
-		panic(err)
-	}
-	return content
 }
 
-func HttpStatus(method, url string, headers map[string]string, body io.Reader) (int, error) {
-	req, err := http.NewRequest(method, url, body)
-	if err != nil {
+type Response struct {
+	*http.Response
+	body []byte
+}
+
+func (resp *Response) GetBody() []byte {
+	if resp.body == nil {
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			panic(`HTTP ` + resp.Request.Method + `: ` + resp.Request.URL.String() + "\n" +
+				`Read Body: ` + err.Error(),
+			)
+		}
+		resp.body = body
+	}
+	return resp.body
+}
+
+func (resp *Response) Ok() *Response {
+	if resp.StatusCode != http.StatusOK {
+		panic(`HTTP ` + resp.Request.Method + `: ` + resp.Request.URL.String() + "\n" +
+			`Response Status: ` + resp.Status + "\n" + string(resp.GetBody()),
+		)
+	}
+	return resp
+}
+
+func (resp *Response) Json(data interface{}) {
+	if err := json.Unmarshal(resp.GetBody(), &data); err != nil {
 		panic(err)
 	}
-	for k, v := range headers {
-		req.Header.Set(k, v)
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if resp != nil {
-		defer resp.Body.Close()
-	}
-	if err != nil {
-		return 0, err
-	}
-	return resp.StatusCode, nil
 }
