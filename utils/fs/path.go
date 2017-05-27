@@ -8,8 +8,13 @@ import (
 )
 
 func Exist(p string) bool {
-	fi, _ := os.Stat(p)
-	return fi != nil
+	_, err := os.Stat(p)
+	return err == nil || !os.IsNotExist(err)
+}
+
+func NotExist(path string) bool {
+	_, err := os.Stat(path)
+	return err != nil && os.IsNotExist(err)
 }
 
 func IsFile(p string) bool {

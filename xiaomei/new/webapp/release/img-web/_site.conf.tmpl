@@ -25,9 +25,7 @@ server {
     expires max;
   }
 
-  {{ if .SendfileOff -}}
-  sendfile off;
-  {{ end -}}
+  {{ "{{ if .SendfileOff }}sendfile off;{{ end }}" }}
   access_log /var/log/nginx/web.log std;
   error_log  /var/log/nginx/web.err;
 }

@@ -86,7 +86,7 @@ func (res Response) Json2(data interface{}, err error) {
 		Msg  string      `json:"msg"`
 		Data interface{} `json:"data"`
 	}
-	if err != nil {
+	if err == nil {
 		res.Json(result{Msg: `ok`, Data: data})
 	} else {
 		res.Json(result{Msg: err.Error()})
