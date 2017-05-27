@@ -19,8 +19,12 @@ func setupLogger() (*os.File, *os.File) {
 	if config.DevMode() {
 		return os.Stdout, os.Stderr
 	} else {
-		return fs.OpenAppend(filepath.Join(config.Root(), `log/app.log`)),
-			fs.OpenAppend(filepath.Join(config.Root(), `log/app.err`))
+		dir := filepath.Join(config.Root(), `log`)
+		if err := os.Mkdir(dir, 0755); err != nil && !os.IsExist(err) {
+			panic(err)
+		}
+		return fs.OpenAppend(filepath.Join(dir, `app.log`)),
+			fs.OpenAppend(filepath.Join(dir, `app.err`))
 	}
 }
 
