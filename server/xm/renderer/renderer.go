@@ -111,9 +111,11 @@ func parseTemplate(tmpl *template.Template, name, base, root string, loaded map[
 	var new []string
 	for _, t := range tmpl.Templates() { // 所有已关联的模板，包括自己
 		nam := t.Name()
-		if nam != name && strings.IndexByte(nam, '/') >= 0 && !loaded[nam] {
+		if strings.IndexByte(nam, '/') >= 0 && !loaded[nam] {
 			loaded[nam] = true
-			new = append(new, nam)
+			if nam != name {
+				new = append(new, nam)
+			}
 		}
 	}
 
