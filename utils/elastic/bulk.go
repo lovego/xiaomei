@@ -2,6 +2,7 @@ package elastic
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/lovego/xiaomei/utils/httputil"
@@ -19,8 +20,18 @@ func (es *ES) BulkCreate(path string, data []map[string]interface{}) {
 	if !result.Errors {
 		return
 	}
+	var errs [][2]map[string]interface{}
 	for i, item := range result.Items {
+		info := item[`create`]
+		if v, ok := info[`created`].(bool); !ok || !v {
+			errs = append(errs, [2]map[string]interface{}{data[i], info})
+		}
 	}
+	errsBuf, err := json.Marshal(errs)
+	if err != nil {
+		panic(err)
+	}
+	panic(fmt.Sprintf(`bulk create errors(%d of %d): %s`, len(errs), len(data), errsBuf))
 }
 
 func MakeBulkCreateBody(rows []map[string]interface{}) (result string) {
