@@ -1,12 +1,8 @@
 package elastic
 
 import (
-	"bytes"
-	"encoding/json"
-	"io"
 	"net/http"
-
-	"github.com/lovego/xiaomei/utils/httputil"
+	"net/url"
 )
 
 type SearchResult struct {
@@ -34,34 +30,15 @@ func (es *ES) Search(method, path string, bodyData map[string]interface{}) (
 	total int, data []map[string]interface{},
 ) {
 	result := SearchResult{}
-	es.Do(method, path, bodyData, &result)
+	uri, err := url.Parse(path)
+	uri.Query().Set(`filter_path`, `hits.total,hits.hits._source`)
+	if err != nil {
+		panic(err)
+	}
+	es.Do(method, uri.String(), bodyData, &result)
 	total = result.Hits.Total
 	for _, hit := range result.Hits.Hits {
 		data = append(data, hit.Source)
 	}
 	return
-}
-
-func (es *ES) GetP(path string, bodyData map[string]interface{}, data interface{}) {
-	es.Do(http.MethodGet, path, bodyData, data)
-}
-
-func (es *ES) PostP(path string, bodyData map[string]interface{}, data interface{}) {
-	es.Do(http.MethodGet, path, bodyData, data)
-}
-
-func (es *ES) Do(method, path string, bodyData map[string]interface{}, data interface{}) {
-	var body io.Reader
-	if bodyData != nil {
-		buf, err := json.Marshal(bodyData)
-		if err != nil {
-			panic(err)
-		}
-		body = bytes.NewBuffer(buf)
-	}
-	resp := httputil.Do(http.MethodPut, es.Uri(path), nil, body)
-	if resp != nil {
-		resp.Body.Close()
-	}
-	resp.Ok().Json(data)
 }
