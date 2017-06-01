@@ -1,14 +1,32 @@
 package httputil
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
-func Do(method, url string, headers map[string]string, body io.Reader) *Response {
-	req, err := http.NewRequest(method, url, body)
+func Get(url string, headers map[string]string, body interface{}) *Response {
+	return Do(http.MethodGet, url, headers, body)
+}
+
+func Post(url string, headers map[string]string, body interface{}) *Response {
+	return Do(http.MethodPost, url, headers, body)
+}
+
+func Head(url string, headers map[string]string, body interface{}) *Response {
+	return Do(http.MethodHead, url, headers, body)
+}
+
+func Put(url string, headers map[string]string, body interface{}) *Response {
+	return Do(http.MethodPut, url, headers, body)
+}
+
+func Do(method, url string, headers map[string]string, body interface{}) *Response {
+	req, err := http.NewRequest(method, url, makeBodyReader(body))
 	if err != nil {
 		panic(err)
 	}
@@ -54,4 +72,23 @@ func (resp *Response) Json(data interface{}) {
 	if err := json.Unmarshal(resp.GetBody(), &data); err != nil {
 		panic(err)
 	}
+}
+
+func makeBodyReader(data interface{}) (reader io.Reader) {
+	if data == nil {
+		return
+	}
+	switch body := data.(type) {
+	case string:
+		reader = strings.NewReader(body)
+	case []byte:
+		reader = bytes.NewBuffer(body)
+	default:
+		buf, err := json.Marshal(body)
+		if err != nil {
+			panic(err)
+		}
+		reader = bytes.NewBuffer(buf)
+	}
+	return
 }

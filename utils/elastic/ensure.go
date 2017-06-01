@@ -1,9 +1,6 @@
 package elastic
 
 import (
-	"bytes"
-	"encoding/json"
-	"io"
 	"net/http"
 	"strings"
 
@@ -41,15 +38,7 @@ func (es *ES) Exist(path string) bool {
 }
 
 func (es *ES) Create(path string, def map[string]interface{}) {
-	var body io.Reader
-	if def != nil {
-		buf, err := json.Marshal(def)
-		if err != nil {
-			panic(err)
-		}
-		body = bytes.NewBuffer(buf)
-	}
-	resp := httputil.Do(http.MethodPut, es.Uri(path), nil, body)
+	resp := httputil.Do(http.MethodPut, es.Uri(path), nil, def)
 	if resp != nil {
 		resp.Body.Close()
 	}
