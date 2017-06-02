@@ -15,15 +15,23 @@ type BulkResult struct {
 }
 
 func (es *ES) BulkCreate(path string, data []map[string]interface{}) {
+	es.BulkDo(path, MakeBulkCreate(data), `create`, `created`, data)
+}
+
+func (es *ES) BulkUpdate(path string, data []map[string]interface{}) {
+	es.BulkDo(path, MakeBulkUpdate(data), `update`, `updated`, data)
+}
+
+func (es *ES) BulkDo(path string, body, typ, expect string, data []map[string]interface{}) {
 	result := BulkResult{}
-	httputil.Post(es.Uri(path), nil, MakeBulkCreateBody(data)).Ok().Json(&result)
+	httputil.Post(es.Uri(path), nil, body).Ok().Json(&result)
 	if !result.Errors {
 		return
 	}
 	var errs [][2]map[string]interface{}
 	for i, item := range result.Items {
-		info := item[`create`]
-		if v, ok := info[`created`].(bool); !ok || !v {
+		info := item[typ]
+		if v, ok := info[`result`].(string); !ok || v != expect {
 			errs = append(errs, [2]map[string]interface{}{data[i], info})
 		}
 	}
@@ -31,10 +39,15 @@ func (es *ES) BulkCreate(path string, data []map[string]interface{}) {
 	if err != nil {
 		panic(err)
 	}
-	panic(fmt.Sprintf(`bulk create errors(%d of %d): %s`, len(errs), len(data), errsBuf))
+	panic(fmt.Sprintf(`bulk %s errors(%d of %d): %s`, typ, len(errs), len(data), errsBuf))
 }
 
-func MakeBulkCreateBody(rows []map[string]interface{}) (result string) {
+/*
+	create es 格式：
+	{ "create" : {"_id" : "2"} }
+	{ "k": "v", ... }
+*/
+func MakeBulkCreate(rows []map[string]interface{}) (result string) {
 	for _, row := range rows {
 		meta, err := json.Marshal(map[string]interface{}{`create`: map[string]string{`_id`: GenUUID()}})
 		if err != nil {
@@ -56,4 +69,34 @@ func GenUUID() string {
 	} else {
 		return strings.Replace(uid.String(), `-`, ``, -1)
 	}
+}
+
+/*
+	upsert es 格式：
+	{ "update" : {"_id" : "2"} }
+	{ "doc" : {"field" : "value"}, "doc_as_upsert" : true }
+*/
+func MakeBulkUpdate(rows []map[string]interface{}) (result string) {
+	for _, row := range rows {
+		id := row[`_id`]
+		if id == nil {
+			rowBuf, err := json.Marshal(row)
+			if err != nil {
+				panic(err)
+			}
+			panic(`bulk update no _id for: ` + string(rowBuf))
+		}
+		meta, err := json.Marshal(map[string]interface{}{`update`: map[string]interface{}{`_id`: id}})
+		if err != nil {
+			panic(err)
+		}
+
+		delete(row, `_id`)
+		content, err := json.Marshal(map[string]interface{}{"doc": row, "doc_as_upsert": true})
+		if err != nil {
+			panic(err)
+		}
+		result += string(meta) + "\n" + string(content) + "\n"
+	}
+	return
 }
