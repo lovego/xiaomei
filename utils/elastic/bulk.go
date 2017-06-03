@@ -3,6 +3,7 @@ package elastic
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"strings"
 
 	"github.com/lovego/xiaomei/utils/httputil"
@@ -15,31 +16,32 @@ type BulkResult struct {
 }
 
 func (es *ES) BulkCreate(path string, data []map[string]interface{}) {
-	es.BulkDo(path, MakeBulkCreate(data), `create`, `created`, data)
+	es.BulkDo(path, MakeBulkCreate(data), `create`, data)
 }
 
-func (es *ES) BulkUpdate(path string, data []map[string]interface{}) {
-	es.BulkDo(path, MakeBulkUpdate(data), `update`, `updated`, data)
+func (es *ES) BulkUpdate(path string, data [][2]interface{}) {
+	es.BulkDo(path, MakeBulkUpdate(data), `update`, data)
 }
 
-func (es *ES) BulkDo(path string, body, typ, expect string, data []map[string]interface{}) {
+func (es *ES) BulkDo(path string, body, typ string, data interface{}) {
 	result := BulkResult{}
 	httputil.Post(es.Uri(path), nil, body).Ok().Json(&result)
 	if !result.Errors {
 		return
 	}
-	var errs [][2]map[string]interface{}
+	dataV := reflect.ValueOf(data)
+	var errs [][2]interface{}
 	for i, item := range result.Items {
-		info := item[typ]
-		if v, ok := info[`result`].(string); !ok || v != expect {
-			errs = append(errs, [2]map[string]interface{}{data[i], info})
+		resp := item[typ]
+		if resp[`error`] != nil {
+			errs = append(errs, [2]interface{}{dataV.Index(i).Interface(), resp})
 		}
 	}
 	errsBuf, err := json.Marshal(errs)
 	if err != nil {
 		panic(err)
 	}
-	panic(fmt.Sprintf(`bulk %s errors(%d of %d): %s`, typ, len(errs), len(data), errsBuf))
+	panic(fmt.Sprintf(`bulk %s errors(%d of %d): %s`, typ, len(errs), dataV.Len(), errsBuf))
 }
 
 /*
@@ -74,25 +76,17 @@ func GenUUID() string {
 /*
 	upsert es 格式：
 	{ "update" : {"_id" : "2"} }
-	{ "doc" : {"field" : "value"}, "doc_as_upsert" : true }
+	{ "doc" : {"field" : "value"}, "upsert" : {"field" : "value"} }
 */
-func MakeBulkUpdate(rows []map[string]interface{}) (result string) {
+func MakeBulkUpdate(rows [][2]interface{}) (result string) {
 	for _, row := range rows {
-		id := row[`_id`]
-		if id == nil {
-			rowBuf, err := json.Marshal(row)
-			if err != nil {
-				panic(err)
-			}
-			panic(`bulk update no _id for: ` + string(rowBuf))
-		}
+		id, updateDef := row[0], row[1]
 		meta, err := json.Marshal(map[string]interface{}{`update`: map[string]interface{}{`_id`: id}})
 		if err != nil {
 			panic(err)
 		}
 
-		delete(row, `_id`)
-		content, err := json.Marshal(map[string]interface{}{"doc": row, "doc_as_upsert": true})
+		content, err := json.Marshal(updateDef)
 		if err != nil {
 			panic(err)
 		}
