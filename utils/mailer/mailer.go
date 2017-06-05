@@ -1,13 +1,17 @@
 package mailer
 
 import (
+	"fmt"
+	"mime"
 	"net/mail"
 	"net/smtp"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/jordan-wright/email"
+	"github.com/lovego/xiaomei/utils"
 )
 
 type Mailer struct {
@@ -52,4 +56,33 @@ func (m *Mailer) Send(e *email.Email, timeout time.Duration) error {
 		e.From = m.Sender.String()
 	}
 	return m.Pool.Send(e, timeout)
+}
+
+func setupAddrsHeaders(e *email.Email) {
+	if len(e.From) > 0 {
+		e.Headers.Set(`From`, quoteAddr(e.From))
+	}
+	if len(e.To) > 0 {
+		e.Headers.Set(`To`, makeAddrsHeader(e.To))
+	}
+	if len(e.Cc) > 0 {
+		e.Headers.Set(`Cc`, makeAddrsHeader(e.Cc))
+	}
+}
+
+func makeAddrsHeader(addrs []string) string {
+	var result []string
+	for _, addr := range addrs {
+		result = append(result, quoteAddr(addr))
+	}
+	return strings.Join(result, `,`)
+}
+
+func quoteAddr(addr string) string {
+	if address, err := mail.ParseAddress(addr); err != nil {
+		utils.Log(err)
+		return ``
+	} else {
+		return fmt.Sprintf(`%s <%s>`, mime.QEncoding.Encode(`UTF-8`, address.Name), address.Address)
+	}
 }
