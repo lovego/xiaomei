@@ -11,6 +11,7 @@ import (
 
 type Node struct {
 	user       string
+	jumpAddr   string
 	Addr       string            `yaml:"addr"`
 	Labels     map[string]string `yaml:"labels"`
 	ListenAddr string            `yaml:"listenAddr"` // only for manager
@@ -50,7 +51,11 @@ func (n Node) Run(o cmd.O, script string) (string, error) {
 	if isLocal {
 		return cmd.Run(o, `bash`, `-c`, script)
 	} else {
-		return cmd.Run(o, `ssh`, `-t`, n.SshAddr(), script)
+		if n.jumpAddr == `` {
+			return cmd.Run(o, `ssh`, `-t`, n.SshAddr(), script)
+		} else {
+			return cmd.Run(o, `ssh`, `-t`, n.jumpAddr, `ssh`, `-t`, n.SshAddr(), script)
+		}
 	}
 }
 

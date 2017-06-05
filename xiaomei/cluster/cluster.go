@@ -25,17 +25,20 @@ func GetCluster() Cluster {
 
 type Cluster struct {
 	User     string `yaml:"user"`
+	JumpAddr string `yaml:"jumpAddr"`
 	Managers []Node `yaml:"managers"`
 	Workers  []Node `yaml:"workers"`
 	nodes    []Node
 }
 
-func (c *Cluster) setNodesUser() {
+func (c *Cluster) init() {
 	for i := range c.Managers {
 		c.Managers[i].user = c.User
+		c.Managers[i].jumpAddr = c.JumpAddr
 	}
 	for i := range c.Workers {
 		c.Workers[i].user = c.User
+		c.Workers[i].jumpAddr = c.JumpAddr
 	}
 }
 
