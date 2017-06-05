@@ -5,6 +5,7 @@ import (
 	"mime"
 	"net/mail"
 	"net/smtp"
+	"net/textproto"
 	"net/url"
 	"strconv"
 	"strings"
@@ -55,10 +56,14 @@ func (m *Mailer) Send(e *email.Email, timeout time.Duration) error {
 	if e.From == `` && m.Sender != nil {
 		e.From = m.Sender.String()
 	}
+	setupAddrsHeaders(e)
 	return m.Pool.Send(e, timeout)
 }
 
 func setupAddrsHeaders(e *email.Email) {
+	if e.Headers == nil {
+		e.Headers = make(textproto.MIMEHeader)
+	}
 	if len(e.From) > 0 {
 		e.Headers.Set(`From`, quoteAddr(e.From))
 	}
@@ -75,7 +80,7 @@ func makeAddrsHeader(addrs []string) string {
 	for _, addr := range addrs {
 		result = append(result, quoteAddr(addr))
 	}
-	return strings.Join(result, `,`)
+	return strings.Join(result, `, `)
 }
 
 func quoteAddr(addr string) string {

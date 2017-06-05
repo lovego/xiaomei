@@ -1,7 +1,6 @@
 package mailer
 
 import (
-	"sync"
 	"testing"
 	"time"
 
@@ -16,25 +15,13 @@ func TestSend(t *testing.T) {
 		panic(err)
 	}
 
-	wg := sync.WaitGroup{}
-	for _, to := range []string{
-		"侯志良<houzhiliang@retail-tek.com>",
-		"侯志良<applejava@qq.com>",
-		"侯志良<bughou@gmail.com>",
-	} {
-		wg.Add(1)
-		go func(to string) {
-			defer wg.Done()
-
-			e := &email.Email{
-				To:      []string{to},
-				Subject: "测试-" + to,
-				HTML:    []byte("<b>超文本!</b>"),
-			}
-			if err := mailer.Send(e, time.Minute); err != nil {
-				panic(err)
-			}
-		}(to)
+	e := &email.Email{
+		To: []string{"侯志良<houzhiliang@retail-tek.com>",
+			"侯志良<applejava@qq.com>", "侯志良<bughou@gmail.com>"},
+		Subject: "测试",
+		HTML:    []byte("<b>超文本!</b>"),
 	}
-	wg.Wait()
+	if err := mailer.Send(e, 10*time.Second); err != nil {
+		panic(err)
+	}
 }
