@@ -1,57 +1,94 @@
 package httputil
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
-func Http(method, url string, headers map[string]string, body io.Reader, data interface{}) []byte {
-	req, err := http.NewRequest(method, url, body)
-	if err != nil {
-		panic(err)
-	}
-	for k, v := range headers {
-		req.Header.Set(k, v)
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if resp != nil {
-		defer resp.Body.Close()
-	}
-	if err != nil {
-		panic(err)
-	}
-
-	content, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		panic(`HTTP POST: ` + url + "\n" + err.Error())
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		panic(`HTTP ` + method + `: ` + url + "\n" + `Response Status: ` + resp.Status + "\n" + string(content))
-	}
-
-	if err := json.Unmarshal(content, &data); err != nil {
-		panic(err)
-	}
-	return content
+func Get(url string, headers map[string]string, body interface{}) *Response {
+	return Do(http.MethodGet, url, headers, body)
 }
 
-func HttpStatus(method, url string, headers map[string]string, body io.Reader) (int, error) {
-	req, err := http.NewRequest(method, url, body)
+func Post(url string, headers map[string]string, body interface{}) *Response {
+	return Do(http.MethodPost, url, headers, body)
+}
+
+func Head(url string, headers map[string]string, body interface{}) *Response {
+	return Do(http.MethodHead, url, headers, body)
+}
+
+func Put(url string, headers map[string]string, body interface{}) *Response {
+	return Do(http.MethodPut, url, headers, body)
+}
+
+func Do(method, url string, headers map[string]string, body interface{}) *Response {
+	req, err := http.NewRequest(method, url, makeBodyReader(body))
 	if err != nil {
 		panic(err)
 	}
 	for k, v := range headers {
 		req.Header.Set(k, v)
 	}
-	resp, err := http.DefaultClient.Do(req)
-	if resp != nil {
+	if resp, err := http.DefaultClient.Do(req); err != nil {
+		panic(err)
+	} else {
+		return &Response{Response: resp}
+	}
+}
+
+type Response struct {
+	*http.Response
+	body []byte
+}
+
+func (resp *Response) GetBody() []byte {
+	if resp.body == nil {
 		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			panic(`HTTP ` + resp.Request.Method + `: ` + resp.Request.URL.String() + "\n" +
+				`Read Body: ` + err.Error(),
+			)
+		}
+		resp.body = body
 	}
-	if err != nil {
-		return 0, err
+	return resp.body
+}
+
+func (resp *Response) Ok() *Response {
+	if resp.StatusCode != http.StatusOK {
+		panic(`HTTP ` + resp.Request.Method + `: ` + resp.Request.URL.String() + "\n" +
+			`Response Status: ` + resp.Status + "\n" + string(resp.GetBody()),
+		)
 	}
-	return resp.StatusCode, nil
+	return resp
+}
+
+func (resp *Response) Json(data interface{}) {
+	if err := json.Unmarshal(resp.GetBody(), &data); err != nil {
+		panic(err)
+	}
+}
+
+func makeBodyReader(data interface{}) (reader io.Reader) {
+	if data == nil {
+		return
+	}
+	switch body := data.(type) {
+	case string:
+		reader = strings.NewReader(body)
+	case []byte:
+		reader = bytes.NewBuffer(body)
+	default:
+		buf, err := json.Marshal(body)
+		if err != nil {
+			panic(err)
+		}
+		reader = bytes.NewBuffer(buf)
+	}
+	return
 }
