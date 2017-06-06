@@ -5,7 +5,6 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"syscall"
 )
@@ -21,6 +20,10 @@ type O struct {
 	Print                       bool
 	Panic                       bool // only for Run And Start
 	Output                      bool // only for Run
+}
+
+func (o O) PrintCmd() bool {
+	return o.Print || os.Getenv(`PrintCmd`) == `true`
 }
 
 func Run(o O, name string, args ...string) (output string, err error) {
@@ -74,7 +77,7 @@ func Fail(o O, name string, args ...string) bool {
 }
 
 func makeCmd(o O, name string, args []string) *exec.Cmd {
-	if o.Print || os.Getenv(`PrintCmd`) == `true` {
+	if o.PrintCmd() {
 		fmt.Println(name, strings.Join(args, ` `))
 	}
 
@@ -114,25 +117,4 @@ func setupStdIO(cmd *exec.Cmd, o O) {
 			cmd.Stderr = os.Stderr
 		}
 	}
-}
-
-func SudoWriteFile(file string, reader io.Reader) {
-	dir := filepath.Dir(file)
-	if !isDir(dir) {
-		Run(O{Panic: true}, `sudo`, `mkdir`, `-p`, dir)
-	}
-
-	cmd := exec.Command(`sudo`, `cp`, `/dev/stdin`, file)
-	cmd.Stdin = reader
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		panic(err)
-	}
-	Run(O{Panic: true}, `sudo`, `chmod`, `644`, file)
-}
-
-func isDir(p string) bool {
-	fi, _ := os.Stat(p)
-	return fi != nil && fi.IsDir()
 }

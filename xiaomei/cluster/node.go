@@ -1,7 +1,6 @@
 package cluster
 
 import (
-	"fmt"
 	"net"
 	"os/user"
 	"strings"
@@ -53,20 +52,11 @@ func (n Node) Run(o cmd.O, script string) (string, error) {
 		return cmd.Run(o, `bash`, `-c`, script)
 	} else {
 		if n.jumpAddr == `` {
-			return cmd.Run(o, `ssh`, `-t`, n.SshAddr(), script)
+			return cmd.SshRun(o, n.SshAddr(), script, `-t`)
 		} else {
-			return n.JumpRun(o, script)
+			return cmd.SshJumpRun(o, n.jumpAddr, n.SshAddr(), script)
 		}
 	}
-}
-
-func (n Node) JumpRun(o cmd.O, script string) (string, error) {
-	if _, err := cmd.Run(cmd.O{Stdin: strings.NewReader(script)},
-		`ssh`, n.jumpAddr, fmt.Sprintf(`ssh %s 'cat > /tmp/runScript.sh'`, n.SshAddr()),
-	); err != nil {
-		return ``, err
-	}
-	return cmd.Run(o, `ssh`, `-t`, n.jumpAddr, fmt.Sprintf(`ssh -t %s bash /tmp/runScript.sh`, n.SshAddr()))
 }
 
 func IsCurrentUser(users string) (bool, error) {
