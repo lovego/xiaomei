@@ -22,12 +22,16 @@ func accessPrint(svcName string) error {
 }
 
 func accessSetup(svcName string) error {
+	name := release.Name()
+	if svcName != `` {
+		name += `_` + svcName
+	}
 	script := fmt.Sprintf(`
 	sudo tee /etc/nginx/sites-enabled/%s.conf > /dev/null &&
 	sudo mkdir -p /var/log/nginx/%s &&
 	sudo nginx -t &&
 	sudo service nginx reload
-	`, release.Name(), release.Name(),
+	`, name, release.Name(),
 	)
 	accessConf, err := getAccessConf(svcName)
 	if err != nil {
