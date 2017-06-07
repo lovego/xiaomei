@@ -17,7 +17,7 @@ func accessPrint(svcName string) error {
 	if err != nil {
 		return err
 	}
-	print(accessConf)
+	fmt.Print(accessConf)
 	return nil
 }
 
