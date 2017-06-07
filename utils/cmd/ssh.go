@@ -17,6 +17,11 @@ func SshRun(o O, addr, script string, flags ...string) (output string, err error
 }
 
 func SshJumpRun(o O, jumpAddr, addr, script string) (output string, err error) {
+	if script == `` {
+		return SshRun(o, jumpAddr, fmt.Sprintf(
+			`ssh -t %s %s`, SshShareConnFlags, addr,
+		), `-t`)
+	}
 	if o.PrintCmd() {
 		fmt.Println(script)
 	}
