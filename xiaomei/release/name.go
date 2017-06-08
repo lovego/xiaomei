@@ -21,6 +21,10 @@ func Name() string {
 	return theName
 }
 
+func DeployName() string {
+	return Name() + `_` + Env()
+}
+
 func App() *conf.Conf {
 	if appConf == nil {
 		appConf = conf.New(filepath.Join(Root(), `img-app`), Env())

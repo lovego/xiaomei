@@ -7,7 +7,7 @@ import (
 
 type driver interface {
 	FlagsForRun(svcName string) ([]string, error)
-	AccessAddrs(svcName string) []string
+	Addrs(svcName string) ([]string, error)
 	Deploy(svcName string) error
 	RmDeploy(svcName string) error
 	Logs(svcName string) error
