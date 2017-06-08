@@ -11,6 +11,7 @@ import (
 
 	"github.com/lovego/xiaomei/server/xm/renderer"
 	"github.com/lovego/xiaomei/server/xm/session"
+	"github.com/lovego/xiaomei/utils/errs"
 )
 
 type LayoutDataFunc func(layout string, data interface{}, req *Request, res *Response) interface{}
@@ -81,15 +82,16 @@ func (res *Response) Json(data interface{}) {
 	}
 }
 
-func (res Response) Json2(data interface{}, err error) {
+func (res Response) Result(data interface{}, err errs.Error) {
 	type result struct {
-		Msg  string      `json:"msg"`
-		Data interface{} `json:"data"`
+		Code    string      `json:"code"`
+		Message string      `json:"message"`
+		Data    interface{} `json:"data,omitempty"`
 	}
-	if err != nil {
-		res.Json(result{Msg: `ok`, Data: data})
+	if err == nil {
+		res.Json(result{Code: `ok`, Message: `success`, Data: data})
 	} else {
-		res.Json(result{Msg: err.Error()})
+		res.Json(result{Code: err.Code(), Message: err.Message(), Data: data})
 	}
 }
 
