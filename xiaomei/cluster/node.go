@@ -30,6 +30,14 @@ func (n Node) SshAddr() string {
 	return strings.Split(n.user, `,`)[0] + `@` + n.Addr
 }
 
+func (n Node) SshCmd() string {
+	cmd := `ssh -t ` + n.SshAddr()
+	if n.jumpAddr != `` {
+		cmd = `ssh -t ` + n.jumpAddr + ` ` + cmd
+	}
+	return cmd
+}
+
 func (n Node) GetListenAddr() string {
 	if n.ListenAddr != `` {
 		return n.ListenAddr

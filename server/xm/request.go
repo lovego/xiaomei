@@ -44,7 +44,7 @@ func (req *Request) Session(p interface{}) {
 		}
 		return
 	}
-	if req.sess.Get(req.Request, p) && p != nil {
+	if req.sess != nil && req.sess.Get(req.Request, p) && p != nil {
 		v := reflect.ValueOf(p).Elem()
 		if v.IsValid() {
 			req.sessData = v

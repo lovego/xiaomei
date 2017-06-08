@@ -60,12 +60,12 @@ func (c Cluster) Nodes() []Node {
 func (c Cluster) List() {
 	ms := []string{}
 	for _, m := range c.Managers {
-		ms = append(ms, m.SshAddr())
+		ms = append(ms, m.SshCmd())
 	}
-	println(`managers: `, strings.Join(ms, " \t"))
+	println("managers:\n", strings.Join(ms, "\n"))
 	ws := []string{}
 	for _, w := range c.Workers {
-		ws = append(ws, w.SshAddr())
+		ws = append(ws, w.SshCmd())
 	}
-	println(`workers: `, strings.Join(ws, " \t"))
+	println("workers:\n", strings.Join(ws, "\n"))
 }
