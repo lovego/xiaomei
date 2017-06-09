@@ -1,0 +1,24 @@
+{{- if gt (len .BackendAddrs) 1 -}}
+upstream {{ .DomainName }} {
+  {{- range .BackendAddrs }}
+  server {{ . }};
+  {{- end }}
+}
+{{ end -}}
+
+server {
+  listen 80;
+  server_name {{ .DomainName }};
+
+  location / {
+    {{ if gt (len .BackendAddrs) 1 -}}
+    proxy_pass http://{{ .DomainName }};
+    {{ else -}}
+    proxy_pass http://{{ index .BackendAddrs 0 }};
+    {{ end -}}
+    include proxy_params;
+  }
+
+  access_log /var/log/nginx/{{ .DomainName }}/access.log std;
+  error_log  /var/log/nginx/{{ .DomainName }}/access.err;
+}

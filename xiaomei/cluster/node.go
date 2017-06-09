@@ -60,7 +60,7 @@ func (n Node) Run(o cmd.O, script string) (string, error) {
 		return cmd.Run(o, `bash`, `-c`, script)
 	} else {
 		if n.jumpAddr == `` {
-			return cmd.SshRun(o, n.SshAddr(), script, `-t`)
+			return cmd.SshRun(o, n.SshAddr(), script)
 		} else {
 			return cmd.SshJumpRun(o, n.jumpAddr, n.SshAddr(), script)
 		}

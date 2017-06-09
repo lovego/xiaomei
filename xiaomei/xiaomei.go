@@ -6,7 +6,6 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/deploy"
 	"github.com/lovego/xiaomei/xiaomei/images"
-	"github.com/lovego/xiaomei/xiaomei/images/access"
 	"github.com/lovego/xiaomei/xiaomei/images/app"
 	"github.com/lovego/xiaomei/xiaomei/images/godoc"
 	"github.com/lovego/xiaomei/xiaomei/images/logc"
@@ -57,12 +56,8 @@ func manageCmds() []*cobra.Command {
 	webCmd.AddCommand(images.Cmds(`web`)...)
 	webCmd.AddCommand(deploy.Cmds(`web`)...)
 
-	accessCmd := access.Cmd()
-	accessCmd.AddCommand(images.Cmds(`access`)...)
-	accessCmd.AddCommand(deploy.Cmds(`access`)...)
-
 	logcCmd := logc.Cmd()
 	logcCmd.AddCommand(deploy.Cmds(`logc`)...)
 
-	return []*cobra.Command{appCmd, tasksCmd, godocCmd, webCmd, accessCmd, logcCmd, cluster.Cmd()}
+	return []*cobra.Command{appCmd, tasksCmd, webCmd, godocCmd, logcCmd, cluster.Cmd()}
 }
