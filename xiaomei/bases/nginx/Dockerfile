@@ -10,6 +10,7 @@ RUN wget -O- 'http://nginx.org/keys/nginx_signing.key' | apt-key add - \
 COPY nginx.conf proxy_params /etc/nginx/
 COPY nginx-start /usr/local/bin/
 
+STOPSIGNAL SIGQUIT
 CMD [ "nginx-start" ]
 EXPOSE 80 443
 

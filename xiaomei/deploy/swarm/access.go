@@ -15,7 +15,7 @@ func setupConf(conf string) error {
 	sudo tee /etc/nginx/sites-enabled/%s.conf > /dev/null &&
 	sudo mkdir -p /var/log/nginx/%s &&
 	sudo nginx -t &&
-	sudo service nginx restart
+	sudo service nginx reload
 	`, release.Name(), release.Name(),
 	)
 	for _, node := range cluster.AccessNodes() {

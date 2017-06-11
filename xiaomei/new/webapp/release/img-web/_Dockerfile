@@ -1,6 +1,6 @@
 FROM 192.168.202.12:5000/xiaomei/nginx
 
-COPY site.conf.tmpl /etc/nginx/sites-available/{{ .ProName }}.conf.tmpl
+COPY web.conf.tmpl /etc/nginx/sites-available/{{ .ProName }}.conf.tmpl
 
 WORKDIR /var/www/{{ .ProName }}
 
