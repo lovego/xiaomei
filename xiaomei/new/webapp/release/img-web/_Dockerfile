@@ -2,6 +2,4 @@ FROM 192.168.202.12:5000/xiaomei/nginx
 
 COPY web.conf.tmpl /etc/nginx/sites-available/{{ .ProName }}.conf.tmpl
 
-WORKDIR /var/www/{{ .ProName }}
-
-COPY public .
+COPY public /var/www/{{ .ProName }}/
