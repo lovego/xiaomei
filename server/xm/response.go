@@ -86,12 +86,12 @@ func (res Response) Result(data interface{}, err errs.Error) {
 	type result struct {
 		Code    string      `json:"code"`
 		Message string      `json:"message"`
-		Data    interface{} `json:"data,omitempty"`
+		Result  interface{} `json:"result,omitempty"`
 	}
 	if err == nil {
-		res.Json(result{Code: `ok`, Message: `success`, Data: data})
+		res.Json(result{Code: `ok`, Message: `success`, Result: data})
 	} else {
-		res.Json(result{Code: err.Code(), Message: err.Message(), Data: data})
+		res.Json(result{Code: err.Code(), Message: err.Message(), Result: data})
 	}
 }
 
