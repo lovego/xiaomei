@@ -30,6 +30,17 @@ func (req *Request) ClientAddr() string {
 	return req.RemoteAddr
 }
 
+func (req *Request) Scheme() string {
+	if proto := req.Header.Get("X-Forwarded-Proto"); proto != `` {
+		return proto
+	}
+	return `http`
+}
+
+func (req *Request) Url() string {
+	return req.Scheme() + `://` + req.Host + req.RequestURI
+}
+
 func (req *Request) Query() url.Values {
 	return req.URL.Query()
 }

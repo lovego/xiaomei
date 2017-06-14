@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"regexp"
-	"strconv"
+	"strings"
 
 	"github.com/lovego/xiaomei/utils/merge"
 	"github.com/lovego/xiaomei/xiaomei/release"
@@ -70,29 +70,19 @@ func ImageNameOf(svcName string) string {
 }
 
 var rePort = regexp.MustCompile(`^\d+$`)
-var rePorts = regexp.MustCompile(`^(\d+)-(\d+)$`)
 
 func PortsOf(svcName string) (ports []string) {
 	svc := GetService(svcName)
 	if svc.Ports == `` {
 		return
 	}
-	if rePort.MatchString(svc.Ports) {
-		ports = append(ports, svc.Ports)
-	} else if m := rePorts.FindStringSubmatch(svc.Ports); len(m) == 3 {
-		start, err := strconv.Atoi(m[1])
-		if err != nil {
-			panic(err)
+	for _, port := range strings.Split(svc.Ports, `,`) {
+		port = strings.TrimSpace(port)
+		if rePort.MatchString(port) {
+			ports = append(ports, port)
+		} else {
+			panic(fmt.Sprintf(`%s: %s.ports: illegal format.`, File, svcName))
 		}
-		end, err := strconv.Atoi(m[2])
-		if err != nil {
-			panic(err)
-		}
-		for ; start <= end; start++ {
-			ports = append(ports, strconv.Itoa(start))
-		}
-	} else {
-		panic(fmt.Sprintf(`%s: %s.ports: illegal format.`, File, svcName))
 	}
 	return
 }
