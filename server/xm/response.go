@@ -18,7 +18,7 @@ type LayoutDataFunc func(layout string, data interface{}, req *Request, res *Res
 
 type Response struct {
 	http.ResponseWriter
-	request        *Request
+	*Request
 	sess           session.Session
 	renderer       *renderer.Renderer
 	layoutDataFunc LayoutDataFunc
@@ -30,7 +30,7 @@ func NewResponse(
 ) *Response {
 	return &Response{
 		ResponseWriter: responseWriter,
-		request:        request,
+		Request:        request,
 		sess:           sess,
 		renderer:       rendrr,
 		layoutDataFunc: layoutDataFunc,
@@ -45,7 +45,7 @@ func (res *Response) GetLayoutData(layout string, data interface{}) interface{} 
 	if res.layoutDataFunc == nil {
 		return data
 	}
-	return res.layoutDataFunc(layout, data, res.request, res)
+	return res.layoutDataFunc(layout, data, res.Request, res)
 }
 
 func (res *Response) Render(path string, data interface{}, options ...renderer.O) {
