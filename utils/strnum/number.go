@@ -28,6 +28,9 @@ func ThousandSep(value interface{}) string {
 }
 
 func thousandSep(number string) string {
+	if number == `` {
+		return `0`
+	}
 	start, end := 0, len(number)
 	if number[0] == '-' {
 		start = 1
