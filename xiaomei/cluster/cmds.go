@@ -9,9 +9,13 @@ import (
 func Cmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `cluster`,
-		Short: `the clusters.`,
+		Short: `ssh into a manager of the cluster.`,
+		RunE: release.NoArgCall(func() error {
+			_, err := Run(cmd.O{}, ``)
+			return err
+		}),
 	}
-	cmd.AddCommand(lsCmd(), shellCmd())
+	cmd.AddCommand(lsCmd())
 	return cmd
 }
 
@@ -22,17 +26,6 @@ func lsCmd() *cobra.Command {
 		RunE: release.NoArgCall(func() error {
 			GetCluster().List()
 			return nil
-		}),
-	}
-}
-
-func shellCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   `shell`,
-		Short: `ssh into a manager of cluster.`,
-		RunE: release.NoArgCall(func() error {
-			_, err := Run(cmd.O{}, ``)
-			return err
 		}),
 	}
 }
