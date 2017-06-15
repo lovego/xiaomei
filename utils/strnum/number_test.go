@@ -6,6 +6,7 @@ import (
 
 func TestThousand(t *testing.T) {
 	cases := map[string]interface{}{
+		`0`:            ``,
 		`1`:            `1`,
 		`12`:           12,
 		`123`:          `123`,
