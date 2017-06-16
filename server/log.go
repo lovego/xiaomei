@@ -16,15 +16,24 @@ import (
 	"github.com/lovego/xiaomei/utils/fs"
 )
 
-var accessLog, errLog = setupLogger()
+var accessLog, errorLog = setupLogger()
 
-func setupLogger() (*os.File, *os.File) {
+func setupLogger() (accessLog, errorLog *os.File) {
 	if config.DevMode() {
 		return os.Stdout, os.Stderr
-	} else {
-		return fs.OpenAppend(filepath.Join(config.Root(), `log/app.log`)),
-			fs.OpenAppend(filepath.Join(config.Root(), `log/app.err`))
 	}
+	var err error
+	accessLogPath := filepath.Join(config.Root(), `log/app.log`)
+	if accessLog, err = fs.OpenAppend(accessLogPath); err != nil {
+		utils.Logf(`open appserver access log %s failed: %v`, accessLogPath, err)
+		os.Exit(1)
+	}
+	errorLogPath := filepath.Join(config.Root(), `log/app.err`)
+	if errorLog, err = fs.OpenAppend(errorLogPath); err != nil {
+		utils.Logf(`open appserver error log %s failed: %v`, errorLogPath, err)
+		os.Exit(1)
+	}
+	return
 }
 
 func writeLog(
@@ -32,7 +41,7 @@ func writeLog(
 ) []byte {
 	line := getLogLine(req, res, t, err, errStr, stack)
 	if err {
-		errLog.Write(line)
+		errorLog.Write(line)
 	} else {
 		accessLog.Write(line)
 	}

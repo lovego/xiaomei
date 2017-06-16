@@ -27,18 +27,22 @@ func IsDir(p string) bool {
 	return fi != nil && fi.IsDir()
 }
 
-func IsEmptyDir(p string) bool {
+func IsEmptyDir(p string) (bool, error) {
 	f, err := os.Open(p)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return false
+			return false, nil
 		}
-		panic(err)
+		return false, err
 	}
 	defer f.Close()
 
 	_, err = f.Readdirnames(1)
-	return err == io.EOF
+	if err == io.EOF {
+		return true, nil
+	} else {
+		return false, err
+	}
 }
 
 func DetectDir(dir string, features ...string) string {
