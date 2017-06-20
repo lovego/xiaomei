@@ -1,5 +1,5 @@
-{{- if gt (len .BackendAddrs) 1 -}}
-upstream {{ .DomainName }} {
+{{- if .BackendName -}}
+upstream {{ .BackendName }} {
   {{- range .BackendAddrs }}
   server {{ . }};
   {{- end }}
@@ -11,8 +11,8 @@ server {
   server_name {{ .DomainName }};
 
   location / {
-    {{ if gt (len .BackendAddrs) 1 -}}
-    proxy_pass http://{{ .DomainName }};
+    {{ if .BackendName -}}
+    proxy_pass http://{{ .BackendName }};
     {{ else -}}
     proxy_pass http://{{ index .BackendAddrs 0 }};
     {{ end -}}

@@ -71,18 +71,19 @@ func getAccessConf(svcName string) (string, error) {
 
 func getConfigData(svcName string) (interface{}, error) {
 	data := struct {
-		Env, SvcName, DomainName string
-		BackendAddrs             []string
+		Env, SvcName, DomainName, BackendName string
+		BackendAddrs                          []string
 	}{
 		Env:        release.Env(),
 		SvcName:    svcName,
 		DomainName: getDomainName(svcName),
 	}
-	if svcName == `` {
-		svcName = getServiceToAccess()
-	}
-	if addrs, err := getDriver().Addrs(svcName); err == nil {
-		data.BackendAddrs = addrs
+	backendSvcName := getBackendSvcName(svcName)
+	if backendAddrs, err := getDriver().Addrs(backendSvcName); err == nil {
+		data.BackendAddrs = backendAddrs
+		if len(backendAddrs) > 1 {
+			data.BackendName = getBackendName(svcName)
+		}
 		return data, nil
 	} else {
 		return nil, err
@@ -106,7 +107,18 @@ func getSvcDomain(domain, svcName string) string {
 	}
 }
 
-func getServiceToAccess() string {
+func getBackendName(svcName string) string {
+	name := release.DeployName()
+	if svcName != `` {
+		name += `_` + svcName
+	}
+	return name
+}
+
+func getBackendSvcName(svcName string) string {
+	if svcName != `` {
+		return svcName
+	}
 	services := conf.ServiceNames()
 	if services[`web`] {
 		return `web`
