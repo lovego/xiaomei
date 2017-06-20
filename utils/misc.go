@@ -12,12 +12,26 @@ import (
 
 const ISO8601 = `2006-01-02T15:04:05Z0700`
 
-func Log(msg interface{}) {
-	fmt.Println(time.Now().Format(ISO8601), msg)
+func Log(args ...interface{}) {
+	args = append([]interface{}{time.Now().Format(ISO8601)}, args...)
+	fmt.Println(args...)
 }
 
-func Logf(w io.Writer, msg string) {
-	w.Write([]byte(time.Now().Format(ISO8601) + ` ` + msg + "\n"))
+func Logf(format string, args ...interface{}) {
+	format = `%s ` + format + "\n"
+	args = append([]interface{}{time.Now().Format(ISO8601)}, args...)
+	fmt.Printf(format, args...)
+}
+
+func Flog(w io.Writer, args ...interface{}) {
+	args = append([]interface{}{time.Now().Format(ISO8601)}, args...)
+	fmt.Fprintln(w, args...)
+}
+
+func FLogf(w io.Writer, format string, args ...interface{}) {
+	format = `%s ` + format + "\n"
+	args = append([]interface{}{time.Now().Format(ISO8601)}, args...)
+	fmt.Fprintf(w, format, args...)
 }
 
 func Stack(skip int) []byte {

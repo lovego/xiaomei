@@ -50,8 +50,10 @@ func checkAndCopy(pkgDir string, noClobber bool) error {
 		return err
 	}
 	// package src dir not empty
-	if fs.IsEmptyDir(pkgSrcDir) {
-		return errors.New(pkgSrcDir + ` exist and is empty.`)
+	if ok, err := fs.IsEmptyDir(pkgSrcDir); err != nil {
+		return err
+	} else if ok {
+		return errors.New(pkgSrcDir + ` exists and is empty.`)
 	}
 	pkgVendorDir := path.Join(vendorDir, pkgDir)
 	if err := checkDir(pkgVendorDir); err != nil {

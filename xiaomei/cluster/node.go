@@ -11,6 +11,7 @@ import (
 
 type Node struct {
 	user       string
+	jumpAddr   string
 	Addr       string            `yaml:"addr"`
 	Labels     map[string]string `yaml:"labels"`
 	ListenAddr string            `yaml:"listenAddr"` // only for manager
@@ -27,6 +28,14 @@ func (n Node) Match(labels map[string]string) bool {
 
 func (n Node) SshAddr() string {
 	return strings.Split(n.user, `,`)[0] + `@` + n.Addr
+}
+
+func (n Node) SshCmd() string {
+	cmd := `ssh -t ` + n.SshAddr()
+	if n.jumpAddr != `` {
+		cmd = `ssh -t ` + n.jumpAddr + ` ` + cmd
+	}
+	return cmd
 }
 
 func (n Node) GetListenAddr() string {
@@ -50,7 +59,11 @@ func (n Node) Run(o cmd.O, script string) (string, error) {
 	if isLocal {
 		return cmd.Run(o, `bash`, `-c`, script)
 	} else {
-		return cmd.Run(o, `ssh`, `-t`, n.SshAddr(), script)
+		if n.jumpAddr == `` {
+			return cmd.SshRun(o, n.SshAddr(), script)
+		} else {
+			return cmd.SshJumpRun(o, n.jumpAddr, n.SshAddr(), script)
+		}
 	}
 }
 

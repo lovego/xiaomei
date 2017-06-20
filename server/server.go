@@ -1,11 +1,14 @@
 package server
 
 import (
+	"context"
 	"net"
 	"net/http"
 	"os"
+	"os/signal"
 	"path"
 	"runtime"
+	"syscall"
 	"time"
 
 	"github.com/fatih/color"
@@ -52,25 +55,37 @@ func (s *Server) ListenAndServe() {
 	}
 	s.Server.Handler = s.Handler()
 
+	ch := make(chan os.Signal)
+	signal.Notify(ch, syscall.SIGTERM)
+
+	go func() {
+		err := s.Server.Serve(getListener())
+		if err != nil && err != http.ErrServerClosed {
+			panic(err)
+		}
+	}()
+
+	<-ch
+	ctx, _ := context.WithDeadline(context.Background(), time.Now().Add(7*time.Second))
+	if err := s.Server.Shutdown(ctx); err == nil {
+		utils.Log(`shutdown`)
+	} else {
+		utils.Log(`shutdown error: ` + err.Error())
+	}
+}
+
+func getListener() net.Listener {
 	port := os.Getenv(`GOPORT`)
 	if port == `` {
 		port = `3000`
 	}
 	addr := `:` + port
-	listener := listen(addr)
+	ln, err := net.Listen(`tcp`, addr)
+	if err != nil {
+		panic(err)
+	}
 	utils.Log(color.GreenString(`started.(` + addr + `)`))
-
-	if err := s.Server.Serve(listener); err != nil {
-		panic(err)
-	}
-}
-
-func listen(addr string) net.Listener {
-	if ln, err := net.Listen(`tcp`, addr); err != nil {
-		panic(err)
-	} else {
-		return tcpKeepAliveListener{ln.(*net.TCPListener)}
-	}
+	return tcpKeepAliveListener{ln.(*net.TCPListener)}
 }
 
 // tcpKeepAliveListener sets TCP keep-alive timeouts on accepted

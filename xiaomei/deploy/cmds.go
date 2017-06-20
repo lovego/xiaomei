@@ -18,7 +18,7 @@ func Cmds(svcName string) (cmds []*cobra.Command) {
 		logsCmdFor(svcName),
 	)
 	if svcName == `` || svcName == `app` || svcName == `web` || svcName == `godoc` {
-		cmds = append(cmds, accessPrintCmd(svcName), accessSetupCmd(svcName))
+		cmds = append(cmds, accessCmd(svcName))
 	}
 	return
 }
@@ -104,22 +104,19 @@ func deployDesc(svcName string) string {
 	}
 }
 
-func accessPrintCmd(svcName string) *cobra.Command {
-	return &cobra.Command{
-		Use:   `access-print`,
-		Short: `print access config for the project.`,
+func accessCmd(svcName string) *cobra.Command {
+	var setup bool
+	cmd := &cobra.Command{
+		Use:   `access`,
+		Short: `access config for the project.`,
 		RunE: release.NoArgCall(func() error {
-			return accessPrint(svcName)
+			if setup {
+				return accessSetup(svcName)
+			} else {
+				return accessPrint(svcName)
+			}
 		}),
 	}
-}
-
-func accessSetupCmd(svcName string) *cobra.Command {
-	return &cobra.Command{
-		Use:   `access-setup`,
-		Short: `setup access config for the project.`,
-		RunE: release.NoArgCall(func() error {
-			return accessSetup(svcName)
-		}),
-	}
+	cmd.Flags().BoolVarP(&setup, `setup`, `s`, false, `setup access.`)
+	return cmd
 }

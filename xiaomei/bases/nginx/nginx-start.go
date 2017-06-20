@@ -6,8 +6,6 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
-	"os/exec"
-	"os/signal"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -18,10 +16,6 @@ import (
 	"github.com/fatih/color"
 )
 
-func init() {
-	go handleSignals()
-}
-
 func main() {
 	confData := getConfData()
 	if n := generateConf(confData); n > 0 {
@@ -30,10 +24,7 @@ func main() {
 		}
 	}
 	log(color.GreenString(`started. (:%s)`, confData.ListenPort))
-	cmd := exec.Command(`nginx`)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
+	if err := syscall.Exec(`/usr/sbin/nginx`, []string{`nginx`}, nil); err != nil {
 		panic(err)
 	}
 }
@@ -131,14 +122,6 @@ func waitNameResolved(host string) {
 	duration := time.Since(start)
 	duration -= duration % time.Second
 	fmt.Printf("%s ready in %s.\n", host, duration)
-}
-
-func handleSignals() {
-	c := make(chan os.Signal, 10)
-	signal.Notify(c, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
-	s := <-c
-	println(` killed by ` + s.String() + ` signal.`)
-	os.Exit(0)
 }
 
 const ISO8601 = `2006-01-02T15:04:05Z0700`

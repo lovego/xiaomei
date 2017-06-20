@@ -1,7 +1,7 @@
 services:
   app:
     image: 192.168.202.12:5000/{{ .Domain }}/app
-    ports: "3001-3002"
+    ports: "3001,4001"
     options: [ -v, "{{ .ProName }}_logs:/home/ubuntu/{{ .ProName }}/log" ]
 # tasks:
 #   nodes: { tasks: true }
@@ -14,6 +14,6 @@ services:
   web:
     ports: "8001"
     image: 192.168.202.12:5000/{{ .Domain }}/web
-    options: [ -v, "{{ .ProName }}_logs:/var/log/nginx" ]
+    options: [ -v, "{{ .ProName }}_logs:/var/log/nginx/{{ .ProName }}" ]
 
 volumesToCreate: [ {{ .ProName }}_logs ]

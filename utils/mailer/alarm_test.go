@@ -10,7 +10,7 @@ import (
 
 func TestAlarm(t *testing.T) {
 	mailer, err := New(
-		`mailer://smtp.qq.com:25/?user=小美<xiaomei-go@qq.com>&pass=gtrqcegfgtqwebga`,
+		`mailer://smtp.qq.com:25/?user=小美<xiaomei-go@qq.com>&pass=zjsbosjlhgugechh`,
 	)
 	if err != nil {
 		panic(err)

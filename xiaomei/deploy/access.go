@@ -3,6 +3,8 @@ package deploy
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
 	"strings"
 	"text/template"
 
@@ -17,17 +19,18 @@ func accessPrint(svcName string) error {
 	if err != nil {
 		return err
 	}
-	print(accessConf)
+	fmt.Print(accessConf)
 	return nil
 }
 
 func accessSetup(svcName string) error {
+	domain := getDomainName(svcName)
 	script := fmt.Sprintf(`
 	sudo tee /etc/nginx/sites-enabled/%s.conf > /dev/null &&
 	sudo mkdir -p /var/log/nginx/%s &&
 	sudo nginx -t &&
 	sudo service nginx reload
-	`, release.Name(), release.Name(),
+	`, domain, domain,
 	)
 	accessConf, err := getAccessConf(svcName)
 	if err != nil {
@@ -46,53 +49,60 @@ func accessSetup(svcName string) error {
 }
 
 func getAccessConf(svcName string) (string, error) {
-	tmpl := template.Must(template.New(``).Parse(accessConfTmpl))
+	var confTmpl string
+	if buf, err := ioutil.ReadFile(
+		filepath.Join(release.Root(), `access`, `access.conf.tmpl`),
+	); err == nil {
+		confTmpl = string(buf)
+	} else {
+		return ``, err
+	}
+	tmpl := template.Must(template.New(``).Parse(confTmpl))
+	configData, err := getConfigData(svcName)
+	if err != nil {
+		return ``, err
+	}
 	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, getConfigData(svcName)); err != nil {
+	if err := tmpl.Execute(&buf, configData); err != nil {
 		return ``, err
 	}
 	return buf.String(), nil
 }
 
-func getConfigData(svcName string) interface{} {
+func getConfigData(svcName string) (interface{}, error) {
 	data := struct {
-		ProName, ServerNames, BackendAddr, UpstreamName string
-		UpstreamAddrs                                   []string
+		Env, SvcName, DomainName string
+		BackendAddrs             []string
 	}{
-		ProName:     release.Name(),
-		ServerNames: getServerNames(svcName),
+		Env:        release.Env(),
+		SvcName:    svcName,
+		DomainName: getDomainName(svcName),
 	}
 	if svcName == `` {
 		svcName = getServiceToAccess()
 	}
-	addrs := getDriver().AccessAddrs(svcName)
-	if len(addrs) == 1 {
-		data.BackendAddr = addrs[0]
+	if addrs, err := getDriver().Addrs(svcName); err == nil {
+		data.BackendAddrs = addrs
+		return data, nil
 	} else {
-		data.UpstreamName = release.Name() + `_` + svcName
-		data.UpstreamAddrs = addrs
+		return nil, err
 	}
-	return data
 }
 
-func getServerNames(svcName string) string {
-	result := []string{}
-	for _, env := range cluster.Envs() {
-		domain := release.AppIn(env).Domain()
-		if svcName == `godoc` {
-			domain = godocDomain(domain)
-		}
-		result = append(result, domain)
+func getDomainName(svcName string) string {
+	domain := release.App().Domain()
+	if svcName != `` {
+		domain = getSvcDomain(domain, svcName)
 	}
-	return strings.Join(result, ` `)
+	return domain
 }
 
-func godocDomain(domain string) string {
+func getSvcDomain(domain, svcName string) string {
 	parts := strings.SplitN(domain, `.`, 2)
 	if len(parts) == 2 {
-		return parts[0] + `-godoc.` + parts[1]
+		return parts[0] + `-` + svcName + `.` + parts[1]
 	} else {
-		return domain + `-godoc`
+		return domain + `-` + svcName
 	}
 }
 
@@ -106,26 +116,3 @@ func getServiceToAccess() string {
 	}
 	panic(`no backend service found in ` + conf.File() + `.`)
 }
-
-const accessConfTmpl = `
-{{- if .UpstreamName -}}
-upstream {{ .UpstreamName }} {
-  {{- range .UpstreamAddrs }}
-  server {{ . }};
-  {{- end }}
-}
-{{ end -}}
-
-server {
-  listen 80;
-  server_name {{ .ServerNames }};
-
-  location / {
-    proxy_pass   http://{{ or .BackendAddr .UpstreamName }};
-    include proxy_params;
-  }
-
-  access_log /var/log/nginx/{{ .ProName }}/access.log std;
-  error_log  /var/log/nginx/{{ .ProName }}/access.err;
-}
-`

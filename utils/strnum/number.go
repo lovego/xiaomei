@@ -12,15 +12,15 @@ func ThousandSep(value interface{}) string {
 		return `0`
 	}
 	var number string
-	switch value.(type) {
+	switch v := value.(type) {
 	case string:
-		number = value.(string)
+		number = v
 	case int:
-		number = strconv.Itoa(value.(int))
+		number = strconv.Itoa(v)
 	case int64:
-		number = strconv.FormatInt(value.(int64), 10)
+		number = strconv.FormatInt(v, 10)
 	case float64:
-		number = fmt.Sprintf(`%0.2f`, value.(float64))
+		number = fmt.Sprintf(`%0.2f`, v)
 	default:
 		panic(fmt.Sprintf(`unsupported value type: %v`, reflect.TypeOf(value).Name()))
 	}
@@ -28,6 +28,9 @@ func ThousandSep(value interface{}) string {
 }
 
 func thousandSep(number string) string {
+	if number == `` {
+		return `0`
+	}
 	start, end := 0, len(number)
 	if number[0] == '-' {
 		start = 1
@@ -37,7 +40,7 @@ func thousandSep(number string) string {
 	}
 	return number[:start] +
 		strings.Join(ThousandSplit(number[start:end]), `,`) +
-		number[end:len(number)]
+		number[end:]
 }
 
 func ThousandSplit(number string) (result []string) {

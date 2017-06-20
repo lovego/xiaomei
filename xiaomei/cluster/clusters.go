@@ -25,7 +25,7 @@ func GetClusters() map[string]Cluster {
 			panic(err)
 		}
 		for _, cluster := range clusters {
-			cluster.setNodesUser()
+			cluster.init()
 		}
 		theClusters = clusters
 	}

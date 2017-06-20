@@ -25,17 +25,20 @@ func GetCluster() Cluster {
 
 type Cluster struct {
 	User     string `yaml:"user"`
+	JumpAddr string `yaml:"jumpAddr"`
 	Managers []Node `yaml:"managers"`
 	Workers  []Node `yaml:"workers"`
 	nodes    []Node
 }
 
-func (c *Cluster) setNodesUser() {
+func (c *Cluster) init() {
 	for i := range c.Managers {
 		c.Managers[i].user = c.User
+		c.Managers[i].jumpAddr = c.JumpAddr
 	}
 	for i := range c.Workers {
 		c.Workers[i].user = c.User
+		c.Workers[i].jumpAddr = c.JumpAddr
 	}
 }
 
@@ -57,12 +60,12 @@ func (c Cluster) Nodes() []Node {
 func (c Cluster) List() {
 	ms := []string{}
 	for _, m := range c.Managers {
-		ms = append(ms, m.SshAddr())
+		ms = append(ms, m.SshCmd())
 	}
-	println(`managers: `, strings.Join(ms, " \t"))
+	println("managers:\n", strings.Join(ms, "\n"))
 	ws := []string{}
 	for _, w := range c.Workers {
-		ws = append(ws, w.SshAddr())
+		ws = append(ws, w.SshCmd())
 	}
-	println(`workers: `, strings.Join(ws, " \t"))
+	println("workers:\n", strings.Join(ws, "\n"))
 }

@@ -38,7 +38,7 @@ func (i Image) EnvsForRun() []string {
 func (i Image) FilesForRun() []string {
 	root := filepath.Join(release.Root(), `img-web`)
 	return []string{
-		root + `/site.conf.tmpl:/etc/nginx/sites-available/` + release.Name() + `.conf.tmpl`,
+		root + `/web.conf.tmpl:/etc/nginx/sites-available/` + release.Name() + `.conf.tmpl`,
 		root + `/public:/var/www/` + release.Name(),
 	}
 }

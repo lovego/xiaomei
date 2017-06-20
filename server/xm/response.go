@@ -11,13 +11,14 @@ import (
 
 	"github.com/lovego/xiaomei/server/xm/renderer"
 	"github.com/lovego/xiaomei/server/xm/session"
+	"github.com/lovego/xiaomei/utils/errs"
 )
 
 type LayoutDataFunc func(layout string, data interface{}, req *Request, res *Response) interface{}
 
 type Response struct {
 	http.ResponseWriter
-	request        *Request
+	*Request
 	sess           session.Session
 	renderer       *renderer.Renderer
 	layoutDataFunc LayoutDataFunc
@@ -29,7 +30,7 @@ func NewResponse(
 ) *Response {
 	return &Response{
 		ResponseWriter: responseWriter,
-		request:        request,
+		Request:        request,
 		sess:           sess,
 		renderer:       rendrr,
 		layoutDataFunc: layoutDataFunc,
@@ -44,7 +45,7 @@ func (res *Response) GetLayoutData(layout string, data interface{}) interface{} 
 	if res.layoutDataFunc == nil {
 		return data
 	}
-	return res.layoutDataFunc(layout, data, res.request, res)
+	return res.layoutDataFunc(layout, data, res.Request, res)
 }
 
 func (res *Response) Render(path string, data interface{}, options ...renderer.O) {
@@ -81,15 +82,16 @@ func (res *Response) Json(data interface{}) {
 	}
 }
 
-func (res Response) Json2(data interface{}, err error) {
+func (res Response) Result(data interface{}, err errs.Error) {
 	type result struct {
-		Msg  string      `json:"msg"`
-		Data interface{} `json:"data"`
+		Code    string      `json:"code"`
+		Message string      `json:"message"`
+		Result  interface{} `json:"result,omitempty"`
 	}
 	if err == nil {
-		res.Json(result{Msg: `ok`, Data: data})
+		res.Json(result{Code: `ok`, Message: `success`, Result: data})
 	} else {
-		res.Json(result{Msg: err.Error()})
+		res.Json(result{Code: err.Code(), Message: err.Message(), Result: data})
 	}
 }
 
