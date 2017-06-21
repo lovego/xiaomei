@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 	"strings"
 )
 
@@ -23,6 +24,10 @@ func Head(url string, headers map[string]string, body interface{}) *Response {
 
 func Put(url string, headers map[string]string, body interface{}) *Response {
 	return Do(http.MethodPut, url, headers, body)
+}
+
+func Delete(url string, headers map[string]string, body interface{}) *Response {
+	return Do(http.MethodDelete, url, headers, body)
 }
 
 func Do(method, url string, headers map[string]string, body interface{}) *Response {
@@ -69,6 +74,10 @@ func (resp *Response) Ok() *Response {
 }
 
 func (resp *Response) Json(data interface{}) {
+	if data == nil {
+		resp.Body.Close()
+		return
+	}
 	if err := json.Unmarshal(resp.GetBody(), &data); err != nil {
 		panic(err)
 	}
@@ -80,15 +89,21 @@ func makeBodyReader(data interface{}) (reader io.Reader) {
 	}
 	switch body := data.(type) {
 	case string:
-		reader = strings.NewReader(body)
-	case []byte:
-		reader = bytes.NewBuffer(body)
-	default:
-		buf, err := json.Marshal(body)
-		if err != nil {
-			panic(err)
+		if len(body) > 0 {
+			reader = strings.NewReader(body)
 		}
-		reader = bytes.NewBuffer(buf)
+	case []byte:
+		if len(body) > 0 {
+			reader = bytes.NewBuffer(body)
+		}
+	default:
+		if !reflect.ValueOf(body).IsNil() {
+			buf, err := json.Marshal(body)
+			if err != nil {
+				panic(err)
+			}
+			reader = bytes.NewBuffer(buf)
+		}
 	}
 	return
 }

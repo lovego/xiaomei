@@ -4,10 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
-	"strings"
 
 	"github.com/lovego/xiaomei/utils/httputil"
-	"github.com/nu7hatch/gouuid"
 )
 
 type BulkResult struct {
@@ -25,7 +23,7 @@ func (es *ES) BulkUpdate(path string, data [][2]interface{}) {
 
 func (es *ES) BulkDo(path string, body, typ string, data interface{}) {
 	result := BulkResult{}
-	httputil.Post(es.Uri(path), nil, body).Ok().Json(&result)
+	httputil.Post(es.Uri(path+`/_bulk`), nil, body).Ok().Json(&result)
 	if !result.Errors {
 		return
 	}
@@ -63,14 +61,6 @@ func MakeBulkCreate(rows []map[string]interface{}) (result string) {
 		result += string(meta) + "\n" + string(content) + "\n"
 	}
 	return
-}
-
-func GenUUID() string {
-	if uid, err := uuid.NewV4(); err != nil {
-		panic(err)
-	} else {
-		return strings.Replace(uid.String(), `-`, ``, -1)
-	}
 }
 
 /*
