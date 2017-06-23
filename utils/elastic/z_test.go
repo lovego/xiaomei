@@ -1,12 +1,43 @@
 package elastic
 
 import (
+	"fmt"
 	"testing"
+	"time"
 )
 
 var testES = New(`http://192.168.202.39:9200/bughou-test`)
 
-func TestAll(t *testing.T) {
+func TestCURD(t *testing.T) {
+	testCreateEmptyUsers()
+
+	testES.Create(`/users/1`, map[string]interface{}{
+		`name`: `lilei`, `age`: 21,
+	}, nil)
+	testES.Create(`/users/2`, map[string]interface{}{
+		`name`: `hanmeimei`, `age`: 20,
+	}, nil)
+	testES.Create(`/users/3`, map[string]interface{}{
+		`name`: `tom`, `age`: 17,
+	}, nil)
+
+	testES.Delete(`/users/3`, nil)
+
+	testES.Update(`/users/1`, map[string]interface{}{`doc`: map[string]int{
+		`age`: 31,
+	}}, nil)
+	testES.Update(`/users/2`, map[string]interface{}{`doc`: map[string]int{
+		`age`: 30,
+	}}, nil)
+
+	time.Sleep(time.Second)
+
+	fmt.Println(testES.Query(`/users`, nil))
+}
+
+func testCreateEmptyUsers() {
+	testES.Delete(`/`, nil)
+
 	testES.Ensure(`/`, nil)
 	testES.Ensure(`/_mapping/users`, map[string]interface{}{
 		"properties": map[string]interface{}{
@@ -16,14 +47,4 @@ func TestAll(t *testing.T) {
 			"created_at": map[string]string{"type": "date", "format": "yyyy-MM-dd'T'HH:mm:ssZ"},
 		},
 	})
-	testES.Create(`/users/1`, map[string]interface{}{
-		`name`: `lilei`, `age`: 18,
-	}, nil)
-	testES.Create(`/users/2`, map[string]interface{}{
-		`name`: `hanmeimei`, `age`: 17,
-	}, nil)
-	testES.Create(`/users/3`, map[string]interface{}{
-		`name`: `tom`, `age`: 17,
-	}, nil)
-	testES.Delete(`/users/3`, nil)
 }

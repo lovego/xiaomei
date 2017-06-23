@@ -29,17 +29,8 @@ func (es *ES) Update(path string, bodyData map[string]interface{}, data interfac
 	httputil.Post(es.Uri(path+`/_update`), nil, bodyData).Ok().Json(data)
 }
 
-type SearchResult struct {
-	Hits struct {
-		Total int `json:"total"`
-		Hits  []struct {
-			Source map[string]interface{} `json:"_source"`
-		} `json:"hits"`
-	} `json:"hits"`
-}
-
 // 查
-func (es *ES) Search(path string, bodyData map[string]interface{}) (
+func (es *ES) Query(path string, bodyData map[string]interface{}) (
 	total int, data []map[string]interface{},
 ) {
 	result := SearchResult{}
