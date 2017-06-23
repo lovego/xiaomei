@@ -3,7 +3,6 @@ package elastic
 import (
 	"fmt"
 	"testing"
-	"time"
 )
 
 var testES = New(`http://192.168.202.39:9200/bughou-test`)
@@ -30,7 +29,9 @@ func TestCURD(t *testing.T) {
 		`age`: 30,
 	}}, nil)
 
-	time.Sleep(time.Second)
+	var result map[string]interface{}
+	testES.Get(`/_refresh`, nil, &result)
+	// fmt.Println(result)
 
 	fmt.Println(testES.Query(`/users`, nil))
 }
