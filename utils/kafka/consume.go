@@ -13,6 +13,7 @@ import (
 )
 
 type Consume struct {
+	Client     sarama.Client
 	Consumer   sarama.Consumer
 	Topic      string
 	LogDir     string
@@ -39,10 +40,17 @@ func (c *Consume) Start() {
 }
 
 func (c *Consume) StartPartition(n int32) {
-	logFile := fs.OpenAppend(filepath.Join(c.LogDir, fmt.Sprintf(`%d.log`, n)))
+	// TODO: error handling ignored
+	logFile, _ := fs.OpenAppend(filepath.Join(c.LogDir, fmt.Sprintf(`%d.log`, n)))
 	defer logFile.Close()
 
 	offset := c.GetPartitionOffset(n, logFile)
+	// NOTE: 如果kafka丢弃了部分消息导致redis缓存的offset失效,使用kafka最小有效offset
+	if lastoffset, err := c.Client.GetOffset(c.Topic, n, sarama.OffsetOldest); err == nil {
+		if offset <= lastoffset {
+			offset = lastoffset
+		}
+	}
 	pc, err := c.Consumer.ConsumePartition(c.Topic, n, offset)
 	if err != nil {
 		panic(err)
