@@ -13,6 +13,7 @@ import (
 
 	"github.com/jordan-wright/email"
 	"github.com/lovego/xiaomei/utils"
+	"io"
 )
 
 type Mailer struct {
@@ -49,7 +50,7 @@ func New(mailerUrl string) (*Mailer, error) {
 	return &Mailer{sender, pool}, nil
 }
 
-func (m *Mailer) Send(e *email.Email, timeout time.Duration) error {
+func (m *Mailer) Send(e *email.Email, timeout time.Duration) (err error) {
 	if m == nil {
 		return nil
 	}
@@ -57,7 +58,18 @@ func (m *Mailer) Send(e *email.Email, timeout time.Duration) error {
 		e.From = m.Sender.String()
 	}
 	setupAddrsHeaders(e)
-	return m.Pool.Send(e, timeout)
+
+	maxRetry := 10
+	for maxRetry > 0 {
+		err = m.Pool.Send(e, timeout)
+		// 如果是io.EOF错误,可能是由于pool链接暂时关闭造成,我们重试
+		if err == io.EOF {
+			maxRetry--
+			continue
+		}
+		break
+	}
+	return
 }
 
 func setupAddrsHeaders(e *email.Email) {
