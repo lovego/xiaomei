@@ -49,7 +49,14 @@ func (es *ES) BulkDo(path string, body, typ string, data interface{}) {
 */
 func MakeBulkCreate(rows []map[string]interface{}) (result string) {
 	for _, row := range rows {
-		meta, err := json.Marshal(map[string]map[string]string{`create`: {`_id`: GenUUID()}})
+		id := row[`_id`]
+		if id == nil {
+			id = GenUUID()
+		} else {
+			row = copyWithoutId(row)
+		}
+
+		meta, err := json.Marshal(map[string]map[string]interface{}{`create`: {`_id`: id}})
 		if err != nil {
 			panic(err)
 		}
@@ -61,6 +68,16 @@ func MakeBulkCreate(rows []map[string]interface{}) (result string) {
 		result += string(meta) + "\n" + string(content) + "\n"
 	}
 	return
+}
+
+func copyWithoutId(m map[string]interface{}) map[string]interface{} {
+	result := make(map[string]interface{})
+	for k, v := range m {
+		if k != `_id` {
+			result[k] = v
+		}
+	}
+	return result
 }
 
 /*
