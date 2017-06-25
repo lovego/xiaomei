@@ -49,7 +49,7 @@ func (es *ES) BulkDo(path string, body, typ string, data interface{}) {
 */
 func MakeBulkCreate(rows []map[string]interface{}) (result string) {
 	for _, row := range rows {
-		meta, err := json.Marshal(map[string]interface{}{`create`: map[string]string{`_id`: GenUUID()}})
+		meta, err := json.Marshal(map[string]map[string]string{`create`: {`_id`: GenUUID()}})
 		if err != nil {
 			panic(err)
 		}
@@ -71,7 +71,7 @@ func MakeBulkCreate(rows []map[string]interface{}) (result string) {
 func MakeBulkUpdate(rows [][2]interface{}) (result string) {
 	for _, row := range rows {
 		id, updateDef := row[0], row[1]
-		meta, err := json.Marshal(map[string]interface{}{`update`: map[string]interface{}{`_id`: id}})
+		meta, err := json.Marshal(map[string]map[string]interface{}{`update`: {`_id`: id}})
 		if err != nil {
 			panic(err)
 		}

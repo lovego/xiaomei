@@ -83,6 +83,18 @@ func (resp *Response) Json(data interface{}) {
 	}
 }
 
+func (resp *Response) JsonUseNumber(data interface{}) {
+	defer resp.Body.Close()
+	if data == nil {
+		return
+	}
+	decoder := json.NewDecoder(resp.Body)
+	decoder.UseNumber()
+	if err := decoder.Decode(&data); err != nil {
+		panic(err)
+	}
+}
+
 func makeBodyReader(data interface{}) (reader io.Reader) {
 	if data == nil {
 		return

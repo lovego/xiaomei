@@ -23,11 +23,15 @@ type SearchHits struct {
 }
 
 type SearchHit struct {
+	Index  string                 `json:"_index"`
+	Type   string                 `json:"_type"`
+	Id     string                 `json:"_id"`
+	Score  string                 `json:"_score"`
 	Source map[string]interface{} `json:"_source"`
 }
 
-func (es *ES) Search(path string, bodyData map[string]interface{}) SearchResult {
+func (es *ES) Search(path string, bodyData interface{}) SearchResult {
 	result := SearchResult{}
-	httputil.Post(es.Uri(path+`/_search`), nil, bodyData).Ok().Json(&result)
+	httputil.Post(es.Uri(path+`/_search`), nil, bodyData).Ok().JsonUseNumber(&result)
 	return result
 }

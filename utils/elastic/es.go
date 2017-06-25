@@ -15,11 +15,11 @@ func New(addr string) *ES {
 	return &ES{BaseAddr: strings.TrimSuffix(addr, `/`)}
 }
 
-func (es *ES) Get(path string, bodyData map[string]interface{}, data interface{}) {
+func (es *ES) Get(path string, bodyData, data interface{}) {
 	httputil.Get(es.Uri(path), nil, bodyData).Ok().Json(data)
 }
 
-func (es *ES) Post(path string, bodyData map[string]interface{}, data interface{}) {
+func (es *ES) Post(path string, bodyData, data interface{}) {
 	httputil.Post(es.Uri(path), nil, bodyData).Ok().Json(data)
 }
 
