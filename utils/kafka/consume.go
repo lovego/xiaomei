@@ -45,12 +45,20 @@ func (c *Consume) StartPartition(n int32) {
 	defer logFile.Close()
 
 	offset := c.GetPartitionOffset(n, logFile)
-	// NOTE: 如果kafka丢弃了部分消息导致redis缓存的offset失效,使用kafka最小有效offset
-	if lastoffset, err := c.Client.GetOffset(c.Topic, n, sarama.OffsetOldest); err == nil {
-		if offset <= lastoffset {
-			offset = lastoffset
+
+	// NOTE: 由于kafka容量限制可能丢弃部分消息导致redis缓存的offset失效
+	//       我们要检查并修正redis缓存offset在[oldest,newest]有效区间
+	if oldestOffset, err := c.Client.GetOffset(c.Topic, n, sarama.OffsetOldest); err == nil {
+		if offset <= oldestOffset {
+			offset = oldestOffset
 		}
 	}
+	if newestOffset, err := c.Client.GetOffset(c.Topic, n, sarama.OffsetNewest); err == nil {
+		if offset >= newestOffset {
+			offset = newestOffset
+		}
+	}
+
 	pc, err := c.Consumer.ConsumePartition(c.Topic, n, offset)
 	if err != nil {
 		panic(err)
