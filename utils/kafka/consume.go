@@ -34,6 +34,7 @@ func (c *Consume) Start() {
 		panic(err)
 	}
 	for _, n := range partitions {
+		n := n
 		go c.StartPartition(n)
 	}
 	select {}
