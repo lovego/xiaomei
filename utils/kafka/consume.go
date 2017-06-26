@@ -20,6 +20,7 @@ type Consume struct {
 	RedisPool  *redis.Pool
 	Handler    func(*sarama.ConsumerMessage, *os.File)
 	OffsetsKey string
+	Group      string
 }
 
 func (c *Consume) Start() {
@@ -27,7 +28,7 @@ func (c *Consume) Start() {
 		panic(err)
 	}
 	if c.OffsetsKey == `` {
-		c.OffsetsKey = `kafka-offsets-` + c.Topic
+		c.OffsetsKey = `kafka-offsets-` + c.Topic + `-` + c.Group
 	}
 	partitions, err := c.Consumer.Partitions(c.Topic)
 	if err != nil {
