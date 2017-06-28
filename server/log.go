@@ -56,7 +56,7 @@ func getLogFields(
 	var sess interface{}
 	req.Session(&sess)
 	m := map[string]interface{}{
-		`at`: t.Format(utils.ISO8601), `time`: fmt.Sprintf(`%.6f`, time.Since(t).Seconds()),
+		`at`: t.Format(utils.ISO8601), `duration`: fmt.Sprintf(`%.6f`, time.Since(t).Seconds()),
 		`host`: req.Host, `method`: req.Method, `path`: req.URL.Path, `query`: req.URL.RawQuery,
 		`status`: res.Status(), `req_body`: req.ContentLength, `res_body`: res.Size(),
 		`session`: sess, `ip`: req.ClientAddr(),
