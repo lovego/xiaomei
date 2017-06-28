@@ -10,14 +10,22 @@ import (
 )
 
 func TestConsume(t *testing.T) {
-	c, err := sarama.NewConsumer([]string{
-		"10.13.3.25:9092", "10.13.3.26:9092", "10.13.3.30:9092",
-	}, nil)
+	var addrs = []string{
+		"10.13.3.25:9092",
+		"10.13.3.26:9092",
+		"10.13.3.30:9092",
+	}
+	consumer, err := sarama.NewConsumer(addrs, nil)
+	if err != nil {
+		panic(err)
+	}
+	client, err := sarama.NewClient(addrs, nil)
 	if err != nil {
 		panic(err)
 	}
 	(&Consume{
-		Consumer: c,
+		Client:   client,
+		Consumer: consumer,
 		Topic:    "dmall_stock_test",
 		LogDir:   ".",
 		RedisPool: &redis.Pool{
