@@ -30,8 +30,10 @@ type SearchHit struct {
 	Source map[string]interface{} `json:"_source"`
 }
 
-func (es *ES) Search(path string, bodyData interface{}) SearchResult {
-	result := SearchResult{}
-	httputil.Post(es.Uri(path+`/_search`), nil, bodyData).Ok().JsonUseNumber(&result)
-	return result
+func (es *ES) Search(path string, bodyData interface{}) (*SearchResult, error) {
+	result := &SearchResult{}
+	if err := httputil.PostJson(es.Uri(path+`/_search`), nil, bodyData, result); err != nil {
+		return nil, err
+	}
+	return result, nil
 }

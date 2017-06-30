@@ -14,13 +14,19 @@ import (
 )
 
 var accessLog, errorLog = setupLogger()
+var isDevMode = config.DevMode()
 
 func setupLogger() (accessLog, errorLog *os.File) {
-	if config.DevMode() {
+	if isDevMode {
 		return os.Stdout, os.Stderr
 	}
 	var err error
-	accessLogPath := filepath.Join(config.Root(), `log/app.log`)
+	logDir := filepath.Join(config.Root(), `log`)
+	if err = os.MkdirAll(logDir, 0775); err != nil {
+		utils.Logf(`open appserver log dir %s failed: %v`, logDir, err)
+		os.Exit(1)
+	}
+	accessLogPath := filepath.Join(logDir, `app.log`)
 	if accessLog, err = fs.OpenAppend(accessLogPath); err != nil {
 		utils.Logf(`open appserver access log %s failed: %v`, accessLogPath, err)
 		os.Exit(1)
@@ -44,6 +50,9 @@ func writeLog(
 	line = append(line, '\n')
 	if hasErr {
 		errorLog.Write(line)
+		if isDevMode {
+			errorLog.WriteString(errStr + "\n" + stack)
+		}
 	} else {
 		accessLog.Write(line)
 	}
@@ -59,10 +68,13 @@ func getLogFields(
 		`at`: t.Format(utils.ISO8601), `duration`: fmt.Sprintf(`%.6f`, time.Since(t).Seconds()),
 		`host`: req.Host, `method`: req.Method, `path`: req.URL.Path, `query`: req.URL.RawQuery,
 		`status`: res.Status(), `req_body`: req.ContentLength, `res_body`: res.Size(),
-		`session`: sess, `ip`: req.ClientAddr(),
+		`ip`:    req.ClientAddr(),
 		`refer`: req.Referer(), `agent`: req.UserAgent(), `proto`: req.Proto,
 	}
-	if hasErr {
+	if sess != nil {
+		m[`session`] = sess
+	}
+	if hasErr && !isDevMode {
 		m[`err`] = errStr
 		m[`stack`] = stack
 	}

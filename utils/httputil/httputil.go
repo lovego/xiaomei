@@ -1,121 +1,77 @@
 package httputil
 
 import (
-	"bytes"
-	"encoding/json"
-	"io"
-	"io/ioutil"
 	"net/http"
-	"reflect"
-	"strings"
+
+	"github.com/lovego/xiaomei/utils/errs"
 )
 
-func Get(url string, headers map[string]string, body interface{}) *Response {
+func Get(url string, headers map[string]string, body interface{}) (*Response, error) {
 	return Do(http.MethodGet, url, headers, body)
 }
 
-func Post(url string, headers map[string]string, body interface{}) *Response {
+func Post(url string, headers map[string]string, body interface{}) (*Response, error) {
 	return Do(http.MethodPost, url, headers, body)
 }
 
-func Head(url string, headers map[string]string, body interface{}) *Response {
+func Head(url string, headers map[string]string, body interface{}) (*Response, error) {
 	return Do(http.MethodHead, url, headers, body)
 }
 
-func Put(url string, headers map[string]string, body interface{}) *Response {
+func Put(url string, headers map[string]string, body interface{}) (*Response, error) {
 	return Do(http.MethodPut, url, headers, body)
 }
 
-func Delete(url string, headers map[string]string, body interface{}) *Response {
+func Delete(url string, headers map[string]string, body interface{}) (*Response, error) {
 	return Do(http.MethodDelete, url, headers, body)
 }
 
-func Do(method, url string, headers map[string]string, body interface{}) *Response {
-	req, err := http.NewRequest(method, url, makeBodyReader(body))
+func GetJson(url string, headers map[string]string, body, data interface{}) error {
+	return DoJson(http.MethodGet, url, headers, body, data)
+}
+
+func PostJson(url string, headers map[string]string, body, data interface{}) error {
+	return DoJson(http.MethodPost, url, headers, body, data)
+}
+
+func HeadJson(url string, headers map[string]string, body, data interface{}) error {
+	return DoJson(http.MethodHead, url, headers, body, data)
+}
+
+func PutJson(url string, headers map[string]string, body, data interface{}) error {
+	return DoJson(http.MethodPut, url, headers, body, data)
+}
+
+func DeleteJson(url string, headers map[string]string, body, data interface{}) error {
+	return DoJson(http.MethodDelete, url, headers, body, data)
+}
+
+func Do(method, url string, headers map[string]string, body interface{}) (*Response, error) {
+	bodyReader, err := makeBodyReader(body)
 	if err != nil {
-		panic(err)
+		return nil, err
+	}
+	req, err := http.NewRequest(method, url, bodyReader)
+	if err != nil {
+		return nil, errs.Stack(err)
 	}
 	for k, v := range headers {
 		req.Header.Set(k, v)
 	}
 	if resp, err := http.DefaultClient.Do(req); err != nil {
-		panic(err)
+		return nil, errs.Stack(err)
 	} else {
-		return &Response{Response: resp}
+		return &Response{Response: resp}, nil
 	}
 }
 
-type Response struct {
-	*http.Response
-	body []byte
-}
-
-func (resp *Response) GetBody() []byte {
-	if resp.body == nil {
-		defer resp.Body.Close()
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			panic(`HTTP ` + resp.Request.Method + `: ` + resp.Request.URL.String() + "\n" +
-				`Read Body: ` + err.Error(),
-			)
-		}
-		resp.body = body
+func DoJson(method, url string, headers map[string]string, body, data interface{}) error {
+	resp, err := Do(method, url, headers, body)
+	if err != nil {
+		return err
 	}
-	return resp.body
-}
-
-func (resp *Response) Ok() *Response {
-	if resp.StatusCode != http.StatusOK {
-		panic(`HTTP ` + resp.Request.Method + `: ` + resp.Request.URL.String() + "\n" +
-			`Response Status: ` + resp.Status + "\n" + string(resp.GetBody()),
-		)
+	if err := resp.Ok(); err != nil {
+		return err
 	}
-	return resp
-}
-
-func (resp *Response) Json(data interface{}) {
-	if data == nil {
-		resp.Body.Close()
-		return
-	}
-	if err := json.Unmarshal(resp.GetBody(), &data); err != nil {
-		panic(err)
-	}
-}
-
-func (resp *Response) JsonUseNumber(data interface{}) {
-	defer resp.Body.Close()
-	if data == nil {
-		return
-	}
-	decoder := json.NewDecoder(resp.Body)
-	decoder.UseNumber()
-	if err := decoder.Decode(&data); err != nil {
-		panic(err)
-	}
-}
-
-func makeBodyReader(data interface{}) (reader io.Reader) {
-	if data == nil {
-		return
-	}
-	switch body := data.(type) {
-	case string:
-		if len(body) > 0 {
-			reader = strings.NewReader(body)
-		}
-	case []byte:
-		if len(body) > 0 {
-			reader = bytes.NewBuffer(body)
-		}
-	default:
-		if !reflect.ValueOf(body).IsNil() {
-			buf, err := json.Marshal(body)
-			if err != nil {
-				panic(err)
-			}
-			reader = bytes.NewBuffer(buf)
-		}
-	}
-	return
+	return resp.Json(data)
 }

@@ -8,25 +8,25 @@ import (
 )
 
 // 增
-func (es *ES) Create(path string, bodyData, data interface{}) {
-	resp := httputil.Put(es.Uri(path), nil, bodyData)
-
-	switch resp.StatusCode {
-	case http.StatusOK, http.StatusCreated:
-	default:
-		panic(`unexpected response: ` + resp.Status + "\n" + string(resp.GetBody()))
+func (es *ES) Create(path string, bodyData, data interface{}) error {
+	resp, err := httputil.Put(es.Uri(path), nil, bodyData)
+	if err != nil {
+		return err
 	}
-	resp.Json(data)
+	if err := resp.Check(http.StatusOK, http.StatusCreated); err != nil {
+		return err
+	}
+	return resp.Json(data)
 }
 
 // 删
-func (es *ES) Delete(path string, data interface{}) {
-	httputil.Delete(es.Uri(path), nil, nil).Ok().Json(data)
+func (es *ES) Delete(path string, data interface{}) error {
+	return httputil.DeleteJson(es.Uri(path), nil, nil, data)
 }
 
 // 改
-func (es *ES) Update(path string, bodyData, data interface{}) {
-	httputil.Post(es.Uri(path+`/_update`), nil, bodyData).Ok().Json(data)
+func (es *ES) Update(path string, bodyData, data interface{}) error {
+	return httputil.PostJson(es.Uri(path+`/_update`), nil, bodyData, data)
 }
 
 // 查
@@ -44,15 +44,18 @@ type QueryHit struct {
 }
 
 func (es *ES) Query(path string, bodyData interface{}) (
-	total int, data []map[string]interface{},
+	total int, data []map[string]interface{}, err error,
 ) {
 	result := QueryResult{}
 	uri, err := url.Parse(path + `/_search`)
-	uri.Query().Set(`filter_path`, `hits.total,hits.hits._source`)
 	if err != nil {
-		panic(err)
+		return
 	}
-	httputil.Post(es.Uri(uri.String()), nil, bodyData).Ok().JsonUseNumber(&result)
+	uri.Query().Set(`filter_path`, `hits.total,hits.hits._source`)
+
+	if err = httputil.PostJson(es.Uri(uri.String()), nil, bodyData, &result); err != nil {
+		return
+	}
 	total = result.Hits.Total
 	for _, hit := range result.Hits.Hits {
 		data = append(data, hit.Source)
@@ -60,24 +63,30 @@ func (es *ES) Query(path string, bodyData interface{}) (
 	return
 }
 
-func (es *ES) Ensure(path string, def interface{}) {
-	if !es.Exist(path) {
-		es.Create(path, def, nil)
+func (es *ES) Ensure(path string, def interface{}) error {
+	if ok, err := es.Exist(path); err != nil {
+		return err
+	} else if !ok {
+		return es.Create(path, def, nil)
 	}
+	return nil
 }
 
-func (es *ES) Exist(path string) bool {
-	resp := httputil.Head(es.Uri(path), nil, nil)
+func (es *ES) Exist(path string) (bool, error) {
+	resp, err := httputil.Head(es.Uri(path), nil, nil)
+	if err != nil {
+		return false, err
+	}
 	if resp != nil {
 		defer resp.Body.Close()
 	}
 
 	switch resp.StatusCode {
 	case http.StatusOK:
-		return true
+		return true, nil
 	case http.StatusNotFound:
-		return false
+		return false, nil
 	default:
-		panic(`unexpected response: ` + resp.Status + "\n" + string(resp.GetBody()))
+		return false, resp.CodeError()
 	}
 }

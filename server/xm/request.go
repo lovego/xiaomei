@@ -3,7 +3,6 @@ package xm
 import (
 	"net"
 	"net/http"
-	"net/url"
 	"reflect"
 	"strings"
 
@@ -42,10 +41,6 @@ func (req *Request) Scheme() string {
 
 func (req *Request) Url() string {
 	return req.Scheme() + `://` + req.Host + req.RequestURI
-}
-
-func (req *Request) Query() url.Values {
-	return req.URL.Query()
 }
 
 // req.Session retains the value the param pointer points to.
