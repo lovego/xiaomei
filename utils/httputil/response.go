@@ -86,6 +86,8 @@ func makeBodyReader(data interface{}) (reader io.Reader, err error) {
 		return
 	}
 	switch body := data.(type) {
+	case io.Reader:
+		reader = body
 	case string:
 		if len(body) > 0 {
 			reader = strings.NewReader(body)

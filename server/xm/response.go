@@ -94,7 +94,7 @@ func (res Response) Result(data interface{}, err error) {
 		if e, ok := err.(errs.CodeMessageErr); ok {
 			res.Json(result{Code: e.Code(), Message: e.Message(), Result: data})
 		} else {
-			res.Json(result{Code: `error`, Message: e.Error(), Result: data})
+			res.Json(result{Code: `error`, Message: err.Error(), Result: data})
 		}
 	}
 }
