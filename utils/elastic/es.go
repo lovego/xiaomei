@@ -12,7 +12,7 @@ type ES struct {
 }
 
 func New(addr string) *ES {
-	return &ES{BaseAddr: strings.TrimSuffix(addr, `/`)}
+	return &ES{BaseAddr: addr}
 }
 
 func (es *ES) Get(path string, bodyData, data interface{}) error {
@@ -38,17 +38,13 @@ func (es *ES) Post(path string, bodyData, data interface{}) error {
 }
 
 func (es *ES) Uri(path string) string {
-	if strings.HasPrefix(path, `/`) {
-		return es.BaseAddr + path
-	} else {
-		return es.BaseAddr + `/` + path
-	}
+	return es.BaseAddr + path
 }
 
-func GenUUID() string {
+func GenUUID() (string, error) {
 	if uid, err := uuid.NewV4(); err != nil {
-		panic(err)
+		return ``, err
 	} else {
-		return strings.Replace(uid.String(), `-`, ``, -1)
+		return strings.Replace(uid.String(), `-`, ``, -1), nil
 	}
 }

@@ -2,6 +2,7 @@ package elastic
 
 import (
 	"encoding/json"
+	"log"
 	"reflect"
 	"testing"
 )
@@ -26,7 +27,10 @@ func createEmptyUsers() {
 func checkLiLeiAndHanMeiMei(t *testing.T) {
 	testES.Get(`/_refresh`, nil, nil)
 
-	total, docs := testES.Query(`/users`, map[string]map[string]string{`sort`: {`age`: `desc`}})
+	total, docs, err := testES.Query(`/users`, map[string]map[string]string{`sort`: {`age`: `desc`}})
+	if err != nil {
+		log.Fatal(err)
+	}
 	expectTotal := 2
 	expectDocs := []map[string]interface{}{
 		{`name`: `lilei`, `age`: json.Number(`31`)},

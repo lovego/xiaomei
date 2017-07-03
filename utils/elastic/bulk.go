@@ -12,7 +12,11 @@ type BulkResult struct {
 }
 
 func (es *ES) BulkCreate(path string, data []map[string]interface{}) error {
-	return es.BulkDo(path, MakeBulkCreate(data), `create`, data)
+	body, err := MakeBulkCreate(data)
+	if err != nil {
+		return err
+	}
+	return es.BulkDo(path, body, `create`, data)
 }
 
 func (es *ES) BulkUpdate(path string, data [][2]interface{}) error {
