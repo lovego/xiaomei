@@ -15,15 +15,15 @@ import (
 const File = `simple.yml`
 
 type Conf struct {
-	Services        map[string]Service
+	Services        []Service
 	VolumesToCreate []string `yaml:"volumesToCreate"`
 	Environments    map[string]map[string]interface{}
 }
 
 type Service struct {
-	Nodes            map[string]string
-	Ports, Image     string
-	Command, Options []string
+	Nodes              map[string]string
+	Name, Ports, Image string
+	Command, Options   []string
 }
 
 var theConf *Conf
@@ -39,26 +39,25 @@ func Get() *Conf {
 			}
 		}
 		mergedConf := merge.Merge(conf, conf.Environments[release.Env()]).(Conf)
-		// utils.PrintJson(conf.Services)
 		theConf = &mergedConf
 	}
 	return theConf
 }
 
 func GetService(svcName string) Service {
-	svc, ok := Get().Services[svcName]
-	if !ok {
-		panic(fmt.Sprintf(`simple.yml: services.%s: undefined.`, svcName))
+	for _, svc := range Get().Services {
+		if svc.Name == svcName {
+			return svc
+		}
 	}
-	return svc
+	panic(fmt.Sprintf(`simple.yml: services.%s: undefined.`, svcName))
 }
 
-func ServiceNames() map[string]bool {
-	m := make(map[string]bool)
-	for svcName := range Get().Services {
-		m[svcName] = true
+func ServiceNames() (names []string) {
+	for _, svc := range Get().Services {
+		names = append(names, svc.Name)
 	}
-	return m
+	return
 }
 
 func ImageNameOf(svcName string) string {

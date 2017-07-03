@@ -16,7 +16,7 @@ func File() string {
 	return `simple.yml`
 }
 
-func ServiceNames() map[string]bool {
+func ServiceNames() []string {
 	return simpleconf.ServiceNames()
 }
 

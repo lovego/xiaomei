@@ -48,10 +48,6 @@ func manageCmds() []*cobra.Command {
 	tasksCmd.AddCommand(images.Cmds(`tasks`)...)
 	tasksCmd.AddCommand(deploy.Cmds(`tasks`)...)
 
-	godocCmd := godoc.Cmd()
-	godocCmd.AddCommand(images.Cmds(`godoc`)...)
-	godocCmd.AddCommand(deploy.Cmds(`godoc`)...)
-
 	webCmd := web.Cmd()
 	webCmd.AddCommand(images.Cmds(`web`)...)
 	webCmd.AddCommand(deploy.Cmds(`web`)...)
@@ -59,5 +55,9 @@ func manageCmds() []*cobra.Command {
 	logcCmd := logc.Cmd()
 	logcCmd.AddCommand(deploy.Cmds(`logc`)...)
 
-	return []*cobra.Command{appCmd, tasksCmd, webCmd, godocCmd, logcCmd, cluster.Cmd()}
+	godocCmd := godoc.Cmd()
+	godocCmd.AddCommand(images.Cmds(`godoc`)...)
+	godocCmd.AddCommand(deploy.Cmds(`godoc`)...)
+
+	return []*cobra.Command{appCmd, tasksCmd, webCmd, logcCmd, godocCmd, cluster.Cmd()}
 }

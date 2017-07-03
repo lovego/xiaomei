@@ -38,15 +38,11 @@ func deployNode(svcs []string, node cluster.Node, psScript string) error {
 }
 
 func getServices(svcName string) []string {
-	svcs := []string{}
 	if svcName == `` {
-		for svcName, _ := range simpleconf.ServiceNames() {
-			svcs = append(svcs, svcName)
-		}
+		return simpleconf.ServiceNames()
 	} else {
-		svcs = append(svcs, svcName)
+		return []string{svcName}
 	}
-	return svcs
 }
 
 func getNodeServices(svcNames []string, node cluster.Node) []string {

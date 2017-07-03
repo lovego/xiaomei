@@ -9,6 +9,7 @@ import (
 	"text/template"
 
 	"github.com/lovego/xiaomei/utils/cmd"
+	"github.com/lovego/xiaomei/utils/slice"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/release"
@@ -120,10 +121,10 @@ func getBackendSvcName(svcName string) string {
 		return svcName
 	}
 	services := conf.ServiceNames()
-	if services[`web`] {
+	if slice.ContainsString(services, `web`) {
 		return `web`
 	}
-	if services[`app`] {
+	if slice.ContainsString(services, `app`) {
 		return `app`
 	}
 	panic(`no backend service found in ` + conf.File() + `.`)

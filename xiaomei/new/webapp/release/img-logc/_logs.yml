@@ -1,0 +1,18 @@
+files:
+  - { name: {{ .Domain }}-app-log, path: {{ .Domain }}_logs/app.log, mapping: *mapping }
+  - { name: {{ .Domain }}-app-err, path: {{ .Domain }}_logs/app.err, mapping: *mapping }
+mapping: &mapping
+  at: { type: date, format: "yyyy-MM-dd'T'HH:mm:ssZ" }
+  duration: { type: float }
+  host: { type: keyword }
+  method: { type: keyword }
+  path: { type: text }
+  query: { type: text }
+  status: { type: keyword }
+  req_body: { type: integer }
+  res_body: { type: integer }
+  ip: { type: ip }
+  refer: { type: text }
+  agent: { type: text }
+  proto: { type: keyword }
+  # session: sess

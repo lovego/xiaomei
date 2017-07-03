@@ -2,7 +2,6 @@ package images
 
 import (
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
-	"github.com/lovego/xiaomei/xiaomei/images/access"
 	"github.com/lovego/xiaomei/xiaomei/images/app"
 	"github.com/lovego/xiaomei/xiaomei/images/godoc"
 	"github.com/lovego/xiaomei/xiaomei/images/logc"
@@ -11,12 +10,11 @@ import (
 )
 
 var imagesMap = map[string]Image{
-	`app`:    Image{svcName: `app`, image: app.Image{}},
-	`web`:    Image{svcName: `web`, image: web.Image{}},
-	`tasks`:  Image{svcName: `tasks`, image: tasks.Image{}},
-	`godoc`:  Image{svcName: `godoc`, image: godoc.Image{}},
-	`access`: Image{svcName: `access`, image: access.Image{}},
-	`logc`:   Image{svcName: `logc`, image: logc.Image{}, external: true},
+	`app`:   Image{svcName: `app`, image: app.Image{}},
+	`tasks`: Image{svcName: `tasks`, image: tasks.Image{}},
+	`web`:   Image{svcName: `web`, image: web.Image{}},
+	`logc`:  Image{svcName: `logc`, image: logc.Image{}},
+	`godoc`: Image{svcName: `godoc`, image: godoc.Image{}},
 }
 
 func Get(svcName string) Image {
@@ -58,7 +56,7 @@ func Push(svcName string) error {
 }
 
 func eachServiceDo(work func(svcName string) error) error {
-	for svcName := range conf.ServiceNames() {
+	for _, svcName := range conf.ServiceNames() {
 		if svcName != `` {
 			if err := work(svcName); err != nil {
 				return err

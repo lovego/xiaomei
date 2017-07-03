@@ -1,19 +1,23 @@
 services:
-  app:
+  - name: app
     image: 192.168.202.12:5000/{{ .Domain }}/app
     ports: "3001,4001"
     options: [ -v, "{{ .ProName }}_logs:/home/ubuntu/{{ .ProName }}/log" ]
-# tasks:
+# - name: tasks
 #   nodes: { tasks: true }
 #   image: 192.168.202.12:5000/{{ .Domain }}/tasks
 #   options: [ -v, "{{ .ProName }}_logs:/home/ubuntu/{{ .ProName }}/log" ]
-# godoc:
-#   nodes: { godoc: true }
-#   image: 192.168.202.12:5000/{{ .Domain }}/godoc
-#   ports: "7001"
-  web:
+  - name: web
     ports: "8001"
     image: 192.168.202.12:5000/{{ .Domain }}/web
     options: [ -v, "{{ .ProName }}_logs:/var/log/nginx/{{ .ProName }}" ]
+  - name: logc
+    image: 192.168.202.12:5000/{{ .Domain }}/logc
+    command: [ "logd.com", "org", "files.yml" ]
+    options: [ -v, "{{ .ProName }}_logs:/home/ubuntu/{{ .ProName }}_logs" ]
+# - name: godoc
+#   nodes: { godoc: true }
+#   image: 192.168.202.12:5000/{{ .Domain }}/godoc
+#   ports: "7001"
 
 volumesToCreate: [ {{ .ProName }}_logs ]
