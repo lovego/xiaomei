@@ -15,7 +15,7 @@ func Name() string {
 		if fs.IsDir(filepath.Join(Root(), `img-app`)) {
 			theName = App().Name()
 		} else {
-			theName = `cluster`
+			theName = filepath.Base(Root())
 		}
 	}
 	return theName
