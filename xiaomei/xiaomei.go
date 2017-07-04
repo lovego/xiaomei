@@ -53,6 +53,7 @@ func manageCmds() []*cobra.Command {
 	webCmd.AddCommand(deploy.Cmds(`web`)...)
 
 	logcCmd := logc.Cmd()
+	logcCmd.AddCommand(images.Cmds(`logc`)...)
 	logcCmd.AddCommand(deploy.Cmds(`logc`)...)
 
 	godocCmd := godoc.Cmd()

@@ -1,6 +1,7 @@
 FROM 192.168.202.12:5000/xiaomei/base
 
 USER ubuntu
+WORKDIR /home/ubuntu
 
 EXPOSE 3000
 HEALTHCHECK --interval=3s --timeout=3s --retries=20 \
