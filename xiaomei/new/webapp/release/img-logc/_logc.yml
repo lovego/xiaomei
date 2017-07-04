@@ -14,8 +14,8 @@ production:
 defaults: &defaults
   orgName: {{ .Domain }}
   files:
-    - { name: {{ .Domain }}-app-log, path: {{ .Domain }}_logs/app.log, mapping: *mapping }
-    - { name: {{ .Domain }}-app-err, path: {{ .Domain }}_logs/app.err, mapping: *mapping }
+    - { name: app-log, path: app.log, mapping: *mapping }
+    - { name: app-err, path: app.err, mapping: *mapping }
   mapping: &mapping
     at: { type: date, format: "yyyy-MM-dd'T'HH:mm:ssZ" }
     duration: { type: float }
