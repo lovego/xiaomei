@@ -7,7 +7,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/lovego/xiaomei/utils/merge"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"gopkg.in/yaml.v2"
 )
@@ -15,9 +14,8 @@ import (
 const File = `simple.yml`
 
 type Conf struct {
-	Services        []Service
+	Services        map[string]Service
 	VolumesToCreate []string `yaml:"volumesToCreate"`
-	Environments    map[string]map[string]interface{}
 }
 
 type Service struct {
@@ -30,32 +28,32 @@ var theConf *Conf
 
 func Get() *Conf {
 	if theConf == nil {
-		conf := &Conf{}
+		envConfs := map[string]*Conf{}
 		if content, err := ioutil.ReadFile(filepath.Join(release.Root(), File)); err != nil {
 			panic(err)
 		} else {
-			if err = yaml.Unmarshal(content, &conf); err != nil {
+			if err = yaml.Unmarshal(content, &envConfs); err != nil {
 				panic(err)
 			}
 		}
-		mergedConf := merge.Merge(conf, conf.Environments[release.Env()]).(Conf)
-		theConf = &mergedConf
+		theConf = envConfs[release.Env()]
 	}
 	return theConf
 }
 
 func GetService(svcName string) Service {
-	for _, svc := range Get().Services {
-		if svc.Name == svcName {
-			return svc
-		}
+	if svc, ok := Get().Services[svcName]; ok {
+		return svc
 	}
 	panic(fmt.Sprintf(`simple.yml: services.%s: undefined.`, svcName))
 }
 
 func ServiceNames() (names []string) {
-	for _, svc := range Get().Services {
-		names = append(names, svc.Name)
+	services := Get().Services
+	for _, svcName := range []string{`app`, `tasks`, `web`, `logc`, `godoc`} {
+		if _, ok := services[svcName]; ok {
+			names = append(names, svcName)
+		}
 	}
 	return
 }

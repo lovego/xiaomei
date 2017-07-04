@@ -2,8 +2,6 @@ package httputil
 
 import (
 	"net/http"
-
-	"github.com/lovego/xiaomei/utils/errs"
 )
 
 func Get(url string, headers map[string]string, body interface{}) (*Response, error) {
@@ -53,13 +51,13 @@ func Do(method, url string, headers map[string]string, body interface{}) (*Respo
 	}
 	req, err := http.NewRequest(method, url, bodyReader)
 	if err != nil {
-		return nil, errs.Stack(err)
+		return nil, err
 	}
 	for k, v := range headers {
 		req.Header.Set(k, v)
 	}
 	if resp, err := http.DefaultClient.Do(req); err != nil {
-		return nil, errs.Stack(err)
+		return nil, err
 	} else {
 		return &Response{Response: resp}, nil
 	}

@@ -2,8 +2,7 @@ FROM 192.168.202.12:5000/xiaomei/base
 
 USER ubuntu
 RUN mkdir -p /home/ubuntu/logc
-WORKDIR /home/ubuntu
 
 COPY logc /usr/local/bin/
 
-ENTRYPOINT [ "logc" ]
+CMD [ "logc", "../logc.yml" ]

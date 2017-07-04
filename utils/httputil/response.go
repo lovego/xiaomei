@@ -9,8 +9,6 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
-
-	"github.com/lovego/xiaomei/utils/errs"
 )
 
 type Response struct {
@@ -24,7 +22,7 @@ func (resp *Response) GetBody() ([]byte, error) {
 		body, err := ioutil.ReadAll(resp.Body)
 		resp.body = body
 		if err != nil {
-			return body, errs.Stack(err)
+			return body, err
 		}
 	}
 	return resp.body, nil
@@ -47,10 +45,14 @@ func (resp *Response) Check(codes ...int) error {
 }
 
 func (resp *Response) CodeError() error {
-	return errs.Stack(errors.New(
-		`HTTP ` + resp.Request.Method + ` ` + resp.Request.URL.String() + "\n" +
-			`Unexpected Response Status: ` + resp.Status,
-	))
+	msg := `HTTP ` + resp.Request.Method + ` ` + resp.Request.URL.String() + "\n" +
+		`Unexpected Response: ` + resp.Status
+	if body, err := resp.GetBody(); err == nil {
+		msg += "\n" + string(body)
+	} else {
+		msg += "\n(GetBody error: " + err.Error() + `)`
+	}
+	return errors.New(msg)
 }
 
 func (resp *Response) Json(data interface{}) error {
@@ -61,7 +63,7 @@ func (resp *Response) Json(data interface{}) error {
 	decoder := json.NewDecoder(resp.Body)
 	decoder.UseNumber()
 	if err := decoder.Decode(&data); err != nil {
-		return errs.Stack(err)
+		return err
 	}
 	return nil
 }
@@ -76,15 +78,16 @@ func (resp *Response) Json2(data interface{}) error {
 		return err
 	}
 	if err := json.Unmarshal(body, &data); err != nil {
-		return errs.Stack(err)
+		return err
 	}
 	return nil
 }
 
-func makeBodyReader(data interface{}) (reader io.Reader, err error) {
+func makeBodyReader(data interface{}) (io.Reader, error) {
 	if data == nil {
-		return
+		return nil, nil
 	}
+	var reader io.Reader
 	switch body := data.(type) {
 	case io.Reader:
 		reader = body
@@ -100,10 +103,10 @@ func makeBodyReader(data interface{}) (reader io.Reader, err error) {
 		if !reflect.ValueOf(body).IsNil() {
 			buf, err := json.Marshal(body)
 			if err != nil {
-				err = errs.Stack(err)
+				return nil, err
 			}
 			reader = bytes.NewBuffer(buf)
 		}
 	}
-	return
+	return reader, nil
 }

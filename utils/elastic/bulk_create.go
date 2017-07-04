@@ -2,8 +2,6 @@ package elastic
 
 import (
 	"encoding/json"
-
-	"github.com/lovego/xiaomei/utils/errs"
 )
 
 /*
@@ -16,7 +14,7 @@ func MakeBulkCreate(rows []map[string]interface{}) (result string, err error) {
 		id := row[`_id`]
 		if id == nil {
 			if id, err = GenUUID(); err != nil {
-				return ``, errs.Stack(err)
+				return ``, err
 			}
 		} else {
 			row = copyWithoutId(row)
