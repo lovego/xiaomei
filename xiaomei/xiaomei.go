@@ -1,8 +1,10 @@
 package main
 
 import (
+	"errors"
 	"os"
 
+	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/deploy"
 	"github.com/lovego/xiaomei/xiaomei/images"
@@ -23,20 +25,30 @@ func main() {
 	root.AddCommand(manageCmds()...)
 	root.AddCommand(images.Cmds(``)...)
 	root.AddCommand(deploy.Cmds(``)...)
-	root.AddCommand(new.Cmd(), yamlCmd(), versionCmd())
+	root.AddCommand(cluster.LsCmd(), new.Cmd(), yamlCmd(), versionCmd())
 	root.Execute()
 }
 
 func rootCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   `xiaomei`,
+	rootCmd := &cobra.Command{
+		Use:   `xiaomei [qa|production|...]`,
 		Short: `be small and beautiful.`,
+		RunE: func(rootCmd *cobra.Command, args []string) error {
+			if len(args) > 0 {
+				return errors.New(`redundant args.`)
+			}
+			if release.Arg1IsEnv() {
+				_, err := cluster.Run(cmd.O{}, ``)
+				return err
+			} else {
+				return rootCmd.Help()
+			}
+		},
 	}
-
 	if release.Arg1IsEnv() {
-		cmd.SetArgs(os.Args[2:])
+		rootCmd.SetArgs(os.Args[2:])
 	}
-	return cmd
+	return rootCmd
 }
 
 func manageCmds() []*cobra.Command {
@@ -60,5 +72,5 @@ func manageCmds() []*cobra.Command {
 	godocCmd.AddCommand(images.Cmds(`godoc`)...)
 	godocCmd.AddCommand(deploy.Cmds(`godoc`)...)
 
-	return []*cobra.Command{appCmd, tasksCmd, webCmd, logcCmd, godocCmd, cluster.Cmd()}
+	return []*cobra.Command{appCmd, tasksCmd, webCmd, logcCmd, godocCmd}
 }
