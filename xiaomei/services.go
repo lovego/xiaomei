@@ -36,7 +36,9 @@ func serviceCmd(name, desc string, cmds []*cobra.Command) *cobra.Command {
 				return errors.New(`redundant args.`)
 			}
 			if release.Arg1IsEnv() {
-				_, err := cluster.Run(cmd.O{}, `docker exec -it `+conf.ContainerNameOf(name)+` bash`)
+				_, err := cluster.Run(cmd.O{},
+					`docker exec -it --detach-keys='ctrl-@' `+conf.ContainerNameOf(name)+` bash`,
+				)
 				return err
 			} else {
 				return thisCmd.Help()
