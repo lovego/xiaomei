@@ -12,6 +12,9 @@ type BulkResult struct {
 }
 
 func (es *ES) BulkCreate(path string, data []map[string]interface{}) error {
+	if len(data) <= 0 {
+		return nil
+	}
 	body, err := MakeBulkCreate(data)
 	if err != nil {
 		return err
@@ -20,6 +23,9 @@ func (es *ES) BulkCreate(path string, data []map[string]interface{}) error {
 }
 
 func (es *ES) BulkUpdate(path string, data [][2]interface{}) error {
+	if len(data) <= 0 {
+		return nil
+	}
 	return es.BulkDo(path, MakeBulkUpdate(data), `update`, data)
 }
 
