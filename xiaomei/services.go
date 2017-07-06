@@ -28,6 +28,7 @@ func serviceCmds() []*cobra.Command {
 }
 
 func serviceCmd(name, desc string, cmds []*cobra.Command) *cobra.Command {
+	var filter string
 	theCmd := &cobra.Command{
 		Use:   name,
 		Short: desc,
@@ -36,7 +37,7 @@ func serviceCmd(name, desc string, cmds []*cobra.Command) *cobra.Command {
 				return errors.New(`redundant args.`)
 			}
 			if release.Arg1IsEnv() {
-				_, err := cluster.Run(cmd.O{},
+				_, err := cluster.ServiceRun(cmd.O{}, name, filter,
 					`docker exec -it --detach-keys='ctrl-@' `+conf.ContainerNameOf(name)+` bash`,
 				)
 				return err
@@ -45,6 +46,7 @@ func serviceCmd(name, desc string, cmds []*cobra.Command) *cobra.Command {
 			}
 		},
 	}
+	theCmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr`)
 	if len(cmds) > 0 {
 		theCmd.AddCommand(cmds...)
 	}

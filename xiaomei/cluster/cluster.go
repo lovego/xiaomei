@@ -4,11 +4,27 @@ import (
 	"strings"
 
 	"github.com/lovego/xiaomei/utils/cmd"
+	"github.com/lovego/xiaomei/xiaomei/deploy/conf/simpleconf"
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-func Run(o cmd.O, script string) (string, error) {
-	return GetCluster().Manager().Run(o, script)
+func Run(o cmd.O, feature, script string) (string, error) {
+	for _, node := range Nodes() {
+		if feature == `` || strings.Contains(node.Addr, feature) {
+			return node.Run(o, script)
+		}
+	}
+	return ``, nil
+}
+
+func ServiceRun(o cmd.O, svcName, feature, script string) (string, error) {
+	labels := simpleconf.GetService(svcName).Nodes
+	for _, node := range Nodes() {
+		if node.Match(labels) && (feature == `` || strings.Contains(node.Addr, feature)) {
+			return node.Run(o, script)
+		}
+	}
+	return ``, nil
 }
 
 func Nodes() []Node {

@@ -47,5 +47,5 @@ func createDbAndTables(options []string) {
 	}
 	sqls := bytes.NewBufferString(createDB + string(createTbs))
 
-	cluster.Run(cmd.O{Stdin: sqls, Panic: true}, `mysql `+strings.Join(options[:l-1], ` `))
+	cluster.Run(cmd.O{Stdin: sqls, Panic: true}, ``, `mysql `+strings.Join(options[:l-1], ` `))
 }

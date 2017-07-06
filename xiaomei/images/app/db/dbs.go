@@ -17,7 +17,7 @@ func Mysql(key string, printCmd bool) error {
 		fmt.Println(command)
 		return nil
 	}
-	_, err := cluster.Run(cmd.O{}, command)
+	_, err := cluster.Run(cmd.O{}, ``, command)
 	return err
 }
 
@@ -28,7 +28,7 @@ func MysqlDump(key string, printCmd bool) error {
 		fmt.Println(command)
 		return nil
 	}
-	_, err := cluster.Run(cmd.O{}, command)
+	_, err := cluster.Run(cmd.O{}, ``, command)
 	return err
 }
 
@@ -38,7 +38,7 @@ func Mongo(key string, printCmd bool) error {
 		fmt.Println(command)
 		return nil
 	}
-	_, err := cluster.Run(cmd.O{}, command)
+	_, err := cluster.Run(cmd.O{}, ``, command)
 	return err
 }
 
@@ -49,6 +49,6 @@ func Redis(key string, printCmd bool) error {
 		fmt.Println(command)
 		return nil
 	}
-	_, err := cluster.Run(cmd.O{}, command)
+	_, err := cluster.Run(cmd.O{}, ``, command)
 	return err
 }

@@ -25,6 +25,7 @@ func main() {
 }
 
 func rootCmd() *cobra.Command {
+	var filter string
 	theCmd := &cobra.Command{
 		Use:   `xiaomei [qa|production|...]`,
 		Short: `be small and beautiful.`,
@@ -33,13 +34,14 @@ func rootCmd() *cobra.Command {
 				return errors.New(`redundant args.`)
 			}
 			if release.Arg1IsEnv() {
-				_, err := cluster.Run(cmd.O{}, ``)
+				_, err := cluster.Run(cmd.O{}, filter, ``)
 				return err
 			} else {
 				return thisCmd.Help()
 			}
 		},
 	}
+	theCmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr`)
 	if release.Arg1IsEnv() {
 		theCmd.SetArgs(os.Args[2:])
 	}
