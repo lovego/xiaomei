@@ -11,17 +11,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func Cmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   `tasks`,
-		Short: `the tasks.`,
+func Cmds() []*cobra.Command {
+	return []*cobra.Command{
+		{
+			Use:   `build-bin`,
+			Short: `build the tasks.`,
+			RunE:  release.NoArgCall(buildBinary),
+		},
 	}
-	cmd.AddCommand(&cobra.Command{
-		Use:   `build-bin`,
-		Short: `build the tasks.`,
-		RunE:  release.NoArgCall(buildBinary),
-	})
-	return cmd
 }
 
 func buildBinary() error {

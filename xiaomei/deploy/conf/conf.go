@@ -39,6 +39,10 @@ func ImageNameAndTagOf(svcName string) (name, tag string) {
 	}
 }
 
+func ContainerNameOf(svcName string) string {
+	return simpleconf.ContainerNameOf(svcName)
+}
+
 func OptionsFor(svcName string) []string {
 	return simpleconf.OptionsFor(svcName)
 }

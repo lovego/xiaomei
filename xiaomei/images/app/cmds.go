@@ -12,19 +12,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func Cmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   `app`,
-		Short: `the app server.`,
-	}
-	cmd.AddCommand(&cobra.Command{
-		Use:   `build-bin`,
-		Short: `build the app server.`,
-		RunE:  release.NoArgCall(buildBinary),
-	})
-	cmd.AddCommand(DepsCmd(), copy2vendorCmd())
-	cmd.AddCommand(db.Cmds()...)
-	return cmd
+func Cmds() []*cobra.Command {
+	return append([]*cobra.Command{
+		{
+			Use:   `build-bin`,
+			Short: `build the app server.`,
+			RunE:  release.NoArgCall(buildBinary),
+		},
+		DepsCmd(),
+		copy2vendorCmd(),
+	}, db.Cmds()...)
 }
 
 func buildBinary() error {

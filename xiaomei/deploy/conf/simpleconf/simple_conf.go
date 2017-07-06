@@ -84,6 +84,14 @@ func PortsOf(svcName string) (ports []string) {
 	return
 }
 
+func ContainerNameOf(svcName string) string {
+	name := release.Name() + `_` + svcName
+	if ports := PortsOf(svcName); len(ports) > 0 {
+		name += `.` + ports[0]
+	}
+	return name
+}
+
 func CommandFor(svcName string) []string {
 	return GetService(svcName).Command
 }
