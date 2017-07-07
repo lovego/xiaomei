@@ -1,14 +1,14 @@
-{{- if .AppUpstream -}}
-upstream {{ .AppUpstream }} {
-  {{- range .AppAddrs }}
+{{- if .App.Upstream -}}
+upstream {{ .App.Upstream }} {
+  {{- range .App.Addrs }}
   server {{ . }} max_fails=0;
   {{- end }}
 }
 {{ end -}}
 
-{{- if .WebUpstream -}}
-upstream {{ .WebUpstream }} {
-  {{- range .WebAddrs }}
+{{- if .Web.Upstream -}}
+upstream {{ .Web.Upstream }} {
+  {{- range .Web.Addrs }}
   server {{ . }} max_fails=0;
   {{- end }}
 }
@@ -16,21 +16,21 @@ upstream {{ .WebUpstream }} {
 
 server {
   listen 80;
-  server_name {{ .DomainName }};
+  server_name {{ .Domain }};
 
-  {{- if and .App .Web -}}
+  {{ if and .App .Web -}}
   location = / {
-    proxy_pass http://{{ .Web }};
+    proxy_pass http://{{ .Web.ProxyPass }};
   }
   location ~ \.(html|js|css|png|gif|jpg|svg|ico|woff|woff2|ttf|eot|map|json)$ {
-    proxy_pass http://{{ .Web }};
+    proxy_pass http://{{ .Web.ProxyPass }};
   }
   location / {
-    proxy_pass http://{{ .App }};
+    proxy_pass http://{{ .App.ProxyPass }};
   }
   {{ else -}}
   location / {
-    proxy_pass http://{{ or .App .Web }};
+    proxy_pass http://{{ (or .App .Web).ProxyPass }};
   }
   {{ end -}}
 
@@ -39,6 +39,6 @@ server {
   proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
   proxy_set_header X-Forwarded-Proto $scheme;
 
-  access_log /var/log/nginx/{{ .DomainName }}/access.log std;
-  error_log  /var/log/nginx/{{ .DomainName }}/access.err;
+  access_log /var/log/nginx/{{ .Domain }}/access.log std;
+  error_log  /var/log/nginx/{{ .Domain }}/access.err;
 }

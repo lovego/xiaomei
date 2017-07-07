@@ -27,6 +27,9 @@ func (s *service) Env() string {
 }
 
 func (s *service) Addrs() ([]string, error) {
+	if s == nil {
+		return nil, nil
+	}
 	if s.addrs == nil {
 		addrs := []string{}
 		ports := simpleconf.PortsOf(s.svcName)
@@ -44,6 +47,9 @@ func (s *service) Addrs() ([]string, error) {
 }
 
 func (s *service) Nodes() (nodes []cluster.Node) {
+	if s == nil {
+		return nil
+	}
 	service := simpleconf.GetService(s.svcName)
 	for _, node := range cluster.Nodes() {
 		if node.Match(service.Nodes) {
@@ -54,6 +60,9 @@ func (s *service) Nodes() (nodes []cluster.Node) {
 }
 
 func (s *service) Upstream() (string, error) {
+	if s == nil {
+		return ``, nil
+	}
 	if addrs, err := s.Addrs(); err != nil {
 		return ``, err
 	} else if len(addrs) > 1 {
@@ -64,6 +73,9 @@ func (s *service) Upstream() (string, error) {
 }
 
 func (s *service) ProxyPass() (string, error) {
+	if s == nil {
+		return ``, nil
+	}
 	if addrs, err := s.Addrs(); err != nil {
 		return ``, err
 	} else if len(addrs) == 1 {
@@ -74,6 +86,9 @@ func (s *service) ProxyPass() (string, error) {
 }
 
 func (s *service) Domain() string {
+	if s == nil {
+		return ``
+	}
 	domain := release.App().Domain()
 	parts := strings.SplitN(domain, `.`, 2)
 	if len(parts) == 2 {

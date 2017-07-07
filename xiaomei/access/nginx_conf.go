@@ -2,6 +2,7 @@ package access
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"text/template"
@@ -14,7 +15,10 @@ func getNginxConf(svcName string) (string, string, error) {
 	if err != nil {
 		return ``, ``, err
 	}
-	data := getConfData(svcName)
+	data, err := getConfData(svcName)
+	if err != nil {
+		return ``, ``, err
+	}
 
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, data); err != nil {
@@ -39,14 +43,22 @@ type domain interface {
 	Domain() string
 }
 
-func getConfData(svcName string) domain {
+func getConfData(svcName string) (domain, error) {
 	if svcName == `` {
-		return accessConfig{
+		data := accessConfig{
 			App: newService(`app`),
 			Web: newService(`web`),
 		}
+		if data.App == nil && data.Web == nil {
+			return nil, fmt.Errorf(`neither app nor web service defined.`, svcName)
+		}
+		return data, nil
 	} else {
-		return newService(svcName)
+		data := newService(svcName)
+		if data == nil {
+			return nil, fmt.Errorf(`%s service not defined.`, svcName)
+		}
+		return data, nil
 	}
 }
 
