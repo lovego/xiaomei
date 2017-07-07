@@ -11,11 +11,12 @@ import (
 )
 
 func getNginxConf(svcName string) (string, string, error) {
-	tmpl, err := getNginxConfTmpl(svcName)
+	data, err := getConfData(svcName)
 	if err != nil {
 		return ``, ``, err
 	}
-	data, err := getConfData(svcName)
+
+	tmpl, err := getNginxConfTmpl(svcName)
 	if err != nil {
 		return ``, ``, err
 	}
