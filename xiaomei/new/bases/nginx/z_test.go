@@ -10,7 +10,3 @@ func TestMakeConf(t *testing.T) {
 		BackendAddrs: []string{`127.0.0.1:3001`, `127.0.0.1:3002`},
 	})))
 }
-
-func TestWaitNameResolved(t *testing.T) {
-	waitNameResolved(`baidu.com`)
-}
