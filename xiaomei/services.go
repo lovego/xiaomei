@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/lovego/xiaomei/utils/cmd"
+	"github.com/lovego/xiaomei/xiaomei/access"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/deploy"
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
@@ -52,5 +53,6 @@ func serviceCmd(name, desc string, cmds []*cobra.Command) *cobra.Command {
 	}
 	theCmd.AddCommand(images.Cmds(name)...)
 	theCmd.AddCommand(deploy.Cmds(name)...)
+	theCmd.AddCommand(access.Cmds(name)...)
 	return theCmd
 }

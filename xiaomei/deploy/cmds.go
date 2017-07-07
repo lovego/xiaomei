@@ -17,9 +17,6 @@ func Cmds(svcName string) (cmds []*cobra.Command) {
 		psCmdFor(svcName),
 		logsCmdFor(svcName),
 	)
-	if svcName == `` || svcName == `app` || svcName == `web` || svcName == `godoc` {
-		cmds = append(cmds, accessCmd(svcName))
-	}
 	return
 }
 
@@ -27,7 +24,7 @@ func runCmdFor(svcName string) *cobra.Command {
 	// var publish []string
 	cmd := &cobra.Command{
 		Use:   `run`,
-		Short: `run    the ` + deployDesc(svcName) + `.`,
+		Short: `run    the ` + desc(svcName) + `.`,
 		RunE: release.NoArgCall(func() error {
 			return run(svcName)
 		}),
@@ -40,7 +37,7 @@ func deployCmdFor(svcName string) *cobra.Command {
 	var noBuild, noPush /*, rmCurrent*/ bool
 	cmd := &cobra.Command{
 		Use:   `deploy`,
-		Short: `deploy the ` + deployDesc(svcName) + `.`,
+		Short: `deploy the ` + desc(svcName) + `.`,
 		RunE: release.NoArgCall(func() error {
 			if !noBuild {
 				if err := images.Build(svcName, true); err != nil {
@@ -64,7 +61,7 @@ func deployCmdFor(svcName string) *cobra.Command {
 func rmDeployCmdFor(svcName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `rm-deploy`,
-		Short: `remove deployment of the ` + deployDesc(svcName) + `.`,
+		Short: `remove deployment of the ` + desc(svcName) + `.`,
 		RunE: release.NoArgCall(func() error {
 			return getDriver().RmDeploy(svcName)
 		}),
@@ -76,7 +73,7 @@ func psCmdFor(svcName string) *cobra.Command {
 	var watch bool
 	cmd := &cobra.Command{
 		Use:   `ps`,
-		Short: `list tasks of the ` + deployDesc(svcName) + `.`,
+		Short: `list tasks of the ` + desc(svcName) + `.`,
 		RunE: func(c *cobra.Command, args []string) error {
 			return getDriver().Ps(svcName, watch, args)
 		},
@@ -88,7 +85,7 @@ func psCmdFor(svcName string) *cobra.Command {
 func logsCmdFor(svcName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `logs`,
-		Short: `list logs  of the ` + deployDesc(svcName) + `.`,
+		Short: `list logs  of the ` + desc(svcName) + `.`,
 		RunE: func(c *cobra.Command, args []string) error {
 			return getDriver().Logs(svcName)
 		},
@@ -96,27 +93,10 @@ func logsCmdFor(svcName string) *cobra.Command {
 	return cmd
 }
 
-func deployDesc(svcName string) string {
+func desc(svcName string) string {
 	if svcName == `` {
 		return `project`
 	} else {
 		return svcName + ` service`
 	}
-}
-
-func accessCmd(svcName string) *cobra.Command {
-	var setup bool
-	cmd := &cobra.Command{
-		Use:   `access`,
-		Short: `access config for the project.`,
-		RunE: release.NoArgCall(func() error {
-			if setup {
-				return accessSetup(svcName)
-			} else {
-				return accessPrint(svcName)
-			}
-		}),
-	}
-	cmd.Flags().BoolVarP(&setup, `setup`, `s`, false, `setup access.`)
-	return cmd
 }

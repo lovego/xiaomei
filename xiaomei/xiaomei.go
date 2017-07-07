@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/lovego/xiaomei/utils/cmd"
+	"github.com/lovego/xiaomei/xiaomei/access"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/deploy"
 	"github.com/lovego/xiaomei/xiaomei/images"
@@ -20,6 +21,7 @@ func main() {
 	root.AddCommand(serviceCmds()...)
 	root.AddCommand(images.Cmds(``)...)
 	root.AddCommand(deploy.Cmds(``)...)
+	root.AddCommand(access.Cmds(``)...)
 	root.AddCommand(cluster.LsCmd(), new.Cmd(), yamlCmd(), versionCmd())
 	root.Execute()
 }

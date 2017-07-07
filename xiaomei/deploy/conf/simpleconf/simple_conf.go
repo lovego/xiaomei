@@ -41,6 +41,11 @@ func Get() *Conf {
 	return theConf
 }
 
+func HasService(svcName string) bool {
+	_, ok := Get().Services[svcName]
+	return ok
+}
+
 func GetService(svcName string) Service {
 	if svc, ok := Get().Services[svcName]; ok {
 		return svc

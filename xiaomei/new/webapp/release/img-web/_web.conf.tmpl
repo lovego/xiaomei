@@ -1,29 +1,11 @@
 # vim: set ft=nginx:
 
-upstream app {
-{{ "{{- range .BackendAddrs }}\n  server {{ . }};\n{{- end }}" }}
-}
-
 server {
   listen {{ `{{ .ListenPort }}` }} default_server;
   root /var/www/{{ .ProName }};
 
-  location = / {
-    try_files /index.html @app;
-  }
-  location / {
-    try_files $uri @app;
-  }
-  location @app {
-    proxy_pass   http://app;
-    proxy_set_header Host $http_host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-  }
+  index index.html
 
-  location ~ \.html$ {
-  }
   location ~ \.(js|css|png|gif|jpg|svg|ico|woff|woff2|ttf|eot|map|json)$ {
     expires max;
   }

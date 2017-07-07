@@ -1,7 +1,15 @@
-{{- if .BackendName -}}
-upstream {{ .BackendName }} {
-  {{- range .BackendAddrs }}
-  server {{ . }};
+{{- if .AppUpstream -}}
+upstream {{ .AppUpstream }} {
+  {{- range .AppAddrs }}
+  server {{ . }} max_fails=0;
+  {{- end }}
+}
+{{ end -}}
+
+{{- if .WebUpstream -}}
+upstream {{ .WebUpstream }} {
+  {{- range .WebAddrs }}
+  server {{ . }} max_fails=0;
   {{- end }}
 }
 {{ end -}}
@@ -10,17 +18,26 @@ server {
   listen 80;
   server_name {{ .DomainName }};
 
-  location / {
-    {{ if .BackendName -}}
-    proxy_pass http://{{ .BackendName }};
-    {{ else -}}
-    proxy_pass http://{{ index .BackendAddrs 0 }};
-    {{ end -}}
-    proxy_set_header Host $http_host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
+  {{- if and .App .Web -}}
+  location = / {
+    proxy_pass http://{{ .Web }};
   }
+  location ~ \.(html|js|css|png|gif|jpg|svg|ico|woff|woff2|ttf|eot|map|json)$ {
+    proxy_pass http://{{ .Web }};
+  }
+  location / {
+    proxy_pass http://{{ .App }};
+  }
+  {{ else -}}
+  location / {
+    proxy_pass http://{{ or .App .Web }};
+  }
+  {{ end -}}
+
+  proxy_set_header Host $http_host;
+  proxy_set_header X-Real-IP $remote_addr;
+  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_set_header X-Forwarded-Proto $scheme;
 
   access_log /var/log/nginx/{{ .DomainName }}/access.log std;
   error_log  /var/log/nginx/{{ .DomainName }}/access.err;
