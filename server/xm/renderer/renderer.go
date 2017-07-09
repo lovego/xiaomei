@@ -5,7 +5,7 @@ import (
 	"html/template"
 	"io"
 	"io/ioutil"
-	"path"
+	"path/filepath"
 	"strings"
 )
 
@@ -19,8 +19,8 @@ type Renderer struct {
 
 func New(root, layout string, cache bool, funcs template.FuncMap) *Renderer {
 	r := &Renderer{
-		Root:   path.Clean(root),
-		Layout: path.Clean(layout),
+		Root:   filepath.Clean(root),
+		Layout: filepath.Clean(layout),
 		Funcs:  funcs,
 	}
 	if cache {
@@ -63,16 +63,18 @@ func (r *Renderer) getTarget(name string, option O) *template.Template {
 	return tmpl
 }
 func (r *Renderer) getTemplateWithLayout(name string, option O) *template.Template {
-	layoutTmpl, err := r.getTemplate(option.Layout, option.Layout, option.Funcs).Clone()
+	tmpl := r.getTemplate(name, ``, option.Funcs)
+
+	layoutTmpl, err := r.getTemplate(option.Layout, option.Layout, nil).Clone()
 	if err != nil {
 		panic(err)
 	}
-	for _, t := range r.getTemplate(name, ``, option.Funcs).Templates() {
-		if _, err := layoutTmpl.AddParseTree(t.Name(), t.Tree); err != nil {
+	for _, t := range layoutTmpl.Templates() {
+		if _, err := tmpl.AddParseTree(t.Name(), t.Tree); err != nil {
 			panic(err)
 		}
 	}
-	return layoutTmpl
+	return tmpl
 }
 
 // 针对同一个模板使用不同的funcs，因为缓存的原因，会得到非预期的结果。
@@ -97,10 +99,10 @@ func (r *Renderer) getTemplate(name, tmplName string, funcs template.FuncMap) *t
 // 关联模板中不能含有同名模板
 func parseTemplate(tmpl *template.Template, name, base, root string, loaded map[string]bool) {
 	var p string
-	if path.IsAbs(name) {
-		p = path.Join(root, name)
+	if filepath.IsAbs(name) {
+		p = filepath.Join(root, name)
 	} else {
-		p = path.Join(base, name)
+		p = filepath.Join(base, name)
 	}
 	content, err := ioutil.ReadFile(p + `.tmpl`)
 	if err != nil {
@@ -119,7 +121,7 @@ func parseTemplate(tmpl *template.Template, name, base, root string, loaded map[
 		}
 	}
 
-	base = path.Dir(p)
+	base = filepath.Dir(p)
 	for _, nam := range new {
 		parseTemplate(tmpl.New(nam), nam, base, root, loaded)
 	}
@@ -127,7 +129,7 @@ func parseTemplate(tmpl *template.Template, name, base, root string, loaded map[
 
 func cleanName(name string) string {
 	if strings.IndexByte(name, '/') >= 0 {
-		name = path.Clean(name)
+		name = filepath.Clean(name)
 		if name[0] == '/' {
 			name = name[1:]
 		}
