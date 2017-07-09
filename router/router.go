@@ -27,7 +27,7 @@ type Router struct {
 	// SocketIO  *socketio.Server
 }
 
-func NewRouter() *Router {
+func New() *Router {
 	return &Router{
 		strRoutes: make(map[string]map[string]StrRouteHandler),
 		regRoutes: make(map[string]map[string][]RegRoute),

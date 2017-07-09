@@ -1,9 +1,9 @@
 package filter
 
 import (
-	"github.com/lovego/xiaomei/server/xm"
+	"github.com/lovego/xiaomei"
 )
 
-func Process(req *xm.Request, res *xm.Response) bool {
+func Process(req *xiaomei.Request, res *xiaomei.Response) bool {
 	return true
 }

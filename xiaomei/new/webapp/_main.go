@@ -7,8 +7,8 @@ import (
 
 	"{{ .ProPath }}/filter"
 	"{{ .ProPath }}/routes"
+	"github.com/lovego/xiaomei"
 	"github.com/lovego/xiaomei/server"
-	"github.com/lovego/xiaomei/server/xm"
 )
 
 func main() {
@@ -23,7 +23,7 @@ func main() {
 }
 
 func layoutData(
-	layout string, data interface{}, req *xm.Request, res *xm.Response,
+	layout string, data interface{}, req *xiaomei.Request, res *xiaomei.Response,
 ) interface{} {
 	if strings.HasPrefix(layout, `layout/`) {
 		return struct {
