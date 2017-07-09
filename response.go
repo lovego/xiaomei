@@ -1,4 +1,4 @@
-package xm
+package xiaomei
 
 import (
 	"bufio"
@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/lovego/xiaomei/server/xm/renderer"
-	"github.com/lovego/xiaomei/server/xm/session"
+	"github.com/lovego/xiaomei/renderer"
+	"github.com/lovego/xiaomei/session"
 	"github.com/lovego/xiaomei/utils/errs"
 )
 

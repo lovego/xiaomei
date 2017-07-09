@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/lovego/xiaomei"
 	"github.com/lovego/xiaomei/config"
-	"github.com/lovego/xiaomei/server/xm"
 	"github.com/lovego/xiaomei/utils"
 	"github.com/lovego/xiaomei/utils/fs"
 )
@@ -40,7 +40,7 @@ func setupLogger() (accessLog, errorLog *os.File) {
 }
 
 func writeLog(
-	req *xm.Request, res *xm.Response, t time.Time, hasErr bool, errStr, stack string,
+	req *xiaomei.Request, res *xiaomei.Response, t time.Time, hasErr bool, errStr, stack string,
 ) []byte {
 	line, err := json.Marshal(getLogFields(req, res, t, hasErr, errStr, stack))
 	if err != nil {
@@ -60,7 +60,7 @@ func writeLog(
 }
 
 func getLogFields(
-	req *xm.Request, res *xm.Response, t time.Time, hasErr bool, errStr, stack string,
+	req *xiaomei.Request, res *xiaomei.Response, t time.Time, hasErr bool, errStr, stack string,
 ) map[string]interface{} {
 	var sess interface{}
 	req.Session(&sess)

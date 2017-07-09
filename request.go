@@ -1,4 +1,4 @@
-package xm
+package xiaomei
 
 import (
 	"net"
@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/lovego/xiaomei/server/xm/session"
+	"github.com/lovego/xiaomei/session"
 )
 
 type Request struct {

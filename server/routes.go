@@ -8,19 +8,20 @@ import (
 	"runtime/pprof"
 	"strconv"
 
-	"github.com/lovego/xiaomei/server/xm"
+	"github.com/lovego/xiaomei"
+	"github.com/lovego/xiaomei/router"
 )
 
 const pprofPath = `/_pprof`
 
-func sysRoutes(router *xm.Router) {
+func sysRoutes(router *router.Router) {
 	router.Root().
 		// 存活检测
-		Get(`/_alive`, func(req *xm.Request, res *xm.Response) {
+		Get(`/_alive`, func(req *xiaomei.Request, res *xiaomei.Response) {
 			res.Write([]byte(`ok`))
 		}).
 		// 当前正在处理的请求列表
-		Get(`/_ps`, func(req *xm.Request, res *xm.Response) {
+		Get(`/_ps`, func(req *xiaomei.Request, res *xiaomei.Response) {
 			res.Write(psData.ToJson())
 		}).
 		// 性能分析
@@ -29,7 +30,7 @@ func sysRoutes(router *xm.Router) {
 
 var pprofIndexHtml []byte
 
-func routePprofIndex(req *xm.Request, res *xm.Response) {
+func routePprofIndex(req *xiaomei.Request, res *xiaomei.Response) {
 	if pprofIndexHtml == nil {
 		var tmpl = template.Must(template.New(``).Parse(`<html>
 <head>
@@ -59,7 +60,7 @@ profiles:<br>
 	res.Write(pprofIndexHtml)
 }
 
-func routePprofGet(req *xm.Request, res *xm.Response, params []string) {
+func routePprofGet(req *xiaomei.Request, res *xiaomei.Response, params []string) {
 	res.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	p := pprof.Lookup(params[1])
 	if p == nil {

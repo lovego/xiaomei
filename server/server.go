@@ -12,11 +12,12 @@ import (
 	"time"
 
 	"github.com/fatih/color"
+	"github.com/lovego/xiaomei"
 	"github.com/lovego/xiaomei/config"
+	"github.com/lovego/xiaomei/renderer"
+	"github.com/lovego/xiaomei/router"
 	"github.com/lovego/xiaomei/server/funcs"
-	"github.com/lovego/xiaomei/server/xm"
-	"github.com/lovego/xiaomei/server/xm/renderer"
-	"github.com/lovego/xiaomei/server/xm/session"
+	"github.com/lovego/xiaomei/session"
 	"github.com/lovego/xiaomei/utils"
 )
 
@@ -29,11 +30,11 @@ func init() {
 type Server struct {
 	*http.Server
 	HandleTimeout  time.Duration
-	FilterFunc     func(req *xm.Request, res *xm.Response) bool
-	Router         *xm.Router
+	FilterFunc     func(req *xiaomei.Request, res *xiaomei.Response) bool
+	Router         *router.Router
 	Session        session.Session
 	Renderer       *renderer.Renderer
-	LayoutDataFunc func(layout string, data interface{}, req *xm.Request, res *xm.Response) interface{}
+	LayoutDataFunc func(layout string, data interface{}, req *xiaomei.Request, res *xiaomei.Response) interface{}
 }
 
 func NewSession() session.Session {

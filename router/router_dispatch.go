@@ -1,9 +1,13 @@
-package xm
+package router
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/lovego/xiaomei"
+)
 
 // 处理请求
-func (r *Router) Handle(req *Request, res *Response) bool {
+func (r *Router) Handle(req *xiaomei.Request, res *xiaomei.Response) bool {
 	method := strings.ToUpper(req.Method)
 	if method == `HEAD` {
 		method = `GET`
@@ -15,7 +19,7 @@ func (r *Router) Handle(req *Request, res *Response) bool {
 	return false
 }
 
-func (r *Router) strRoutesMatch(method string, path string, req *Request, res *Response) bool {
+func (r *Router) strRoutesMatch(method string, path string, req *xiaomei.Request, res *xiaomei.Response) bool {
 	routes := r.strRoutes[method]
 	if routes == nil {
 		return false
@@ -29,7 +33,7 @@ func (r *Router) strRoutesMatch(method string, path string, req *Request, res *R
 }
 
 // 按斜线作为分隔符从深到浅依次匹配
-func (r *Router) regRoutesMatch(method string, path string, req *Request, res *Response) bool {
+func (r *Router) regRoutesMatch(method string, path string, req *xiaomei.Request, res *xiaomei.Response) bool {
 	routes := r.regRoutes[method]
 	if routes == nil {
 		return false

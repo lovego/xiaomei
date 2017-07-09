@@ -1,4 +1,4 @@
-package xm
+package router
 
 // go test -c -gcflags "-N -l"
 
@@ -7,9 +7,11 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+
+	"github.com/lovego/xiaomei"
 )
 
-func notFound(req *Request, res *Response) {}
+func notFound(req *xiaomei.Request, res *xiaomei.Response) {}
 
 type testRouteData struct {
 	method string
@@ -58,19 +60,19 @@ func TestGroupRouter(t *testing.T) {
 func testAddRoute(r *Router, route testRouteData, matched map[string]bool, testing *testing.T) {
 	switch route.method {
 	case `get`:
-		r.Get(route.path, func(req *Request, res *Response) {
+		r.Get(route.path, func(req *xiaomei.Request, res *xiaomei.Response) {
 			matched[route.name] = true
 		})
 	case `post`:
-		r.Post(route.path, func(req *Request, res *Response) {
+		r.Post(route.path, func(req *xiaomei.Request, res *xiaomei.Response) {
 			matched[route.name] = true
 		})
 	case `getx`:
-		r.GetX(route.path, func(req *Request, res *Response, params []string) {
+		r.GetX(route.path, func(req *xiaomei.Request, res *xiaomei.Response, params []string) {
 			matched[route.name] = true
 		})
 	case `postx`:
-		r.PostX(route.path, func(req *Request, res *Response, params []string) {
+		r.PostX(route.path, func(req *xiaomei.Request, res *xiaomei.Response, params []string) {
 			matched[route.name] = true
 		})
 	}

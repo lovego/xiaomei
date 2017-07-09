@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lovego/xiaomei"
 	"github.com/lovego/xiaomei/config"
-	"github.com/lovego/xiaomei/server/xm"
 	"github.com/lovego/xiaomei/utils"
 )
 
@@ -28,8 +28,8 @@ func (s *Server) ServeHTTP(response http.ResponseWriter, request *http.Request) 
 	psData.Add(request.Method, request.URL.Path, startTime)
 	defer psData.Remove(request.Method, request.URL.Path, startTime)
 
-	req := xm.NewRequest(request, s.Session)
-	res := xm.NewResponse(response, req, s.Session, s.Renderer, s.LayoutDataFunc)
+	req := xiaomei.NewRequest(request, s.Session)
+	res := xiaomei.NewResponse(response, req, s.Session, s.Renderer, s.LayoutDataFunc)
 
 	var notFound bool
 	defer handleError(startTime, req, res, &notFound)
@@ -40,7 +40,7 @@ func (s *Server) ServeHTTP(response http.ResponseWriter, request *http.Request) 
 	}
 }
 
-func handleError(t time.Time, req *xm.Request, res *xm.Response, notFound *bool) {
+func handleError(t time.Time, req *xiaomei.Request, res *xiaomei.Response, notFound *bool) {
 	if *notFound {
 		handleNotFound(req, res)
 	}
@@ -61,14 +61,14 @@ func handleError(t time.Time, req *xm.Request, res *xm.Response, notFound *bool)
 	}
 }
 
-func handleNotFound(req *xm.Request, res *xm.Response) {
+func handleNotFound(req *xiaomei.Request, res *xiaomei.Response) {
 	res.WriteHeader(404)
 	if res.Size() <= 0 {
 		res.Json(map[string]string{"code": "404", "message": "Not Found."})
 	}
 }
 
-func handleServerError(req *xm.Request, res *xm.Response) {
+func handleServerError(req *xiaomei.Request, res *xiaomei.Response) {
 	res.WriteHeader(500)
 	if res.Size() <= 0 {
 		res.Json(map[string]string{"code": "500", "message": "Application Server Error."})
