@@ -7,8 +7,7 @@ import (
 	"time"
 
 	"github.com/lovego/xiaomei"
-	"github.com/lovego/xiaomei/config"
-	"github.com/lovego/xiaomei/utils"
+	"github.com/lovego/xiaomei/server/log"
 )
 
 func (s *Server) Handler() (handler http.Handler) {
@@ -46,19 +45,13 @@ func handleError(t time.Time, req *xiaomei.Request, res *xiaomei.Response, notFo
 	}
 
 	err := recover()
-	var errStr, stack string
 	if err != nil {
 		handleServerError(req, res)
-		errStr = fmt.Sprint(err)
-		stack = string(utils.Stack(3))
 	}
 	if err == nil && strings.HasPrefix(req.URL.Path, `/_`) {
 		return
 	}
-	log := writeLog(req, res, t, err != nil, errStr, stack)
-	if err != nil {
-		go config.Alarm(`500错误`, string(log), errStr+` `+stack)
-	}
+	log.Write(req, res, t, err)
 }
 
 func handleNotFound(req *xiaomei.Request, res *xiaomei.Response) {
