@@ -1,5 +1,5 @@
 name: {{ .ProName }}
 timeZone: { name: China, offset: 28800 }
-mailer: "mailer://imap.exmail.qq.com:25?user=xiaomei<xiaomei-go@qq.com>&pass=abc123"
+mailer: "mailer://smtp.qq.com:25/?user=小美<xiaomei-go@qq.com>&pass=zjsbosjlhgugechh"
 keepers: [ "xiaomei<xiaomei-go@qq.com>" ]
 
