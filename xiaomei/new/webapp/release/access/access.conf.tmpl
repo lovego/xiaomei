@@ -1,7 +1,7 @@
 {{- if .App.Upstream -}}
 upstream {{ .App.Upstream }} {
   {{- range .App.Addrs }}
-  server {{ . }} max_fails=0;
+  server {{ . }} fail_timeout=1;
   {{- end }}
 }
 {{ end -}}
@@ -9,7 +9,7 @@ upstream {{ .App.Upstream }} {
 {{- if .Web.Upstream -}}
 upstream {{ .Web.Upstream }} {
   {{- range .Web.Addrs }}
-  server {{ . }} max_fails=0;
+  server {{ . }} fail_timeout=1;
   {{- end }}
 }
 {{ end -}}
