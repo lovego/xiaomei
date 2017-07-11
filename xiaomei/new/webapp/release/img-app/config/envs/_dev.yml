@@ -1,5 +1,4 @@
 domain: {{ .Domain }}.dev
-keepers: [ ]
 
 dataSource:
   mysql:
