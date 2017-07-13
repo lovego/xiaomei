@@ -1,7 +1,6 @@
 package kafka
 
 import (
-	"os"
 	"testing"
 	"time"
 
@@ -27,7 +26,8 @@ func TestConsume(t *testing.T) {
 		Client:   client,
 		Consumer: consumer,
 		Topic:    "dmall_stock_test",
-		LogDir:   ".",
+		Group:    "test-group",
+		LogPath:  "tmp/topic.log",
 		RedisPool: &redis.Pool{
 			MaxIdle:     5,
 			MaxActive:   5,
@@ -41,7 +41,8 @@ func TestConsume(t *testing.T) {
 				)
 			},
 		},
-		Handler: func(m *sarama.ConsumerMessage, f *os.File) {
+		Handler: func(m *sarama.ConsumerMessage, logMap map[string]interface{}) {
+			logMap[`size`] = 9
 			// fmt.Println("%s\n", m.Value)
 		},
 	}).Start()
