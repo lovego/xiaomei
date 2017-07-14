@@ -13,11 +13,7 @@ type ES struct {
 	BaseAddrs []string
 }
 
-// Ensure that at least one addr must be provided.
-func New(addr string, otherAddrs ...string) *ES {
-	addrs := []string{}
-	addrs = append(addrs, addr)
-	addrs = append(addrs, otherAddrs...)
+func New(addrs ...string) *ES {
 	return &ES{BaseAddrs: addrs}
 }
 
