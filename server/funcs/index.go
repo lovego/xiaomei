@@ -3,11 +3,11 @@ package funcs
 import (
 	"strings"
 
-	"github.com/lovego/xiaomei/utils/slice"
+	"github.com/lovego/xiaomei/utils/slice/union"
 	"github.com/lovego/xiaomei/utils/strnum"
 )
 
-func Map() map[string]interface{} {
+func Index() map[string]interface{} {
 	return map[string]interface{}{
 		`asset`:        AssetFunc(),
 		`html_safe`:    HtmlSafe,
@@ -16,7 +16,7 @@ func Map() map[string]interface{} {
 		`values`:       MapValues,
 		`IF`:           IF,
 		`field`:        StructOrMapField,
-		`union`:        slice.Union,
+		`union`:        union.Union,
 		`keys_union`:   MapKeysUnion,
 		`thousand_sep`: strnum.ThousandSep,
 		`contains`:     strings.Contains,

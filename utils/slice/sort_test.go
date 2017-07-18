@@ -7,6 +7,13 @@ import (
 
 type ssCase [2][]interface{}
 
+type s struct {
+	Name string
+	V    int
+}
+
+type m map[string]interface{}
+
 func TestSort(t *testing.T) {
 	var nilResult = []interface{}{}
 	var cases = []ssCase{

@@ -34,7 +34,9 @@ type Server struct {
 	Router         *router.Router
 	Session        session.Session
 	Renderer       *renderer.Renderer
-	LayoutDataFunc func(layout string, data interface{}, req *xiaomei.Request, res *xiaomei.Response) interface{}
+	LayoutDataFunc func(
+		layout string, data interface{}, req *xiaomei.Request, res *xiaomei.Response,
+	) interface{}
 }
 
 func NewSession() session.Session {
@@ -46,7 +48,7 @@ func NewSession() session.Session {
 
 func NewRenderer() *renderer.Renderer {
 	return renderer.New(
-		path.Join(config.Root(), `views`), `layout/default`, !config.DevMode(), funcs.Map(),
+		path.Join(config.Root(), `views`), `layout/default`, !config.DevMode(), funcs.Index(),
 	)
 }
 
