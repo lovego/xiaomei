@@ -38,7 +38,7 @@ func detectRoot() string {
 		strings.HasPrefix(program, `/tmp/`) /* go run ... */ {
 		if cwd, err := os.Getwd(); err != nil {
 			panic(err)
-		} else if dir := fs.DetectDir(cwd, `release/stack.yml`); dir == `` {
+		} else if dir := fs.DetectDir(cwd, `release/simple.yml`); dir == `` {
 			return ``
 		} else {
 			return filepath.Join(dir, `release/img-app`)
