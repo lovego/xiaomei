@@ -2,8 +2,10 @@ package dsn
 
 import (
 	"fmt"
+	"net"
 	"os"
-	"regexp"
+
+	"github.com/go-sql-driver/mysql"
 )
 
 type MysqlDSN struct {
@@ -15,13 +17,15 @@ func Mysql(uri string) MysqlDSN {
 		fmt.Println(`invalid mysql config`)
 		os.Exit(1)
 	}
-	m := regexp.MustCompile(
-		`^(\w+):(\w+)@\w+\(([^()]+):(\d+)\)/(\w+)`,
-	).FindStringSubmatch(uri)
-	if len(m) == 0 {
+	c, err := mysql.ParseDSN(uri)
+	if err != nil {
 		panic(`mysql addr match faild.`)
 	}
-	return MysqlDSN{m[1], m[2], m[3], m[4], m[5]}
+	host, port, err := net.SplitHostPort(c.Addr)
+	if err != nil {
+		panic(`mysql addr match faild.`)
+	}
+	return MysqlDSN{c.User, c.Passwd, host, port, c.DBName}
 }
 
 func (c MysqlDSN) Flags() []string {
