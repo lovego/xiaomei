@@ -73,6 +73,11 @@ func (res *Response) RenderToBuffer(
 }
 
 func (res *Response) Json(data interface{}) {
+	if data != nil {
+		if err, ok := data.(error); ok {
+			res.Log(map[string]interface{}{`err`: err.Error()})
+		}
+	}
 	bytes, err := json.Marshal(data)
 	if err == nil {
 		res.Header().Set(`Content-Type`, `application/json; charset=utf-8`)

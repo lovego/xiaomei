@@ -20,7 +20,7 @@ func Routes() *router.Router {
 
 	router.Get(`/`, func(req *xiaomei.Request, res *xiaomei.Response) {
 		res.Json(map[string]string{`hello`: config.DeployName()})
-		req.Log = map[string]interface{}{`hello`: `world`, `i'm`: `xiaomei`}
+		req.Log(map[string]interface{}{`hello`: `world`, `i'm`: `xiaomei`})
 	})
 
 	router.Get(`/result-ok`, func(req *xiaomei.Request, res *xiaomei.Response) {

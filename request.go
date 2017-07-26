@@ -14,7 +14,7 @@ type Request struct {
 	sess       session.Session
 	sessParsed bool
 	sessData   reflect.Value
-	Log        map[string]interface{}
+	log        map[string]interface{}
 }
 
 func NewRequest(request *http.Request, sess session.Session) *Request {
@@ -70,5 +70,18 @@ func (req *Request) SetSession(i interface{}) {
 	if v.IsValid() {
 		req.sessData = v
 		req.sessParsed = true
+	}
+}
+
+func (req *Request) GetLog() map[string]interface{} {
+	return req.log
+}
+
+func (req *Request) Log(m map[string]interface{}) {
+	if req.log == nil {
+		req.log = make(map[string]interface{})
+	}
+	for k, v := range m {
+		req.log[k] = v
 	}
 }

@@ -36,7 +36,7 @@ func getFields(
 	}
 
 	// custom log fields
-	for k, v := range req.Log {
+	for k, v := range req.GetLog() {
 		m[k] = v
 	}
 	return m
@@ -66,11 +66,15 @@ func formatFields(fields map[string]interface{}, highlight bool) (result string)
 	if err := fields[`err`]; err != nil {
 		if errStr, ok := err.(string); ok {
 			result += errStr + "\n"
+		} else {
+			result += fmt.Sprint(err) + "\n"
 		}
 	}
 	if stack := fields[`stack`]; stack != nil {
 		if stackStr, ok := stack.(string); ok {
 			result += stackStr + "\n"
+		} else {
+			result += fmt.Sprint(stack) + "\n"
 		}
 	}
 	return
