@@ -75,7 +75,9 @@ func (res *Response) RenderToBuffer(
 func (res *Response) Json(data interface{}) {
 	if data != nil {
 		if err, ok := data.(error); ok {
-			res.Log(map[string]interface{}{`err`: err.Error()})
+			if errStr := err.Error(); errStr != `` {
+				res.Log(map[string]interface{}{`err`: errStr})
+			}
 		}
 	}
 	bytes, err := json.Marshal(data)
