@@ -27,7 +27,7 @@ func setupLogger() (accessLog, errorLog *os.File) {
 		utils.Logf(`open appserver access log %s failed: %v`, accessLogPath, err)
 		os.Exit(1)
 	}
-	errorLogPath := filepath.Join(config.Root(), `log/app.err`)
+	errorLogPath := filepath.Join(logDir, `app.err`)
 	if errorLog, err = fs.OpenAppend(errorLogPath); err != nil {
 		utils.Logf(`open appserver error log %s failed: %v`, errorLogPath, err)
 		os.Exit(1)
