@@ -30,7 +30,7 @@ func Index(slice []string, target string) int {
 func LastIndex(slice []string, target string) int {
 	for i := len(slice) - 1; i >= 0; i-- {
 		if slice[i] == target {
-			return len(slice) - 1 - i
+			return i
 		}
 	}
 	return -1
