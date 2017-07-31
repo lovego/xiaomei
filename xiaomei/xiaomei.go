@@ -23,7 +23,9 @@ func main() {
 	root.AddCommand(deploy.Cmds(``)...)
 	root.AddCommand(access.Cmds(``)...)
 	root.AddCommand(cluster.LsCmd(), new.Cmd(), yamlCmd(), versionCmd())
-	root.Execute()
+	if err := root.Execute(); err != nil {
+		os.Exit(1)
+	}
 }
 
 func rootCmd() *cobra.Command {
@@ -42,6 +44,7 @@ func rootCmd() *cobra.Command {
 				return thisCmd.Help()
 			}
 		},
+		SilenceUsage: true,
 	}
 	theCmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr`)
 	if release.Arg1IsEnv() {
