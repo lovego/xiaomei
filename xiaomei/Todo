@@ -1,10 +1,6 @@
+log rotate
 ls-deploy、 rollback 命令开发
 蓝绿部署等方式调研
-web run 无日志问题: exec tail
-
-swarm特有问题：
-  nginx no upstream问题: nginx-start: wait until host available，not good. may be use ip is better.
-  stack首次本地deploy未锁定image问题：在QA环境跟踪。
 
 尝试引入kubernetes，不要想只使用简单部署，不尝试就放弃k8s，不科学。
 
