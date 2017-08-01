@@ -22,7 +22,7 @@ func Write(req *xiaomei.Request, res *xiaomei.Response, t time.Time, err interfa
 		if !isDevMode {
 			go config.Alarm(`500错误`, formatFields(fields, false), errStr+` `+errStack)
 		}
-	} else if err := fields[`err`]; err != nil && !isDevMode {
+	} else if err = fields[`err`]; err != nil && !isDevMode {
 		errStr, ok := err.(string)
 		if !ok {
 			errStr = fmt.Sprint(err)
