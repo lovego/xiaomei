@@ -1,8 +1,9 @@
 package elastic
 
 import (
-	"bytes"
+	"encoding/json"
 	"fmt"
+	"log"
 	"reflect"
 )
 
@@ -33,23 +34,18 @@ func (b bulkError) Items() [][2]interface{} {
 }
 
 func (b bulkError) Error() string {
-	errsCount := 0
-	errsMap := make(map[string]int)
+	var errs []interface{}
 	for _, result := range b.results {
-		if err := result[b.typ][`error`]; err != nil {
-			if errInfo, ok := err.(map[string]interface{}); ok {
-				if typ, ok := errInfo[`type`].(string); ok {
-					errsCount++
-					errsMap[typ]++
-				}
-			}
+		info := result[b.typ]
+		if info[`error`] != nil {
+			errs = append(errs, info)
 		}
 	}
-	buf := bytes.NewBufferString(fmt.Sprintf(
-		"bulk %s errors(%d of %d)\n", b.typ, errsCount, b.inputs.Len(),
-	))
-	for typ, count := range errsMap {
-		fmt.Fprintf(buf, "%s: %d\n", typ, count)
+	buf, err := json.MarshalIndent(errs, ``, `  `)
+	if err != nil {
+		log.Println(`marshal elastic bulk errors: `, err)
 	}
-	return buf.String()
+	return fmt.Sprintf("bulk %s errors(%d of %d)\n%s\n",
+		b.typ, len(errs), b.inputs.Len(), buf,
+	)
 }
