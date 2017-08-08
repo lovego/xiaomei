@@ -9,14 +9,14 @@ import (
 )
 
 var pools = struct {
-	sync.RWMutex
+	sync.Mutex
 	m map[string]*redis.Pool
 }{m: make(map[string]*redis.Pool)}
 
 func Pool(name string) *redis.Pool {
-	pools.RLock()
+	pools.Lock()
+	defer pools.Unlock()
 	p := pools.m[name]
-	pools.RUnlock()
 	if p == nil {
 		p = &redis.Pool{
 			MaxIdle:     32,
@@ -31,9 +31,7 @@ func Pool(name string) *redis.Pool {
 				)
 			},
 		}
-		pools.Lock()
 		pools.m[name] = p
-		pools.Unlock()
 	}
 	return p
 }

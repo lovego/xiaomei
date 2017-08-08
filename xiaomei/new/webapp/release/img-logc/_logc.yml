@@ -12,10 +12,9 @@ production:
   <<: *defaults
 
 defaults: &defaults
-  orgName: {{ .Domain }}
   files:
-    - { name: app-log, path: app.log, mapping: *mapping }
-    - { name: app-err, path: app.err, mapping: *mapping }
+    - { org: {{ .Domain }}, name: app-log, path: app.log, mapping: *mapping }
+    - { org: {{ .Domain }}, name: app-err, path: app.err, mapping: *mapping }
   mapping: &mapping
     at: { type: date, format: "yyyy-MM-dd'T'HH:mm:ssZ" }
     duration: { type: float }

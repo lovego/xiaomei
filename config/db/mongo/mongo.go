@@ -9,24 +9,22 @@ import (
 
 var mongoSessions = struct {
 	m map[string]MongoSession
-	sync.RWMutex
+	sync.Mutex
 }{
 	m: make(map[string]MongoSession),
 }
 
 func Session(name string) MongoSession {
-	mongoSessions.RLock()
+	mongoSessions.Lock()
+	defer mongoSessions.Unlock()
 	sess, ok := mongoSessions.m[name]
-	mongoSessions.RUnlock()
 	if !ok {
 		session, err := mgo.Dial(config.DataSource(`mongo`, name))
 		if err != nil {
 			panic(err)
 		}
 		sess = MongoSession{session}
-		mongoSessions.Lock()
 		mongoSessions.m[name] = sess
-		mongoSessions.Unlock()
 	}
 	return sess
 }

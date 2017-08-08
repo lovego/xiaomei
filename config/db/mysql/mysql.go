@@ -5,19 +5,19 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lovego/xiaomei/config"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/lovego/xiaomei/config"
 )
 
 var mysqlConns = struct {
-	sync.RWMutex
+	sync.Mutex
 	m map[string]*sql.DB
 }{m: make(map[string]*sql.DB)}
 
 func DB(name string) *sql.DB {
-	mysqlConns.RLock()
+	mysqlConns.Lock()
+	defer mysqlConns.Unlock()
 	mysql := mysqlConns.m[name]
-	mysqlConns.RUnlock()
 	if mysql != nil {
 		return mysql
 	}
@@ -32,8 +32,6 @@ func DB(name string) *sql.DB {
 	mysql.SetConnMaxLifetime(time.Minute * 10)
 	mysql.SetMaxIdleConns(5)
 	mysql.SetMaxOpenConns(50)
-	mysqlConns.Lock()
 	mysqlConns.m[name] = mysql
-	mysqlConns.Unlock()
 	return mysql
 }
