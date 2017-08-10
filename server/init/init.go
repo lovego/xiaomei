@@ -3,12 +3,11 @@
 package init
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/lovego/xiaomei/config"
-	"github.com/lovego/xiaomei/utils"
 )
 
 func init() {
-	utils.Log(fmt.Sprintf(`starting.(%s)`, config.Env()))
+	log.Printf(`starting.(%s)`, config.Env())
 }

@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"log"
 	"net"
 	"net/http"
 	"os"
@@ -64,7 +65,7 @@ func (s *Server) ListenAndServe() {
 	go func() {
 		err := s.Server.Serve(getListener())
 		if err != nil && err != http.ErrServerClosed {
-			panic(err)
+			log.Panic(err)
 		}
 	}()
 
@@ -85,7 +86,7 @@ func getListener() net.Listener {
 	addr := `:` + port
 	ln, err := net.Listen(`tcp`, addr)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 	utils.Log(color.GreenString(`started.(` + addr + `)`))
 	return tcpKeepAliveListener{ln.(*net.TCPListener)}

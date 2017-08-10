@@ -10,6 +10,8 @@ import (
 	"github.com/lovego/xiaomei/utils"
 )
 
+var isDevMode = config.DevMode()
+
 func Write(req *xiaomei.Request, res *xiaomei.Response, t time.Time, err interface{}) {
 	fields := getFields(req, res, t)
 
@@ -32,9 +34,9 @@ func Write(req *xiaomei.Request, res *xiaomei.Response, t time.Time, err interfa
 
 	if line := serializeFields(fields); len(line) > 0 {
 		if err != nil {
-			errorLog.Write(line)
+			getErrorLog().Write(line)
 		} else {
-			accessLog.Write(line)
+			getAccessLog().Write(line)
 		}
 	}
 }
