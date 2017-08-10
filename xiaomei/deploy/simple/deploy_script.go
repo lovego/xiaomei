@@ -74,7 +74,7 @@ func getServiceConf(svcName string) serviceConf {
 	image := images.Get(svcName)
 	service := simpleconf.GetService(svcName)
 	conf := serviceConf{
-		Name:    release.Name() + `_` + svcName,
+		Name:    release.DeployName() + `_` + svcName,
 		Image:   image.NameWithDigestInRegistry(),
 		PortEnv: image.PortEnvName(),
 		Envs:    image.Envs(),

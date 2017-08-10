@@ -90,7 +90,7 @@ func PortsOf(svcName string) (ports []string) {
 }
 
 func ContainerNameOf(svcName string) string {
-	name := release.Name() + `_` + svcName
+	name := release.DeployName() + `_` + svcName
 	if ports := PortsOf(svcName); len(ports) > 0 {
 		name += `.` + ports[0]
 	}

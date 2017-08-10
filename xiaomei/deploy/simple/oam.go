@@ -15,7 +15,7 @@ for name in $(docker ps -af name=%s_%s --format '{{.Names}}'); do
 	docker logs $name
 	echo
 done
-`, release.Name(), svcName)
+`, release.DeployName(), svcName)
 	return eachNodeRun(script)
 }
 
@@ -24,7 +24,7 @@ func (d driver) RmDeploy(svcName string) error {
 for name in $(docker ps -af name=%s_%s --format '{{.Names}}'); do
 	docker stop $name >/dev/null 2>&1 && docker rm $name
 done
-`, release.Name(), svcName)
+`, release.DeployName(), svcName)
 	return eachNodeRun(script)
 }
 
@@ -33,7 +33,7 @@ func (d driver) Ps(svcName string, watch bool, options []string) error {
 }
 
 func getPsScript(svcName string, watch bool) string {
-	script := fmt.Sprintf(`docker ps -f name=%s_%s`, release.Name(), svcName)
+	script := fmt.Sprintf(`docker ps -f name=%s_%s`, release.DeployName(), svcName)
 	if watch {
 		script = `watch ` + script
 	}
