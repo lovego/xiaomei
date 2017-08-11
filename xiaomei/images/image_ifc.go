@@ -38,17 +38,7 @@ func (i Image) EnvsForRun() []string {
 	return nil
 }
 
-// 4. files to map into docker container for run
-func (i Image) FilesForRun() []string {
-	if ifc, ok := i.image.(interface {
-		FilesForRun() []string
-	}); ok {
-		return ifc.FilesForRun()
-	}
-	return nil
-}
-
-// 5. prepare files for build
+// 4. prepare files for build
 func (i Image) prepare() error {
 	if ifc, ok := i.image.(interface {
 		Prepare() error
@@ -58,7 +48,7 @@ func (i Image) prepare() error {
 	return nil
 }
 
-// 6. dir for build
+// 5. dir for build
 func (i Image) buildDir() string {
 	if ifc, ok := i.image.(interface {
 		BuildDir() string
@@ -68,7 +58,7 @@ func (i Image) buildDir() string {
 	return filepath.Join(release.Root(), `img-`+i.svcName)
 }
 
-// 7. dockerfile for build
+// 6. dockerfile for build
 func (i Image) dockerfile() string {
 	if ifc, ok := i.image.(interface {
 		Dockerfile() string

@@ -55,7 +55,7 @@ func GetService(svcName string) Service {
 
 func ServiceNames() (names []string) {
 	services := Get().Services
-	for _, svcName := range []string{`app`, `tasks`, `web`, `logc`, `godoc`} {
+	for _, svcName := range []string{`app`, `tasks`, `web`, `logc`, `cron`, `godoc`} {
 		if _, ok := services[svcName]; ok {
 			names = append(names, svcName)
 		}

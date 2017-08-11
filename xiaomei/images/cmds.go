@@ -6,13 +6,9 @@ import (
 )
 
 func Cmds(svcName string) []*cobra.Command {
-	if svcName != `` && Get(svcName).external {
-		return nil
-	} else {
-		return []*cobra.Command{
-			buildCmdFor(svcName),
-			pushCmdFor(svcName),
-		}
+	return []*cobra.Command{
+		buildCmdFor(svcName),
+		pushCmdFor(svcName),
 	}
 }
 

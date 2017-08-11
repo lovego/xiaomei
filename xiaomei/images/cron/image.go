@@ -1,9 +1,6 @@
 package cron
 
 import (
-	"fmt"
-	"path/filepath"
-
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 

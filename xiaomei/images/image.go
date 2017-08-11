@@ -11,15 +11,11 @@ import (
 )
 
 type Image struct {
-	svcName  string
-	image    interface{}
-	external bool
+	svcName string
+	image   interface{}
 }
 
 func (i Image) Build(pull bool) error {
-	if i.external {
-		return nil
-	}
 	if err := i.prepare(); err != nil {
 		return err
 	}
@@ -34,24 +30,9 @@ func (i Image) Build(pull bool) error {
 }
 
 func (i Image) Push() error {
-	if i.external {
-		return nil
-	}
 	utils.Log(color.GreenString(`pushing ` + i.svcName + ` image.`))
 	_, err := cmd.Run(cmd.O{Print: true}, `docker`, `push`, conf.ImageNameOf(i.svcName))
 	return err
-}
-
-func (i Image) PrepareOrBuild() error {
-	if i.external {
-		return nil
-	}
-	if cmd.Ok(cmd.O{NoStdout: true, NoStderr: true},
-		`docker`, `image`, `inspect`, conf.ImageNameOf(i.svcName)) {
-		return i.prepare()
-	} else {
-		return i.Build(true)
-	}
 }
 
 // TODO: https or http check.

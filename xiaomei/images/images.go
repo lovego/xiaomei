@@ -3,6 +3,7 @@ package images
 import (
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/images/app"
+	"github.com/lovego/xiaomei/xiaomei/images/cron"
 	"github.com/lovego/xiaomei/xiaomei/images/godoc"
 	"github.com/lovego/xiaomei/xiaomei/images/logc"
 	"github.com/lovego/xiaomei/xiaomei/images/tasks"
@@ -14,6 +15,7 @@ var imagesMap = map[string]Image{
 	`tasks`: Image{svcName: `tasks`, image: tasks.Image{}},
 	`web`:   Image{svcName: `web`, image: web.Image{}},
 	`logc`:  Image{svcName: `logc`, image: logc.Image{}},
+	`cron`:  Image{svcName: `cron`, image: cron.Image{}},
 	`godoc`: Image{svcName: `godoc`, image: godoc.Image{}},
 }
 

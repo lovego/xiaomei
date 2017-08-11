@@ -7,8 +7,7 @@ import (
 )
 
 func run(svcName string) error {
-	image := images.Get(svcName)
-	if err := image.PrepareOrBuild(); err != nil {
+	if err := images.Build(svcName, true); err != nil {
 		return err
 	}
 
@@ -18,14 +17,12 @@ func run(svcName string) error {
 	} else {
 		args = append(args, flags...)
 	}
+	image := images.Get(svcName)
 	for _, env := range image.Envs() {
 		args = append(args, `-e`, env)
 	}
 	for _, env := range image.EnvsForRun() {
 		args = append(args, `-e`, env)
-	}
-	for _, file := range image.FilesForRun() {
-		args = append(args, `-v`, file)
 	}
 	args = append(args, conf.OptionsFor(svcName)...)
 	args = append(args, conf.ImageNameOf(svcName))

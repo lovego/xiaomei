@@ -1,7 +1,6 @@
 package godoc
 
 import (
-	"fmt"
 	"path/filepath"
 
 	"github.com/lovego/xiaomei/xiaomei/release"
@@ -20,12 +19,4 @@ func (i Image) BuildDir() string {
 
 func (i Image) Dockerfile() string {
 	return `release/img-godoc/Dockerfile`
-}
-
-func (i Image) FilesForRun() []string {
-	root := filepath.Join(release.Root(), `..`)
-	name := filepath.Base(root)
-	return []string{
-		fmt.Sprintf(`%s:/home/ubuntu/go/src/%s`, root, name),
-	}
 }
