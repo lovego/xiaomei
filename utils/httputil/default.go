@@ -2,9 +2,10 @@ package httputil
 
 import (
 	"net/http"
+	"time"
 )
 
-var DefaultClient = &Client{Client: http.DefaultClient}
+var DefaultClient = &Client{Client: &http.Client{Timeout: 10 * time.Second}}
 
 func Get(url string, headers map[string]string, body interface{}) (*Response, error) {
 	return DefaultClient.Do(http.MethodGet, url, headers, body)

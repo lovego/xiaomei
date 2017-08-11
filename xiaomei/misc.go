@@ -26,7 +26,11 @@ func yamlCmd() *cobra.Command {
 			if goSyntax {
 				fmt.Printf("%#v\n", data)
 			} else {
-				fmt.Println(data)
+				if buf, err := yaml.Marshal(data); err != nil {
+					fmt.Println(err)
+				} else {
+					fmt.Printf("%s\n", buf)
+				}
 			}
 			return nil
 		}),

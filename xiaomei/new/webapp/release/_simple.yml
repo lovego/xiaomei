@@ -24,6 +24,10 @@ defaults: &defaults
     logc:
       image: 192.168.202.12:5000/{{ .Domain }}/logc
       options: [ -v, "{{ .ProName }}_logs:/home/ubuntu/{{ .ProName }}_logs" ]
+    cron:
+      image: 192.168.202.12:5000/{{ .Domain }}/logc
+      options: [ -v, "{{ .ProName }}_logs:/home/ubuntu/{{ .ProName }}_logs",
+                 -v, "/var/run/docker.sock:/var/run/docker.sock" ]
   # godoc:
   #   nodes: { godoc: true }
   #   image: 192.168.202.12:5000/{{ .Domain }}/godoc

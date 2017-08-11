@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 
 	"github.com/lovego/xiaomei/utils/httputil"
 )
@@ -61,6 +62,7 @@ func getClient() *httputil.Client {
 			Transport: &http.Transport{
 				Dial: unixDial,
 			},
+			Timeout: 5 * time.Second,
 		},
 	}
 }
