@@ -73,14 +73,11 @@ func unixDial(proto, addr string) (conn net.Conn, err error) {
 
 func getArgs() (signal string, names []string) {
 	flag.CommandLine.Usage = usage
-
-	var help bool
-	flag.BoolVar(&help, `help`, false, `print usage`)
-	flag.StringVar(&signal, `signal`, `SIGKILL`, `signal to send to the containers`)
+	flag.StringVar(&signal, `s`, `SIGKILL`, `signal to send to the containers`)
 	flag.Parse()
 
 	names = flag.Args()
-	if help || len(names) == 0 {
+	if len(names) == 0 {
 		usage()
 		os.Exit(0)
 	}
@@ -88,6 +85,9 @@ func getArgs() (signal string, names []string) {
 }
 
 func usage() {
-	fmt.Fprintf(os.Stderr, "Usage: %s [options] <container-name> ... \n", os.Args[0])
+	fmt.Fprintf(os.Stderr,
+		`docker-kill send signal to containers whose name match the regexps. (version 17.8.11)
+usage: %s [options] <container-name-regexp> ...
+`, os.Args[0])
 	flag.PrintDefaults()
 }
