@@ -1,5 +1,6 @@
 FROM 192.168.202.12:5000/xiaomei/cron
 
 COPY logrotate.conf /etc/logrotate.d/{{ .ProName }}
-RUN mkdir /home/ubuntu/{{ .ProName }}_logs
+
+RUN mkdir /home/ubuntu/{{ .ProName }}_logs && chown ubuntu:ubuntu /home/ubuntu/{{ .ProName }}_logs
 WORKDIR /home/ubuntu/{{ .ProName }}_logs

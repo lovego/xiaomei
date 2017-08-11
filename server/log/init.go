@@ -1,7 +1,6 @@
 package log
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -53,7 +52,7 @@ func init() {
 func setupLogger() error {
 	logDir := filepath.Join(config.Root(), `log`)
 	if err := os.MkdirAll(logDir, 0775); err != nil {
-		return fmt.Errorf(`mkdir %s failed: %v`, logDir, err)
+		return err
 	}
 	accessLogPath := filepath.Join(logDir, `app.log`)
 	if accessLog, err := fs.OpenAppend(accessLogPath); err != nil {
