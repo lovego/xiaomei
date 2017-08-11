@@ -43,7 +43,9 @@ func init() {
 	go func() {
 		for {
 			<-ch
-			setupLogger()
+			if err := setupLogger(); err != nil {
+				log.Println(err)
+			}
 		}
 	}()
 }
@@ -51,21 +53,27 @@ func init() {
 func setupLogger() error {
 	logDir := filepath.Join(config.Root(), `log`)
 	if err := os.MkdirAll(logDir, 0775); err != nil {
-		return fmt.Errorf(`open appserver log dir %s failed: %v`, logDir, err)
+		return fmt.Errorf(`mkdir %s failed: %v`, logDir, err)
 	}
 	accessLogPath := filepath.Join(logDir, `app.log`)
 	if accessLog, err := fs.OpenAppend(accessLogPath); err != nil {
-		return fmt.Errorf(`open appserver access log %s failed: %v`, accessLogPath, err)
+		return err
 	} else {
 		accessLogLock.Lock()
+		if theAccessLog != nil {
+			theAccessLog.Close()
+		}
 		theAccessLog = accessLog
 		accessLogLock.Unlock()
 	}
 	errorLogPath := filepath.Join(logDir, `app.err`)
 	if errorLog, err := fs.OpenAppend(errorLogPath); err != nil {
-		return fmt.Errorf(`open appserver error log %s failed: %v`, errorLogPath, err)
+		return err
 	} else {
 		errorLogLock.Lock()
+		if theErrorLog != nil {
+			theErrorLog.Close()
+		}
 		theErrorLog = errorLog
 		errorLogLock.Unlock()
 	}

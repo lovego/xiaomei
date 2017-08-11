@@ -19,7 +19,6 @@ import (
 	"github.com/lovego/xiaomei/router"
 	"github.com/lovego/xiaomei/server/funcs"
 	"github.com/lovego/xiaomei/session"
-	"github.com/lovego/xiaomei/utils"
 )
 
 func init() {
@@ -72,9 +71,9 @@ func (s *Server) ListenAndServe() {
 	<-ch
 	ctx, _ := context.WithDeadline(context.Background(), time.Now().Add(7*time.Second))
 	if err := s.Server.Shutdown(ctx); err == nil {
-		utils.Log(`shutdown`)
+		log.Println(`shutdown`)
 	} else {
-		utils.Log(`shutdown error: ` + err.Error())
+		log.Printf("shutdown error: %v", err)
 	}
 }
 
@@ -88,7 +87,7 @@ func getListener() net.Listener {
 	if err != nil {
 		log.Panic(err)
 	}
-	utils.Log(color.GreenString(`started.(` + addr + `)`))
+	log.Println(color.GreenString(`started.(` + addr + `)`))
 	return tcpKeepAliveListener{ln.(*net.TCPListener)}
 }
 
