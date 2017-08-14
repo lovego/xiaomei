@@ -3,5 +3,5 @@ FROM 192.168.202.12:5000/xiaomei/nginx
 COPY web.conf.tmpl /etc/nginx/sites-available/{{ .ProName }}.conf.tmpl
 COPY public /var/www/{{ .ProName }}/
 
-RUN  mkdir /var/log/nginx/{{ .ProName }} && chown ubuntu:ubuntu /var/log/nginx/{{ .ProName }}
 WORKDIR /var/log/nginx/{{ .ProName }}
+RUN  chown ubuntu:ubuntu .
