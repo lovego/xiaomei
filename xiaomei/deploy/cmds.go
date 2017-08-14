@@ -35,6 +35,7 @@ func runCmdFor(svcName string) *cobra.Command {
 
 func deployCmdFor(svcName string) *cobra.Command {
 	var noBuild, noPush /*, rmCurrent*/ bool
+	var filter string
 	cmd := &cobra.Command{
 		Use:   `deploy`,
 		Short: `deploy the ` + desc(svcName) + `.`,
@@ -49,47 +50,54 @@ func deployCmdFor(svcName string) *cobra.Command {
 					return err
 				}
 			}
-			return getDriver().Deploy(svcName) // , rmCurrent)
+			return getDriver().Deploy(svcName, filter) // , rmCurrent)
 		}),
 	}
 	cmd.Flags().BoolVarP(&noBuild, `no-build`, `B`, false, `do not build the images.`)
 	cmd.Flags().BoolVarP(&noPush, `no-push`, `P`, false, `do not push the images.`)
 	// cmd.Flags().BoolVar(&rmCurrent, `rm-current`, false, `remove the current running `+desc+`.`)
+	cmd.Flags().StringVarP(&filter, `filter`, `f,`, ``, `filter by node addr.`)
 	return cmd
 }
 
 func rmDeployCmdFor(svcName string) *cobra.Command {
+	var filter string
 	cmd := &cobra.Command{
 		Use:   `rm-deploy`,
 		Short: `remove deployment of the ` + desc(svcName) + `.`,
 		RunE: release.NoArgCall(func() error {
-			return getDriver().RmDeploy(svcName)
+			return getDriver().RmDeploy(svcName, filter)
 		}),
 	}
+	cmd.Flags().StringVarP(&filter, `filter`, `f,`, ``, `filter by node addr.`)
 	return cmd
 }
 
 func psCmdFor(svcName string) *cobra.Command {
 	var watch bool
+	var filter string
 	cmd := &cobra.Command{
 		Use:   `ps`,
 		Short: `list tasks of the ` + desc(svcName) + `.`,
 		RunE: func(c *cobra.Command, args []string) error {
-			return getDriver().Ps(svcName, watch, args)
+			return getDriver().Ps(svcName, filter, watch, args)
 		},
 	}
+	cmd.Flags().StringVarP(&filter, `filter`, `f,`, ``, `filter by node addr.`)
 	cmd.Flags().BoolVarP(&watch, `watch`, `w`, false, `watch ps.`)
 	return cmd
 }
 
 func logsCmdFor(svcName string) *cobra.Command {
+	var filter string
 	cmd := &cobra.Command{
 		Use:   `logs`,
 		Short: `list logs  of the ` + desc(svcName) + `.`,
 		RunE: func(c *cobra.Command, args []string) error {
-			return getDriver().Logs(svcName)
+			return getDriver().Logs(svcName, filter)
 		},
 	}
+	cmd.Flags().StringVarP(&filter, `filter`, `f,`, ``, `filter by node addr.`)
 	return cmd
 }
 

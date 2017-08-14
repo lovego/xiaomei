@@ -8,7 +8,7 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-func (d driver) Logs(svcName string) error {
+func (d driver) Logs(svcName, feature string) error {
 	script := fmt.Sprintf(`
 for name in $(docker ps -af name=%s_%s --format '{{.Names}}'); do
 	echo -e "\033[32m$name\033[0m"
@@ -16,20 +16,20 @@ for name in $(docker ps -af name=%s_%s --format '{{.Names}}'); do
 	echo
 done
 `, release.DeployName(), svcName)
-	return eachNodeRun(script)
+	return eachNodeRun(script, feature)
 }
 
-func (d driver) RmDeploy(svcName string) error {
+func (d driver) RmDeploy(svcName, feature string) error {
 	script := fmt.Sprintf(`
 for name in $(docker ps -af name=%s_%s --format '{{.Names}}'); do
 	docker stop $name >/dev/null 2>&1 && docker rm $name
 done
 `, release.DeployName(), svcName)
-	return eachNodeRun(script)
+	return eachNodeRun(script, feature)
 }
 
-func (d driver) Ps(svcName string, watch bool, options []string) error {
-	return eachNodeRun(getPsScript(svcName, watch))
+func (d driver) Ps(svcName, feature string, watch bool, options []string) error {
+	return eachNodeRun(getPsScript(svcName, watch), feature)
 }
 
 func getPsScript(svcName string, watch bool) string {
@@ -40,8 +40,8 @@ func getPsScript(svcName string, watch bool) string {
 	return script
 }
 
-func eachNodeRun(script string) error {
-	for _, node := range cluster.Nodes() {
+func eachNodeRun(script, feature string) error {
+	for _, node := range cluster.Nodes(feature) {
 		if _, err := node.Run(cmd.O{}, script); err != nil {
 			return err
 		}

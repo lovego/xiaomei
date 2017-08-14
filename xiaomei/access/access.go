@@ -17,7 +17,7 @@ func accessPrint(svcName string) error {
 	return nil
 }
 
-func accessSetup(svcName string) error {
+func accessSetup(svcName, feature string) error {
 	nginxConf, fileName, err := getNginxConf(svcName)
 	if err != nil {
 		return err
@@ -29,7 +29,7 @@ func accessSetup(svcName string) error {
 	sudo service nginx reload
 	`, fileName, fileName,
 	)
-	for _, node := range cluster.Nodes() {
+	for _, node := range cluster.Nodes(feature) {
 		if node.Labels[`access`] == `true` {
 			if _, err := node.Run(
 				cmd.O{Stdin: strings.NewReader(nginxConf)}, script,

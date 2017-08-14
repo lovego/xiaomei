@@ -12,10 +12,10 @@ var Driver driver
 
 type driver struct{}
 
-func (d driver) Deploy(svcName string) error {
+func (d driver) Deploy(svcName, feature string) error {
 	svcs := getServices(svcName)
 	psScript := getPsScript(svcName, true)
-	for _, node := range cluster.Nodes() {
+	for _, node := range cluster.Nodes(feature) {
 		if err := deployNode(svcs, node, psScript); err != nil {
 			return err
 		}

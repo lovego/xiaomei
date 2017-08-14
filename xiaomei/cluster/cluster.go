@@ -9,26 +9,24 @@ import (
 )
 
 func Run(o cmd.O, feature, script string) (string, error) {
-	for _, node := range Nodes() {
-		if feature == `` || strings.Contains(node.Addr, feature) {
-			return node.Run(o, script)
-		}
+	for _, node := range Nodes(feature) {
+		return node.Run(o, script)
 	}
 	return ``, nil
 }
 
 func ServiceRun(o cmd.O, svcName, feature, script string) (string, error) {
 	labels := simpleconf.GetService(svcName).Nodes
-	for _, node := range Nodes() {
-		if node.Match(labels) && (feature == `` || strings.Contains(node.Addr, feature)) {
+	for _, node := range Nodes(feature) {
+		if node.Match(labels) {
 			return node.Run(o, script)
 		}
 	}
 	return ``, nil
 }
 
-func Nodes() []Node {
-	return GetCluster().Nodes()
+func Nodes(feature string) []Node {
+	return GetCluster().Nodes(feature)
 }
 
 func GetCluster() Cluster {
@@ -44,7 +42,6 @@ type Cluster struct {
 	JumpAddr string `yaml:"jumpAddr"`
 	Managers []Node `yaml:"managers"`
 	Workers  []Node `yaml:"workers"`
-	nodes    []Node
 }
 
 func (c *Cluster) init() {
@@ -65,12 +62,18 @@ func (c Cluster) Manager() Node {
 	return c.Managers[0]
 }
 
-func (c Cluster) Nodes() []Node {
-	if c.nodes == nil {
-		c.nodes = append(c.nodes, c.Managers...)
-		c.nodes = append(c.nodes, c.Workers...)
+func (c Cluster) Nodes(feature string) (nodes []Node) {
+	for _, node := range c.Managers {
+		if feature != `` || strings.Contains(node.Addr, feature) {
+			nodes = append(nodes, node)
+		}
 	}
-	return c.nodes
+	for _, node := range c.Workers {
+		if feature != `` || strings.Contains(node.Addr, feature) {
+			nodes = append(nodes, node)
+		}
+	}
+	return
 }
 
 func (c Cluster) List() {

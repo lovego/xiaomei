@@ -15,18 +15,20 @@ func Cmds(svcName string) (cmds []*cobra.Command) {
 
 func accessCmd(svcName string) *cobra.Command {
 	var setup bool
+	var filter string
 	cmd := &cobra.Command{
 		Use:   `access`,
 		Short: `access config for the ` + desc(svcName) + `.`,
 		RunE: release.NoArgCall(func() error {
 			if setup {
-				return accessSetup(svcName)
+				return accessSetup(svcName, filter)
 			} else {
 				return accessPrint(svcName)
 			}
 		}),
 	}
 	cmd.Flags().BoolVarP(&setup, `setup`, `s`, false, `setup access.`)
+	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
 	return cmd
 }
 

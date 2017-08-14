@@ -51,7 +51,7 @@ func (s *service) Nodes() (nodes []cluster.Node) {
 		return nil
 	}
 	service := simpleconf.GetService(s.svcName)
-	for _, node := range cluster.Nodes() {
+	for _, node := range cluster.Nodes(``) {
 		if node.Match(service.Nodes) {
 			nodes = append(nodes, node)
 		}

@@ -7,10 +7,10 @@ import (
 
 type driver interface {
 	FlagsForRun(svcName string) ([]string, error)
-	Deploy(svcName string) error
-	RmDeploy(svcName string) error
-	Logs(svcName string) error
-	Ps(svcName string, watch bool, options []string) error
+	Deploy(svcName, feature string) error
+	RmDeploy(svcName, feature string) error
+	Logs(svcName, feature string) error
+	Ps(svcName, feature string, watch bool, options []string) error
 }
 
 var theDriver driver
