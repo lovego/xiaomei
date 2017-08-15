@@ -56,7 +56,7 @@ func deployCmdFor(svcName string) *cobra.Command {
 	cmd.Flags().BoolVarP(&noBuild, `no-build`, `B`, false, `do not build the images.`)
 	cmd.Flags().BoolVarP(&noPush, `no-push`, `P`, false, `do not push the images.`)
 	// cmd.Flags().BoolVar(&rmCurrent, `rm-current`, false, `remove the current running `+desc+`.`)
-	cmd.Flags().StringVarP(&filter, `filter`, `f,`, ``, `filter by node addr.`)
+	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
 	return cmd
 }
 
@@ -69,7 +69,7 @@ func rmDeployCmdFor(svcName string) *cobra.Command {
 			return getDriver().RmDeploy(svcName, filter)
 		}),
 	}
-	cmd.Flags().StringVarP(&filter, `filter`, `f,`, ``, `filter by node addr.`)
+	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
 	return cmd
 }
 
@@ -83,7 +83,7 @@ func psCmdFor(svcName string) *cobra.Command {
 			return getDriver().Ps(svcName, filter, watch, args)
 		},
 	}
-	cmd.Flags().StringVarP(&filter, `filter`, `f,`, ``, `filter by node addr.`)
+	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
 	cmd.Flags().BoolVarP(&watch, `watch`, `w`, false, `watch ps.`)
 	return cmd
 }
@@ -97,7 +97,7 @@ func logsCmdFor(svcName string) *cobra.Command {
 			return getDriver().Logs(svcName, filter)
 		},
 	}
-	cmd.Flags().StringVarP(&filter, `filter`, `f,`, ``, `filter by node addr.`)
+	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
 	return cmd
 }
 

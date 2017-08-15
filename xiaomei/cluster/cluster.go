@@ -64,12 +64,12 @@ func (c Cluster) Manager() Node {
 
 func (c Cluster) Nodes(feature string) (nodes []Node) {
 	for _, node := range c.Managers {
-		if feature != `` || strings.Contains(node.Addr, feature) {
+		if feature == `` || strings.Contains(node.Addr, feature) {
 			nodes = append(nodes, node)
 		}
 	}
 	for _, node := range c.Workers {
-		if feature != `` || strings.Contains(node.Addr, feature) {
+		if feature == `` || strings.Contains(node.Addr, feature) {
 			nodes = append(nodes, node)
 		}
 	}
