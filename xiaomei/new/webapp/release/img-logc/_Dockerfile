@@ -1,5 +1,5 @@
 FROM 192.168.202.12:5000/xiaomei/logc
 
-COPY logc.yml ./
-RUN mkdir /home/ubuntu/{{ .ProName }}_logs
+COPY logc.yml logrotate.conf ./
 WORKDIR /home/ubuntu/{{ .ProName }}_logs
+RUN chown ubuntu:ubuntu .

@@ -15,18 +15,21 @@ defaults: &defaults
   files:
     - { org: {{ .Domain }}, name: app-log, path: app.log, mapping: *mapping }
     - { org: {{ .Domain }}, name: app-err, path: app.err, mapping: *mapping }
-  mapping: &mapping
-    at: { type: date, format: "yyyy-MM-dd'T'HH:mm:ssZ" }
-    duration: { type: float }
-    host: { type: keyword }
-    method: { type: keyword }
-    path: { type: text }
-    query: { type: text }
-    status: { type: keyword }
-    req_body: { type: integer }
-    res_body: { type: integer }
-    ip: { type: ip }
-    refer: { type: text }
-    agent: { type: text }
-    proto: { type: keyword }
-    # session: sess
+  rotateTime: "33 33 3 0 0 0"
+  rotateCmd: [ logrotate, logrotate.conf ]
+
+mapping: &mapping
+  at: { type: date, format: "yyyy-MM-dd'T'HH:mm:ssZ" }
+  duration: { type: float }
+  host: { type: keyword }
+  method: { type: keyword }
+  path: { type: text }
+  query: { type: text }
+  status: { type: keyword }
+  req_body: { type: integer }
+  res_body: { type: integer }
+  ip: { type: ip }
+  refer: { type: text }
+  agent: { type: text }
+  proto: { type: keyword }
+  # session: sess
