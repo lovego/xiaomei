@@ -3,14 +3,27 @@ package log
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/lovego/xiaomei"
 	"github.com/lovego/xiaomei/config"
 	"github.com/lovego/xiaomei/utils"
+	"github.com/lovego/xiaomei/utils/fs"
 )
 
 var isDevMode = config.DevMode()
+var theAccessLog, theErrorLog = getLogWriter()
+
+func getLogWriter() (io.Writer, io.Writer) {
+	if isDevMode {
+		return os.Stdout, os.Stderr
+	}
+	path := filepath.Join(config.Root(), `log`, `app`)
+	return fs.NewLogFile(path + `.log`), fs.NewLogFile(path + `.err`)
+}
 
 func Write(req *xiaomei.Request, res *xiaomei.Response, t time.Time, err interface{}) {
 	fields := getFields(req, res, t)
@@ -34,9 +47,9 @@ func Write(req *xiaomei.Request, res *xiaomei.Response, t time.Time, err interfa
 
 	if line := serializeFields(fields); len(line) > 0 {
 		if err != nil {
-			getErrorLog().Write(line)
+			theErrorLog.Write(line)
 		} else {
-			getAccessLog().Write(line)
+			theAccessLog.Write(line)
 		}
 	}
 }

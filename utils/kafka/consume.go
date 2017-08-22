@@ -1,13 +1,15 @@
 package kafka
 
 import (
+	"encoding/json"
+	"io"
 	"log"
-	"os"
 	"time"
 
 	"github.com/Shopify/sarama"
 	"github.com/garyburd/redigo/redis"
 	"github.com/lovego/xiaomei/utils"
+	"github.com/lovego/xiaomei/utils/fs"
 )
 
 type Consume struct {
@@ -19,12 +21,11 @@ type Consume struct {
 	RedisPool  *redis.Pool
 	OffsetsKey string
 	LogPath    string
-	logFile    *os.File
+	logWriter  io.Writer
 }
 
 func (c *Consume) Start() {
-	c.setupLogFile()
-	defer c.logFile.Close()
+	c.logWriter = fs.NewLogFile(c.LogPath)
 
 	if c.OffsetsKey == `` {
 		c.OffsetsKey = `kafka-offsets-` + c.Topic + `-` + c.Group
@@ -61,16 +62,30 @@ func (c *Consume) process(pc sarama.PartitionConsumer, n int32, message *sarama.
 		`max`:       pc.HighWaterMarkOffset(),
 		`bytes`:     len(message.Value),
 	}
-	c.handle(message, logMap)
+	c.callHandler(message, logMap)
 	c.setPartitionOffset(n, message.Offset)
 	c.writeLog(logMap)
 }
 
-func (c *Consume) handle(message *sarama.ConsumerMessage, logMap map[string]interface{}) {
+func (c *Consume) callHandler(message *sarama.ConsumerMessage, logMap map[string]interface{}) {
 	defer func() {
 		if err := recover(); err != nil {
 			log.Printf("offset: %d, PANIC: %s\n%s", message.Offset, err, utils.Stack(4))
 		}
 	}()
 	c.Handler(message, logMap)
+}
+
+func (c *Consume) writeLog(m map[string]interface{}) {
+	buf, err := json.Marshal(m)
+	if err != nil {
+		log.Printf("marshal log err: %v", err)
+		return
+	}
+	buf = append(buf, '\n')
+	_, err = c.logWriter.Write(buf)
+	if err != nil {
+		log.Printf("write log err: %v", err)
+		return
+	}
 }
