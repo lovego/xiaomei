@@ -11,14 +11,14 @@ defaults: &defaults
   services:
     app:
       image: 192.168.202.12:5000/{{ .Domain }}/app
-      ports: "3001,4001"
+      instances: "3001,4001"
       options: [ -v, "{{ .ProName }}_logs:/home/ubuntu/{{ .ProName }}/log" ]
   # tasks:
   #   nodes: { tasks: true }
   #   image: 192.168.202.12:5000/{{ .Domain }}/tasks
   #   options: [ -v, "{{ .ProName }}_logs:/home/ubuntu/{{ .ProName }}/log" ]
     web:
-      ports: "8001"
+      instances: "8001"
       image: 192.168.202.12:5000/{{ .Domain }}/web
       options: [ -v, "{{ .ProName }}_logs:/var/log/nginx/{{ .ProName }}" ]
     logc:
@@ -28,6 +28,6 @@ defaults: &defaults
   # godoc:
   #   nodes: { godoc: true }
   #   image: 192.168.202.12:5000/{{ .Domain }}/godoc
-  #   ports: "7001"
+  #   instances: "7001"
 
   volumesToCreate: [ {{ .ProName }}_logs ]

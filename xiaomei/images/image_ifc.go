@@ -9,11 +9,11 @@ import (
 // the 7 interfaces, image driver choose to implement.
 
 // 1. for simple deploy
-func (i Image) PortEnvName() string {
+func (i Image) InstanceEnvName() string {
 	if ifc, ok := i.image.(interface {
-		PortEnvName() string
+		InstanceEnvName() string
 	}); ok {
-		return ifc.PortEnvName()
+		return ifc.InstanceEnvName()
 	}
 	return ``
 }

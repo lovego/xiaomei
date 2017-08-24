@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/lovego/xiaomei/utils/cmd"
-	"github.com/lovego/xiaomei/xiaomei/deploy/conf/simpleconf"
+	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
@@ -16,7 +16,7 @@ func Run(o cmd.O, feature, script string) (string, error) {
 }
 
 func ServiceRun(o cmd.O, svcName, feature, script string) (string, error) {
-	labels := simpleconf.GetService(svcName).Nodes
+	labels := conf.GetService(svcName).Nodes
 	for _, node := range Nodes(feature) {
 		if node.Match(labels) {
 			return node.Run(o, script)

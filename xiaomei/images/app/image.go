@@ -7,7 +7,7 @@ import (
 type Image struct {
 }
 
-func (i Image) PortEnvName() string {
+func (i Image) InstanceEnvName() string {
 	return `GOPORT`
 }
 

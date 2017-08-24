@@ -1,11 +1,11 @@
-package simple
+package deploy
 
 import (
 	"bytes"
 	"strings"
 	"text/template"
 
-	"github.com/lovego/xiaomei/xiaomei/deploy/conf/simpleconf"
+	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/images"
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
@@ -34,8 +34,8 @@ deploy() {
 {{ range .Services -}}
 args='{{range .Envs}}-e {{.}} {{end}}{{.Options}} {{.Image}} {{.Command}}'
 {{ $svc := . -}}
-{{ range .Ports -}}
-deploy {{$svc.Name}}.{{.}} "-e {{$svc.PortEnv}}={{.}} $args"
+{{ range .Instances -}}
+deploy {{$svc.Name}}.{{.}} "-e {{$svc.InstanceEnvName}}={{.}} $args"
 {{ else -}}
 deploy {{.Name}} "$args"
 {{ end }}
@@ -45,44 +45,44 @@ deploy {{.Name}} "$args"
 func getDeployScript(svcNames []string) (string, error) {
 	tmpl := template.Must(template.New(``).Parse(deployScriptTmpl))
 	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, getDeployConf(svcNames)); err != nil {
+	if err := tmpl.Execute(&buf, getDeployConfig(svcNames)); err != nil {
 		return ``, err
 	}
 	return buf.String(), nil
 }
 
-type deployConf struct {
+type deployConfig struct {
 	VolumesToCreate []string
-	Services        []serviceConf
+	Services        []serviceConfig
 }
-type serviceConf struct {
-	Name, Image, PortEnv, Command, Options string
-	Ports, Envs                            []string
+type serviceConfig struct {
+	Name, Image, InstanceEnvName, Command, Options string
+	Instances, Envs                                []string
 }
 
-func getDeployConf(svcNames []string) deployConf {
-	conf := deployConf{
-		VolumesToCreate: simpleconf.Get().VolumesToCreate,
+func getDeployConfig(svcNames []string) deployConfig {
+	data := deployConfig{
+		VolumesToCreate: conf.Get().VolumesToCreate,
 	}
 	for _, svcName := range svcNames {
-		conf.Services = append(conf.Services, getServiceConf(svcName))
+		data.Services = append(data.Services, getServiceConf(svcName))
 	}
-	return conf
+	return data
 }
 
-func getServiceConf(svcName string) serviceConf {
+func getServiceConf(svcName string) serviceConfig {
 	image := images.Get(svcName)
-	service := simpleconf.GetService(svcName)
-	conf := serviceConf{
-		Name:    release.DeployName() + `_` + svcName,
-		Image:   image.NameWithDigestInRegistry(),
-		PortEnv: image.PortEnvName(),
-		Envs:    image.Envs(),
-		Command: strings.Join(service.Command, ` `),
-		Options: strings.Join(service.Options, ` `),
+	service := conf.GetService(svcName)
+	data := serviceConfig{
+		Name:            release.DeployName() + `_` + svcName,
+		Image:           image.NameWithDigestInRegistry(),
+		InstanceEnvName: image.InstanceEnvName(),
+		Envs:            image.Envs(),
+		Command:         strings.Join(service.Command, ` `),
+		Options:         strings.Join(service.Options, ` `),
 	}
-	if conf.PortEnv != `` {
-		conf.Ports = simpleconf.PortsOf(svcName)
+	if data.InstanceEnvName != `` {
+		data.Instances = conf.InstancesOf(svcName)
 	}
-	return conf
+	return data
 }

@@ -1,4 +1,4 @@
-package simple
+package deploy
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-func (d driver) Logs(svcName, feature string) error {
+func logs(svcName, feature string) error {
 	script := fmt.Sprintf(`
 for name in $(docker ps -af name=%s_%s --format '{{.Names}}'); do
 	echo -e "\033[32m$name\033[0m"
@@ -19,7 +19,7 @@ done
 	return eachNodeRun(script, feature)
 }
 
-func (d driver) RmDeploy(svcName, feature string) error {
+func rm(svcName, feature string) error {
 	script := fmt.Sprintf(`
 for name in $(docker ps -af name=%s_%s --format '{{.Names}}'); do
 	docker stop $name >/dev/null 2>&1 && docker rm $name
@@ -28,16 +28,12 @@ done
 	return eachNodeRun(script, feature)
 }
 
-func (d driver) Ps(svcName, feature string, watch bool, options []string) error {
-	return eachNodeRun(getPsScript(svcName, watch), feature)
-}
-
-func getPsScript(svcName string, watch bool) string {
+func ps(svcName, feature string, watch bool) error {
 	script := fmt.Sprintf(`docker ps -f name=%s_%s`, release.DeployName(), svcName)
 	if watch {
 		script = `watch ` + script
 	}
-	return script
+	return eachNodeRun(script, feature)
 }
 
 func eachNodeRun(script, feature string) error {

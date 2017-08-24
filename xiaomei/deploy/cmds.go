@@ -13,7 +13,7 @@ func Cmds(svcName string) (cmds []*cobra.Command) {
 	}
 	cmds = append(cmds,
 		deployCmdFor(svcName),
-		rmDeployCmdFor(svcName),
+		rmCmdFor(svcName),
 		psCmdFor(svcName),
 		logsCmdFor(svcName),
 	)
@@ -50,7 +50,7 @@ func deployCmdFor(svcName string) *cobra.Command {
 					return err
 				}
 			}
-			return getDriver().Deploy(svcName, filter) // , rmCurrent)
+			return deploy(svcName, filter) // , rmCurrent)
 		}),
 	}
 	cmd.Flags().BoolVarP(&noBuild, `no-build`, `B`, false, `do not build the images.`)
@@ -60,13 +60,13 @@ func deployCmdFor(svcName string) *cobra.Command {
 	return cmd
 }
 
-func rmDeployCmdFor(svcName string) *cobra.Command {
+func rmCmdFor(svcName string) *cobra.Command {
 	var filter string
 	cmd := &cobra.Command{
-		Use:   `rm-deploy`,
+		Use:   `rm`,
 		Short: `remove deployment of the ` + desc(svcName) + `.`,
 		RunE: release.NoArgCall(func() error {
-			return getDriver().RmDeploy(svcName, filter)
+			return rm(svcName, filter)
 		}),
 	}
 	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
@@ -79,9 +79,9 @@ func psCmdFor(svcName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `ps`,
 		Short: `list tasks of the ` + desc(svcName) + `.`,
-		RunE: func(c *cobra.Command, args []string) error {
-			return getDriver().Ps(svcName, filter, watch, args)
-		},
+		RunE: release.NoArgCall(func() error {
+			return ps(svcName, filter, watch)
+		}),
 	}
 	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
 	cmd.Flags().BoolVarP(&watch, `watch`, `w`, false, `watch ps.`)
@@ -93,9 +93,9 @@ func logsCmdFor(svcName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `logs`,
 		Short: `list logs  of the ` + desc(svcName) + `.`,
-		RunE: func(c *cobra.Command, args []string) error {
-			return getDriver().Logs(svcName, filter)
-		},
+		RunE: release.NoArgCall(func() error {
+			return logs(svcName, filter)
+		}),
 	}
 	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
 	return cmd

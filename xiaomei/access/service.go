@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/lovego/xiaomei/xiaomei/cluster"
-	"github.com/lovego/xiaomei/xiaomei/deploy/conf/simpleconf"
+	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
@@ -15,7 +15,7 @@ type service struct {
 }
 
 func newService(svcName string) *service {
-	if simpleconf.HasService(svcName) {
+	if conf.HasService(svcName) {
 		return &service{svcName: svcName}
 	} else {
 		return nil
@@ -32,10 +32,10 @@ func (s *service) Addrs() ([]string, error) {
 	}
 	if s.addrs == nil {
 		addrs := []string{}
-		ports := simpleconf.PortsOf(s.svcName)
+		instances := conf.InstancesOf(s.svcName)
 		for _, node := range s.Nodes() {
-			for _, port := range ports {
-				addrs = append(addrs, node.GetListenAddr()+`:`+port)
+			for _, instance := range instances {
+				addrs = append(addrs, node.GetListenAddr()+`:`+instance)
 			}
 		}
 		s.addrs = addrs
@@ -50,7 +50,7 @@ func (s *service) Nodes() (nodes []cluster.Node) {
 	if s == nil {
 		return nil
 	}
-	service := simpleconf.GetService(s.svcName)
+	service := conf.GetService(s.svcName)
 	for _, node := range cluster.Nodes(``) {
 		if node.Match(service.Nodes) {
 			nodes = append(nodes, node)

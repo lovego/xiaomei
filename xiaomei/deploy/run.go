@@ -1,9 +1,12 @@
 package deploy
 
 import (
+	"fmt"
+
 	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/images"
+	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
 func run(svcName string) error {
@@ -11,13 +14,16 @@ func run(svcName string) error {
 		return err
 	}
 
-	args := []string{`run`, `-it`, `--rm`}
-	if flags, err := getDriver().FlagsForRun(svcName); err != nil {
-		return err
-	} else {
-		args = append(args, flags...)
+	args := []string{
+		`run`, `-it`, `--rm`, `--network=host`,
+		`--name=` + release.DeployName() + `_` + svcName + `.run`,
 	}
 	image := images.Get(svcName)
+	if instanceEnvName := image.InstanceEnvName(); instanceEnvName != `` {
+		if instances := conf.InstancesOf(svcName); len(instances) > 0 {
+			args = append(args, fmt.Sprintf(`-e=%s=%s`, instanceEnvName, instances[0]))
+		}
+	}
 	for _, env := range image.Envs() {
 		args = append(args, `-e`, env)
 	}
