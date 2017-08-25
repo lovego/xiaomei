@@ -11,7 +11,7 @@ import (
 )
 
 func Mysql(key string, printCmd bool) error {
-	flags := dsn.Mysql(release.App().DataSource(`mysql`, key)).Flags()
+	flags := dsn.Mysql(release.AppData().Get(`mysql`).GetString(key)).Flags()
 	command := `mysql --pager=less -SX ` + strings.Join(flags, ` `)
 	if printCmd {
 		fmt.Println(command)
@@ -22,7 +22,7 @@ func Mysql(key string, printCmd bool) error {
 }
 
 func MysqlDump(key string, printCmd bool) error {
-	flags := dsn.Mysql(release.App().DataSource(`mysql`, key)).Flags()
+	flags := dsn.Mysql(release.AppData().Get(`mysql`).GetString(key)).Flags()
 	command := `mysqldump -t ` + strings.Join(flags, ` `)
 	if printCmd {
 		fmt.Println(command)
@@ -33,7 +33,7 @@ func MysqlDump(key string, printCmd bool) error {
 }
 
 func Mongo(key string, printCmd bool) error {
-	command := `mongo ` + release.App().DataSource(`mongo`, key)
+	command := `mongo ` + release.AppData().Get(`mongo`).GetString(key)
 	if printCmd {
 		fmt.Println(command)
 		return nil
@@ -43,7 +43,7 @@ func Mongo(key string, printCmd bool) error {
 }
 
 func Redis(key string, printCmd bool) error {
-	flags := dsn.Redis(release.App().DataSource(`redis`, key)).Flags()
+	flags := dsn.Redis(release.AppData().Get(`redis`).GetString(key)).Flags()
 	command := `redis-cli ` + strings.Join(flags, ` `)
 	if printCmd {
 		fmt.Println(command)

@@ -23,7 +23,7 @@ func Alarm(title, body, mergeKey string) {
 	}
 	title = DeployName() + ` ` + title
 	err := alarmEngine.Alarm(alarm.Mail{
-		Mailer: Mailer,
+		Mailer: Mailer(),
 		Email: &email.Email{
 			To:      keepers,
 			Subject: title,

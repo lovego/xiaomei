@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -10,53 +11,57 @@ import (
 	"github.com/lovego/xiaomei/utils/mailer"
 )
 
-var theConf = getConf()
-var Mailer = getMailer()
+var theConf = conf.Get(Root()).Get(Env())
+var theData = conf.Data(Root(), Env())
+var theMailer = getMailer()
 
-func getConf() *conf.Conf {
-	root := detectRoot()
-	if root == `` {
-		panic(`app root not found.`)
+var theRoot string
+
+func Root() string {
+	if theRoot == `` {
+		program, err := filepath.Abs(os.Args[0])
+		if err != nil {
+			log.Panic(err)
+		}
+		if strings.HasSuffix(program, `.test`) /* go test ... */ ||
+			strings.HasPrefix(program, `/tmp/`) /* go run ... */ {
+			cwd, err := os.Getwd()
+			if err != nil {
+				log.Panic(err)
+			}
+			projectDir := fs.DetectDir(cwd, `release/simple.yml`)
+			if projectDir != `` {
+				theRoot = filepath.Join(projectDir, `release/img-app`)
+			} else {
+				log.Panic(`app root not found.`)
+			}
+		} else { // project binary file
+			theRoot = filepath.Dir(program)
+		}
 	}
-	return conf.New(root, detectEnv())
+	return theRoot
+}
+
+var theEnv string
+
+func Env() string {
+	if theEnv == `` {
+		theEnv = os.Getenv(`GOENV`)
+		if theEnv == `` {
+			if strings.HasSuffix(os.Args[0], `.test`) {
+				theEnv = `test`
+			} else {
+				theEnv = `dev`
+			}
+		}
+	}
+	return theEnv
 }
 
 func getMailer() *mailer.Mailer {
-	m, err := mailer.New(theConf.Mailer())
+	m, err := mailer.New(theConf.Mailer)
 	if err != nil {
 		panic(err)
 	}
 	return m
-}
-
-func detectRoot() string {
-	program, err := filepath.Abs(os.Args[0])
-	if err != nil {
-		panic(err)
-	}
-	if strings.HasSuffix(program, `.test`) /* go test ... */ ||
-		strings.HasPrefix(program, `/tmp/`) /* go run ... */ {
-		if cwd, err := os.Getwd(); err != nil {
-			panic(err)
-		} else if dir := fs.DetectDir(cwd, `release/simple.yml`); dir == `` {
-			return ``
-		} else {
-			return filepath.Join(dir, `release/img-app`)
-		}
-	} else { // project binary file
-		return fs.DetectDir(filepath.Dir(program), `config/config.yml`)
-	}
-}
-
-func detectEnv() string {
-	env := os.Getenv(`GOENV`)
-	if env != `` {
-		return env
-	}
-	if strings.HasSuffix(os.Args[0], `.test`) {
-		env = `test`
-	} else {
-		env = `dev`
-	}
-	return env
 }

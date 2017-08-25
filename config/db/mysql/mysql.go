@@ -22,7 +22,7 @@ func DB(name string) *sql.DB {
 		return mysql
 	}
 	var err error
-	mysql, err = sql.Open(`mysql`, config.DataSource(`mysql`, name))
+	mysql, err = sql.Open(`mysql`, config.GetString(`mysql`, name))
 	if err != nil {
 		panic(err.Error())
 	}

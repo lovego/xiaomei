@@ -89,7 +89,7 @@ func (s *service) Domain() string {
 	if s == nil {
 		return ``
 	}
-	domain := release.App().Domain()
+	domain := release.App().Domain
 	parts := strings.SplitN(domain, `.`, 2)
 	if len(parts) == 2 {
 		return parts[0] + `-` + s.svcName + `.` + parts[1]

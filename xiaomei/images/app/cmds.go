@@ -28,7 +28,7 @@ func buildBinary() error {
 	utils.Log(color.GreenString(`building app binary.`))
 	if cmd.Ok(cmd.O{
 		Dir: filepath.Join(release.Root(), `..`),
-		Env: []string{`GOBIN=` + release.App().Root()},
+		Env: []string{`GOBIN=` + filepath.Join(release.Root(), `img-app`)},
 	}, `go`, `install`, `-v`) {
 		return nil
 	}

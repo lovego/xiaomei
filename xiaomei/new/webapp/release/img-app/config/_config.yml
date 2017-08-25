@@ -1,5 +1,29 @@
 name: {{ .ProName }}
-timeZone: { name: China, offset: 28800 }
-mailer: "mailer://smtp.qq.com:25/?user=小美<xiaomei-go@qq.com>&pass=zjsbosjlhgugechh"
-keepers: [ "xiaomei<xiaomei-go@qq.com>" ]
+envs:
+  dev:
+    <<: *defaults
+    domain: {{ .Domain }}.dev
+    keepers: [ ]
+  test:
+    <<: *defaults
+    domain: {{ .Domain }}.test
+    keepers: [ ]
+  demo:
+    <<: *defaults
+    domain: {{ .Domain }}.demo
+  qa:
+    <<: *defaults
+    domain: {{ .Domain }}.qa
+  preview:
+    <<: *defaults
+    domain: {{ .Domain }}.preview
+  prouduction:
+    <<: *defaults
+    domain: {{ .Domain }}.com
+    secret: {{ .Secret }}
+
+defaults: &defaults
+  timeZone: { name: China, offset: 28800 }
+  mailer: "mailer://smtp.qq.com:25/?user=小美<xiaomei-go@qq.com>&pass=zjsbosjlhgugechh"
+  keepers: [ "xiaomei<xiaomei-go@qq.com>" ]
 

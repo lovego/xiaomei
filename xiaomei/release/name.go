@@ -5,15 +5,17 @@ import (
 
 	"github.com/lovego/xiaomei/config/conf"
 	"github.com/lovego/xiaomei/utils/fs"
+	"github.com/lovego/xiaomei/utils/strmap"
 )
 
 var theName string
-var appConf *conf.Conf
+var appConfig *conf.Config
+var appData = map[string]strmap.StrMap{}
 
 func Name() string {
 	if theName == `` {
 		if fs.IsDir(filepath.Join(Root(), `img-app`)) {
-			theName = App().Name()
+			theName = AppConfig().Name
 		} else {
 			theName = filepath.Base(Root())
 		}
@@ -25,13 +27,28 @@ func DeployName() string {
 	return Name() + `_` + Env()
 }
 
-func App() *conf.Conf {
-	if appConf == nil {
-		appConf = conf.New(filepath.Join(Root(), `img-app`), Env())
+func AppConfig() *conf.Config {
+	if appConfig == nil {
+		appConfig = conf.Get(filepath.Join(Root(), `img-app`))
 	}
-	return appConf
+	return appConfig
+}
+
+func App() *conf.Conf {
+	return AppConfig().Get(Env())
 }
 
 func AppIn(env string) *conf.Conf {
-	return conf.New(filepath.Join(Root(), `img-app`), env)
+	return AppConfig().Get(Env())
+}
+
+func AppData() strmap.StrMap {
+	var env = Env()
+	if data := appData[env]; data == nil {
+		data = conf.Data(filepath.Join(Root(), `img-app`), env)
+		appData[env] = data
+		return data
+	} else {
+		return data
+	}
 }

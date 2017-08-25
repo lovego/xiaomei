@@ -3,45 +3,46 @@ package config
 import (
 	"time"
 
-	"github.com/lovego/xiaomei/config/conf"
+	"github.com/lovego/xiaomei/utils/mailer"
+	"github.com/lovego/xiaomei/utils/strmap"
 )
 
-func Root() string {
-	return theConf.Root()
-}
-
 func Name() string {
-	return theConf.Name()
-}
-
-func Env() string {
-	return theConf.Env()
+	return theConf.Name
 }
 
 func DeployName() string {
-	return theConf.DeployName()
+	return theConf.DeployName(Env())
 }
 
 func Domain() string {
-	return theConf.Domain()
+	return theConf.Domain
 }
 
 func Secret() string {
-	return theConf.Secret()
+	return theConf.Secret
 }
 
 func TimeZone() *time.Location {
-	return theConf.TimeZone()
+	return theConf.TimeLocation
 }
 
 func Keepers() []string {
-	return theConf.Keepers()
+	return theConf.Keepers
 }
 
-func DataSource(typ, key string) string {
-	return theConf.DataSource(typ, key)
+func Mailer() *mailer.Mailer {
+	return theMailer
 }
 
-func Parse(p interface{}) {
-	conf.Parse(p, Root(), Env())
+func Get(key string) strmap.StrMap {
+	return theData.Get(key)
+}
+
+func GetString(key string) string {
+	return theData.GetString(key)
+}
+
+func GetStringSlice(key string) []string {
+	return theData.GetStringSlice(key)
 }

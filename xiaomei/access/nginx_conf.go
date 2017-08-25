@@ -72,5 +72,5 @@ func (a accessConfig) Env() string {
 }
 
 func (a accessConfig) Domain() string {
-	return release.App().Domain()
+	return release.App().Domain
 }

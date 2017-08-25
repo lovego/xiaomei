@@ -30,7 +30,7 @@ func setupCmd() *cobra.Command {
 }
 
 func setupMysql(key string) {
-	options := dsn.Mysql(release.App().DataSource(`mysql`, key)).Flags()
+	options := dsn.Mysql(release.AppData().Get(`mysql`).GetString(key)).Flags()
 	createDbAndTables(options)
 
 	fmt.Println(`setup mysql ok.`)
@@ -41,7 +41,7 @@ func createDbAndTables(options []string) {
 	db := options[l-1]
 
 	createDB := fmt.Sprintf(`create database if not exists %s charset utf8; use %s;`, db, db)
-	createTbs, err := ioutil.ReadFile(path.Join(release.App().Root(), `config/data/ddl.mysql`))
+	createTbs, err := ioutil.ReadFile(path.Join(release.Root(), `img-app/config/data/ddl.mysql`))
 	if err != nil {
 		panic(err)
 	}
