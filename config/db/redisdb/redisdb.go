@@ -24,7 +24,7 @@ func Pool(name string) *redis.Pool {
 			IdleTimeout: 600 * time.Second,
 			Dial: func() (redis.Conn, error) {
 				return redis.DialURL(
-					config.GetString(`redis`, name),
+					config.Get(`redis`).GetString(name),
 					redis.DialConnectTimeout(time.Second),
 					redis.DialReadTimeout(time.Second),
 					redis.DialWriteTimeout(time.Second),
@@ -44,7 +44,7 @@ func Do(name string, work func(redis.Conn)) {
 
 func SubscribeConn(name string) (redis.Conn, error) {
 	return redis.DialURL(
-		config.DataSource(`redis`, name),
+		config.Get(`redis`).GetString(name),
 		redis.DialConnectTimeout(time.Second),
 		redis.DialWriteTimeout(time.Second),
 	)
