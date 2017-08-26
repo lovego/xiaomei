@@ -8,9 +8,9 @@ import (
 func LsCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   `ls`,
-		Short: `list all clusters.`,
-		RunE: release.NoArgCall(func() error {
-			GetCluster().List()
+		Short: `list all nodes.`,
+		RunE: release.EnvCall(func(env string) error {
+			Get(env).List()
 			return nil
 		}),
 	}

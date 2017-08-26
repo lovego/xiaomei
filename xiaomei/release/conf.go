@@ -23,10 +23,6 @@ func Name() string {
 	return theName
 }
 
-func DeployName() string {
-	return Name() + `_` + Env()
-}
-
 func AppConfig() *conf.Config {
 	if appConfig == nil {
 		appConfig = conf.Get(filepath.Join(Root(), `img-app`))
@@ -34,16 +30,11 @@ func AppConfig() *conf.Config {
 	return appConfig
 }
 
-func App() *conf.Conf {
-	return AppConfig().Get(Env())
+func AppConf(env string) *conf.Conf {
+	return AppConfig().Get(env)
 }
 
-func AppIn(env string) *conf.Conf {
-	return AppConfig().Get(Env())
-}
-
-func AppData() strmap.StrMap {
-	var env = Env()
+func AppData(env string) strmap.StrMap {
 	if data := appData[env]; data == nil {
 		data = conf.Data(filepath.Join(Root(), `img-app`), env)
 		appData[env] = data

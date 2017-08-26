@@ -25,8 +25,9 @@ func Get(root string) *Config {
 	if err != nil {
 		log.Fatalf("parse config/config.yml: %v", err)
 	}
-	for _, conf := range config.Envs {
+	for env, conf := range config.Envs {
 		conf.Name = config.Name
+		conf.Env = env
 		if conf.TimeZone.Name != `` {
 			conf.TimeLocation = time.FixedZone(conf.TimeZone.Name, conf.TimeZone.Offset)
 		}

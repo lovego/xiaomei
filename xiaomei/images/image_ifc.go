@@ -8,62 +8,62 @@ import (
 
 // the 7 interfaces, image driver choose to implement.
 
-// 1. for simple deploy
+// 1. instance env variable name
 func (i Image) InstanceEnvName() string {
-	if ifc, ok := i.image.(interface {
+	if img, ok := i.image.(interface {
 		InstanceEnvName() string
 	}); ok {
-		return ifc.InstanceEnvName()
+		return img.InstanceEnvName()
 	}
 	return ``
 }
 
-// 2. envs for deploy and run
-func (i Image) Envs() []string {
-	if ifc, ok := i.image.(interface {
-		Envs() []string
+// 2. environment env variable name
+func (i Image) EnvironmentEnvName() string {
+	if img, ok := i.image.(interface {
+		EnvironmentEnvName() string
 	}); ok {
-		return ifc.Envs()
+		return img.EnvironmentEnvName()
 	}
-	return nil
+	return ``
 }
 
-// 3. envs for run
-func (i Image) EnvsForRun() []string {
-	if ifc, ok := i.image.(interface {
-		EnvsForRun() []string
+// 3. run env variable name
+func (i Image) RunEnvName() string {
+	if img, ok := i.image.(interface {
+		EnvsForRun() string
 	}); ok {
-		return ifc.EnvsForRun()
+		return img.EnvsForRun()
 	}
-	return nil
+	return ``
 }
 
 // 4. prepare files for build
 func (i Image) prepare() error {
-	if ifc, ok := i.image.(interface {
+	if img, ok := i.image.(interface {
 		Prepare() error
 	}); ok {
-		return ifc.Prepare()
+		return img.Prepare()
 	}
 	return nil
 }
 
 // 5. dir for build
 func (i Image) buildDir() string {
-	if ifc, ok := i.image.(interface {
+	if img, ok := i.image.(interface {
 		BuildDir() string
 	}); ok {
-		return ifc.BuildDir()
+		return img.BuildDir()
 	}
 	return filepath.Join(release.Root(), `img-`+i.svcName)
 }
 
 // 6. dockerfile for build
 func (i Image) dockerfile() string {
-	if ifc, ok := i.image.(interface {
+	if img, ok := i.image.(interface {
 		Dockerfile() string
 	}); ok {
-		return ifc.Dockerfile()
+		return img.Dockerfile()
 	}
 	return `Dockerfile`
 }

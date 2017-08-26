@@ -6,6 +6,7 @@ import (
 
 type Conf struct {
 	Name   string `yaml:"name"`
+	Env    string `yaml:"name"`
 	Domain string `yaml:"domain"`
 	Secret string `yaml:"secret"`
 
@@ -20,6 +21,6 @@ type timeZone struct {
 	Offset int    `yaml:"offset"`
 }
 
-func (c *Conf) DeployName(env string) string {
-	return c.Name + `_` + env
+func (c *Conf) DeployName() string {
+	return c.Name + `_` + c.Env
 }

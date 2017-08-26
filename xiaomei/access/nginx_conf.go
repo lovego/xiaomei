@@ -10,8 +10,8 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-func getNginxConf(svcName string) (string, string, error) {
-	data, err := getConfData(svcName)
+func getNginxConf(env, svcName string) (string, string, error) {
+	data, err := getConfData(env, svcName)
 	if err != nil {
 		return ``, ``, err
 	}
@@ -44,18 +44,19 @@ type domain interface {
 	Domain() string
 }
 
-func getConfData(svcName string) (domain, error) {
+func getConfData(env, svcName string) (domain, error) {
 	if svcName == `` {
 		data := accessConfig{
-			App: newService(`app`),
-			Web: newService(`web`),
+			Env: env,
+			App: newService(env, `app`),
+			Web: newService(env, `web`),
 		}
 		if data.App == nil && data.Web == nil {
 			return nil, fmt.Errorf(`neither app nor web service defined.`, svcName)
 		}
 		return data, nil
 	} else {
-		data := newService(svcName)
+		data := newService(env, svcName)
 		if data == nil {
 			return nil, fmt.Errorf(`%s service not defined.`, svcName)
 		}
@@ -64,13 +65,10 @@ func getConfData(svcName string) (domain, error) {
 }
 
 type accessConfig struct {
+	Env      string
 	App, Web *service
 }
 
-func (a accessConfig) Env() string {
-	return release.Env()
-}
-
 func (a accessConfig) Domain() string {
-	return release.App().Domain
+	return release.AppConf(a.Env).Domain
 }

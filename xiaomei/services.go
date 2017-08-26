@@ -10,7 +10,6 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/images"
 	"github.com/lovego/xiaomei/xiaomei/images/app"
-	"github.com/lovego/xiaomei/xiaomei/images/cron"
 	"github.com/lovego/xiaomei/xiaomei/images/godoc"
 	"github.com/lovego/xiaomei/xiaomei/images/logc"
 	"github.com/lovego/xiaomei/xiaomei/images/tasks"
@@ -25,7 +24,6 @@ func serviceCmds() []*cobra.Command {
 		serviceCmd(`tasks`, `the app tasks.`, tasks.Cmds()),
 		serviceCmd(`web`, `the web server.`, web.Cmds()),
 		serviceCmd(`logc`, `the log collector.`, logc.Cmds()),
-		serviceCmd(`cron`, `the cron tasks.`, cron.Cmds()),
 		serviceCmd(`godoc`, `the godoc server.`, godoc.Cmds()),
 	}
 }

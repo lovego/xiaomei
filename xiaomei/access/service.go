@@ -10,20 +10,17 @@ import (
 )
 
 type service struct {
+	Env     string
 	svcName string
 	addrs   []string
 }
 
-func newService(svcName string) *service {
+func newService(env, svcName string) *service {
 	if conf.HasService(svcName) {
-		return &service{svcName: svcName}
+		return &service{Env: env, svcName: svcName}
 	} else {
 		return nil
 	}
-}
-
-func (s *service) Env() string {
-	return release.Env()
 }
 
 func (s *service) Addrs() ([]string, error) {
@@ -51,7 +48,7 @@ func (s *service) Nodes() (nodes []cluster.Node) {
 		return nil
 	}
 	service := conf.GetService(s.svcName)
-	for _, node := range cluster.Nodes(``) {
+	for _, node := range cluster.Get(s.Env).GetNodes(``) {
 		if node.Match(service.Nodes) {
 			nodes = append(nodes, node)
 		}
@@ -66,7 +63,7 @@ func (s *service) Upstream() (string, error) {
 	if addrs, err := s.Addrs(); err != nil {
 		return ``, err
 	} else if len(addrs) > 1 {
-		return release.DeployName() + `_` + s.svcName, nil
+		return release.AppConf(s.Env).DeployName() + `_` + s.svcName, nil
 	} else {
 		return ``, nil
 	}
@@ -89,7 +86,7 @@ func (s *service) Domain() string {
 	if s == nil {
 		return ``
 	}
-	domain := release.App().Domain
+	domain := release.AppConf(s.Env).Domain
 	parts := strings.SplitN(domain, `.`, 2)
 	if len(parts) == 2 {
 		return parts[0] + `-` + s.svcName + `.` + parts[1]

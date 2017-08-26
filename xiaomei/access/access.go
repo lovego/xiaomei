@@ -8,8 +8,8 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 )
 
-func accessPrint(svcName string) error {
-	nginxConf, _, err := getNginxConf(svcName)
+func accessPrint(env, svcName string) error {
+	nginxConf, _, err := getNginxConf(env, svcName)
 	if err != nil {
 		return err
 	}
@@ -17,8 +17,8 @@ func accessPrint(svcName string) error {
 	return nil
 }
 
-func accessSetup(svcName, feature string) error {
-	nginxConf, fileName, err := getNginxConf(svcName)
+func accessSetup(svcName, env, feature string) error {
+	nginxConf, fileName, err := getNginxConf(env, svcName)
 	if err != nil {
 		return err
 	}
@@ -29,7 +29,7 @@ func accessSetup(svcName, feature string) error {
 	sudo service nginx reload
 	`, fileName, fileName,
 	)
-	for _, node := range cluster.Nodes(feature) {
+	for _, node := range cluster.Get(env).GetNodes(feature) {
 		if node.Labels[`access`] == `true` {
 			if _, err := node.Run(
 				cmd.O{Stdin: strings.NewReader(nginxConf)}, script,

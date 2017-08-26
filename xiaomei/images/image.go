@@ -37,8 +37,8 @@ func (i Image) Push() error {
 
 // TODO: https or http check.
 // TODO: https://registry.hub.docker.com/v2/
-func (i Image) NameWithDigestInRegistry() string {
-	imgName, tag := conf.ImageNameAndTagOf(i.svcName)
+func (i Image) NameWithDigestInRegistry(tag string) string {
+	imgName := conf.ImageNameOf(i.svcName)
 	uri, err := url.Parse(`http://` + imgName + `/manifests/` + tag)
 	if err != nil {
 		panic(err)

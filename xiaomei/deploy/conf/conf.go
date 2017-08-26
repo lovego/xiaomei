@@ -11,25 +11,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var reImageName = regexp.MustCompile(`^(.+):([\w.-]+)$`)
-
-func ImageNameOf(svcName string) string {
-	name := imageNameOf(svcName)
-	if !reImageName.MatchString(name) {
-		name += `:` + release.Env()
-	}
-	return name
-}
-
-func ImageNameAndTagOf(svcName string) (name, tag string) {
-	name = imageNameOf(svcName)
-	if m := reImageName.FindStringSubmatch(name); len(m) == 3 {
-		return m[1], m[2]
-	} else {
-		return name, release.Env()
-	}
-}
-
 type Conf struct {
 	Services        map[string]Service
 	VolumesToCreate []string `yaml:"volumesToCreate"`
@@ -45,15 +26,13 @@ var theConf *Conf
 
 func Get() *Conf {
 	if theConf == nil {
-		envConfs := map[string]*Conf{}
 		if content, err := ioutil.ReadFile(filepath.Join(release.Root(), `simple.yml`)); err != nil {
 			log.Panic(err)
 		} else {
-			if err = yaml.Unmarshal(content, &envConfs); err != nil {
+			if err = yaml.Unmarshal(content, theConf); err != nil {
 				log.Panic(err)
 			}
 		}
-		theConf = envConfs[release.Env()]
 	}
 	return theConf
 }
@@ -81,7 +60,7 @@ func ServiceNames() (names []string) {
 	return
 }
 
-func imageNameOf(svcName string) string {
+func ImageNameOf(svcName string) string {
 	svc := GetService(svcName)
 	if svc.Image == `` {
 		log.Panicf(`simple.yml: %s.image: empty.`, svcName)
@@ -107,8 +86,8 @@ func InstancesOf(svcName string) (instances []string) {
 	return
 }
 
-func ContainerNameOf(svcName string) string {
-	name := release.DeployName() + `_` + svcName
+func FirstContainerNameOf(svcName, env string) string {
+	name := release.AppConf(env).DeployName() + `_` + svcName
 	if instances := InstancesOf(svcName); len(instances) > 0 {
 		name += `.` + instances[0]
 	}

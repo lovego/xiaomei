@@ -2,7 +2,9 @@ package release
 
 import (
 	"errors"
+	"fmt"
 
+	"github.com/lovego/xiaomei/utils/slice"
 	"github.com/spf13/cobra"
 )
 
@@ -30,5 +32,23 @@ func Arg1Call(arg1 string, work func(string) error) cmdFunc {
 			return errors.New(`more than one arguments given.`)
 		}
 		return work(arg1)
+	}
+}
+
+func EnvCall(work func(string) error) cmdFunc {
+	return func(c *cobra.Command, args []string) error {
+		var env string
+		switch len(args) {
+		case 0:
+			env = `dev`
+		case 1:
+			env = args[0]
+			if !slice.ContainsString(getEnvs(), env) {
+				return fmt.Errorf("env %s not defined in cluster.yml", env)
+			}
+		default:
+			return errors.New(`more than one arguments given.`)
+		}
+		return work(env)
 	}
 }

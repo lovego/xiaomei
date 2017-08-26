@@ -11,32 +11,16 @@ import (
 	"github.com/lovego/xiaomei/utils/dsn"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/release"
-	"github.com/spf13/cobra"
 )
 
-func setupCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   `setup-mysql [<dbkey>]`,
-		Short: `create mysql databases and tables.`,
-		Run: func(c *cobra.Command, args []string) {
-			key := ``
-			if len(args) > 0 {
-				key = args[0]
-			}
-			setupMysql(key)
-		},
-	}
-	return cmd
-}
-
-func setupMysql(key string) {
-	options := dsn.Mysql(release.AppData().Get(`mysql`).GetString(key)).Flags()
-	createDbAndTables(options)
+func setupMysql(env, key string) {
+	options := dsn.Mysql(release.AppData(env).Get(`mysql`).GetString(key)).Flags()
+	createDbAndTables(env, options)
 
 	fmt.Println(`setup mysql ok.`)
 }
 
-func createDbAndTables(options []string) {
+func createDbAndTables(env string, options []string) {
 	l := len(options)
 	db := options[l-1]
 
@@ -47,5 +31,5 @@ func createDbAndTables(options []string) {
 	}
 	sqls := bytes.NewBufferString(createDB + string(createTbs))
 
-	cluster.Run(cmd.O{Stdin: sqls, Panic: true}, ``, `mysql `+strings.Join(options[:l-1], ` `))
+	cluster.Get(env).Run(``, cmd.O{Stdin: sqls, Panic: true}, `mysql `+strings.Join(options[:l-1], ` `))
 }

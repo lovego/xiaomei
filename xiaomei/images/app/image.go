@@ -1,9 +1,5 @@
 package app
 
-import (
-	"github.com/lovego/xiaomei/xiaomei/release"
-)
-
 type Image struct {
 }
 
@@ -11,12 +7,12 @@ func (i Image) InstanceEnvName() string {
 	return `GOPORT`
 }
 
-func (i Image) Envs() []string {
-	return []string{`GOENV=` + release.Env()}
+func (i Image) EnvironmentEnvName() string {
+	return `GOENV`
 }
 
-func (i Image) EnvsForRun() []string {
-	return []string{`GODEV=true`}
+func (i Image) RunEnvName() string {
+	return `GODEV`
 }
 
 func (i Image) Prepare() error {

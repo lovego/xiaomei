@@ -12,7 +12,7 @@ func Name() string {
 }
 
 func DeployName() string {
-	return theConf.DeployName(Env())
+	return theConf.DeployName()
 }
 
 func Domain() string {

@@ -9,12 +9,12 @@ import (
 type Image struct {
 }
 
-func (i Image) Envs() []string {
-	return []string{`GOENV=` + release.Env()}
+func (i Image) EnvironmentEnvName() string {
+	return `GOENV`
 }
 
-func (i Image) EnvsForRun() []string {
-	return []string{`GODEV=true`}
+func (i Image) RunEnvName() string {
+	return `GODEV`
 }
 
 func (i Image) BuildDir() string {
