@@ -34,6 +34,10 @@ func AppConf(env string) *conf.Conf {
 	return AppConfig().Get(env)
 }
 
+func ServiceName(env, svcName string) string {
+	return AppConf(env).DeployName() + `_` + svcName
+}
+
 func AppData(env string) strmap.StrMap {
 	if data := appData[env]; data == nil {
 		data = conf.Data(filepath.Join(Root(), `img-app`), env)

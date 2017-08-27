@@ -11,24 +11,24 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-func deploy(svcName, feature string) error {
+func deploy(env, svcName, feature string) error {
 	svcs := getServices(svcName)
-	psScript := fmt.Sprintf(`watch docker ps -f name=%s_%s`, release.DeployName(), svcName)
-	for _, node := range cluster.Nodes(feature) {
-		if err := deployNode(svcs, node, psScript); err != nil {
+	psScript := fmt.Sprintf(`watch docker ps -f name=%s`, release.ServiceName(env, svcName))
+	for _, node := range cluster.Get(env).GetNodes(feature) {
+		if err := deployNode(env, svcs, node, psScript); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func deployNode(svcs []string, node cluster.Node, psScript string) error {
+func deployNode(env string, svcs []string, node cluster.Node, psScript string) error {
 	nodeSvcs := getNodeServices(svcs, node)
 	if len(nodeSvcs) == 0 {
 		return nil
 	}
 	utils.Log(color.GreenString(`deploying ` + node.SshAddr()))
-	deployScript, err := getDeployScript(nodeSvcs)
+	deployScript, err := getDeployScript(env, nodeSvcs)
 	if err != nil {
 		return err
 	}

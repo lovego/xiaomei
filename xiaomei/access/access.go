@@ -17,7 +17,7 @@ func accessPrint(env, svcName string) error {
 	return nil
 }
 
-func accessSetup(svcName, env, feature string) error {
+func accessSetup(env, svcName, feature string) error {
 	nginxConf, fileName, err := getNginxConf(env, svcName)
 	if err != nil {
 		return err

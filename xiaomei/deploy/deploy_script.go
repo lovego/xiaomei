@@ -20,7 +20,7 @@ deploy() {
   local name=$1
   local args=$2
   docker stop $name >/dev/null 2>&1 && docker rm $name
-  id=$(docker run --name=$name -d --network=host --restart=always $args)
+  id=$(docker run --name=$name -d --restart=always $args)
   while status=$(docker ps -f id="$id" --format {{ "'{{.Status}}'" }}); do
     echo "$name: $status"
     case "$status" in
@@ -32,7 +32,7 @@ deploy() {
 }
 
 {{ range .Services -}}
-args='{{range .Envs}}-e {{.}} {{end}}{{.Options}} {{.Image}} {{.Command}}'
+args='{{.CommonArgs}}'
 {{ $svc := . -}}
 {{ range .Instances -}}
 deploy {{$svc.Name}}.{{.}} "-e {{$svc.InstanceEnvName}}={{.}} $args"
@@ -42,10 +42,10 @@ deploy {{.Name}} "$args"
 {{ end -}}
 `
 
-func getDeployScript(svcNames []string) (string, error) {
+func getDeployScript(env string, svcNames []string) (string, error) {
 	tmpl := template.Must(template.New(``).Parse(deployScriptTmpl))
 	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, getDeployConfig(svcNames)); err != nil {
+	if err := tmpl.Execute(&buf, getDeployConfig(env, svcNames)); err != nil {
 		return ``, err
 	}
 	return buf.String(), nil
@@ -56,30 +56,28 @@ type deployConfig struct {
 	Services        []serviceConfig
 }
 type serviceConfig struct {
-	Name, Image, InstanceEnvName, Command, Options string
-	Instances, Envs                                []string
+	Name, InstanceEnvName, CommonArgs string
+	Instances                         []string
 }
 
-func getDeployConfig(svcNames []string) deployConfig {
+func getDeployConfig(env string, svcNames []string) deployConfig {
 	data := deployConfig{
 		VolumesToCreate: conf.Get().VolumesToCreate,
 	}
 	for _, svcName := range svcNames {
-		data.Services = append(data.Services, getServiceConf(svcName))
+		data.Services = append(data.Services, getServiceConf(env, svcName))
 	}
 	return data
 }
 
-func getServiceConf(svcName string) serviceConfig {
+func getServiceConf(env, svcName string) serviceConfig {
 	image := images.Get(svcName)
 	service := conf.GetService(svcName)
+	commonArgs := getCommonArgs(service, image, env)
 	data := serviceConfig{
-		Name:            release.DeployName() + `_` + svcName,
-		Image:           image.NameWithDigestInRegistry(),
+		Name:            release.ServiceName(env, svcName),
 		InstanceEnvName: image.InstanceEnvName(),
-		Envs:            image.Envs(),
-		Command:         strings.Join(service.Command, ` `),
-		Options:         strings.Join(service.Options, ` `),
+		CommonArgs:      strings.Join(commonArgs, ` `),
 	}
 	if data.InstanceEnvName != `` {
 		data.Instances = conf.InstancesOf(svcName)

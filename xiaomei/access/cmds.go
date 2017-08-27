@@ -19,11 +19,11 @@ func accessCmd(svcName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `access`,
 		Short: `access config for the ` + desc(svcName) + `.`,
-		RunE: release.NoArgCall(func() error {
+		RunE: release.EnvCall(func(env string) error {
 			if setup {
-				return accessSetup(svcName, filter)
+				return accessSetup(env, svcName, filter)
 			} else {
-				return accessPrint(svcName)
+				return accessPrint(env, svcName)
 			}
 		}),
 	}

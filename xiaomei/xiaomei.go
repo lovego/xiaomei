@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"os"
 
 	"github.com/lovego/xiaomei/utils/cmd"
@@ -29,26 +28,25 @@ func main() {
 }
 
 func rootCmd() *cobra.Command {
+	theCmd := &cobra.Command{
+		Use:          `xiaomei`,
+		Short:        `be small and beautiful.`,
+		SilenceUsage: true,
+	}
+	theCmd.AddCommand(shellCmd())
+	return theCmd
+}
+
+func shellCmd() *cobra.Command {
 	var filter string
 	theCmd := &cobra.Command{
-		Use:   `xiaomei [qa|production|...]`,
-		Short: `be small and beautiful.`,
-		RunE: func(thisCmd *cobra.Command, args []string) error {
-			if len(args) > 0 {
-				return errors.New(`redundant args.`)
-			}
-			if release.Arg1IsEnv() {
-				_, err := cluster.Run(cmd.O{}, filter, ``)
-				return err
-			} else {
-				return thisCmd.Help()
-			}
-		},
+		Use:   `shell`,
+		Short: `enter a node shell.`,
+		RunE: release.EnvCall(func(env string) error {
+			_, err := cluster.Get(env).Run(cmd.O{}, filter, ``)
+			return err
+		}),
 		SilenceUsage: true,
 	}
 	theCmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr`)
-	if release.Arg1IsEnv() {
-		theCmd.SetArgs(os.Args[2:])
-	}
-	return theCmd
 }

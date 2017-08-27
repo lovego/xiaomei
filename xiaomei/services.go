@@ -1,8 +1,6 @@
 package main
 
 import (
-	"errors"
-
 	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/access"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
@@ -29,30 +27,32 @@ func serviceCmds() []*cobra.Command {
 }
 
 func serviceCmd(name, desc string, cmds []*cobra.Command) *cobra.Command {
-	var filter string
 	theCmd := &cobra.Command{
 		Use:   name,
 		Short: desc,
-		RunE: func(thisCmd *cobra.Command, args []string) error {
-			if len(args) > 0 {
-				return errors.New(`redundant args.`)
-			}
-			if release.Arg1IsEnv() {
-				_, err := cluster.ServiceRun(cmd.O{}, name, filter,
-					`docker exec -it --detach-keys='ctrl-@' `+conf.ContainerNameOf(name)+` bash`,
-				)
-				return err
-			} else {
-				return thisCmd.Help()
-			}
-		},
 	}
-	theCmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr`)
 	if len(cmds) > 0 {
 		theCmd.AddCommand(cmds...)
 	}
 	theCmd.AddCommand(images.Cmds(name)...)
 	theCmd.AddCommand(deploy.Cmds(name)...)
 	theCmd.AddCommand(access.Cmds(name)...)
+	theCmd.AddCommand(serviceShellCmd(name))
+	return theCmd
+}
+
+func serviceShellCmd(svcName string) *cobra.Command {
+	var filter string
+	theCmd := &cobra.Command{
+		Use:   `shell`,
+		Short: fmt.Sprintf(`enter a container for %s`, svcName),
+		RunE: release.EnvCall(func(env string) error {
+			_, err := cluster.Get(env).ServiceRun(cmd.O{}, name, filter,
+				`docker exec -it --detach-keys='ctrl-@' `+conf.FirstContainerNameOf(name)+` bash`,
+			)
+			return err
+		}),
+	}
+	theCmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr`)
 	return theCmd
 }

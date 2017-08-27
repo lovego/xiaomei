@@ -25,8 +25,8 @@ func runCmdFor(svcName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `run`,
 		Short: `run    the ` + desc(svcName) + `.`,
-		RunE: release.NoArgCall(func() error {
-			return run(svcName)
+		RunE: release.EnvCall(func(env string) error {
+			return run(env, svcName)
 		}),
 	}
 	// cmd.Flags().StringSliceVarP(&publish, `publish`, `p`, nil, `publish ports for container.`)
@@ -39,7 +39,7 @@ func deployCmdFor(svcName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `deploy`,
 		Short: `deploy the ` + desc(svcName) + `.`,
-		RunE: release.NoArgCall(func() error {
+		RunE: release.EnvCall(func(env string) error {
 			if !noBuild {
 				if err := images.Build(svcName, true); err != nil {
 					return err
@@ -50,7 +50,7 @@ func deployCmdFor(svcName string) *cobra.Command {
 					return err
 				}
 			}
-			return deploy(svcName, filter) // , rmCurrent)
+			return deploy(env, svcName, filter) // , rmCurrent)
 		}),
 	}
 	cmd.Flags().BoolVarP(&noBuild, `no-build`, `B`, false, `do not build the images.`)
@@ -65,8 +65,8 @@ func rmCmdFor(svcName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `rm`,
 		Short: `remove deployment of the ` + desc(svcName) + `.`,
-		RunE: release.NoArgCall(func() error {
-			return rm(svcName, filter)
+		RunE: release.EnvCall(func(env string) error {
+			return rm(env, svcName, filter)
 		}),
 	}
 	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
@@ -79,8 +79,8 @@ func psCmdFor(svcName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `ps`,
 		Short: `list tasks of the ` + desc(svcName) + `.`,
-		RunE: release.NoArgCall(func() error {
-			return ps(svcName, filter, watch)
+		RunE: release.EnvCall(func(env string) error {
+			return ps(env, svcName, filter, watch)
 		}),
 	}
 	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
@@ -93,8 +93,8 @@ func logsCmdFor(svcName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `logs`,
 		Short: `list logs  of the ` + desc(svcName) + `.`,
-		RunE: release.NoArgCall(func() error {
-			return logs(svcName, filter)
+		RunE: release.EnvCall(func(env string) error {
+			return logs(env, svcName, filter)
 		}),
 	}
 	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)

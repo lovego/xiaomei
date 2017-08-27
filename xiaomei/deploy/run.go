@@ -9,30 +9,37 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-func run(svcName string) error {
+func run(env, svcName string) error {
 	if err := images.Build(svcName, true); err != nil {
 		return err
 	}
+	image := images.Get(svcName)
+	service := conf.GetService(svcName)
 
 	args := []string{
-		`run`, `-it`, `--rm`, `--network=host`,
-		`--name=` + release.DeployName() + `_` + svcName + `.run`,
+		`run`, `-it`, `--rm`, `--name=` + release.ServiceName(env, svcName) + `.run`,
 	}
-	image := images.Get(svcName)
 	if instanceEnvName := image.InstanceEnvName(); instanceEnvName != `` {
 		if instances := conf.InstancesOf(svcName); len(instances) > 0 {
-			args = append(args, fmt.Sprintf(`-e=%s=%s`, instanceEnvName, instances[0]))
+			args = append(args, `-e`, fmt.Sprintf(`%s=%s`, instanceEnvName, instances[0]))
 		}
 	}
-	for _, env := range image.Envs() {
-		args = append(args, `-e`, env)
+	if runEnvName := image.RunEnvName(); runEnvName != `` {
+		args = append(args, `-e`, fmt.Sprintf(`%s=%s`, runEnvName, `true`))
 	}
-	for _, env := range image.EnvsForRun() {
-		args = append(args, `-e`, env)
-	}
-	args = append(args, conf.OptionsFor(svcName)...)
-	args = append(args, conf.ImageNameOf(svcName))
-	args = append(args, conf.CommandFor(svcName)...)
+
+	args = append(args, getCommonArgs(service, image, env)...)
 	_, err := cmd.Run(cmd.O{}, `docker`, args...)
 	return err
+}
+
+func getCommonArgs(service conf.Service, image images.Image, env string) []string {
+	args := []string{`--network=host`}
+	if name := image.EnvironmentEnvName(); name != `` {
+		args = append(args, `-e`, name+`=`+env)
+	}
+	args = append(args, service.Options...)
+	args = append(args, image.NameWithDigestInRegistry(env))
+	args = append(args, service.Command...)
+	return args
 }
