@@ -43,10 +43,11 @@ func shellCmd() *cobra.Command {
 		Use:   `shell`,
 		Short: `enter a node shell.`,
 		RunE: release.EnvCall(func(env string) error {
-			_, err := cluster.Get(env).Run(cmd.O{}, filter, ``)
+			_, err := cluster.Get(env).Run(filter, cmd.O{}, ``)
 			return err
 		}),
 		SilenceUsage: true,
 	}
 	theCmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr`)
+	return theCmd
 }

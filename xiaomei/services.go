@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/access"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
@@ -47,8 +49,8 @@ func serviceShellCmd(svcName string) *cobra.Command {
 		Use:   `shell`,
 		Short: fmt.Sprintf(`enter a container for %s`, svcName),
 		RunE: release.EnvCall(func(env string) error {
-			_, err := cluster.Get(env).ServiceRun(cmd.O{}, name, filter,
-				`docker exec -it --detach-keys='ctrl-@' `+conf.FirstContainerNameOf(name)+` bash`,
+			_, err := cluster.Get(env).ServiceRun(svcName, filter, cmd.O{},
+				`docker exec -it --detach-keys='ctrl-@' `+conf.FirstContainerNameOf(svcName, env)+` bash`,
 			)
 			return err
 		}),
