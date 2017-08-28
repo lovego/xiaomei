@@ -15,7 +15,7 @@ func Cmds(svcName string) []*cobra.Command {
 func buildCmdFor(svcName string) *cobra.Command {
 	var pull bool
 	cmd := &cobra.Command{
-		Use:   `build`,
+		Use:   `build [<env>]`,
 		Short: `build  ` + imageDesc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			return Build(env, svcName, pull)
@@ -27,7 +27,7 @@ func buildCmdFor(svcName string) *cobra.Command {
 
 func pushCmdFor(svcName string) *cobra.Command {
 	return &cobra.Command{
-		Use:   `push`,
+		Use:   `push [<env>]`,
 		Short: `push   ` + imageDesc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			return Push(env, svcName)

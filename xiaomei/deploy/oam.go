@@ -19,7 +19,7 @@ done
 	return eachNodeRun(env, script, feature)
 }
 
-func rm(env, svcName, feature string) error {
+func rmDeploy(env, svcName, feature string) error {
 	script := fmt.Sprintf(`
 for name in $(docker ps -af name=%s --format '{{.Names}}'); do
 	docker stop $name >/dev/null 2>&1 && docker rm $name

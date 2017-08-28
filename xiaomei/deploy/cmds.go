@@ -13,7 +13,7 @@ func Cmds(svcName string) (cmds []*cobra.Command) {
 	}
 	cmds = append(cmds,
 		deployCmdFor(svcName),
-		rmCmdFor(svcName),
+		rmDeployCmdFor(svcName),
 		psCmdFor(svcName),
 		logsCmdFor(svcName),
 	)
@@ -23,7 +23,7 @@ func Cmds(svcName string) (cmds []*cobra.Command) {
 func runCmdFor(svcName string) *cobra.Command {
 	// var publish []string
 	cmd := &cobra.Command{
-		Use:   `run`,
+		Use:   `run [<env>]`,
 		Short: `run    the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			return run(env, svcName)
@@ -37,7 +37,7 @@ func deployCmdFor(svcName string) *cobra.Command {
 	var noBuild, noPush /*, rmCurrent*/ bool
 	var filter string
 	cmd := &cobra.Command{
-		Use:   `deploy`,
+		Use:   `deploy [<env>]`,
 		Short: `deploy the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			if !noBuild {
@@ -60,13 +60,13 @@ func deployCmdFor(svcName string) *cobra.Command {
 	return cmd
 }
 
-func rmCmdFor(svcName string) *cobra.Command {
+func rmDeployCmdFor(svcName string) *cobra.Command {
 	var filter string
 	cmd := &cobra.Command{
-		Use:   `rm`,
+		Use:   `rm-deploy [<env>]`,
 		Short: `remove deployment of the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
-			return rm(env, svcName, filter)
+			return rmDeploy(env, svcName, filter)
 		}),
 	}
 	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
@@ -77,7 +77,7 @@ func psCmdFor(svcName string) *cobra.Command {
 	var watch bool
 	var filter string
 	cmd := &cobra.Command{
-		Use:   `ps`,
+		Use:   `ps [<env>]`,
 		Short: `list tasks of the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			return ps(env, svcName, filter, watch)
@@ -91,7 +91,7 @@ func psCmdFor(svcName string) *cobra.Command {
 func logsCmdFor(svcName string) *cobra.Command {
 	var filter string
 	cmd := &cobra.Command{
-		Use:   `logs`,
+		Use:   `logs [<env>]`,
 		Short: `list logs  of the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			return logs(env, svcName, filter)
