@@ -22,7 +22,7 @@ func Cmds() []*cobra.Command {
 func makeCmd(name, short string, fun func(env, key string, print bool) error) *cobra.Command {
 	var print bool
 	cmd := &cobra.Command{
-		Use:   name + `[<env>] [<dbkey>]`,
+		Use:   name + ` [<env> [<dbkey>]]`,
 		Short: short,
 		RunE: func(c *cobra.Command, args []string) error {
 			env, key, err := GetEnvAndKey(args)
@@ -38,7 +38,7 @@ func makeCmd(name, short string, fun func(env, key string, print bool) error) *c
 
 func setupMysqlCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   `setup-mysql [<dbkey>]`,
+		Use:   `setup-mysql [<env> [<dbkey>]]`,
 		Short: `create mysql databases and tables.`,
 		RunE: func(c *cobra.Command, args []string) error {
 			env, key, err := GetEnvAndKey(args)

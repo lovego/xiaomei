@@ -33,13 +33,13 @@ func serviceCmd(name, desc string, cmds []*cobra.Command) *cobra.Command {
 		Use:   name,
 		Short: desc,
 	}
-	if len(cmds) > 0 {
-		theCmd.AddCommand(cmds...)
-	}
 	theCmd.AddCommand(images.Cmds(name)...)
 	theCmd.AddCommand(deploy.Cmds(name)...)
 	theCmd.AddCommand(access.Cmds(name)...)
 	theCmd.AddCommand(serviceShellCmd(name))
+	if len(cmds) > 0 {
+		theCmd.AddCommand(cmds...)
+	}
 	return theCmd
 }
 
