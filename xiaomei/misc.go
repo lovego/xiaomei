@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 
+	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
@@ -39,12 +41,16 @@ func yamlCmd() *cobra.Command {
 	return cmd
 }
 
-func versionCmd() *cobra.Command {
+func autoCompleteCmd(rootCmd *cobra.Command) *cobra.Command {
 	return &cobra.Command{
-		Use:   `version`,
-		Short: `show xiaomei version.`,
+		Use:   `auto-complete`,
+		Short: `setup shell auto completion.`,
 		RunE: release.NoArgCall(func() error {
-			fmt.Println(`xiaomei version 17.6.15`)
+			var buf bytes.Buffer
+			if err := rootCmd.GenBashCompletion(&buf); err != nil {
+				return err
+			}
+			cmd.SudoWriteFile(`/etc/bash_completion.d/xiaomei`, &buf)
 			return nil
 		}),
 	}

@@ -1,6 +1,7 @@
 package release
 
 import (
+	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -13,7 +14,7 @@ var theRoot *string
 func Root() string {
 	root := detectRoot()
 	if root == `` {
-		panic(`release root not found.`)
+		log.Fatal(`release root not found.`)
 	}
 	return root
 }

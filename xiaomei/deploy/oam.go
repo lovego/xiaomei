@@ -5,8 +5,16 @@ import (
 
 	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
+	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
+
+func shell(env, svcName, feature string) error {
+	_, err := cluster.Get(env).ServiceRun(svcName, feature, cmd.O{},
+		`docker exec -it --detach-keys='ctrl-@' `+conf.GetService(env, svcName).FirstContainerName()+` bash`,
+	)
+	return err
+}
 
 func logs(env, svcName, feature string) error {
 	script := fmt.Sprintf(`
