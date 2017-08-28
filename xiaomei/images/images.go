@@ -25,7 +25,7 @@ func Get(svcName string) Image {
 	}
 }
 
-func Build(svcName string, pull bool) error {
+func Build(env, svcName string, pull bool) error {
 	if svcName == `` {
 		done := map[string]bool{}
 		return eachServiceDo(func(svcName string) error {
@@ -33,14 +33,14 @@ func Build(svcName string, pull bool) error {
 				return nil
 			} else {
 				done[imgName] = true
-				return Build(svcName, pull)
+				return Build(env, svcName, pull)
 			}
 		})
 	}
-	return imagesMap[svcName].Build(pull)
+	return imagesMap[svcName].Build(env, pull)
 }
 
-func Push(svcName string) error {
+func Push(env, svcName string) error {
 	if svcName == `` {
 		done := map[string]bool{}
 		return eachServiceDo(func(svcName string) error {
@@ -48,11 +48,11 @@ func Push(svcName string) error {
 				return nil
 			} else {
 				done[imgName] = true
-				return Push(svcName)
+				return Push(env, svcName)
 			}
 		})
 	}
-	return imagesMap[svcName].Push()
+	return imagesMap[svcName].Push(env)
 }
 
 func eachServiceDo(work func(svcName string) error) error {

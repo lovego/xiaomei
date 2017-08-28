@@ -26,7 +26,8 @@ var theConf *Conf
 
 func Get() *Conf {
 	if theConf == nil {
-		if content, err := ioutil.ReadFile(filepath.Join(release.Root(), `simple.yml`)); err != nil {
+		theConf = &Conf{}
+		if content, err := ioutil.ReadFile(filepath.Join(release.Root(), `deploy.yml`)); err != nil {
 			log.Panic(err)
 		} else {
 			if err = yaml.Unmarshal(content, theConf); err != nil {
@@ -45,7 +46,7 @@ func HasService(svcName string) bool {
 func GetService(svcName string) Service {
 	svc, ok := Get().Services[svcName]
 	if !ok {
-		log.Panicf(`simple.yml: services.%s: undefined.`, svcName)
+		log.Panicf(`deploy.yml: services.%s: undefined.`, svcName)
 	}
 	return svc
 }
@@ -63,7 +64,7 @@ func ServiceNames() (names []string) {
 func ImageNameOf(svcName string) string {
 	svc := GetService(svcName)
 	if svc.Image == `` {
-		log.Panicf(`simple.yml: %s.image: empty.`, svcName)
+		log.Panicf(`deploy.yml: %s.image: empty.`, svcName)
 	}
 	return svc.Image
 }
@@ -80,7 +81,7 @@ func InstancesOf(svcName string) (instances []string) {
 		if rePort.MatchString(instance) {
 			instances = append(instances, instance)
 		} else {
-			log.Panicf(`simple.yml: %s.instances: illegal format.`, svcName)
+			log.Panicf(`deploy.yml: %s.instances: illegal format.`, svcName)
 		}
 	}
 	return

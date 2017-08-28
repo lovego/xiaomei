@@ -41,12 +41,12 @@ func deployCmdFor(svcName string) *cobra.Command {
 		Short: `deploy the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			if !noBuild {
-				if err := images.Build(svcName, true); err != nil {
+				if err := images.Build(env, svcName, true); err != nil {
 					return err
 				}
 			}
 			if !noPush {
-				if err := images.Push(svcName); err != nil {
+				if err := images.Push(env, svcName); err != nil {
 					return err
 				}
 			}

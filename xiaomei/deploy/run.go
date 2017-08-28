@@ -10,7 +10,7 @@ import (
 )
 
 func run(env, svcName string) error {
-	if err := images.Build(svcName, true); err != nil {
+	if err := images.Build(env, svcName, true); err != nil {
 		return err
 	}
 	image := images.Get(svcName)

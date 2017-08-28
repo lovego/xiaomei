@@ -40,7 +40,7 @@ func rootCmd() *cobra.Command {
 func shellCmd() *cobra.Command {
 	var filter string
 	theCmd := &cobra.Command{
-		Use:   `shell`,
+		Use:   `shell [<env>]`,
 		Short: `enter a node shell.`,
 		RunE: release.EnvCall(func(env string) error {
 			_, err := cluster.Get(env).Run(filter, cmd.O{}, ``)

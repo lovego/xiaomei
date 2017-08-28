@@ -15,7 +15,7 @@ type Image struct {
 	image   interface{}
 }
 
-func (i Image) Build(pull bool) error {
+func (i Image) Build(env string, pull bool) error {
 	if err := i.prepare(); err != nil {
 		return err
 	}
@@ -24,14 +24,14 @@ func (i Image) Build(pull bool) error {
 	if pull {
 		args = append(args, `--pull`)
 	}
-	args = append(args, `--file=`+i.dockerfile(), `--tag=`+conf.ImageNameOf(i.svcName), `.`)
+	args = append(args, `--file=`+i.dockerfile(), `--tag=`+conf.ImageNameOf(i.svcName)+`:`+env, `.`)
 	_, err := cmd.Run(cmd.O{Dir: i.buildDir(), Print: true}, `docker`, args...)
 	return err
 }
 
-func (i Image) Push() error {
+func (i Image) Push(env string) error {
 	utils.Log(color.GreenString(`pushing ` + i.svcName + ` image.`))
-	_, err := cmd.Run(cmd.O{Print: true}, `docker`, `push`, conf.ImageNameOf(i.svcName))
+	_, err := cmd.Run(cmd.O{Print: true}, `docker`, `push`, conf.ImageNameOf(i.svcName)+`:`+env)
 	return err
 }
 

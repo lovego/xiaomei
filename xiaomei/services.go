@@ -46,7 +46,7 @@ func serviceCmd(name, desc string, cmds []*cobra.Command) *cobra.Command {
 func serviceShellCmd(svcName string) *cobra.Command {
 	var filter string
 	theCmd := &cobra.Command{
-		Use:   `shell`,
+		Use:   `shell [<env>]`,
 		Short: fmt.Sprintf(`enter a container for %s`, svcName),
 		RunE: release.EnvCall(func(env string) error {
 			_, err := cluster.Get(env).ServiceRun(svcName, filter, cmd.O{},

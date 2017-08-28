@@ -17,8 +17,8 @@ func buildCmdFor(svcName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `build`,
 		Short: `build  ` + imageDesc(svcName) + `.`,
-		RunE: release.NoArgCall(func() error {
-			return Build(svcName, pull)
+		RunE: release.EnvCall(func(env string) error {
+			return Build(env, svcName, pull)
 		}),
 	}
 	cmd.Flags().BoolVarP(&pull, `pull`, `p`, true, `pull base image.`)
@@ -29,8 +29,8 @@ func pushCmdFor(svcName string) *cobra.Command {
 	return &cobra.Command{
 		Use:   `push`,
 		Short: `push   ` + imageDesc(svcName) + `.`,
-		RunE: release.NoArgCall(func() error {
-			return Push(svcName)
+		RunE: release.EnvCall(func(env string) error {
+			return Push(env, svcName)
 		}),
 	}
 }

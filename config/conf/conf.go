@@ -5,8 +5,8 @@ import (
 )
 
 type Conf struct {
-	Name   string `yaml:"name"`
-	Env    string `yaml:"name"`
+	Name   string `yaml:"-"`
+	Env    string `yaml:"-"`
 	Domain string `yaml:"domain"`
 	Secret string `yaml:"secret"`
 
