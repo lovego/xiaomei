@@ -24,21 +24,21 @@ func (i Image) Build(env string, pull bool) error {
 	if pull {
 		args = append(args, `--pull`)
 	}
-	args = append(args, `--file=`+i.dockerfile(), `--tag=`+conf.ImageNameOf(env, i.svcName)+`:`+env, `.`)
+	args = append(args, `--file=`+i.dockerfile(), `--tag=`+conf.GetService(env, i.svcName).ImageNameAndTag(), `.`)
 	_, err := cmd.Run(cmd.O{Dir: i.buildDir(), Print: true}, `docker`, args...)
 	return err
 }
 
 func (i Image) Push(env string) error {
 	utils.Log(color.GreenString(`pushing ` + i.svcName + ` image.`))
-	_, err := cmd.Run(cmd.O{Print: true}, `docker`, `push`, conf.ImageNameOf(env, i.svcName)+`:`+env)
+	_, err := cmd.Run(cmd.O{Print: true}, `docker`, `push`, conf.GetService(env, i.svcName).ImageNameAndTag())
 	return err
 }
 
 // TODO: https or http check.
 // TODO: https://registry.hub.docker.com/v2/
 func (i Image) NameWithDigestInRegistry(env string) string {
-	imgName := conf.ImageNameOf(env, i.svcName)
+	imgName := conf.GetService(env, i.svcName).ImageName()
 	uri, err := url.Parse(`http://` + imgName + `/manifests/` + env)
 	if err != nil {
 		panic(err)

@@ -12,7 +12,7 @@ type Cluster struct {
 	env      string
 	User     string `yaml:"user"`
 	JumpAddr string `yaml:"jumpAddr"`
-	Nodes    []Node `yaml:"managers"`
+	Nodes    []Node `yaml:"nodes"`
 }
 
 func Get(env string) Cluster {

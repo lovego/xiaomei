@@ -50,7 +50,7 @@ func serviceShellCmd(svcName string) *cobra.Command {
 		Short: fmt.Sprintf(`enter a container for %s`, svcName),
 		RunE: release.EnvCall(func(env string) error {
 			_, err := cluster.Get(env).ServiceRun(svcName, filter, cmd.O{},
-				`docker exec -it --detach-keys='ctrl-@' `+conf.FirstContainerNameOf(env, svcName)+` bash`,
+				`docker exec -it --detach-keys='ctrl-@' `+conf.GetService(env, svcName).FirstContainerName()+` bash`,
 			)
 			return err
 		}),

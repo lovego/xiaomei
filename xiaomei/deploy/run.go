@@ -14,13 +14,12 @@ func run(env, svcName string) error {
 		return err
 	}
 	image := images.Get(svcName)
-	service := conf.GetService(env, svcName)
 
 	args := []string{
 		`run`, `-it`, `--rm`, `--name=` + release.ServiceName(env, svcName) + `.run`,
 	}
 	if instanceEnvName := image.InstanceEnvName(); instanceEnvName != `` {
-		if instances := conf.InstancesOf(env, svcName); len(instances) > 0 {
+		if instances := conf.GetService(env, svcName).Instances(); len(instances) > 0 {
 			args = append(args, `-e`, fmt.Sprintf(`%s=%s`, instanceEnvName, instances[0]))
 		}
 	}
@@ -28,18 +27,25 @@ func run(env, svcName string) error {
 		args = append(args, `-e`, fmt.Sprintf(`%s=%s`, runEnvName, `true`))
 	}
 
-	args = append(args, getCommonArgs(service, image, env)...)
+	args = append(args, getCommonArgs(env, svcName, false)...)
 	_, err := cmd.Run(cmd.O{}, `docker`, args...)
 	return err
 }
 
-func getCommonArgs(service conf.Service, image images.Image, env string) []string {
+func getCommonArgs(env, svcName string, digest bool) []string {
+	image := images.Get(svcName)
+	service := conf.GetService(env, svcName)
+
 	args := []string{`--network=host`}
 	if name := image.EnvironmentEnvName(); name != `` {
 		args = append(args, `-e`, name+`=`+env)
 	}
 	args = append(args, service.Options...)
-	args = append(args, image.NameWithDigestInRegistry(env))
+	if digest {
+		args = append(args, image.NameWithDigestInRegistry(env))
+	} else {
+		args = append(args, service.ImageNameAndTag())
+	}
 	args = append(args, service.Command...)
 	return args
 }

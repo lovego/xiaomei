@@ -71,16 +71,14 @@ func getDeployConfig(env string, svcNames []string) deployConfig {
 }
 
 func getServiceConf(env, svcName string) serviceConfig {
-	image := images.Get(svcName)
-	service := conf.GetService(env, svcName)
-	commonArgs := getCommonArgs(service, image, env)
+	commonArgs := getCommonArgs(env, svcName, true)
 	data := serviceConfig{
 		Name:            release.ServiceName(env, svcName),
-		InstanceEnvName: image.InstanceEnvName(),
+		InstanceEnvName: images.Get(svcName).InstanceEnvName(),
 		CommonArgs:      strings.Join(commonArgs, ` `),
 	}
 	if data.InstanceEnvName != `` {
-		data.Instances = conf.InstancesOf(env, svcName)
+		data.Instances = conf.GetService(env, svcName).Instances()
 	}
 	return data
 }

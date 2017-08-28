@@ -1,8 +1,7 @@
 dev:
   user: ubuntu
-  managers:
+  nodes:
     - { addr: 127.0.0.1, labels: { access: true, tasks: true, godoc: true } }
-  workers:
 demo:
 qa:
 production:

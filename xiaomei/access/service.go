@@ -29,7 +29,7 @@ func (s *service) Addrs() ([]string, error) {
 	}
 	if s.addrs == nil {
 		addrs := []string{}
-		instances := conf.InstancesOf(s.Env, s.svcName)
+		instances := conf.GetService(s.Env, s.svcName).Instances()
 		for _, node := range s.Nodes() {
 			for _, instance := range instances {
 				addrs = append(addrs, node.GetListenAddr()+`:`+instance)
