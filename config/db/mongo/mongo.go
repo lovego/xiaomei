@@ -1,6 +1,7 @@
 package mongo
 
 import (
+	"log"
 	"sync"
 
 	"github.com/lovego/xiaomei/config"
@@ -8,59 +9,59 @@ import (
 )
 
 var mongoSessions = struct {
-	m map[string]MongoSession
+	m map[string]Sess
 	sync.Mutex
 }{
-	m: make(map[string]MongoSession),
+	m: make(map[string]Sess),
 }
 
-func Session(name string) MongoSession {
+func Session(name string) Sess {
 	mongoSessions.Lock()
 	defer mongoSessions.Unlock()
 	sess, ok := mongoSessions.m[name]
 	if !ok {
 		session, err := mgo.Dial(config.Get(`mongo`).GetString(name))
 		if err != nil {
-			panic(err)
+			log.Panic(err)
 		}
-		sess = MongoSession{session}
+		sess = Sess{session}
 		mongoSessions.m[name] = sess
 	}
 	return sess
 }
 
-type MongoSession struct {
+type Sess struct {
 	s *mgo.Session
 }
-type MongoDB struct {
+type DB struct {
 	db *mgo.Database
 }
-type MongoColl struct {
+type Coll struct {
 	c *mgo.Collection
 }
 
-func (s MongoSession) Session(work func(*mgo.Session)) {
+func (s Sess) Session(work func(*mgo.Session)) {
 	sess := s.s.Copy()
 	defer sess.Close()
 	work(sess)
 }
 
-func (db MongoDB) Session(work func(*mgo.Database)) {
+func (db DB) Session(work func(*mgo.Database)) {
 	sess := db.db.Session.Copy()
 	defer sess.Close()
 	work(db.db.With(sess))
 }
 
-func (c MongoColl) Session(work func(*mgo.Collection)) {
+func (c Coll) Session(work func(*mgo.Collection)) {
 	sess := c.c.Database.Session.Copy()
 	defer sess.Close()
 	work(c.c.With(sess))
 }
 
-func (s MongoSession) DB(name string) MongoDB {
-	return MongoDB{s.s.DB(name)}
+func (s Sess) DB(name string) DB {
+	return DB{s.s.DB(name)}
 }
 
-func (db MongoDB) C(name string) MongoColl {
-	return MongoColl{db.db.C(name)}
+func (db DB) C(name string) Coll {
+	return Coll{db.db.C(name)}
 }

@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"database/sql"
+	"log"
 	"sync"
 	"time"
 
@@ -9,29 +10,32 @@ import (
 	"github.com/lovego/xiaomei/config"
 )
 
-var mysqlConns = struct {
+var mysqlDBs = struct {
 	sync.Mutex
 	m map[string]*sql.DB
 }{m: make(map[string]*sql.DB)}
 
 func DB(name string) *sql.DB {
-	mysqlConns.Lock()
-	defer mysqlConns.Unlock()
-	mysql := mysqlConns.m[name]
-	if mysql != nil {
-		return mysql
+	mysqlDBs.Lock()
+	defer mysqlDBs.Unlock()
+	db := mysqlDBs.m[name]
+	if db == nil {
+		db = newDB(name)
+		mysqlDBs.m[name] = db
 	}
-	var err error
-	mysql, err = sql.Open(`mysql`, config.Get(`mysql`).GetString(name))
+	return db
+}
+
+func newDB(name string) *sql.DB {
+	db, err := sql.Open(`mysql`, config.Get(`mysql`).GetString(name))
 	if err != nil {
-		panic(err.Error())
+		log.Panic(err)
 	}
-	if err := mysql.Ping(); err != nil {
-		panic(err.Error())
+	if err := db.Ping(); err != nil {
+		log.Panic(err)
 	}
-	mysql.SetConnMaxLifetime(time.Minute * 10)
-	mysql.SetMaxIdleConns(5)
-	mysql.SetMaxOpenConns(50)
-	mysqlConns.m[name] = mysql
-	return mysql
+	db.SetConnMaxLifetime(time.Minute * 10)
+	db.SetMaxIdleConns(5)
+	db.SetMaxOpenConns(50)
+	return db
 }

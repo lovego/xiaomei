@@ -31,9 +31,9 @@ func (i Image) EnvironmentEnvName() string {
 // 3. run env variable name
 func (i Image) RunEnvName() string {
 	if img, ok := i.image.(interface {
-		EnvsForRun() string
+		RunEnvName() string
 	}); ok {
-		return img.EnvsForRun()
+		return img.RunEnvName()
 	}
 	return ``
 }

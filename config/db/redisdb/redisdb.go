@@ -8,32 +8,36 @@ import (
 	"github.com/lovego/xiaomei/config"
 )
 
-var pools = struct {
+var redisPools = struct {
 	sync.Mutex
 	m map[string]*redis.Pool
 }{m: make(map[string]*redis.Pool)}
 
 func Pool(name string) *redis.Pool {
-	pools.Lock()
-	defer pools.Unlock()
-	p := pools.m[name]
-	if p == nil {
-		p = &redis.Pool{
-			MaxIdle:     32,
-			MaxActive:   32,
-			IdleTimeout: 600 * time.Second,
-			Dial: func() (redis.Conn, error) {
-				return redis.DialURL(
-					config.Get(`redis`).GetString(name),
-					redis.DialConnectTimeout(time.Second),
-					redis.DialReadTimeout(time.Second),
-					redis.DialWriteTimeout(time.Second),
-				)
-			},
-		}
-		pools.m[name] = p
+	redisPools.Lock()
+	defer redisPools.Unlock()
+	pool := redisPools.m[name]
+	if pool == nil {
+		pool = newPool(name)
+		redisPools.m[name] = pool
 	}
-	return p
+	return pool
+}
+
+func newPool(name string) *redis.Pool {
+	return &redis.Pool{
+		MaxIdle:     32,
+		MaxActive:   32,
+		IdleTimeout: 600 * time.Second,
+		Dial: func() (redis.Conn, error) {
+			return redis.DialURL(
+				config.Get(`redis`).GetString(name),
+				redis.DialConnectTimeout(time.Second),
+				redis.DialReadTimeout(time.Second),
+				redis.DialWriteTimeout(time.Second),
+			)
+		},
+	}
 }
 
 func Do(name string, work func(redis.Conn)) {
