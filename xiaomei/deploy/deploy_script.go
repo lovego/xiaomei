@@ -62,7 +62,7 @@ type serviceConfig struct {
 
 func getDeployConfig(env string, svcNames []string) deployConfig {
 	data := deployConfig{
-		VolumesToCreate: conf.Get().VolumesToCreate,
+		VolumesToCreate: conf.Get(env).VolumesToCreate,
 	}
 	for _, svcName := range svcNames {
 		data.Services = append(data.Services, getServiceConf(env, svcName))
@@ -72,7 +72,7 @@ func getDeployConfig(env string, svcNames []string) deployConfig {
 
 func getServiceConf(env, svcName string) serviceConfig {
 	image := images.Get(svcName)
-	service := conf.GetService(svcName)
+	service := conf.GetService(env, svcName)
 	commonArgs := getCommonArgs(service, image, env)
 	data := serviceConfig{
 		Name:            release.ServiceName(env, svcName),
@@ -80,7 +80,7 @@ func getServiceConf(env, svcName string) serviceConfig {
 		CommonArgs:      strings.Join(commonArgs, ` `),
 	}
 	if data.InstanceEnvName != `` {
-		data.Instances = conf.InstancesOf(svcName)
+		data.Instances = conf.InstancesOf(env, svcName)
 	}
 	return data
 }

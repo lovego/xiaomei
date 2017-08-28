@@ -14,13 +14,13 @@ func run(env, svcName string) error {
 		return err
 	}
 	image := images.Get(svcName)
-	service := conf.GetService(svcName)
+	service := conf.GetService(env, svcName)
 
 	args := []string{
 		`run`, `-it`, `--rm`, `--name=` + release.ServiceName(env, svcName) + `.run`,
 	}
 	if instanceEnvName := image.InstanceEnvName(); instanceEnvName != `` {
-		if instances := conf.InstancesOf(svcName); len(instances) > 0 {
+		if instances := conf.InstancesOf(env, svcName); len(instances) > 0 {
 			args = append(args, `-e`, fmt.Sprintf(`%s=%s`, instanceEnvName, instances[0]))
 		}
 	}

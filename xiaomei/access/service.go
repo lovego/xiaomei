@@ -16,7 +16,7 @@ type service struct {
 }
 
 func newService(env, svcName string) *service {
-	if conf.HasService(svcName) {
+	if conf.HasService(env, svcName) {
 		return &service{Env: env, svcName: svcName}
 	} else {
 		return nil
@@ -29,7 +29,7 @@ func (s *service) Addrs() ([]string, error) {
 	}
 	if s.addrs == nil {
 		addrs := []string{}
-		instances := conf.InstancesOf(s.svcName)
+		instances := conf.InstancesOf(s.Env, s.svcName)
 		for _, node := range s.Nodes() {
 			for _, instance := range instances {
 				addrs = append(addrs, node.GetListenAddr()+`:`+instance)
@@ -47,7 +47,7 @@ func (s *service) Nodes() (nodes []cluster.Node) {
 	if s == nil {
 		return nil
 	}
-	service := conf.GetService(s.svcName)
+	service := conf.GetService(s.Env, s.svcName)
 	for _, node := range cluster.Get(s.Env).GetNodes(``) {
 		if node.Match(service.Nodes) {
 			nodes = append(nodes, node)

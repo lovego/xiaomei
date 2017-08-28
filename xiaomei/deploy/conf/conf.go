@@ -24,35 +24,36 @@ type Service struct {
 
 var theConf *Conf
 
-func Get() *Conf {
+func Get(env string) *Conf {
 	if theConf == nil {
-		theConf = &Conf{}
 		if content, err := ioutil.ReadFile(filepath.Join(release.Root(), `deploy.yml`)); err != nil {
 			log.Panic(err)
 		} else {
-			if err = yaml.Unmarshal(content, theConf); err != nil {
+			envConfs := map[string]*Conf{}
+			if err = yaml.Unmarshal(content, &envConfs); err != nil {
 				log.Panic(err)
 			}
+			theConf = envConfs[env]
 		}
 	}
 	return theConf
 }
 
-func HasService(svcName string) bool {
-	_, ok := Get().Services[svcName]
+func HasService(env, svcName string) bool {
+	_, ok := Get(env).Services[svcName]
 	return ok
 }
 
-func GetService(svcName string) Service {
-	svc, ok := Get().Services[svcName]
+func GetService(env, svcName string) Service {
+	svc, ok := Get(env).Services[svcName]
 	if !ok {
 		log.Panicf(`deploy.yml: services.%s: undefined.`, svcName)
 	}
 	return svc
 }
 
-func ServiceNames() (names []string) {
-	services := Get().Services
+func ServiceNames(env string) (names []string) {
+	services := Get(env).Services
 	for _, svcName := range []string{`app`, `tasks`, `web`, `logc`, `cron`, `godoc`} {
 		if _, ok := services[svcName]; ok {
 			names = append(names, svcName)
@@ -61,8 +62,8 @@ func ServiceNames() (names []string) {
 	return
 }
 
-func ImageNameOf(svcName string) string {
-	svc := GetService(svcName)
+func ImageNameOf(env, svcName string) string {
+	svc := GetService(env, svcName)
 	if svc.Image == `` {
 		log.Panicf(`deploy.yml: %s.image: empty.`, svcName)
 	}
@@ -71,8 +72,8 @@ func ImageNameOf(svcName string) string {
 
 var rePort = regexp.MustCompile(`^\d+$`)
 
-func InstancesOf(svcName string) (instances []string) {
-	svc := GetService(svcName)
+func InstancesOf(env, svcName string) (instances []string) {
+	svc := GetService(env, svcName)
 	if svc.Ports == `` {
 		return
 	}
@@ -87,18 +88,10 @@ func InstancesOf(svcName string) (instances []string) {
 	return
 }
 
-func FirstContainerNameOf(svcName, env string) string {
+func FirstContainerNameOf(env, svcName string) string {
 	name := release.AppConf(env).DeployName() + `_` + svcName
-	if instances := InstancesOf(svcName); len(instances) > 0 {
+	if instances := InstancesOf(env, svcName); len(instances) > 0 {
 		name += `.` + instances[0]
 	}
 	return name
-}
-
-func CommandFor(svcName string) []string {
-	return GetService(svcName).Command
-}
-
-func OptionsFor(svcName string) []string {
-	return GetService(svcName).Options
 }

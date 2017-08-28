@@ -24,22 +24,22 @@ func (i Image) Build(env string, pull bool) error {
 	if pull {
 		args = append(args, `--pull`)
 	}
-	args = append(args, `--file=`+i.dockerfile(), `--tag=`+conf.ImageNameOf(i.svcName)+`:`+env, `.`)
+	args = append(args, `--file=`+i.dockerfile(), `--tag=`+conf.ImageNameOf(env, i.svcName)+`:`+env, `.`)
 	_, err := cmd.Run(cmd.O{Dir: i.buildDir(), Print: true}, `docker`, args...)
 	return err
 }
 
 func (i Image) Push(env string) error {
 	utils.Log(color.GreenString(`pushing ` + i.svcName + ` image.`))
-	_, err := cmd.Run(cmd.O{Print: true}, `docker`, `push`, conf.ImageNameOf(i.svcName)+`:`+env)
+	_, err := cmd.Run(cmd.O{Print: true}, `docker`, `push`, conf.ImageNameOf(env, i.svcName)+`:`+env)
 	return err
 }
 
 // TODO: https or http check.
 // TODO: https://registry.hub.docker.com/v2/
-func (i Image) NameWithDigestInRegistry(tag string) string {
-	imgName := conf.ImageNameOf(i.svcName)
-	uri, err := url.Parse(`http://` + imgName + `/manifests/` + tag)
+func (i Image) NameWithDigestInRegistry(env string) string {
+	imgName := conf.ImageNameOf(env, i.svcName)
+	uri, err := url.Parse(`http://` + imgName + `/manifests/` + env)
 	if err != nil {
 		panic(err)
 	}
@@ -55,7 +55,7 @@ func (i Image) NameWithDigestInRegistry(tag string) string {
 	}
 	digest := resp.Header.Get(`Docker-Content-Digest`)
 	if digest == `` {
-		panic(`get image digest faild for: ` + imgName + `:` + tag)
+		panic(`get image digest faild for: ` + imgName + `:` + env)
 	}
 	return imgName + `@` + digest
 }

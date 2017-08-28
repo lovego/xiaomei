@@ -24,8 +24,8 @@ func GetClusters() map[string]Cluster {
 		if err := yaml.Unmarshal(content, clusters); err != nil {
 			panic(err)
 		}
-		for _, cluster := range clusters {
-			cluster.init()
+		for env, cluster := range clusters {
+			cluster.init(env)
 		}
 		theClusters = clusters
 	}

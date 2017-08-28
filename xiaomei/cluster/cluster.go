@@ -9,6 +9,7 @@ import (
 )
 
 type Cluster struct {
+	env      string
 	User     string `yaml:"user"`
 	JumpAddr string `yaml:"jumpAddr"`
 	Nodes    []Node `yaml:"managers"`
@@ -22,7 +23,8 @@ func Get(env string) Cluster {
 	return cluster
 }
 
-func (c *Cluster) init() {
+func (c *Cluster) init(env string) {
+	c.env = env
 	for i := range c.Nodes {
 		c.Nodes[i].user = c.User
 		c.Nodes[i].jumpAddr = c.JumpAddr
@@ -46,7 +48,7 @@ func (c Cluster) Run(feature string, o cmd.O, script string) (string, error) {
 }
 
 func (c Cluster) ServiceRun(svcName, feature string, o cmd.O, script string) (string, error) {
-	labels := conf.GetService(svcName).Nodes
+	labels := conf.GetService(c.env, svcName).Nodes
 	for _, node := range c.GetNodes(feature) {
 		if node.Match(labels) {
 			return node.Run(o, script)

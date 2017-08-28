@@ -12,7 +12,7 @@ import (
 )
 
 func deploy(env, svcName, feature string) error {
-	svcs := getServices(svcName)
+	svcs := getServices(env, svcName)
 	psScript := fmt.Sprintf(`watch docker ps -f name=%s`, release.ServiceName(env, svcName))
 	for _, node := range cluster.Get(env).GetNodes(feature) {
 		if err := deployNode(env, svcs, node, psScript); err != nil {
@@ -23,7 +23,7 @@ func deploy(env, svcName, feature string) error {
 }
 
 func deployNode(env string, svcs []string, node cluster.Node, psScript string) error {
-	nodeSvcs := getNodeServices(svcs, node)
+	nodeSvcs := getNodeServices(env, svcs, node)
 	if len(nodeSvcs) == 0 {
 		return nil
 	}
@@ -36,18 +36,18 @@ func deployNode(env string, svcs []string, node cluster.Node, psScript string) e
 	return err
 }
 
-func getServices(svcName string) []string {
+func getServices(env, svcName string) []string {
 	if svcName == `` {
-		return conf.ServiceNames()
+		return conf.ServiceNames(env)
 	} else {
 		return []string{svcName}
 	}
 }
 
-func getNodeServices(svcNames []string, node cluster.Node) []string {
+func getNodeServices(env string, svcNames []string, node cluster.Node) []string {
 	svcs := []string{}
 	for _, svcName := range svcNames {
-		service := conf.GetService(svcName)
+		service := conf.GetService(env, svcName)
 		if node.Match(service.Nodes) {
 			svcs = append(svcs, svcName)
 		}
