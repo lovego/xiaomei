@@ -29,7 +29,7 @@ func Root() string {
 			if err != nil {
 				log.Panic(err)
 			}
-			projectDir := fs.DetectDir(cwd, `release/simple.yml`)
+			projectDir := fs.DetectDir(cwd, `release/deploy.yml`)
 			if projectDir != `` {
 				theRoot = filepath.Join(projectDir, `release/img-app`)
 			} else {
