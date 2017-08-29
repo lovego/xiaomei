@@ -17,7 +17,7 @@ func accessCmd(svcName string) *cobra.Command {
 	var setup bool
 	var filter string
 	cmd := &cobra.Command{
-		Use:   `access`,
+		Use:   `access [<env>]`,
 		Short: `access config for the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			if setup {
