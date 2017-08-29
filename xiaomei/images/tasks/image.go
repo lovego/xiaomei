@@ -26,7 +26,7 @@ func (i Image) Dockerfile() string {
 }
 
 func (i Image) Prepare() error {
-	if err := buildBinary(); err != nil {
+	if err := compile(); err != nil {
 		return err
 	}
 	return nil

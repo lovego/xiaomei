@@ -14,20 +14,20 @@ import (
 func Cmds() []*cobra.Command {
 	return []*cobra.Command{
 		{
-			Use:   `build-bin`,
-			Short: `build the tasks.`,
-			RunE:  release.NoArgCall(buildBinary),
+			Use:   `compile`,
+			Short: `compile the tasks binary.`,
+			RunE:  release.NoArgCall(compile),
 		},
 	}
 }
 
-func buildBinary() error {
-	utils.Log(color.GreenString(`building tasks binary.`))
+func compile() error {
+	utils.Log(color.GreenString(`compile the tasks binary.`))
 	if cmd.Ok(cmd.O{
 		Dir: filepath.Join(release.Root(), "../tasks"),
 		Env: []string{`GOBIN=` + filepath.Join(release.Root(), `img-app`)},
 	}, `go`, `install`, `-v`) {
 		return nil
 	}
-	return errors.New(`building tasks binary failed.`)
+	return errors.New(`compile the tasks binary failed.`)
 }

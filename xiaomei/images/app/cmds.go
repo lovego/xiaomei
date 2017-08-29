@@ -15,22 +15,22 @@ import (
 func Cmds() []*cobra.Command {
 	return append([]*cobra.Command{
 		{
-			Use:   `build-bin`,
-			Short: `build the app server.`,
-			RunE:  release.NoArgCall(buildBinary),
+			Use:   `compile`,
+			Short: `compile the app server binary.`,
+			RunE:  release.NoArgCall(compile),
 		},
 		DepsCmd(),
 		copy2vendorCmd(),
 	}, db.Cmds()...)
 }
 
-func buildBinary() error {
-	utils.Log(color.GreenString(`building app binary.`))
+func compile() error {
+	utils.Log(color.GreenString(`compile the app server binary.`))
 	if cmd.Ok(cmd.O{
 		Dir: filepath.Join(release.Root(), `..`),
 		Env: []string{`GOBIN=` + filepath.Join(release.Root(), `img-app`)},
 	}, `go`, `install`, `-v`) {
 		return nil
 	}
-	return errors.New(`building app binary failed.`)
+	return errors.New(`compile the app server binary failed.`)
 }

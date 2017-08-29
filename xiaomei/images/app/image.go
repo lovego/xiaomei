@@ -16,7 +16,7 @@ func (i Image) RunEnvName() string {
 }
 
 func (i Image) Prepare() error {
-	if err := buildBinary(); err != nil {
+	if err := compile(); err != nil {
 		return err
 	}
 	/*
