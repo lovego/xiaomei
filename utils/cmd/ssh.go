@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/lovego/xiaomei/utils/slice"
 )
@@ -35,12 +36,13 @@ func SshJumpRun(o O, jumpAddr, addr, script string) (output string, err error) {
 	if o.PrintCmd() {
 		fmt.Println(script)
 	}
+	tmpFile := fmt.Sprintf(`/tmp/xiaomei.%s.sh`, time.Now().Format(`2006-01-02T15:04:05.999999999`))
 	if _, err := SshRun(O{Stdin: strings.NewReader(script)}, jumpAddr, fmt.Sprintf(
-		`ssh %s %s 'cat > /tmp/runScript.sh'`, SshShareConnFlags, addr,
+		`ssh %s %s 'cat > %s'`, SshShareConnFlags, addr, tmpFile,
 	)); err != nil {
 		return ``, err
 	}
 	return SshRun(o, jumpAddr, fmt.Sprintf(
-		`ssh %s %s %s bash /tmp/runScript.sh`, ttyFlag, SshShareConnFlags, addr,
+		`ssh %s %s %s "bash %s; rm %s"`, ttyFlag, SshShareConnFlags, addr, tmpFile, tmpFile,
 	))
 }

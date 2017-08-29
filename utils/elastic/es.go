@@ -1,7 +1,7 @@
 package elastic
 
 import (
-	"math"
+	"log"
 	"strings"
 
 	"github.com/lovego/xiaomei/utils/httputil"
@@ -9,11 +9,14 @@ import (
 )
 
 type ES struct {
-	counter   int
 	BaseAddrs []string
+	i         int
 }
 
 func New(addrs ...string) *ES {
+	if len(addrs) == 0 {
+		log.Panic(`empty elastic addrs`)
+	}
 	return &ES{BaseAddrs: addrs}
 }
 
@@ -40,14 +43,14 @@ func (es *ES) Post(path string, bodyData, data interface{}) error {
 }
 
 func (es *ES) Uri(path string) string {
-	// Round-Robin elastic nodes
-	if es.counter+1 >= math.MaxInt32 {
-		es.counter = 0 // reset counter before overflow
-	} else {
-		es.counter++
+	uri := es.BaseAddrs[es.i] + path
+	if len(es.BaseAddrs) > 1 { // Round-Robin elastic nodes
+		es.i++
+		if es.i >= len(es.BaseAddrs) {
+			es.i = 0
+		}
 	}
-	i := es.counter % len(es.BaseAddrs)
-	return es.BaseAddrs[i] + path
+	return uri
 }
 
 func GenUUID() (string, error) {
