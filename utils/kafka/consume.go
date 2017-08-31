@@ -9,6 +9,7 @@ import (
 	"github.com/Shopify/sarama"
 	"github.com/garyburd/redigo/redis"
 	"github.com/lovego/xiaomei/utils"
+	"github.com/lovego/xiaomei/utils/alarm"
 	"github.com/lovego/xiaomei/utils/fs"
 )
 
@@ -17,11 +18,13 @@ type Consume struct {
 	Consumer   sarama.Consumer
 	Topic      string
 	Group      string
-	Handler    func(*sarama.ConsumerMessage, map[string]interface{})
+	Handler    func(*sarama.ConsumerMessage, map[string]interface{}) error
 	RedisPool  *redis.Pool
 	OffsetsKey string
-	LogPath    string
-	logWriter  io.Writer
+
+	LogPath   string
+	logWriter io.Writer
+	Alarm     alarm.Engine
 }
 
 func (c *Consume) Start() {
@@ -32,7 +35,7 @@ func (c *Consume) Start() {
 	}
 	partitions, err := c.Consumer.Partitions(c.Topic)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 	for _, n := range partitions {
 		go c.startPartition(n)
@@ -45,7 +48,7 @@ func (c *Consume) startPartition(n int32) {
 
 	pc, err := c.Consumer.ConsumePartition(c.Topic, n, offset)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 	defer pc.Close()
 
@@ -70,10 +73,12 @@ func (c *Consume) process(pc sarama.PartitionConsumer, n int32, message *sarama.
 func (c *Consume) callHandler(message *sarama.ConsumerMessage, logMap map[string]interface{}) {
 	defer func() {
 		if err := recover(); err != nil {
-			log.Printf("offset: %d, PANIC: %s\n%s", message.Offset, err, utils.Stack(4))
+			c.Alarm.Alarmf("PANIC: %v\n%s", err, utils.Stack(1))
 		}
 	}()
-	c.Handler(message, logMap)
+	if err := c.Handler(message, logMap); err != nil {
+		c.Alarm.Alarmf("error: %v\n%s", err, utils.Stack(4))
+	}
 }
 
 func (c *Consume) writeLog(m map[string]interface{}) {

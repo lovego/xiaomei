@@ -17,8 +17,9 @@ import (
 )
 
 type Mailer struct {
-	Sender *mail.Address
-	Pool   *email.Pool
+	Sender   *mail.Address
+	Pool     *email.Pool
+	poolSize int
 }
 
 func New(mailerUrl string) (*Mailer, error) {
@@ -47,11 +48,11 @@ func New(mailerUrl string) (*Mailer, error) {
 		smtp.PlainAuth(``, sender.Address, query.Get(`pass`), mailer.Hostname()),
 	)
 
-	return &Mailer{sender, pool}, nil
+	return &Mailer{sender, pool, poolSize}, nil
 }
 
 func (m *Mailer) Send(e *email.Email, timeout time.Duration) (err error) {
-	if m == nil {
+	if m == nil || e == nil || len(e.To) == 0 {
 		return nil
 	}
 	if e.From == `` && m.Sender != nil {
@@ -59,15 +60,12 @@ func (m *Mailer) Send(e *email.Email, timeout time.Duration) (err error) {
 	}
 	setupAddrsHeaders(e)
 
-	maxRetry := 10
-	for maxRetry > 0 {
+	// 如果是io.EOF错误,可能是由于pool连接被关闭造成, 重试
+	for i := 0; i < m.poolSize; i++ {
 		err = m.Pool.Send(e, timeout)
-		// 如果是io.EOF错误,可能是由于pool链接暂时关闭造成,我们重试
-		if err == io.EOF {
-			maxRetry--
-			continue
+		if err == nil || err != io.EOF {
+			return
 		}
-		break
 	}
 	return
 }

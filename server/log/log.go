@@ -29,20 +29,9 @@ func Write(req *xiaomei.Request, res *xiaomei.Response, t time.Time, err interfa
 	fields := getFields(req, res, t)
 
 	if err != nil {
-		errStr := fmt.Sprint(err)
-		errStack := string(utils.Stack(3))
-		fields[`err`] = errStr
-		fields[`stack`] = errStack
-
-		if !isDevMode {
-			go config.Alarm(`500错误`, formatFields(fields, false), errStr+` `+errStack)
-		}
-	} else if err = fields[`err`]; err != nil && !isDevMode {
-		errStr, ok := err.(string)
-		if !ok {
-			errStr = fmt.Sprint(err)
-		}
-		go config.Alarm(`错误`, formatFields(fields, false), errStr)
+		handlePanic(err, fields)
+	} else if err = fields[`err`]; err != nil {
+		handleError(err, fields)
 	}
 
 	if line := serializeFields(fields); len(line) > 0 {
@@ -52,6 +41,26 @@ func Write(req *xiaomei.Request, res *xiaomei.Response, t time.Time, err interfa
 			theAccessLog.Write(line)
 		}
 	}
+}
+
+func handlePanic(err interface{}, fields map[string]interface{}) {
+	errStr := fmt.Sprintf("Panic: %v", err)
+	errStack := utils.Stack(3)
+	fields[`err`] = errStr
+	fields[`stack`] = errStack
+	config.AlarmMergeKey(errStr, formatFields(fields, false), errStr+` `+errStack)
+}
+
+func handleError(err interface{}, fields map[string]interface{}) {
+	errStr := fmt.Sprintf("Error: %v", err)
+	var errStack string
+	if stack := fields[`stack`]; stack == nil {
+		errStack = utils.Stack(3)
+		fields[`stack`] = errStack
+	} else {
+		errStack = fmt.Sprint(stack)
+	}
+	config.AlarmMergeKey(errStr, formatFields(fields, false), errStr+` `+errStack)
 }
 
 func serializeFields(fields map[string]interface{}) []byte {

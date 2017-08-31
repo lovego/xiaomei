@@ -34,7 +34,7 @@ func FLogf(w io.Writer, format string, args ...interface{}) {
 	fmt.Fprintf(w, format, args...)
 }
 
-func Stack(skip int) []byte {
+func Stack(skip int) string {
 	buf := new(bytes.Buffer)
 	for i := skip; ; i++ {
 		pc, file, line, ok := runtime.Caller(i)
@@ -43,7 +43,7 @@ func Stack(skip int) []byte {
 		}
 		fmt.Fprintf(buf, "%s:%d (0x%x)\n", file, line, pc)
 	}
-	return buf.Bytes()
+	return buf.String()
 }
 
 func Protect(fn func()) {
