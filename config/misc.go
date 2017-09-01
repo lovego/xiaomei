@@ -20,15 +20,23 @@ func AlarmEngine() alarm.Engine {
 	return alarmEngine
 }
 
-func AlarmMergeKey(title, content, mergeKey string) {
-	alarmEngine.AlarmMergeKey(DeployName()+` `+title, content, mergeKey)
+func Protect(fn func()) {
+	defer Recover()
+	fn()
 }
 
 func Recover() {
 	alarmEngine.Recover(DeployName())
 }
 
-func Protect(fn func()) {
-	defer Recover()
-	fn()
+func Alarmf(format string, args ...interface{}) {
+	alarmEngine.Alarmf(DeployName()+` `+format, args...)
+}
+
+func Alarm(title string) {
+	alarmEngine.Alarm(DeployName() + ` ` + title)
+}
+
+func AlarmMergeKey(title, content, mergeKey string) {
+	alarmEngine.AlarmMergeKey(DeployName()+` `+title, content, mergeKey)
 }

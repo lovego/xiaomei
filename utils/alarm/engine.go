@@ -36,7 +36,7 @@ func NewEngine(sender Sender, min, inc, max time.Duration) Engine {
 
 func (e *engine) Recover(prefix string) {
 	if err := recover(); err != nil {
-		e.Alarm(fmt.Sprintf("PANIC: %v", err))
+		e.Alarm(fmt.Sprintf("%s PANIC: %v", prefix, err))
 	}
 }
 
