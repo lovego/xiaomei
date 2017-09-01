@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"reflect"
 )
 
 type BulkError interface {
@@ -13,24 +12,24 @@ type BulkError interface {
 }
 
 type bulkError struct {
-	typ     string
-	inputs  reflect.Value
-	results []map[string]map[string]interface{}
-	items   [][2]interface{}
+	typ         string
+	inputs      []map[string]interface{}
+	results     []map[string]map[string]interface{}
+	failedItems []map[string]interface{}
 }
 
-func (b bulkError) Items() [][2]interface{} {
-	if b.items == nil {
-		items := make([][2]interface{}, 0)
+func (b bulkError) FailedItems() []map[string]interface{} {
+	if b.failedItems == nil {
+		failedItems := make([]map[string]interface{}, 0)
 		for i, result := range b.results {
 			res := result[b.typ]
 			if res[`error`] != nil {
-				items = append(items, [2]interface{}{b.inputs.Index(i).Interface(), res})
+				failedItems = append(failedItems, b.inputs[i])
 			}
 		}
-		b.items = items
+		b.failedItems = failedItems
 	}
-	return b.items
+	return b.failedItems
 }
 
 func (b bulkError) Error() string {
@@ -46,6 +45,6 @@ func (b bulkError) Error() string {
 		log.Println(`marshal elastic bulk errors: `, err)
 	}
 	return fmt.Sprintf("bulk %s errors(%d of %d)\n%s\n",
-		b.typ, len(errs), b.inputs.Len(), buf,
+		b.typ, len(errs), len(b.inputs), buf,
 	)
 }

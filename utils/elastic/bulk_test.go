@@ -15,9 +15,9 @@ func TestBulk(t *testing.T) {
 
 	testES.Delete(`/users/3`, nil)
 
-	testES.BulkUpdate(`/users`, [][2]interface{}{
-		{1, map[string]map[string]int{`doc`: {`age`: 31}}},
-		{2, map[string]map[string]int{`doc`: {`age`: 29}}},
+	testES.BulkUpdate(`/users`, []map[string]interface{}{
+		map[string]interface{}{`_id`: 1, `doc`: {`age`: 31}},
+		map[string]interface{}{`_id`: 2, `doc`: {`age`: 29}},
 	})
 
 	checkLiLeiAndHanMeiMei(t)

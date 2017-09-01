@@ -1,8 +1,6 @@
 package elastic
 
 import (
-	"reflect"
-
 	"github.com/lovego/xiaomei/utils/httputil"
 )
 
@@ -22,14 +20,14 @@ func (es *ES) BulkCreate(path string, data []map[string]interface{}) error {
 	return es.BulkDo(path, body, `create`, data)
 }
 
-func (es *ES) BulkUpdate(path string, data [][2]interface{}) error {
+func (es *ES) BulkUpdate(path string, data []map[string]interface{}) error {
 	if len(data) <= 0 {
 		return nil
 	}
 	return es.BulkDo(path, MakeBulkUpdate(data), `update`, data)
 }
 
-func (es *ES) BulkDo(path string, body, typ string, data interface{}) error {
+func (es *ES) BulkDo(path string, body, typ string, data []map[string]interface{}) error {
 	result := BulkResult{}
 	if err := httputil.PostJson(es.Uri(path+`/_bulk`), nil, body, &result); err != nil {
 		return err
@@ -37,5 +35,5 @@ func (es *ES) BulkDo(path string, body, typ string, data interface{}) error {
 	if !result.Errors {
 		return nil
 	}
-	return bulkError{typ: typ, inputs: reflect.ValueOf(data), results: result.Items}
+	return bulkError{typ: typ, inputs: data, results: result.Items}
 }
