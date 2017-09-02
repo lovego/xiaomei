@@ -3,13 +3,11 @@ package elastic
 import (
 	"net/http"
 	"net/url"
-
-	"github.com/lovego/xiaomei/utils/httputil"
 )
 
 // 增
 func (es *ES) Create(path string, bodyData, data interface{}) error {
-	resp, err := httputil.Put(es.Uri(path), nil, bodyData)
+	resp, err := es.client.Put(es.Uri(path), nil, bodyData)
 	if err != nil {
 		return err
 	}
@@ -21,12 +19,12 @@ func (es *ES) Create(path string, bodyData, data interface{}) error {
 
 // 删
 func (es *ES) Delete(path string, data interface{}) error {
-	return httputil.DeleteJson(es.Uri(path), nil, nil, data)
+	return es.client.DeleteJson(es.Uri(path), nil, nil, data)
 }
 
 // 改
 func (es *ES) Update(path string, bodyData, data interface{}) error {
-	return httputil.PostJson(es.Uri(path+`/_update`), nil, bodyData, data)
+	return es.client.PostJson(es.Uri(path+`/_update`), nil, bodyData, data)
 }
 
 // 查
@@ -53,7 +51,7 @@ func (es *ES) Query(path string, bodyData interface{}) (
 	}
 	uri.Query().Set(`filter_path`, `hits.total,hits.hits._source`)
 
-	if err = httputil.PostJson(es.Uri(uri.String()), nil, bodyData, &result); err != nil {
+	if err = es.client.PostJson(es.Uri(uri.String()), nil, bodyData, &result); err != nil {
 		return
 	}
 	total = result.Hits.Total
@@ -73,7 +71,7 @@ func (es *ES) Ensure(path string, def interface{}) error {
 }
 
 func (es *ES) Exist(path string) (bool, error) {
-	resp, err := httputil.Head(es.Uri(path), nil, nil)
+	resp, err := es.client.Head(es.Uri(path), nil, nil)
 	if err != nil {
 		return false, err
 	}

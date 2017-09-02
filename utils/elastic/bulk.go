@@ -1,9 +1,5 @@
 package elastic
 
-import (
-	"github.com/lovego/xiaomei/utils/httputil"
-)
-
 type BulkResult struct {
 	Errors bool                                `json:"errors"`
 	Items  []map[string]map[string]interface{} `json:"items"`
@@ -29,7 +25,7 @@ func (es *ES) BulkUpdate(path string, data []map[string]interface{}) error {
 
 func (es *ES) BulkDo(path string, body, typ string, data []map[string]interface{}) error {
 	result := BulkResult{}
-	if err := httputil.PostJson(es.Uri(path+`/_bulk`), nil, body, &result); err != nil {
+	if err := es.client.PostJson(es.Uri(path+`/_bulk`), nil, body, &result); err != nil {
 		return err
 	}
 	if !result.Errors {

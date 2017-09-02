@@ -11,17 +11,25 @@ import (
 type ES struct {
 	BaseAddrs []string
 	i         int
+	client    *httputil.Client
 }
 
 func New(addrs ...string) *ES {
 	if len(addrs) == 0 {
 		log.Panic(`empty elastic addrs`)
 	}
-	return &ES{BaseAddrs: addrs}
+	return &ES{BaseAddrs: addrs, client: httputil.DefaultClient}
+}
+
+func New2(client *httputil.Client, addrs ...string) *ES {
+	if len(addrs) == 0 {
+		log.Panic(`empty elastic addrs`)
+	}
+	return &ES{BaseAddrs: addrs, client: client}
 }
 
 func (es *ES) Get(path string, bodyData, data interface{}) error {
-	resp, err := httputil.Get(es.Uri(path), nil, bodyData)
+	resp, err := es.client.Get(es.Uri(path), nil, bodyData)
 	if err != nil {
 		return err
 	}
@@ -32,7 +40,7 @@ func (es *ES) Get(path string, bodyData, data interface{}) error {
 }
 
 func (es *ES) Post(path string, bodyData, data interface{}) error {
-	resp, err := httputil.Post(es.Uri(path), nil, bodyData)
+	resp, err := es.client.Post(es.Uri(path), nil, bodyData)
 	if err != nil {
 		return err
 	}
