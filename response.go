@@ -89,6 +89,19 @@ func (res *Response) Json(data interface{}) {
 	}
 }
 
+func (res *Response) Json2(data interface{}, err error) {
+	if err != nil {
+		res.LogError(err)
+	}
+	bytes, err := json.Marshal(data)
+	if err == nil {
+		res.Header().Set(`Content-Type`, `application/json; charset=utf-8`)
+		res.Write(bytes)
+	} else {
+		panic(err)
+	}
+}
+
 func (res Response) Result(data interface{}, err error) {
 	type result struct {
 		Code    string      `json:"code"`
@@ -101,9 +114,23 @@ func (res Response) Result(data interface{}, err error) {
 		if e, ok := err.(errs.CodeMessageErr); ok {
 			res.Json(result{Code: e.Code(), Message: e.Message(), Result: data})
 		} else {
+			res.LogError(err)
 			res.Json(result{Code: `error`, Message: err.Error(), Result: data})
 		}
 	}
+}
+
+func (res *Response) LogError(err error) {
+	if err == nil {
+		return
+	}
+	log := map[string]interface{}{`err`: err}
+	if stack, ok := err.(interface {
+		Stack() string
+	}); ok {
+		log[`stack`] = stack.Stack()
+	}
+	res.Log(log)
 }
 
 func (res *Response) Redirect(path string) {
