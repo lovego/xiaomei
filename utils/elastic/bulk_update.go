@@ -2,24 +2,30 @@ package elastic
 
 import (
 	"encoding/json"
+	"log"
 )
 
 /*
 	upsert es 格式：
 	{ "update" : {"_id" : "2"} }
-	{ "doc" : {"field" : "value"}, "upsert" : {"field" : "value"} }
+	{ "_id": id, "doc" : {"field" : "value"}, "upsert" : {"field" : "value"}, ... }
 */
-func MakeBulkUpdate(rows [][2]interface{}) (result string) {
+func MakeBulkUpdate(rows []map[string]interface{}) (result string) {
 	for _, row := range rows {
-		id, updateDef := row[0], row[1]
+		id := row[`_id`]
+		if id == nil {
+			log.Panicf("must have _id: %v", row)
+		}
+		row = copyWithoutId(row)
+
 		meta, err := json.Marshal(map[string]map[string]interface{}{`update`: {`_id`: id}})
 		if err != nil {
-			panic(err)
+			log.Panic(err)
 		}
 
-		content, err := json.Marshal(updateDef)
+		content, err := json.Marshal(row)
 		if err != nil {
-			panic(err)
+			log.Panic(err)
 		}
 		result += string(meta) + "\n" + string(content) + "\n"
 	}

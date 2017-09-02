@@ -2,12 +2,13 @@ package elastic
 
 import (
 	"encoding/json"
+	"log"
 )
 
 /*
 	create es 格式：
 	{ "create" : {"_id" : "2"} }
-	{ "k": "v", ... }
+	{ "_id": id, "k": "v", ... }
 */
 func MakeBulkCreate(rows []map[string]interface{}) (result string, err error) {
 	for _, row := range rows {
@@ -22,12 +23,12 @@ func MakeBulkCreate(rows []map[string]interface{}) (result string, err error) {
 
 		meta, err := json.Marshal(map[string]map[string]interface{}{`create`: {`_id`: id}})
 		if err != nil {
-			panic(err)
+			log.Panic(err)
 		}
 
 		content, err := json.Marshal(row)
 		if err != nil {
-			panic(err)
+			log.Panic(err)
 		}
 		result += string(meta) + "\n" + string(content) + "\n"
 	}
