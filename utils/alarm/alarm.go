@@ -11,7 +11,7 @@ type alarm struct {
 	count          int
 	lastSendTime   time.Time
 	interval       time.Duration
-	engine         *engine
+	engine         *Engine
 }
 
 func (a *alarm) Add(title, content string) {

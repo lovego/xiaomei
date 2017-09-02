@@ -36,12 +36,16 @@ func FLogf(w io.Writer, format string, args ...interface{}) {
 
 func Stack(skip int) string {
 	buf := new(bytes.Buffer)
-	for i := skip; ; i++ {
-		pc, file, line, ok := runtime.Caller(i)
-		if !ok {
+
+	callers := make([]uintptr, 32)
+	n := runtime.Callers(skip, callers)
+	frames := runtime.CallersFrames(callers[:n])
+	for {
+		if f, ok := frames.Next(); ok {
+			fmt.Fprintf(buf, "%s %s:%d (0x%x)\n", f.Function, f.File, f.Line, f.PC)
+		} else {
 			break
 		}
-		fmt.Fprintf(buf, "%s:%d (0x%x)\n", file, line, pc)
 	}
 	return buf.String()
 }

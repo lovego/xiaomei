@@ -22,7 +22,9 @@ func (m MailSender) Send(title, content string, count int) {
 	if len(m.Receivers) == 0 {
 		return
 	}
-	title += fmt.Sprintf(` [Merged: %d]`, count)
+	if count > 1 {
+		title += fmt.Sprintf(` [Merged: %d]`, count)
+	}
 
 	err := m.Mailer.Send(&email.Email{
 		To:      m.Receivers,

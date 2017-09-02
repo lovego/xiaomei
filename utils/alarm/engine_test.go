@@ -43,35 +43,35 @@ const redundantTime = 10 * time.Millisecond
 
 func TestRecover(t *testing.T) {
 	s := &testSenderT{}
-	engine := NewEngine(s, 0, time.Second, 10*time.Second)
+	engine := NewEngine(`Recover`, s, 0, time.Second, 10*time.Second, nil)
 	func() {
-		defer engine.Recover(`Recover`)
+		defer engine.Recover()
 		panic(`wrong`)
 	}()
 	time.Sleep(redundantTime) // wait the alarm wait and send goroutine ends.
 	fmt.Println(s)
 }
 
-func TestAlarmf(t *testing.T) {
+func TestPrintf(t *testing.T) {
 	s := &testSenderT{}
-	engine := NewEngine(s, 0, time.Second, 10*time.Second)
-	engine.Alarmf("Alarmf: %s", `wrong`)
+	engine := NewEngine(``, s, 0, time.Second, 10*time.Second, nil)
+	engine.Printf("Alarmf: %s", `wrong`)
 	time.Sleep(redundantTime) // wait the alarm wait and send goroutine ends.
 	fmt.Println(s)
 }
 
 func TestAlarm(t *testing.T) {
 	s := &testSenderT{}
-	engine := NewEngine(s, 0, time.Second, 10*time.Second)
-	engine.Alarmf(`Alarm: wrong`)
+	engine := NewEngine(``, s, 0, time.Second, 10*time.Second, nil)
+	engine.Alarm(`Alarm: wrong`)
 	time.Sleep(redundantTime) // wait the alarm wait and send goroutine ends.
 	fmt.Println(s)
 }
 
-func TestAlarmMergeKey1(t *testing.T) {
+func TestDo1(t *testing.T) {
 	s := &testSenderT{}
-	engine := NewEngine(s, 0, time.Second, 10*time.Second)
-	testAlarmMergeKey(engine, map[string]int{`a`: 3, `b`: 4, `c`: 5})
+	engine := NewEngine(``, s, 0, time.Second, 10*time.Second, nil)
+	testDo(engine, map[string]int{`a`: 3, `b`: 4, `c`: 5})
 	time.Sleep(redundantTime) // wait the test goroutine ends.
 	// 首次报警立即发出
 	assertEqual(t, s, [][]string{
@@ -84,7 +84,7 @@ func TestAlarmMergeKey1(t *testing.T) {
 		{`标题a[2] 内容a`, `标题b[3] 内容b`, `标题c[4] 内容c`},
 	})
 	time.Sleep(2*time.Second + redundantTime)
-	testAlarmMergeKey(engine, map[string]int{`a`: 3, `b`: 4, `c`: 5})
+	testDo(engine, map[string]int{`a`: 3, `b`: 4, `c`: 5})
 	time.Sleep(redundantTime) // wait the test goroutine ends.
 	// 本次报警立即发出
 	assertEqual(t, s, [][]string{
@@ -94,11 +94,11 @@ func TestAlarmMergeKey1(t *testing.T) {
 	})
 }
 
-func TestAlarmMergeKey2(t *testing.T) {
+func TestDo2(t *testing.T) {
 	s := &testSenderT{}
-	engine := NewEngine(s, time.Second, time.Second, 10*time.Second)
+	engine := NewEngine(``, s, time.Second, time.Second, 10*time.Second, nil)
 
-	testAlarmMergeKey(engine, map[string]int{`a`: 3, `b`: 4, `c`: 5})
+	testDo(engine, map[string]int{`a`: 3, `b`: 4, `c`: 5})
 	time.Sleep(redundantTime) // wait the test goroutine ends.
 	// 首次报警等待1秒
 	time.Sleep(time.Second + redundantTime)
@@ -108,8 +108,8 @@ func TestAlarmMergeKey2(t *testing.T) {
 
 	// 先等待1秒
 	time.Sleep(time.Second)
-	testAlarmMergeKey(engine, map[string]int{`a`: 2, `b`: 3, `c`: 1})
-	testAlarmMergeKey(engine, map[string]int{`a`: 4, `b`: 4, `c`: 7})
+	testDo(engine, map[string]int{`a`: 2, `b`: 3, `c`: 1})
+	testDo(engine, map[string]int{`a`: 4, `b`: 4, `c`: 7})
 	// 本次报警等待2秒，减去之前已经等待的1秒，只需再等待1秒
 	time.Sleep(time.Second + redundantTime)
 	assertEqual(t, s, [][]string{
@@ -118,14 +118,14 @@ func TestAlarmMergeKey2(t *testing.T) {
 	})
 }
 
-func testAlarmMergeKey(engine Engine, groups map[string]int) {
+func testDo(engine *Engine, groups map[string]int) {
 	var wg sync.WaitGroup
 	for mergeKey, count := range groups {
 		wg.Add(count)
 		for i := 0; i < count; i++ {
 			go func(mergeKey string) {
 				defer wg.Done()
-				engine.AlarmMergeKey(mergeKey, mergeKey, mergeKey)
+				engine.Do(mergeKey, mergeKey, mergeKey)
 			}(mergeKey)
 		}
 	}

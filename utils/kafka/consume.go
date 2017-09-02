@@ -3,7 +3,6 @@ package kafka
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"time"
 
 	"github.com/Shopify/sarama"
@@ -15,7 +14,7 @@ import (
 
 type Consume struct {
 	Client     sarama.Client
-	Consumer   sarama.Consumer
+	consumer   sarama.Consumer
 	Topic      string
 	Group      string
 	Handler    func(*sarama.ConsumerMessage, map[string]interface{}) error
@@ -24,18 +23,24 @@ type Consume struct {
 
 	LogPath   string
 	logWriter io.Writer
-	Alarm     alarm.Engine
+	Alarm     *alarm.Engine
 }
 
 func (c *Consume) Start() {
+	if consumer, err := sarama.NewConsumerFromClient(c.Client); err == nil {
+		c.consumer = consumer
+	} else {
+		c.Alarm.Panic(err)
+	}
+
 	c.logWriter = fs.NewLogFile(c.LogPath)
 
 	if c.OffsetsKey == `` {
 		c.OffsetsKey = `kafka-offsets-` + c.Topic + `-` + c.Group
 	}
-	partitions, err := c.Consumer.Partitions(c.Topic)
+	partitions, err := c.Client.Partitions(c.Topic)
 	if err != nil {
-		log.Panic(err)
+		c.Alarm.Panic(err)
 	}
 	for _, n := range partitions {
 		go c.startPartition(n)
@@ -46,9 +51,9 @@ func (c *Consume) Start() {
 func (c *Consume) startPartition(n int32) {
 	offset := c.getPartitionOffset(n)
 
-	pc, err := c.Consumer.ConsumePartition(c.Topic, n, offset)
+	pc, err := c.consumer.ConsumePartition(c.Topic, n, offset)
 	if err != nil {
-		log.Panic(err)
+		c.Alarm.Panic(err)
 	}
 	defer pc.Close()
 
@@ -71,26 +76,22 @@ func (c *Consume) process(pc sarama.PartitionConsumer, n int32, message *sarama.
 }
 
 func (c *Consume) callHandler(message *sarama.ConsumerMessage, logMap map[string]interface{}) {
-	defer func() {
-		if err := recover(); err != nil {
-			c.Alarm.Alarmf("PANIC: %v\n%s", err, utils.Stack(1))
-		}
-	}()
+	defer c.Alarm.Recover()
 	if err := c.Handler(message, logMap); err != nil {
-		c.Alarm.Alarmf("error: %v\n%s", err, utils.Stack(4))
+		c.Alarm.Printf("consume handler error: %v", err)
 	}
 }
 
 func (c *Consume) writeLog(m map[string]interface{}) {
 	buf, err := json.Marshal(m)
 	if err != nil {
-		log.Printf("marshal log err: %v", err)
+		c.Alarm.Printf("marshal log err: %v", err)
 		return
 	}
 	buf = append(buf, '\n')
 	_, err = c.logWriter.Write(buf)
 	if err != nil {
-		log.Printf("write log err: %v", err)
+		c.Alarm.Printf("write log err: %v", err)
 		return
 	}
 }
