@@ -10,6 +10,8 @@ import (
 	"github.com/lovego/xiaomei/utils"
 )
 
+const timeFormat = `2006-01-02 15:04:05`
+
 // Engine合并报警邮件，防止在出错高峰，收到大量重复报警邮件，
 //	 甚至因为邮件过多导致发送失败、接收失败。
 type Engine struct {
@@ -36,6 +38,14 @@ func NewEngine(
 		alarms: make(map[string]*alarm),
 		writer: writer,
 	}
+}
+
+func (e *Engine) Log(args ...interface{}) {
+	e.writer.Write([]byte(time.Now().Format(timeFormat) + ` ` + fmt.Sprint(args...)))
+}
+
+func (e *Engine) Logf(format string, args ...interface{}) {
+	e.writer.Write([]byte(time.Now().Format(timeFormat) + ` ` + fmt.Sprintf(format, args...)))
 }
 
 func (e *Engine) Recover() {
@@ -110,7 +120,7 @@ func (e *Engine) Do(title, content, mergeKey string) {
 func (e *Engine) getTitleContentMergeKey(title string) (string, string, string) {
 	// 根据title和调用栈对报警消息进行合并
 	mergeKey := title + "\n" + utils.Stack(3)
-	content := e.prefix + ` ` + time.Now().Format(utils.ISO8601) + ` ` + mergeKey
+	content := e.prefix + ` ` + time.Now().Format(timeFormat) + ` ` + mergeKey
 	title = e.prefix + ` ` + title
 	return title, content, mergeKey
 }
