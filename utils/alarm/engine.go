@@ -55,53 +55,53 @@ func (e *Engine) Recover() {
 }
 
 func (e *Engine) Fatal(args ...interface{}) {
-	msg := fmt.Sprint(args...)
-	title, content, _ := e.getTitleContentMergeKey(msg)
+	title := fmt.Sprint(args...)
+	content, _ := e.getContentMergeKey(title)
 	e.writer.Write([]byte(content))
-	e.sender.Send(title, content, 0)
+	e.sender.Send(e.prefix+` `+title, content, 0)
 	os.Exit(1)
 }
 
 func (e *Engine) Fatalf(format string, args ...interface{}) {
-	msg := fmt.Sprintf(format, args...)
-	title, content, _ := e.getTitleContentMergeKey(msg)
+	title := fmt.Sprintf(format, args...)
+	content, _ := e.getContentMergeKey(title)
 	e.writer.Write([]byte(content))
-	e.sender.Send(title, content, 1)
+	e.sender.Send(e.prefix+` `+title, content, 1)
 	os.Exit(1)
 }
 
 func (e *Engine) Panic(args ...interface{}) {
-	msg := fmt.Sprint(args...)
-	title, content, mergeKey := e.getTitleContentMergeKey(msg)
+	title := fmt.Sprint(args...)
+	content, _ := e.getContentMergeKey(title)
 	e.writer.Write([]byte(content))
-	e.Do(title, content, mergeKey)
+	e.sender.Send(e.prefix+` `+title, content, 1)
 	panic(content)
 }
 
 func (e *Engine) Panicf(format string, args ...interface{}) {
-	msg := fmt.Sprintf(format, args...)
-	title, content, mergeKey := e.getTitleContentMergeKey(msg)
+	title := fmt.Sprintf(format, args...)
+	content, _ := e.getContentMergeKey(title)
 	e.writer.Write([]byte(content))
-	e.Do(title, content, mergeKey)
+	e.sender.Send(e.prefix+` `+title, content, 1)
 	panic(content)
 }
 
 func (e *Engine) Print(args ...interface{}) {
-	msg := fmt.Sprint(args...)
-	title, content, mergeKey := e.getTitleContentMergeKey(msg)
+	title := fmt.Sprint(args...)
+	content, mergeKey := e.getContentMergeKey(title)
 	e.writer.Write([]byte(content))
 	e.Do(title, content, mergeKey)
 }
 
 func (e *Engine) Printf(format string, args ...interface{}) {
-	msg := fmt.Sprintf(format, args...)
-	title, content, mergeKey := e.getTitleContentMergeKey(msg)
+	title := fmt.Sprintf(format, args...)
+	content, mergeKey := e.getContentMergeKey(title)
 	e.writer.Write([]byte(content))
 	e.Do(title, content, mergeKey)
 }
 
-func (e *Engine) Alarm(msg string) {
-	title, content, mergeKey := e.getTitleContentMergeKey(msg)
+func (e *Engine) Alarm(title string) {
+	content, mergeKey := e.getContentMergeKey(title)
 	e.Do(title, content, mergeKey)
 }
 
@@ -114,13 +114,12 @@ func (e *Engine) Do(title, content, mergeKey string) {
 		e.alarms[mergeKey] = a
 	}
 	e.Unlock()
-	a.Add(title, content)
+	a.Add(e.prefix+` `+title, content)
 }
 
-func (e *Engine) getTitleContentMergeKey(title string) (string, string, string) {
+func (e *Engine) getContentMergeKey(title string) (string, string) {
 	// 根据title和调用栈对报警消息进行合并
 	mergeKey := title + "\n" + utils.Stack(3)
-	content := e.prefix + ` ` + time.Now().Format(timeFormat) + ` ` + mergeKey
-	title = e.prefix + ` ` + title
-	return title, content, mergeKey
+	content := time.Now().Format(timeFormat) + ` ` + mergeKey
+	return content, mergeKey
 }
