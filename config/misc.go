@@ -16,7 +16,7 @@ var alarmEngine = alarm.NewEngine(DeployName(), alarm.MailSender{
 	Mailer:    Mailer(),
 }, 0, time.Second, 10*time.Second, nil)
 
-func AlarmEngine() *alarm.Engine {
+func Alarm() *alarm.Engine {
 	return alarmEngine
 }
 

@@ -15,8 +15,8 @@ import (
 )
 
 var isDevMode = config.DevMode()
-var alarmEngine = config.AlarmEngine()
 var theAccessLog, theErrorLog = getLogWriter()
+var alarm = config.Alarm()
 
 func getLogWriter() (io.Writer, io.Writer) {
 	if isDevMode {
@@ -46,7 +46,7 @@ func Write(req *xiaomei.Request, res *xiaomei.Response, t time.Time, err interfa
 	if err != nil {
 		errStr := fmt.Sprint(fields[`err`])
 		errStack := fmt.Sprint(fields[`stack`])
-		alarmEngine.Do(errStr, formatFields(fields, false), errStr+` `+errStack)
+		alarm.Do(errStr, formatFields(fields, false), errStr+` `+errStack)
 	}
 }
 
