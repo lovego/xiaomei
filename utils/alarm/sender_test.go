@@ -25,7 +25,7 @@ func getTestMailSender() Sender {
 }
 
 func TestMailAlarm(t *testing.T) {
-	engine := New(`测试`, testMailSender, 0, time.Second, 10*time.Second, nil)
-	engine.Do(`title`, `content`, `mergeKey`)
+	alarm := New(`测试`, testMailSender, 0, time.Second, 10*time.Second)
+	alarm.Alarm(`title`, `content`, `mergeKey`)
 	time.Sleep(3 * time.Second) // wait the alarms been sent
 }
