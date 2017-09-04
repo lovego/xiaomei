@@ -23,7 +23,7 @@ type Consume struct {
 
 	LogPath   string
 	logWriter io.Writer
-	Alarm     *alarm.Engine
+	Alarm     *alarm.Alarm
 }
 
 func (c *Consume) Start() {

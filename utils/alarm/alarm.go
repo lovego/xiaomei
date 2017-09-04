@@ -1,59 +1,131 @@
 package alarm
 
 import (
+	"fmt"
+	"io"
+	"os"
 	"sync"
 	"time"
+
+	"github.com/lovego/xiaomei/utils"
 )
 
-type alarm struct {
+const timeFormat = `2006-01-02 15:04:05`
+
+// Alarm合并报警邮件，防止在出错高峰，收到大量重复报警邮件，
+//	 甚至因为邮件过多导致发送失败、接收失败。
+type Alarm struct {
+	prefix        string
+	sender        Sender
+	min, inc, max time.Duration // 发送间隔时间最小值，最大值，增加值
 	sync.Mutex
-	title, content string
-	count          int
-	lastSendTime   time.Time
-	interval       time.Duration
-	engine         *Engine
+	alarms map[string]*alarm
+	writer io.Writer
 }
 
-func (a *alarm) Add(title, content string) {
-	a.Lock()
-	a.count++
-	count := a.count
-	a.Unlock()
-
-	if count == 1 { // 发送间隔内的首次报警
-		a.title, a.content = title, content
-		go func() {
-			a.Wait()
-			a.Send()
-		}()
+func New(
+	prefix string, sender Sender, min, inc, max time.Duration, writer io.Writer,
+) *Alarm {
+	if writer == nil {
+		writer = os.Stderr
 	}
-}
-
-func (a *alarm) Wait() {
-	if a.interval <= 0 {
-		return
-	}
-	if gap := a.interval - time.Since(a.lastSendTime); gap > 0 {
-		time.Sleep(gap)
-	} else {
-		// 本次报警超过了间隔时间, 重置间隔时间为min
-		a.interval = a.engine.min
-		if a.engine.min > 0 {
-			time.Sleep(a.engine.min)
-		}
+	return &Alarm{
+		prefix: prefix,
+		sender: sender,
+		min:    min,
+		inc:    inc,
+		max:    max,
+		alarms: make(map[string]*alarm),
+		writer: writer,
 	}
 }
 
-func (a *alarm) Send() {
-	a.Lock()
-	title, content, count := a.title, a.content, a.count
-	a.title, a.content, a.count = ``, ``, 0
-	a.lastSendTime = time.Now()
-	a.interval += a.engine.inc // 每发送一次，间隔时间增加inc，直到max。
-	if a.interval > a.engine.max {
-		a.interval = a.engine.max
-	}
-	a.Unlock()
+func (alm *Alarm) DupWriter(writer io.Writer) *Alarm {
+	dup := *alm
+	dup.writer = writer
+	return &dup
+}
 
-	a.engine.sender.Send(title, content, count)
+func (alm *Alarm) Log(args ...interface{}) {
+	alm.writer.Write([]byte(time.Now().Format(timeFormat) + ` ` + fmt.Sprint(args...)))
+}
+
+func (alm *Alarm) Logf(format string, args ...interface{}) {
+	alm.writer.Write([]byte(time.Now().Format(timeFormat) + ` ` + fmt.Sprintf(format, args...)))
+}
+
+func (alm *Alarm) Recover() {
+	if err := recover(); err != nil {
+		alm.Printf("PANIC: %v", err)
+	}
+}
+
+func (alm *Alarm) Fatal(args ...interface{}) {
+	title := fmt.Sprint(args...)
+	content, _ := alm.getContentMergeKey(title)
+	alm.writer.Write([]byte(content))
+	alm.sender.Send(alm.prefix+` `+title, content, 0)
+	os.Exit(1)
+}
+
+func (alm *Alarm) Fatalf(format string, args ...interface{}) {
+	title := fmt.Sprintf(format, args...)
+	content, _ := alm.getContentMergeKey(title)
+	alm.writer.Write([]byte(content))
+	alm.sender.Send(alm.prefix+` `+title, content, 1)
+	os.Exit(1)
+}
+
+func (alm *Alarm) Panic(args ...interface{}) {
+	title := fmt.Sprint(args...)
+	content, _ := alm.getContentMergeKey(title)
+	alm.writer.Write([]byte(content))
+	alm.sender.Send(alm.prefix+` `+title, content, 1)
+	panic(content)
+}
+
+func (alm *Alarm) Panicf(format string, args ...interface{}) {
+	title := fmt.Sprintf(format, args...)
+	content, _ := alm.getContentMergeKey(title)
+	alm.writer.Write([]byte(content))
+	alm.sender.Send(alm.prefix+` `+title, content, 1)
+	panic(content)
+}
+
+func (alm *Alarm) Print(args ...interface{}) {
+	title := fmt.Sprint(args...)
+	content, mergeKey := alm.getContentMergeKey(title)
+	alm.writer.Write([]byte(content))
+	alm.Do(title, content, mergeKey)
+}
+
+func (alm *Alarm) Printf(format string, args ...interface{}) {
+	title := fmt.Sprintf(format, args...)
+	content, mergeKey := alm.getContentMergeKey(title)
+	alm.writer.Write([]byte(content))
+	alm.Do(title, content, mergeKey)
+}
+
+func (alm *Alarm) Alarm(title string) {
+	content, mergeKey := alm.getContentMergeKey(title)
+	alm.Do(title, content, mergeKey)
+}
+
+func (alm *Alarm) Do(title, content, mergeKey string) {
+	alm.Lock()
+	// 根据mergeKey对报警消息进行合并
+	a := alm.alarms[mergeKey]
+	if a == nil {
+		a = &alarm{Alarm: alm, interval: alm.min, lastSendTime: time.Now()}
+		alm.alarms[mergeKey] = a
+	}
+	alm.Unlock()
+	a.Add(alm.prefix+` `+title, content)
+}
+
+func (alm *Alarm) getContentMergeKey(title string) (string, string) {
+	// 根据title和调用栈对报警消息进行合并
+	mergeKey := title + "\n" + utils.Stack(3)
+	content := time.Now().Format(timeFormat) + ` ` + mergeKey
+	return content, mergeKey
 }

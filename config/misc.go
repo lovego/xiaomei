@@ -11,16 +11,16 @@ func DevMode() bool {
 	return os.Getenv(`GODEV`) == `true`
 }
 
-var alarmEngine = alarm.NewEngine(DeployName(), alarm.MailSender{
+var theAlarm = alarm.New(DeployName(), alarm.MailSender{
 	Receivers: Keepers(),
 	Mailer:    Mailer(),
 }, 0, time.Second, 10*time.Second, nil)
 
-func Alarm() *alarm.Engine {
-	return alarmEngine
+func Alarm() *alarm.Alarm {
+	return theAlarm
 }
 
 func Protect(fn func()) {
-	defer alarmEngine.Recover()
+	defer theAlarm.Recover()
 	fn()
 }

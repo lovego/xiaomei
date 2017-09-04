@@ -43,7 +43,7 @@ const redundantTime = 10 * time.Millisecond
 
 func TestRecover(t *testing.T) {
 	s := &testSenderT{}
-	engine := NewEngine(`Recover`, s, 0, time.Second, 10*time.Second, nil)
+	engine := New(`Recover`, s, 0, time.Second, 10*time.Second, nil)
 	func() {
 		defer engine.Recover()
 		panic(`wrong`)
@@ -54,7 +54,7 @@ func TestRecover(t *testing.T) {
 
 func TestPrintf(t *testing.T) {
 	s := &testSenderT{}
-	engine := NewEngine(``, s, 0, time.Second, 10*time.Second, nil)
+	engine := New(``, s, 0, time.Second, 10*time.Second, nil)
 	engine.Printf("Alarmf: %s", `wrong`)
 	time.Sleep(redundantTime) // wait the alarm wait and send goroutine ends.
 	fmt.Println(s)
@@ -62,7 +62,7 @@ func TestPrintf(t *testing.T) {
 
 func TestAlarm(t *testing.T) {
 	s := &testSenderT{}
-	engine := NewEngine(``, s, 0, time.Second, 10*time.Second, nil)
+	engine := New(``, s, 0, time.Second, 10*time.Second, nil)
 	engine.Alarm(`Alarm: wrong`)
 	time.Sleep(redundantTime) // wait the alarm wait and send goroutine ends.
 	fmt.Println(s)
@@ -70,7 +70,7 @@ func TestAlarm(t *testing.T) {
 
 func TestDo1(t *testing.T) {
 	s := &testSenderT{}
-	engine := NewEngine(``, s, 0, time.Second, 10*time.Second, nil)
+	engine := New(``, s, 0, time.Second, 10*time.Second, nil)
 	testDo(engine, map[string]int{`a`: 3, `b`: 4, `c`: 5})
 	time.Sleep(redundantTime) // wait the test goroutine ends.
 	// 首次报警立即发出
@@ -96,7 +96,7 @@ func TestDo1(t *testing.T) {
 
 func TestDo2(t *testing.T) {
 	s := &testSenderT{}
-	engine := NewEngine(``, s, time.Second, time.Second, 10*time.Second, nil)
+	engine := New(``, s, time.Second, time.Second, 10*time.Second, nil)
 
 	testDo(engine, map[string]int{`a`: 3, `b`: 4, `c`: 5})
 	time.Sleep(redundantTime) // wait the test goroutine ends.
@@ -118,7 +118,7 @@ func TestDo2(t *testing.T) {
 	})
 }
 
-func testDo(engine *Engine, groups map[string]int) {
+func testDo(engine *Alarm, groups map[string]int) {
 	var wg sync.WaitGroup
 	for mergeKey, count := range groups {
 		wg.Add(count)
