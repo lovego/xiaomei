@@ -20,7 +20,7 @@ type Alarm interface {
 	Alarm(title, content, mergeKey string)
 }
 
-const timeFormat = `2006-01-02 15:04:05`
+const timeFormat = `2006/01/02 15:04:05`
 
 func New(prefix string, writer io.Writer, alarm Alarm) *Logger {
 	if writer == nil {
