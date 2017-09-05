@@ -7,20 +7,20 @@ import (
 )
 
 type BulkError interface {
-	Items() [][2]interface{}
+	FailedItems() [][2]interface{}
 	Error() string
 }
 
 type bulkError struct {
 	typ         string
-	inputs      []map[string]interface{}
+	inputs      [][2]interface{}
 	results     []map[string]map[string]interface{}
-	failedItems []map[string]interface{}
+	failedItems [][2]interface{}
 }
 
-func (b bulkError) FailedItems() []map[string]interface{} {
+func (b bulkError) FailedItems() [][2]interface{} {
 	if b.failedItems == nil {
-		failedItems := make([]map[string]interface{}, 0)
+		failedItems := make([][2]interface{}, 0)
 		for i, result := range b.results {
 			res := result[b.typ]
 			if res[`error`] != nil {
