@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/lovego/xiaomei/utils/alarm"
+	"github.com/lovego/xiaomei/utils/logger"
 )
 
 func DevMode() bool {
@@ -14,13 +15,19 @@ func DevMode() bool {
 var theAlarm = alarm.New(DeployName(), alarm.MailSender{
 	Receivers: Keepers(),
 	Mailer:    Mailer(),
-}, 0, time.Second, 10*time.Second, nil)
+}, 0, time.Second, 10*time.Second)
+
+var theLogger = logger.New(``, os.Stderr, theAlarm)
 
 func Alarm() *alarm.Alarm {
 	return theAlarm
 }
 
+func Logger() *logger.Logger {
+	return theLogger
+}
+
 func Protect(fn func()) {
-	defer theAlarm.Recover()
+	defer theLogger.Recover()
 	fn()
 }

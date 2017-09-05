@@ -8,8 +8,8 @@ import (
 	"github.com/Shopify/sarama"
 	"github.com/garyburd/redigo/redis"
 	"github.com/lovego/xiaomei/utils"
-	"github.com/lovego/xiaomei/utils/alarm"
 	"github.com/lovego/xiaomei/utils/fs"
+	"github.com/lovego/xiaomei/utils/logger"
 )
 
 type Consume struct {
@@ -23,14 +23,14 @@ type Consume struct {
 
 	LogPath   string
 	logWriter io.Writer
-	Alarm     *alarm.Alarm
+	logger    *logger.Logger
 }
 
 func (c *Consume) Start() {
 	if consumer, err := sarama.NewConsumerFromClient(c.Client); err == nil {
 		c.consumer = consumer
 	} else {
-		c.Alarm.Panic(err)
+		c.logger.Panic(err)
 	}
 
 	c.logWriter = fs.NewLogFile(c.LogPath)
@@ -40,7 +40,7 @@ func (c *Consume) Start() {
 	}
 	partitions, err := c.Client.Partitions(c.Topic)
 	if err != nil {
-		c.Alarm.Panic(err)
+		c.logger.Panic(err)
 	}
 	for _, n := range partitions {
 		go c.startPartition(n)
@@ -53,7 +53,7 @@ func (c *Consume) startPartition(n int32) {
 
 	pc, err := c.consumer.ConsumePartition(c.Topic, n, offset)
 	if err != nil {
-		c.Alarm.Panic(err)
+		c.logger.Panic(err)
 	}
 	defer pc.Close()
 
@@ -76,22 +76,22 @@ func (c *Consume) process(pc sarama.PartitionConsumer, n int32, message *sarama.
 }
 
 func (c *Consume) callHandler(message *sarama.ConsumerMessage, logMap map[string]interface{}) {
-	defer c.Alarm.Recover()
+	defer c.logger.Recover()
 	if err := c.Handler(message, logMap); err != nil {
-		c.Alarm.Printf("consume handler error: %v", err)
+		c.logger.Printf("consume handler error: %v", err)
 	}
 }
 
 func (c *Consume) writeLog(m map[string]interface{}) {
 	buf, err := json.Marshal(m)
 	if err != nil {
-		c.Alarm.Printf("marshal log err: %v", err)
+		c.logger.Printf("marshal log err: %v", err)
 		return
 	}
 	buf = append(buf, '\n')
 	_, err = c.logWriter.Write(buf)
 	if err != nil {
-		c.Alarm.Printf("write log err: %v", err)
+		c.logger.Printf("write log err: %v", err)
 		return
 	}
 }

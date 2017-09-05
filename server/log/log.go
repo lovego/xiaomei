@@ -44,7 +44,7 @@ func Write(req *xiaomei.Request, res *xiaomei.Response, t time.Time, err interfa
 	if fields[`err`] != nil {
 		errStr := fmt.Sprint(fields[`err`])
 		errStack := fmt.Sprint(fields[`stack`])
-		alarm.Do(errStr, formatFields(fields, false), errStr+` `+errStack)
+		alarm.Alarm(errStr, formatFields(fields, false), errStr+` `+errStack)
 	}
 }
 
