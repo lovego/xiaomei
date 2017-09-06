@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func DepsCmd() *cobra.Command {
+func depsCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `deps`,
 		Short: "list dependence packages.",
