@@ -27,7 +27,7 @@ func Pool(name string) *redis.Pool {
 func newPool(name string) *redis.Pool {
 	return &redis.Pool{
 		MaxIdle:     32,
-		MaxActive:   32,
+		MaxActive:   128,
 		IdleTimeout: 600 * time.Second,
 		Dial: func() (redis.Conn, error) {
 			return redis.DialURL(
