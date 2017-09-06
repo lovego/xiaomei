@@ -1,13 +1,11 @@
 package images
 
 import (
-	"net/http"
-	"net/url"
-
 	"github.com/fatih/color"
 	"github.com/lovego/xiaomei/utils"
 	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
+	"github.com/lovego/xiaomei/xiaomei/registry"
 )
 
 type Image struct {
@@ -39,23 +37,6 @@ func (i Image) Push(env string) error {
 // TODO: https://registry.hub.docker.com/v2/
 func (i Image) NameWithDigestInRegistry(env string) string {
 	imgName := conf.GetService(env, i.svcName).ImageName()
-	uri, err := url.Parse(`http://` + imgName + `/manifests/` + env)
-	if err != nil {
-		panic(err)
-	}
-	uri.Path = `/v2` + uri.Path
-	req, err := http.NewRequest(http.MethodGet, uri.String(), nil)
-	if err != nil {
-		panic(err)
-	}
-	req.Header.Set(`Accept`, `application/vnd.docker.distribution.manifest.v2+json`)
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	digest := resp.Header.Get(`Docker-Content-Digest`)
-	if digest == `` {
-		panic(`get image digest faild for: ` + imgName + `:` + env)
-	}
+	digest := registry.Digest(imgName, env)
 	return imgName + `@` + digest
 }
