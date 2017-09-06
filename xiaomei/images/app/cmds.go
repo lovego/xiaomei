@@ -19,7 +19,8 @@ func Cmds() []*cobra.Command {
 			Short: `compile the app server binary.`,
 			RunE:  release.NoArgCall(compile),
 		},
-		DepsCmd(),
+		specCmd(),
+		depsCmd(),
 		copy2vendorCmd(),
 	}, db.Cmds()...)
 }
@@ -30,7 +31,7 @@ func compile() error {
 		Dir: filepath.Join(release.Root(), `..`),
 		Env: []string{`GOBIN=` + filepath.Join(release.Root(), `img-app`)},
 	}, `go`, `install`, `-v`) {
-		return nil
+		return gospec(nil, true)
 	}
 	return errors.New(`compile the app server binary failed.`)
 }

@@ -6,35 +6,37 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/lovego/xiaomei/utils"
 	"github.com/lovego/xiaomei/utils/cmd"
+	"github.com/lovego/xiaomei/utils/fs"
 	"github.com/lovego/xiaomei/xiaomei/release"
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
-func SpecCmd() *cobra.Command {
-	return &cobra.Command{
+func specCmd() *cobra.Command {
+	var onlyChanged bool
+	cmd := &cobra.Command{
 		Use:   `spec`,
 		Short: `check code spec.`,
 		RunE: func(c *cobra.Command, args []string) error {
-			arg := ``
-			if len(args) > 0 {
-				arg = args[0]
-			}
-			return Spec(arg)
+			return gospec(args, onlyChanged)
 		},
 	}
+	cmd.Flags().BoolVarP(&onlyChanged, `only-changed`, `c`, true, `only check the changed files.`)
+	return cmd
 }
 
-func Spec(t string) error {
+func gospec(targets []string, onlyChanged bool) error {
 	utils.Log(color.GreenString(`check app code spec.`))
 	if err := os.Chdir(filepath.Join(release.Root(), `..`)); err != nil {
 		panic(err)
 	}
 
-	targets := specTargets()
-	if t != `all` {
+	if len(targets) == 0 {
+		targets = specTargets()
+	}
+	if onlyChanged {
 		targets = specChangedTargets(targets)
 	}
 	if len(targets) == 0 {
@@ -52,7 +54,7 @@ func Spec(t string) error {
 }
 
 func specTargets() []string {
-	matches, err := filepath.Glob(`*`)
+	matches, err := filepath.Glob(`[^.]*`)
 	if err != nil {
 		panic(err)
 	}
@@ -60,6 +62,9 @@ func specTargets() []string {
 	targets := []string{}
 	for _, v := range matches {
 		if v != `release` && v != `vendor` {
+			if fs.IsDir(v) {
+				v = v + `/`
+			}
 			targets = append(targets, v)
 		}
 	}
