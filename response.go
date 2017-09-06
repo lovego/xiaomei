@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"log"
 	"net"
 	"net/http"
 	"reflect"
@@ -73,19 +74,12 @@ func (res *Response) RenderToBuffer(
 }
 
 func (res *Response) Json(data interface{}) {
-	if data != nil {
-		if err, ok := data.(error); ok {
-			if errStr := err.Error(); errStr != `` {
-				res.Log(map[string]interface{}{`err`: errStr})
-			}
-		}
-	}
 	bytes, err := json.Marshal(data)
 	if err == nil {
 		res.Header().Set(`Content-Type`, `application/json; charset=utf-8`)
 		res.Write(bytes)
 	} else {
-		panic(err)
+		log.Panic(err)
 	}
 }
 

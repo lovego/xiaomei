@@ -28,7 +28,7 @@ func (s stack) Stack() string {
 }
 
 func (s stack) Error() string {
-	return s.err + "\n" + s.stack
+	return s.err
 }
 
 func getStack(skip int) string {
