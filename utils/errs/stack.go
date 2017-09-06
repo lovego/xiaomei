@@ -19,6 +19,11 @@ func Stack(err error) StackErr {
 	}
 }
 
+func Stackf(format string, args ...interface{}) StackErr {
+	err := fmt.Errorf(format, args)
+	return stack{err: err.Error(), stack: getStack(1)}
+}
+
 type stack struct {
 	err, stack string
 }
