@@ -27,25 +27,7 @@ func run(env, svcName string) error {
 		args = append(args, `-e`, fmt.Sprintf(`%s=%s`, runEnvName, `true`))
 	}
 
-	args = append(args, getCommonArgs(env, svcName, false)...)
+	args = append(args, getCommonArgs(env, svcName, ``)...)
 	_, err := cmd.Run(cmd.O{}, `docker`, args...)
 	return err
-}
-
-func getCommonArgs(env, svcName string, digest bool) []string {
-	image := images.Get(svcName)
-	service := conf.GetService(env, svcName)
-
-	args := []string{`--network=host`}
-	if name := image.EnvironmentEnvName(); name != `` {
-		args = append(args, `-e`, name+`=`+env)
-	}
-	args = append(args, service.Options...)
-	if digest {
-		args = append(args, image.NameWithDigestInRegistry(env))
-	} else {
-		args = append(args, service.ImageNameAndTag())
-	}
-	args = append(args, service.Command...)
-	return args
 }

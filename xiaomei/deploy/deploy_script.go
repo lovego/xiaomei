@@ -42,10 +42,10 @@ deploy {{.Name}} "$args"
 {{ end -}}
 `
 
-func getDeployScript(env string, svcNames []string) (string, error) {
+func getDeployScript(svcNames []string, env, timeTag string) (string, error) {
 	tmpl := template.Must(template.New(``).Parse(deployScriptTmpl))
 	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, getDeployConfig(env, svcNames)); err != nil {
+	if err := tmpl.Execute(&buf, getDeployConfig(svcNames, env, timeTag)); err != nil {
 		return ``, err
 	}
 	return buf.String(), nil
@@ -60,18 +60,18 @@ type serviceConfig struct {
 	Instances                         []string
 }
 
-func getDeployConfig(env string, svcNames []string) deployConfig {
+func getDeployConfig(svcNames []string, env, timeTag string) deployConfig {
 	data := deployConfig{
 		VolumesToCreate: conf.Get(env).VolumesToCreate,
 	}
 	for _, svcName := range svcNames {
-		data.Services = append(data.Services, getServiceConf(env, svcName))
+		data.Services = append(data.Services, getServiceConf(svcName, env, timeTag))
 	}
 	return data
 }
 
-func getServiceConf(env, svcName string) serviceConfig {
-	commonArgs := getCommonArgs(env, svcName, true)
+func getServiceConf(svcName, env, timeTag string) serviceConfig {
+	commonArgs := getCommonArgs(env, svcName, timeTag)
 	data := serviceConfig{
 		Name:            release.ServiceName(env, svcName),
 		InstanceEnvName: images.Get(svcName).InstanceEnvName(),

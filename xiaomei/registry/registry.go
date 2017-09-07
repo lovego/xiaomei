@@ -39,6 +39,8 @@ func Remove(imgName, digest string) {
 var httpClient = http.Client{Timeout: 5 * time.Second}
 
 func getResponse(method, resource string) *http.Response {
+	// TODO: https or http check.
+	// TODO: https://registry.hub.docker.com/v2/
 	uri, err := url.Parse(`http://` + resource)
 	if err != nil {
 		log.Panic(err)
