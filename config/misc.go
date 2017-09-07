@@ -15,7 +15,7 @@ func DevMode() bool {
 var theAlarm = alarm.New(DeployName(), alarm.MailSender{
 	Receivers: Keepers(),
 	Mailer:    Mailer(),
-}, 0, time.Second, 10*time.Second)
+}, 0, 5*time.Second, 30*time.Second)
 
 var theLogger = logger.New(``, os.Stderr, theAlarm)
 
