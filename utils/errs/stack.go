@@ -6,12 +6,12 @@ import (
 	"runtime"
 )
 
-type StackErr interface {
+type TraceErr interface {
 	Stack() string
 	Error() string
 }
 
-func Trace(err error) StackErr {
+func Trace(err error) TraceErr {
 	if s, ok := err.(trace); ok {
 		return s
 	} else {
@@ -19,7 +19,7 @@ func Trace(err error) StackErr {
 	}
 }
 
-func Stackf(format string, args ...interface{}) StackErr {
+func Tracef(format string, args ...interface{}) TraceErr {
 	return trace{err: fmt.Sprintf(format, args...), stack: getStack(1)}
 }
 
@@ -37,12 +37,16 @@ func (s trace) Error() string {
 
 func getStack(skip int) string {
 	buf := new(bytes.Buffer)
-	for i := skip; ; i++ {
-		pc, file, line, ok := runtime.Caller(i)
-		if !ok {
+
+	callers := make([]uintptr, 32)
+	n := runtime.Callers(skip, callers)
+	frames := runtime.CallersFrames(callers[:n])
+	for {
+		if f, ok := frames.Next(); ok {
+			fmt.Fprintf(buf, "%s %s:%d (0x%x)\n", f.Function, f.File, f.Line, f.PC)
+		} else {
 			break
 		}
-		fmt.Fprintf(buf, "%s:%d (0x%x)\n", file, line, pc)
 	}
 	return buf.String()
 }
