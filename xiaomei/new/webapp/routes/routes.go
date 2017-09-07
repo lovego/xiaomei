@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"errors"
 	"time"
 
 	"github.com/lovego/xiaomei"
@@ -23,12 +24,20 @@ func Routes() *router.Router {
 		req.Log(map[string]interface{}{`hello`: `world`, `i'm`: `xiaomei`})
 	})
 
-	router.Get(`/result-ok`, func(req *xiaomei.Request, res *xiaomei.Response) {
+	router.Get(`/result`, func(req *xiaomei.Request, res *xiaomei.Response) {
 		res.Result([]string{`hello`, `world`}, nil)
 	})
 
-	router.Get(`/result-bad`, func(req *xiaomei.Request, res *xiaomei.Response) {
+	router.Get(`/result2`, func(req *xiaomei.Request, res *xiaomei.Response) {
 		res.Result([]string{`hello`, `world`}, errs.New(`captcha-err`, `验证码错误`))
+	})
+
+	router.Get(`/result-err`, func(req *xiaomei.Request, res *xiaomei.Response) {
+		res.Result([]string{`hello`, `world`}, errors.New(`unknown error`))
+	})
+
+	router.Get(`/json-err`, func(req *xiaomei.Request, res *xiaomei.Response) {
+		res.Result([]string{`hello`, `world`}, errs.Trace(errors.New(`unknown error`)))
 	})
 
 	router.Get(`/session-get`, func(req *xiaomei.Request, res *xiaomei.Response) {

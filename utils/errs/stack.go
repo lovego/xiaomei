@@ -11,28 +11,27 @@ type StackErr interface {
 	Error() string
 }
 
-func Stack(err error) StackErr {
-	if s, ok := err.(stack); ok {
+func Trace(err error) StackErr {
+	if s, ok := err.(trace); ok {
 		return s
 	} else {
-		return stack{err: err.Error(), stack: getStack(1)}
+		return trace{err: err.Error(), stack: getStack(1)}
 	}
 }
 
 func Stackf(format string, args ...interface{}) StackErr {
-	err := fmt.Errorf(format, args)
-	return stack{err: err.Error(), stack: getStack(1)}
+	return trace{err: fmt.Sprintf(format, args...), stack: getStack(1)}
 }
 
-type stack struct {
+type trace struct {
 	err, stack string
 }
 
-func (s stack) Stack() string {
+func (s trace) Stack() string {
 	return s.stack
 }
 
-func (s stack) Error() string {
+func (s trace) Error() string {
 	return s.err
 }
 
