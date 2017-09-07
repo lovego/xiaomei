@@ -11,24 +11,24 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-func deploy(env, svcName, feature string) error {
+func deploy(svcName, env, timeTag, feature string) error {
 	svcs := getServices(env, svcName)
 	psScript := fmt.Sprintf(`watch docker ps -f name=%s`, release.ServiceName(env, svcName))
 	for _, node := range cluster.Get(env).GetNodes(feature) {
-		if err := deployNode(env, svcs, node, psScript); err != nil {
+		if err := deployNode(svcs, env, timeTag, node, psScript); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func deployNode(env string, svcs []string, node cluster.Node, psScript string) error {
-	nodeSvcs := getNodeServices(env, svcs, node)
+func deployNode(svcs []string, env, timeTag string, node cluster.Node, psScript string) error {
+	nodeSvcs := getNodeServices(svcs, env, node)
 	if len(nodeSvcs) == 0 {
 		return nil
 	}
 	utils.Log(color.GreenString(`deploying ` + node.SshAddr()))
-	deployScript, err := getDeployScript(env, nodeSvcs)
+	deployScript, err := getDeployScript(nodeSvcs, env, timeTag)
 	if err != nil {
 		return err
 	}
@@ -44,7 +44,7 @@ func getServices(env, svcName string) []string {
 	}
 }
 
-func getNodeServices(env string, svcNames []string, node cluster.Node) []string {
+func getNodeServices(svcNames []string, env string, node cluster.Node) []string {
 	svcs := []string{}
 	for _, svcName := range svcNames {
 		service := conf.GetService(env, svcName)

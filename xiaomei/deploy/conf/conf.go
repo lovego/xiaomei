@@ -74,11 +74,11 @@ func (svc Service) ImageName() string {
 	return svc.Image
 }
 
-func (svc Service) ImageNameAndTag() string {
+func (svc Service) ImageNameWithTag(timeTag string) string {
 	if svc.Image == `` {
 		log.Panicf(`deploy.yml: %s.image: empty.`, svc.name)
 	}
-	return svc.Image + `:` + svc.env
+	return svc.Image + `:` + svc.env + timeTag
 }
 
 var rePort = regexp.MustCompile(`^\d+$`)

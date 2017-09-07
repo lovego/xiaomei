@@ -25,31 +25,27 @@ func Get(svcName string) Image {
 	}
 }
 
-func Build(env, svcName string, pull bool) error {
-	if svcName == `` {
-		return eachServiceDo(env, func(svcName string) error {
-			return Build(env, svcName, pull)
-		})
-	}
-	return imagesMap[svcName].Build(env, pull)
+func Build(svcName, env, timeTag string, pull bool) error {
+	return imagesDo(svcName, env, func(img Image) error {
+		return img.build(env, timeTag, pull)
+	})
 }
 
-func Push(env, svcName string) error {
-	if svcName == `` {
-		return eachServiceDo(env, func(svcName string) error {
-			return Push(env, svcName)
-		})
-	}
-	return imagesMap[svcName].Push(env)
+func Push(svcName, env, timeTag string) error {
+	return imagesDo(svcName, env, func(img Image) error {
+		return img.push(env, timeTag)
+	})
 }
 
-func eachServiceDo(env string, work func(svcName string) error) error {
-	for _, svcName := range conf.ServiceNames(env) {
-		if svcName != `` {
-			if err := work(svcName); err != nil {
+func imagesDo(svcName, env string, work func(Image) error) error {
+	if svcName == `` {
+		for _, svcName := range conf.ServiceNames(env) {
+			if err := work(Get(svcName)); err != nil {
 				return err
 			}
 		}
+		return nil
+	} else {
+		return work(Get(svcName))
 	}
-	return nil
 }

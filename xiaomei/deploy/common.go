@@ -1,10 +1,16 @@
 package deploy
 
 import (
+	"time"
+
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/images"
 	//	"github.com/lovego/xiaomei/xiaomei/registry"
 )
+
+func getTimeTag(env string) string {
+	time.Now().In()
+}
 
 func getCommonArgs(env, svcName, timeTag string) []string {
 	service := conf.GetService(env, svcName)
@@ -14,14 +20,7 @@ func getCommonArgs(env, svcName, timeTag string) []string {
 		args = append(args, `-e`, name+`=`+env)
 	}
 	args = append(args, service.Options...)
-	args = append(args, getImageNameWithTag(service.ImageName(), env, timeTag))
+	args = append(args, service.ImageNameWithTag(timeTag))
 	args = append(args, service.Command...)
 	return args
-}
-
-func getImageNameWithTag(imgName, env, timeTag string) string {
-	if timeTag == `` {
-		return imgName
-	}
-	return imgName + `:` + env + timeTag
 }
