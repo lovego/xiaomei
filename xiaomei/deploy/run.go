@@ -23,8 +23,8 @@ func run(env, svcName string) error {
 			args = append(args, `-e`, fmt.Sprintf(`%s=%s`, instanceEnvName, instances[0]))
 		}
 	}
-	if runEnvName := image.RunEnvName(); runEnvName != `` {
-		args = append(args, `-e`, fmt.Sprintf(`%s=%s`, runEnvName, `true`))
+	if options := image.OptionsForRun(); len(options) > 0 {
+		args = append(args, options...)
 	}
 
 	args = append(args, getCommonArgs(env, svcName, false)...)

@@ -11,8 +11,8 @@ func (i Image) EnvironmentEnvName() string {
 	return `GOENV`
 }
 
-func (i Image) RunEnvName() string {
-	return `GODEV`
+func (i Image) OptionsForRun() []string {
+	return []string{`-e=GODEV=true`}
 }
 
 func (i Image) Prepare() error {
