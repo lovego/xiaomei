@@ -9,35 +9,35 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-func shell(env, svcName, feature string) error {
+func shell(svcName, env, feature string) error {
 	_, err := cluster.Get(env).ServiceRun(svcName, feature, cmd.O{},
-		`docker exec -it --detach-keys='ctrl-@' `+conf.GetService(env, svcName).FirstContainerName()+` bash`,
+		`docker exec -it --detach-keys='ctrl-@' `+conf.GetService(svcName, env).FirstContainerName()+` bash`,
 	)
 	return err
 }
 
-func logs(env, svcName, feature string) error {
+func logs(svcName, env, feature string) error {
 	script := fmt.Sprintf(`
 for name in $(docker ps -af name=%s --format '{{.Names}}'); do
 	echo -e "\033[32m$name\033[0m"
 	docker logs $name
 	echo
 done
-`, release.ServiceName(env, svcName))
+`, release.ServiceName(svcName, env))
 	return eachNodeRun(env, script, feature)
 }
 
-func rmDeploy(env, svcName, feature string) error {
+func rmDeploy(svcName, env, feature string) error {
 	script := fmt.Sprintf(`
 for name in $(docker ps -af name=%s --format '{{.Names}}'); do
 	docker stop $name >/dev/null 2>&1 && docker rm $name
 done
-`, release.ServiceName(env, svcName))
+`, release.ServiceName(svcName, env))
 	return eachNodeRun(env, script, feature)
 }
 
-func ps(env, svcName, feature string, watch bool) error {
-	script := fmt.Sprintf(`docker ps -f name=%s`, release.ServiceName(env, svcName))
+func ps(svcName, env, feature string, watch bool) error {
+	script := fmt.Sprintf(`docker ps -f name=%s`, release.ServiceName(svcName, env))
 	if watch {
 		script = `watch ` + script
 	}

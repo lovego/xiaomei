@@ -10,13 +10,13 @@ import (
 )
 
 func run(env, svcName string) error {
-	if err := images.Build(env, svcName, true); err != nil {
+	if err := images.Build(svcName, env, ``, true); err != nil {
 		return err
 	}
 	image := images.Get(svcName)
 
 	args := []string{
-		`run`, `-it`, `--rm`, `--name=` + release.ServiceName(env, svcName) + `.run`,
+		`run`, `-it`, `--rm`, `--name=` + release.ServiceName(svcName, env) + `.run`,
 	}
 	if instanceEnvName := image.InstanceEnvName(); instanceEnvName != `` {
 		if instances := conf.GetService(env, svcName).Instances(); len(instances) > 0 {

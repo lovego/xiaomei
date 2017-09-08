@@ -1,6 +1,7 @@
 package deploy
 
 import (
+	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/images"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/spf13/cobra"
@@ -33,44 +34,39 @@ func runCmdFor(svcName string) *cobra.Command {
 	return cmd
 }
 
+func deployCmdFor(svcName string) *cobra.Command {
+	var filter string
+	cmd := &cobra.Command{
+		Use:   `deploy [<env>]`,
+		Short: `deploy the ` + desc(svcName) + `.`,
+		RunE: release.Env1Call(func(env, timeTag string) error {
+			if timeTag == `` {
+				timeTag = conf.TimeTag(env)
+				if err := images.Build(svcName, env, timeTag, true); err != nil {
+					return err
+				}
+				if err := images.Push(svcName, env, timeTag); err != nil {
+					return err
+				}
+			}
+			return deploy(svcName, env, timeTag, filter)
+		}),
+	}
+	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
+	return cmd
+}
+
 func shellCmdFor(svcName string) *cobra.Command {
 	var filter string
 	theCmd := &cobra.Command{
 		Use:   `shell [<env>]`,
 		Short: `enter a container for ` + desc(svcName),
 		RunE: release.EnvCall(func(env string) error {
-			return shell(env, svcName, filter)
+			return shell(svcName, env, filter)
 		}),
 	}
 	theCmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr`)
 	return theCmd
-}
-
-func deployCmdFor(svcName string) *cobra.Command {
-	var filter string
-	var noBuild, noPush /*, rmCurrent*/ bool
-	cmd := &cobra.Command{
-		Use:   `deploy [<env>]`,
-		Short: `deploy the ` + desc(svcName) + `.`,
-		RunE: release.EnvCall(func(env string) error {
-			if !noBuild {
-				if err := images.Build(env, svcName, true); err != nil {
-					return err
-				}
-			}
-			if !noPush {
-				if err := images.Push(env, svcName); err != nil {
-					return err
-				}
-			}
-			return deploy(env, svcName, filter) // , rmCurrent)
-		}),
-	}
-	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
-	cmd.Flags().BoolVarP(&noBuild, `no-build`, `B`, false, `do not build the images.`)
-	cmd.Flags().BoolVarP(&noPush, `no-push`, `P`, false, `do not push the images.`)
-	// cmd.Flags().BoolVar(&rmCurrent, `rm-current`, false, `remove the current running `+desc+`.`)
-	return cmd
 }
 
 func rmDeployCmdFor(svcName string) *cobra.Command {
@@ -79,7 +75,7 @@ func rmDeployCmdFor(svcName string) *cobra.Command {
 		Use:   `rm-deploy [<env>]`,
 		Short: `remove deployment of the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
-			return rmDeploy(env, svcName, filter)
+			return rmDeploy(svcName, env, filter)
 		}),
 	}
 	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
@@ -93,7 +89,7 @@ func psCmdFor(svcName string) *cobra.Command {
 		Use:   `ps [<env>]`,
 		Short: `list tasks of the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
-			return ps(env, svcName, filter, watch)
+			return ps(svcName, env, filter, watch)
 		}),
 	}
 	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
@@ -107,7 +103,7 @@ func logsCmdFor(svcName string) *cobra.Command {
 		Use:   `logs [<env>]`,
 		Short: `list logs  of the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
-			return logs(env, svcName, filter)
+			return logs(svcName, env, filter)
 		}),
 	}
 	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)

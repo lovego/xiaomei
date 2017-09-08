@@ -2,9 +2,9 @@ package deploy
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/fatih/color"
-	"github.com/lovego/xiaomei/utils"
 	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
@@ -13,7 +13,7 @@ import (
 
 func deploy(svcName, env, timeTag, feature string) error {
 	svcs := getServices(env, svcName)
-	psScript := fmt.Sprintf(`watch docker ps -f name=%s`, release.ServiceName(env, svcName))
+	psScript := fmt.Sprintf(`watch docker ps -f name=%s`, release.ServiceName(svcName, env))
 	for _, node := range cluster.Get(env).GetNodes(feature) {
 		if err := deployNode(svcs, env, timeTag, node, psScript); err != nil {
 			return err
@@ -27,7 +27,7 @@ func deployNode(svcs []string, env, timeTag string, node cluster.Node, psScript 
 	if len(nodeSvcs) == 0 {
 		return nil
 	}
-	utils.Log(color.GreenString(`deploying ` + node.SshAddr()))
+	log.Println(color.GreenString(`deploying ` + node.SshAddr()))
 	deployScript, err := getDeployScript(nodeSvcs, env, timeTag)
 	if err != nil {
 		return err

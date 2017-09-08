@@ -34,7 +34,7 @@ func AppConf(env string) *conf.Conf {
 	return AppConfig().Get(env)
 }
 
-func ServiceName(env, svcName string) string {
+func ServiceName(svcName, env string) string {
 	return AppConf(env).DeployName() + `_` + svcName
 }
 

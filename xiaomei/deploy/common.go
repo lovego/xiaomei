@@ -1,8 +1,6 @@
 package deploy
 
 import (
-	"time"
-
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/images"
 	//	"github.com/lovego/xiaomei/xiaomei/registry"

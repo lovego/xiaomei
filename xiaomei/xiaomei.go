@@ -20,10 +20,10 @@ func main() {
 		Short: `be small and beautiful.`,
 	}
 	root.AddCommand(serviceCmds()...)
+	root.AddCommand(cluster.Cmds()...)
 	root.AddCommand(images.Cmds(``)...)
 	root.AddCommand(deploy.Cmds(``)...)
 	root.AddCommand(access.Cmds(``)...)
-	root.AddCommand(cluster.Cmds()...)
 	root.AddCommand(new.Cmd(), yamlCmd(), autoCompleteCmd(root), versionCmd())
 	if err := root.Execute(); err != nil {
 		os.Exit(1)
@@ -35,7 +35,7 @@ func versionCmd() *cobra.Command {
 		Use:   `version`,
 		Short: `show xiaomei version.`,
 		RunE: release.NoArgCall(func() error {
-			fmt.Println(`xiaomei version 17.8.29`)
+			fmt.Println(`xiaomei version 17.9.8`)
 			return nil
 		}),
 	}
