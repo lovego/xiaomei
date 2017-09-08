@@ -47,7 +47,7 @@ func getServices(env, svcName string) []string {
 func getNodeServices(svcNames []string, env string, node cluster.Node) []string {
 	svcs := []string{}
 	for _, svcName := range svcNames {
-		service := conf.GetService(env, svcName)
+		service := conf.GetService(svcName, env)
 		if node.Match(service.Nodes) {
 			svcs = append(svcs, svcName)
 		}

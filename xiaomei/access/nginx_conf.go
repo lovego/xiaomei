@@ -48,15 +48,15 @@ func getConfData(env, svcName string) (domain, error) {
 	if svcName == `` {
 		data := accessConfig{
 			Env: env,
-			App: newService(env, `app`),
-			Web: newService(env, `web`),
+			App: newService(`app`, env),
+			Web: newService(`web`, env),
 		}
 		if data.App == nil && data.Web == nil {
 			return nil, fmt.Errorf(`neither app nor web service defined.`, svcName)
 		}
 		return data, nil
 	} else {
-		data := newService(env, svcName)
+		data := newService(svcName, env)
 		if data == nil {
 			return nil, fmt.Errorf(`%s service not defined.`, svcName)
 		}

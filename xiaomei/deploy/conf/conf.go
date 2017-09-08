@@ -37,6 +37,9 @@ func Get(env string) *Conf {
 				log.Panic(err)
 			}
 			theConf = envConfs[env]
+			if theConf == nil {
+				log.Fatalf(`deploy.yml: %s: undefined.`, env)
+			}
 			for name, svc := range theConf.Services {
 				svc.name = name
 				svc.env = env
@@ -46,15 +49,15 @@ func Get(env string) *Conf {
 	return theConf
 }
 
-func HasService(env, svcName string) bool {
+func HasService(svcName, env string) bool {
 	_, ok := Get(env).Services[svcName]
 	return ok
 }
 
-func GetService(env, svcName string) *Service {
+func GetService(svcName, env string) *Service {
 	svc, ok := Get(env).Services[svcName]
 	if !ok {
-		log.Panicf(`deploy.yml: services.%s: undefined.`, svcName)
+		log.Fatalf(`deploy.yml: %s.services.%s: undefined.`, env, svcName)
 	}
 	return svc
 }

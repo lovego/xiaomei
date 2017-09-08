@@ -58,7 +58,6 @@ func Env1Call(work func(string, string) error) cmdFunc {
 		var env, arg1 string
 		switch len(args) {
 		case 0:
-			env = `dev`
 		case 1:
 			env = args[0]
 		case 2:
@@ -66,6 +65,9 @@ func Env1Call(work func(string, string) error) cmdFunc {
 			arg1 = args[1]
 		default:
 			return errors.New(`more than two arguments given.`)
+		}
+		if env == `` {
+			env = `dev`
 		}
 		if !slice.ContainsString(getEnvs(), env) {
 			return fmt.Errorf("env %s not defined in cluster.yml", env)

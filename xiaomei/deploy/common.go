@@ -6,8 +6,8 @@ import (
 	//	"github.com/lovego/xiaomei/xiaomei/registry"
 )
 
-func getCommonArgs(env, svcName, timeTag string) []string {
-	service := conf.GetService(env, svcName)
+func getCommonArgs(svcName, env, timeTag string) []string {
+	service := conf.GetService(svcName, env)
 
 	args := []string{`--network=host`}
 	if name := images.Get(svcName).EnvironmentEnvName(); name != `` {

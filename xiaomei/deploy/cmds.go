@@ -3,6 +3,7 @@ package deploy
 import (
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/images"
+	"github.com/lovego/xiaomei/xiaomei/registry"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/spf13/cobra"
 )
@@ -10,7 +11,7 @@ import (
 // Run, Deploy, Ps, Logs commands
 func Cmds(svcName string) (cmds []*cobra.Command) {
 	if svcName != `` {
-		cmds = append(cmds, runCmdFor(svcName), shellCmdFor(svcName))
+		cmds = append(cmds, runCmdFor(svcName), shellCmdFor(svcName), tagsCmdFor(svcName))
 	}
 	cmds = append(cmds,
 		deployCmdFor(svcName),
@@ -34,6 +35,31 @@ func runCmdFor(svcName string) *cobra.Command {
 	return cmd
 }
 
+func shellCmdFor(svcName string) *cobra.Command {
+	var filter string
+	theCmd := &cobra.Command{
+		Use:   `shell [<env>]`,
+		Short: `enter a container for ` + desc(svcName),
+		RunE: release.EnvCall(func(env string) error {
+			return shell(svcName, env, filter)
+		}),
+	}
+	theCmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr`)
+	return theCmd
+}
+
+func tagsCmdFor(svcName string) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   `tags [<env>]`,
+		Short: `list image tags of the ` + desc(svcName) + `.`,
+		RunE: release.EnvCall(func(env string) error {
+			registry.ListTimeTags(svcName, env)
+			return nil
+		}),
+	}
+	return cmd
+}
+
 func deployCmdFor(svcName string) *cobra.Command {
 	var filter string
 	cmd := &cobra.Command{
@@ -54,19 +80,6 @@ func deployCmdFor(svcName string) *cobra.Command {
 	}
 	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
 	return cmd
-}
-
-func shellCmdFor(svcName string) *cobra.Command {
-	var filter string
-	theCmd := &cobra.Command{
-		Use:   `shell [<env>]`,
-		Short: `enter a container for ` + desc(svcName),
-		RunE: release.EnvCall(func(env string) error {
-			return shell(svcName, env, filter)
-		}),
-	}
-	theCmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr`)
-	return theCmd
 }
 
 func rmDeployCmdFor(svcName string) *cobra.Command {

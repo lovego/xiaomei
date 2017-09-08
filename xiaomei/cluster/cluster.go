@@ -48,7 +48,7 @@ func (c Cluster) Run(feature string, o cmd.O, script string) (string, error) {
 }
 
 func (c Cluster) ServiceRun(svcName, feature string, o cmd.O, script string) (string, error) {
-	labels := conf.GetService(c.env, svcName).Nodes
+	labels := conf.GetService(svcName, c.env).Nodes
 	for _, node := range c.GetNodes(feature) {
 		if node.Match(labels) {
 			return node.Run(o, script)

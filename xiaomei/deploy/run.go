@@ -19,7 +19,7 @@ func run(env, svcName string) error {
 		`run`, `-it`, `--rm`, `--name=` + release.ServiceName(svcName, env) + `.run`,
 	}
 	if instanceEnvName := image.InstanceEnvName(); instanceEnvName != `` {
-		if instances := conf.GetService(env, svcName).Instances(); len(instances) > 0 {
+		if instances := conf.GetService(svcName, env).Instances(); len(instances) > 0 {
 			args = append(args, `-e`, fmt.Sprintf(`%s=%s`, instanceEnvName, instances[0]))
 		}
 	}
@@ -27,7 +27,7 @@ func run(env, svcName string) error {
 		args = append(args, `-e`, fmt.Sprintf(`%s=%s`, runEnvName, `true`))
 	}
 
-	args = append(args, getCommonArgs(env, svcName, ``)...)
+	args = append(args, getCommonArgs(svcName, env, ``)...)
 	_, err := cmd.Run(cmd.O{}, `docker`, args...)
 	return err
 }
