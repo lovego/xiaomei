@@ -8,10 +8,6 @@ import (
 	//	"github.com/lovego/xiaomei/xiaomei/registry"
 )
 
-func getTimeTag(env string) string {
-	time.Now().In()
-}
-
 func getCommonArgs(env, svcName, timeTag string) []string {
 	service := conf.GetService(env, svcName)
 

@@ -81,6 +81,10 @@ func (svc Service) ImageNameWithTag(timeTag string) string {
 	return svc.Image + `:` + svc.env + timeTag
 }
 
+func TimeTag(env string) string {
+	return time.Now().In(release.AppConf(env).TimeLocation).Format(`060102-150405`)
+}
+
 var rePort = regexp.MustCompile(`^\d+$`)
 
 func (svc Service) Instances() (instances []string) {

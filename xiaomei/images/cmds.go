@@ -13,7 +13,7 @@ func Cmds(svcName string) []*cobra.Command {
 }
 
 func buildCmdFor(svcName string) *cobra.Command {
-	var pull bool
+	var deployTag, pull bool
 	cmd := &cobra.Command{
 		Use:   `build [<env>]`,
 		Short: `build  ` + imageDesc(svcName) + `.`,
@@ -21,6 +21,7 @@ func buildCmdFor(svcName string) *cobra.Command {
 			return Build(svcName, env, ``, pull)
 		}),
 	}
+	cmd.Flags().BoolVarP(&deployTag, `deploy-tag`, `t`, false, `add a deploy time tag.`)
 	cmd.Flags().BoolVarP(&pull, `pull`, `p`, true, `pull base image.`)
 	return cmd
 }
