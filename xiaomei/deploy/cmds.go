@@ -3,7 +3,6 @@ package deploy
 import (
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/images"
-	"github.com/lovego/xiaomei/xiaomei/registry"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/spf13/cobra"
 )
@@ -11,7 +10,7 @@ import (
 // Run, Deploy, Ps, Logs commands
 func Cmds(svcName string) (cmds []*cobra.Command) {
 	if svcName != `` {
-		cmds = append(cmds, runCmdFor(svcName), shellCmdFor(svcName), tagsCmdFor(svcName))
+		cmds = append(cmds, runCmdFor(svcName), shellCmdFor(svcName))
 	}
 	cmds = append(cmds,
 		deployCmdFor(svcName),
@@ -46,18 +45,6 @@ func shellCmdFor(svcName string) *cobra.Command {
 	}
 	theCmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr`)
 	return theCmd
-}
-
-func tagsCmdFor(svcName string) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   `tags [<env>]`,
-		Short: `list image tags of the ` + desc(svcName) + `.`,
-		RunE: release.EnvCall(func(env string) error {
-			registry.ListTimeTags(svcName, env)
-			return nil
-		}),
-	}
-	return cmd
 }
 
 func deployCmdFor(svcName string) *cobra.Command {

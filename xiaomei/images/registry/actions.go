@@ -9,6 +9,11 @@ import (
 
 func ListTimeTags(svcName, env string) {
 	imgName := conf.GetService(svcName, env).ImageName()
-	tags := Tags(imgName)
+	tags := []string{}
+	for _, tag := range Tags(imgName) {
+		if strings.HasPrefix(tag, env) && tag != env {
+			tags = append(tags, tag[len(env):])
+		}
+	}
 	fmt.Println(strings.Join(tags, "\n"))
 }

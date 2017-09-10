@@ -2,6 +2,7 @@ package images
 
 import (
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
+	"github.com/lovego/xiaomei/xiaomei/images/registry"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/spf13/cobra"
 )
@@ -10,6 +11,7 @@ func Cmds(svcName string) []*cobra.Command {
 	return []*cobra.Command{
 		buildCmdFor(svcName),
 		pushCmdFor(svcName),
+		tagsCmdFor(svcName),
 	}
 }
 
@@ -39,6 +41,18 @@ func pushCmdFor(svcName string) *cobra.Command {
 			return Push(svcName, env, timeTag)
 		}),
 	}
+}
+
+func tagsCmdFor(svcName string) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   `tags [<env>]`,
+		Short: `list tags of the ` + imageDesc(svcName) + `.`,
+		RunE: release.EnvCall(func(env string) error {
+			registry.ListTimeTags(svcName, env)
+			return nil
+		}),
+	}
+	return cmd
 }
 
 func imageDesc(svcName string) string {
