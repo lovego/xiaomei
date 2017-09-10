@@ -10,14 +10,14 @@ import (
 func main() {
 	fmt.Println(testCodeMessage().Error(), "\n")
 
-	fmt.Println(testStack().Error())
+	fmt.Println(testTrace().Error())
 }
 
 func testCodeMessage() error {
 	return errs.New(`no-login`, `please login first.`)
 }
 
-func testStack() error {
+func testTrace() error {
 	err := errors.New(`connection timeout`)
-	return errs.Stack(err)
+	return errs.Trace(err)
 }

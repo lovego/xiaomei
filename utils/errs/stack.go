@@ -6,44 +6,47 @@ import (
 	"runtime"
 )
 
-type StackErr interface {
+type TraceErr interface {
 	Stack() string
 	Error() string
 }
 
-func Stack(err error) StackErr {
-	if s, ok := err.(stack); ok {
+func Trace(err error) TraceErr {
+	if s, ok := err.(trace); ok {
 		return s
 	} else {
-		return stack{err: err.Error(), stack: getStack(1)}
+		return trace{err: err.Error(), stack: getStack(1)}
 	}
 }
 
-func Stackf(format string, args ...interface{}) StackErr {
-	err := fmt.Errorf(format, args)
-	return stack{err: err.Error(), stack: getStack(1)}
+func Tracef(format string, args ...interface{}) TraceErr {
+	return trace{err: fmt.Sprintf(format, args...), stack: getStack(1)}
 }
 
-type stack struct {
+type trace struct {
 	err, stack string
 }
 
-func (s stack) Stack() string {
+func (s trace) Stack() string {
 	return s.stack
 }
 
-func (s stack) Error() string {
+func (s trace) Error() string {
 	return s.err
 }
 
 func getStack(skip int) string {
 	buf := new(bytes.Buffer)
-	for i := skip; ; i++ {
-		pc, file, line, ok := runtime.Caller(i)
-		if !ok {
+
+	callers := make([]uintptr, 32)
+	n := runtime.Callers(skip, callers)
+	frames := runtime.CallersFrames(callers[:n])
+	for {
+		if f, ok := frames.Next(); ok {
+			fmt.Fprintf(buf, "%s %s:%d (0x%x)\n", f.Function, f.File, f.Line, f.PC)
+		} else {
 			break
 		}
-		fmt.Fprintf(buf, "%s:%d (0x%x)\n", file, line, pc)
 	}
 	return buf.String()
 }

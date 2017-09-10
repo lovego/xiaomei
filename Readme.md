@@ -11,8 +11,8 @@
   xiaomei app run           # 启动app服务器
   xiaomei web run           # 启动web服务器
   xiaomei deploy            # 部署到开发环境
-  xiaomei qa deploy         # 部署到QA环境
-  xiaomei production deploy # 部署到生产环境
+  xiaomei deploy qa         # 部署到QA环境
+  xiaomei deploy production # 部署到生产环境
   xiaomei --help            # 完整的xiaomei命令文档
 ```
 

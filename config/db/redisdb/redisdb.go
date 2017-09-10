@@ -32,9 +32,9 @@ func newPool(name string) *redis.Pool {
 		Dial: func() (redis.Conn, error) {
 			return redis.DialURL(
 				config.Get(`redis`).GetString(name),
-				redis.DialConnectTimeout(time.Second),
-				redis.DialReadTimeout(time.Second),
-				redis.DialWriteTimeout(time.Second),
+				redis.DialConnectTimeout(3*time.Second),
+				redis.DialReadTimeout(3*time.Second),
+				redis.DialWriteTimeout(3*time.Second),
 			)
 		},
 	}
@@ -49,7 +49,7 @@ func Do(name string, work func(redis.Conn)) {
 func SubscribeConn(name string) (redis.Conn, error) {
 	return redis.DialURL(
 		config.Get(`redis`).GetString(name),
-		redis.DialConnectTimeout(time.Second),
-		redis.DialWriteTimeout(time.Second),
+		redis.DialConnectTimeout(3*time.Second),
+		redis.DialWriteTimeout(3*time.Second),
 	)
 }

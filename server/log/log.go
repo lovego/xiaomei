@@ -31,6 +31,10 @@ func Write(req *xiaomei.Request, res *xiaomei.Response, t time.Time, err interfa
 	if err != nil {
 		fields[`err`] = fmt.Sprintf("Panic: %v", err)
 		fields[`stack`] = utils.Stack(3)
+	} else if err = fields[`err`]; err != nil {
+		if _, ok := err.(string); !ok {
+			fields[`err`] = fmt.Sprint(err)
+		}
 	}
 
 	if line := serializeFields(fields); len(line) > 0 {
@@ -41,9 +45,9 @@ func Write(req *xiaomei.Request, res *xiaomei.Response, t time.Time, err interfa
 		}
 	}
 
-	if fields[`err`] != nil {
-		errStr := fmt.Sprint(fields[`err`])
-		errStack := fmt.Sprint(fields[`stack`])
+	if err != nil {
+		errStr := fields[`err`].(string)
+		errStack, _ := fields[`stack`].(string)
 		alarm.Alarm(errStr, formatFields(fields, false), errStr+` `+errStack)
 	}
 }

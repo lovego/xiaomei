@@ -28,14 +28,14 @@ func (i Image) EnvironmentEnvName() string {
 	return ``
 }
 
-// 3. run env variable name
-func (i Image) RunEnvName() string {
+// 3. options for run
+func (i Image) OptionsForRun() []string {
 	if img, ok := i.image.(interface {
-		RunEnvName() string
+		OptionsForRun() []string
 	}); ok {
-		return img.RunEnvName()
+		return img.OptionsForRun()
 	}
-	return ``
+	return nil
 }
 
 // 4. prepare files for build
