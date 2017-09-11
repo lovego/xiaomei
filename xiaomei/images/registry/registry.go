@@ -30,9 +30,11 @@ func Remove(imgName, digest string) {
 func Digest(imgName, tag string) string {
 	resp := getResponse(http.MethodHead, imgName+`/manifests/`+tag)
 	digest := resp.Header.Get(`Docker-Content-Digest`)
-	if digest == `` {
-		log.Panicf("get image digest faild for: %s:%s ", imgName, tag)
-	}
+	/*
+		if digest == `` {
+			log.Panicf("get image digest faild for: %s:%s ", imgName, tag)
+		}
+	*/
 	return digest
 }
 

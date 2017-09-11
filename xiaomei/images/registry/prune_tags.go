@@ -21,12 +21,29 @@ func pruneTimeTags(svcName, env string, n int) {
 	if len(tags) <= n {
 		return
 	}
-	RemoveTimeTags(svcName, env, tags[n:])
+	removeTimeTags(svcName, env, tags[n:])
 }
 
-func RemoveTimeTags(imgName, env string, tags []string) {
+func RemoveTimeTags(svcName, env string, tags []string) {
+	if svcName == `` {
+		for _, svcName := range conf.ServiceNames(env) {
+			removeTimeTags(svcName, env, tags)
+		}
+	} else {
+		removeTimeTags(svcName, env, tags)
+	}
+}
+
+func removeTimeTags(svcName, env string, tags []string) {
+	imgName := conf.GetService(svcName, env).ImageName()
 	for _, tag := range tags {
-		Remove(imgName, Digest(imgName, env+tag))
-		log.Printf("removed %s:%s\n", imgName, env+tag)
+		if digest := Digest(imgName, env+tag); digest != `` {
+			// TODO
+			// it actually delete the image identified by the digest.
+			// so the other tags on the same image are also deleted.
+			// we want to just delete the tag. but we didn't see a remove tag registry api.
+			Remove(imgName, digest)
+			log.Printf("removed %s:%s\n", imgName, env+tag)
+		}
 	}
 }
