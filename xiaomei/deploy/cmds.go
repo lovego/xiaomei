@@ -50,7 +50,7 @@ func shellCmdFor(svcName string) *cobra.Command {
 func deployCmdFor(svcName string) *cobra.Command {
 	var filter string
 	cmd := &cobra.Command{
-		Use:   `deploy [<env>]`,
+		Use:   `deploy [<env> [<tag>]]`,
 		Short: `deploy the ` + desc(svcName) + `.`,
 		RunE: release.Env1Call(func(env, timeTag string) error {
 			if timeTag == `` {

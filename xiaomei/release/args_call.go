@@ -75,3 +75,19 @@ func Env1Call(work func(string, string) error) cmdFunc {
 		return work(env, arg1)
 	}
 }
+
+func EnvSliceCall(work func(string, []string) error) cmdFunc {
+	return func(c *cobra.Command, args []string) error {
+		if len(args) < 2 {
+			return errors.New(`at leaset two arguments required.`)
+		}
+		env := args[0]
+		if env == `` {
+			env = `dev`
+		}
+		if !slice.ContainsString(getEnvs(), env) {
+			return fmt.Errorf("env %s not defined in cluster.yml", env)
+		}
+		return work(env, args[1:])
+	}
+}

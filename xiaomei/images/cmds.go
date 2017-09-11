@@ -46,9 +46,36 @@ func pushCmdFor(svcName string) *cobra.Command {
 func tagsCmdFor(svcName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `tags [<env>]`,
-		Short: `list tags of the ` + imageDesc(svcName) + `.`,
+		Short: `list time tags of ` + imageDesc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			registry.ListTimeTags(svcName, env)
+			return nil
+		}),
+	}
+	cmd.AddCommand(pruneCmdFor(svcName), rmCmdFor(svcName))
+	return cmd
+}
+
+func pruneCmdFor(svcName string) *cobra.Command {
+	var n uint8
+	cmd := &cobra.Command{
+		Use:   `prune [<env>]`,
+		Short: `prune time tags of ` + imageDesc(svcName) + `.`,
+		RunE: release.EnvCall(func(env string) error {
+			registry.PruneTimeTags(svcName, env, int(n))
+			return nil
+		}),
+	}
+	cmd.Flags().Uint8Var(&n, `n`, 10, `the number of time tags to keep.`)
+	return cmd
+}
+
+func rmCmdFor(svcName string) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   `rm [<env> [<tag>....]]`,
+		Short: `remove time tags of ` + imageDesc(svcName) + `.`,
+		RunE: release.EnvSliceCall(func(env string, tags []string) error {
+			registry.RemoveTimeTags(svcName, env, tags)
 			return nil
 		}),
 	}

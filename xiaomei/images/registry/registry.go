@@ -9,15 +9,6 @@ import (
 	"time"
 )
 
-func Digest(imgName, tag string) string {
-	resp := getResponse(http.MethodHead, imgName+`/manifests/`+tag)
-	digest := resp.Header.Get(`Docker-Content-Digest`)
-	if digest == `` {
-		log.Panicf("get image digest faild for: %s:%s ", imgName, tag)
-	}
-	return digest
-}
-
 func Tags(imgName string) (tags []string) {
 	data := getResponseJson(http.MethodGet, imgName+`/tags/list`)
 	if data != nil && data[`tags`] != nil {
@@ -34,6 +25,15 @@ func Remove(imgName, digest string) {
 		content, err := ioutil.ReadAll(resp.Body)
 		log.Panicf("unexpected response: %s\n%s\n%v", resp.Status, content, err)
 	}
+}
+
+func Digest(imgName, tag string) string {
+	resp := getResponse(http.MethodHead, imgName+`/manifests/`+tag)
+	digest := resp.Header.Get(`Docker-Content-Digest`)
+	if digest == `` {
+		log.Panicf("get image digest faild for: %s:%s ", imgName, tag)
+	}
+	return digest
 }
 
 var httpClient = http.Client{Timeout: 5 * time.Second}
