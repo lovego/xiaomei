@@ -20,8 +20,8 @@ defaults: &defaults
   #   image: 192.168.202.12:5000/{{ .Domain }}/tasks
   #   options: [ -v, "{{ .ProName }}_logs:/home/ubuntu/{{ .ProName }}/log" ]
     web:
-      ports: "8001"
       image: 192.168.202.12:5000/{{ .Domain }}/web
+      ports: "8001"
       options: [ -v, "{{ .ProName }}_logs:/var/log/nginx/{{ .ProName }}" ]
     logc:
       image: 192.168.202.12:5000/{{ .Domain }}/logc
