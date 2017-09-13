@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"path"
 	"strings"
 
 	"github.com/lovego/xiaomei/utils/cmd"
@@ -13,19 +12,19 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-func setupMysql(env, key string) {
+func setupMysql(file, env, key string) {
 	options := dsn.Mysql(release.AppData(env).Get(`mysql`).GetString(key)).Flags()
-	createDbAndTables(env, options)
+	createDbAndTables(file, env, options)
 
 	fmt.Println(`setup mysql ok.`)
 }
 
-func createDbAndTables(env string, options []string) {
+func createDbAndTables(file, env string, options []string) {
 	l := len(options)
 	db := options[l-1]
 
 	createDB := fmt.Sprintf(`create database if not exists %s charset utf8; use %s;`, db, db)
-	createTbs, err := ioutil.ReadFile(path.Join(release.Root(), `img-app/config/data/ddl.mysql`))
+	createTbs, err := ioutil.ReadFile(file)
 	if err != nil {
 		panic(err)
 	}

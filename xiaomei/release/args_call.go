@@ -2,9 +2,7 @@ package release
 
 import (
 	"errors"
-	"fmt"
 
-	"github.com/lovego/xiaomei/utils/slice"
 	"github.com/spf13/cobra"
 )
 
@@ -37,42 +35,39 @@ func Arg1Call(arg1 string, work func(string) error) cmdFunc {
 
 func EnvCall(work func(string) error) cmdFunc {
 	return func(c *cobra.Command, args []string) error {
-		var env string
+		var arg0 string
 		switch len(args) {
 		case 0:
-			env = `dev`
 		case 1:
-			env = args[0]
-			if !slice.ContainsString(getEnvs(), env) {
-				return fmt.Errorf("env %s not defined in cluster.yml", env)
-			}
+			arg0 = args[0]
 		default:
 			return errors.New(`more than one arguments given.`)
 		}
-		return work(env)
+		if env, err := CheckEnv(arg0); err == nil {
+			return work(env)
+		} else {
+			return err
+		}
 	}
 }
 
 func Env1Call(work func(string, string) error) cmdFunc {
 	return func(c *cobra.Command, args []string) error {
-		var env, arg1 string
+		var arg0, arg1 string
 		switch len(args) {
 		case 0:
 		case 1:
-			env = args[0]
+			arg0 = args[0]
 		case 2:
-			env = args[0]
-			arg1 = args[1]
+			arg0, arg1 = args[0], args[1]
 		default:
 			return errors.New(`more than two arguments given.`)
 		}
-		if env == `` {
-			env = `dev`
+		if env, err := CheckEnv(arg0); err == nil {
+			return work(env, arg1)
+		} else {
+			return err
 		}
-		if !slice.ContainsString(getEnvs(), env) {
-			return fmt.Errorf("env %s not defined in cluster.yml", env)
-		}
-		return work(env, arg1)
 	}
 }
 
@@ -81,13 +76,10 @@ func EnvSliceCall(work func(string, []string) error) cmdFunc {
 		if len(args) < 2 {
 			return errors.New(`at leaset two arguments required.`)
 		}
-		env := args[0]
-		if env == `` {
-			env = `dev`
+		if env, err := CheckEnv(args[0]); err == nil {
+			return work(env, args[1:])
+		} else {
+			return err
 		}
-		if !slice.ContainsString(getEnvs(), env) {
-			return fmt.Errorf("env %s not defined in cluster.yml", env)
-		}
-		return work(env, args[1:])
 	}
 }
