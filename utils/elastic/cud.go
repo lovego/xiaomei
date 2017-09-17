@@ -2,7 +2,6 @@ package elastic
 
 import (
 	"net/http"
-	"net/url"
 )
 
 // 增
@@ -27,40 +26,7 @@ func (es *ES) Update(path string, bodyData, data interface{}) error {
 	return es.client.PostJson(es.Uri(path+`/_update`), nil, bodyData, data)
 }
 
-// 查
-type QueryResult struct {
-	Hits QueryHits `json:"hits"`
-}
-
-type QueryHits struct {
-	Total int        `json:"total"`
-	Hits  []QueryHit `json:"hits"`
-}
-
-type QueryHit struct {
-	Source map[string]interface{} `json:"_source"`
-}
-
-func (es *ES) Query(path string, bodyData interface{}) (
-	total int, data []map[string]interface{}, err error,
-) {
-	result := QueryResult{}
-	uri, err := url.Parse(path + `/_search`)
-	if err != nil {
-		return
-	}
-	uri.Query().Set(`filter_path`, `hits.total,hits.hits._source`)
-
-	if err = es.client.PostJson(es.Uri(uri.String()), nil, bodyData, &result); err != nil {
-		return
-	}
-	total = result.Hits.Total
-	for _, hit := range result.Hits.Hits {
-		data = append(data, hit.Source)
-	}
-	return
-}
-
+// Create if not Exist
 func (es *ES) Ensure(path string, def interface{}) error {
 	if ok, err := es.Exist(path); err != nil {
 		return err
