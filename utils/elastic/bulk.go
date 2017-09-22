@@ -20,7 +20,11 @@ func (es *ES) BulkUpdate(path string, data [][2]interface{}) error {
 	if len(data) <= 0 {
 		return nil
 	}
-	return es.BulkDo(path, makeBulkUpdate(data), `update`, data)
+	body, err := makeBulkUpdate(data)
+	if err != nil {
+		return err
+	}
+	return es.BulkDo(path, body, `update`, data)
 }
 
 func (es *ES) BulkDo(path string, body, typ string, data [][2]interface{}) error {
@@ -34,13 +38,17 @@ func (es *ES) BulkDo(path string, body, typ string, data [][2]interface{}) error
 	return bulkError{typ: typ, inputs: data, results: result.Items}
 }
 
-func (es *ES) BulkDelete(path string, data []interface{}) error {
+func (es *ES) BulkDelete(path string, data []string) error {
 	if len(data) <= 0 {
 		return nil
 	}
+	body, err := makeBulkDelete(data)
+	if err != nil {
+		return err
+	}
 
 	result := BulkResult{}
-	if err := es.client.PostJson(es.Uri(path+`/_bulk`), nil, makeBulkDelete(data), &result); err != nil {
+	if err := es.client.PostJson(es.Uri(path+`/_bulk`), nil, body, &result); err != nil {
 		return err
 	}
 	if !result.Errors {

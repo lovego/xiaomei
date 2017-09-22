@@ -6,7 +6,7 @@ import (
 
 // 覆盖
 func (es *ES) Put(path string, bodyData, data interface{}) error {
-	resp, err := es.client.Get(es.Uri(path), nil, bodyData)
+	resp, err := es.client.Put(es.Uri(path), nil, bodyData)
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (es *ES) Ensure(path string, def interface{}) error {
 	if ok, err := es.Exist(path); err != nil {
 		return err
 	} else if !ok {
-		return es.Create(path, def, nil)
+		return es.Put(path, def, nil)
 	}
 	return nil
 }

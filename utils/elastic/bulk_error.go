@@ -50,19 +50,19 @@ func (b bulkError) Error() string {
 }
 
 type BulkDeleteError interface {
-	FailedItems() []interface{}
+	FailedItems() []string
 	Error() string
 }
 
 type bulkDeleteError struct {
-	inputs      []interface{}
+	inputs      []string
 	results     []map[string]map[string]interface{}
-	failedItems []interface{}
+	failedItems []string
 }
 
-func (b bulkDeleteError) FailedItems() []interface{} {
+func (b bulkDeleteError) FailedItems() []string {
 	if b.failedItems == nil {
-		failedItems := make([]interface{}, 0)
+		failedItems := make([]string, 0)
 		for i, result := range b.results {
 			res := result[`delete`]
 			if res[`error`] != nil {

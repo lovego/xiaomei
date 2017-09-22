@@ -2,7 +2,6 @@ package elastic
 
 import (
 	"net/url"
-	"reflect"
 )
 
 // 查
@@ -53,9 +52,6 @@ func (es *ES) QueryIds(path string, bodyData interface{}) (
 		return
 	}
 	uri.Query().Set(`filter_path`, `hits.total,hits.hits._id`)
-	if bodyValue := reflect.ValueOf(bodyData); bodyValue.Kind() == reflect.Map {
-		bodyValue.SetMapIndex(reflect.ValueOf(`_source`), reflect.ValueOf(false))
-	}
 
 	result := &QueryResult{}
 	if err = es.client.PostJson(es.Uri(uri.String()), nil, bodyData, result); err != nil {
