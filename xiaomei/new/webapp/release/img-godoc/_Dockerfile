@@ -4,6 +4,5 @@ WORKDIR /home/ubuntu/go/src/{{ .ProPath }}
 
 COPY routes ./routes
 COPY models ./models
-COPY config ./config
 COPY filter ./filter
 COPY helpers ./helpers

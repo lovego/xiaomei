@@ -2,6 +2,7 @@ package elastic
 
 import (
 	"net/url"
+	"reflect"
 )
 
 // 查
@@ -40,6 +41,29 @@ func (es *ES) QueryWithId(path string, bodyData interface{}) (
 	for _, hit := range result.Hits.Hits {
 		hit.Source[`_id`] = hit.Id
 		data = append(data, hit.Source)
+	}
+	return
+}
+
+func (es *ES) QueryIds(path string, bodyData interface{}) (
+	total int, data []string, err error,
+) {
+	uri, err := url.Parse(path + `/_search`)
+	if err != nil {
+		return
+	}
+	uri.Query().Set(`filter_path`, `hits.total,hits.hits._id`)
+	if bodyValue := reflect.ValueOf(bodyData); bodyValue.Kind() == reflect.Map {
+		bodyValue.SetMapIndex(reflect.ValueOf(`_source`), reflect.ValueOf(false))
+	}
+
+	result := &QueryResult{}
+	if err = es.client.PostJson(es.Uri(uri.String()), nil, bodyData, result); err != nil {
+		return
+	}
+	total = result.Hits.Total
+	for _, hit := range result.Hits.Hits {
+		data = append(data, hit.Id)
 	}
 	return
 }

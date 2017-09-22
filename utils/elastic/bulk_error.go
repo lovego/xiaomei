@@ -48,3 +48,43 @@ func (b bulkError) Error() string {
 		b.typ, len(errs), len(b.inputs), buf,
 	)
 }
+
+type BulkDeleteError interface {
+	FailedItems() []interface{}
+	Error() string
+}
+
+type bulkDeleteError struct {
+	inputs      []interface{}
+	results     []map[string]map[string]interface{}
+	failedItems []interface{}
+}
+
+func (b bulkDeleteError) FailedItems() []interface{} {
+	if b.failedItems == nil {
+		failedItems := make([]interface{}, 0)
+		for i, result := range b.results {
+			res := result[`delete`]
+			if res[`error`] != nil {
+				failedItems = append(failedItems, b.inputs[i])
+			}
+		}
+		b.failedItems = failedItems
+	}
+	return b.failedItems
+}
+
+func (b bulkDeleteError) Error() string {
+	var errs []interface{}
+	for _, result := range b.results {
+		info := result[`delete`]
+		if info[`error`] != nil {
+			errs = append(errs, info)
+		}
+	}
+	buf, err := json.MarshalIndent(errs, ``, `  `)
+	if err != nil {
+		log.Println(`marshal elastic bulk errors: `, err)
+	}
+	return fmt.Sprintf("bulk delete errors(%d of %d)\n%s\n", len(errs), len(b.inputs), buf)
+}
