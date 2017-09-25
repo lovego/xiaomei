@@ -7,17 +7,17 @@ import (
 func TestBulk(t *testing.T) {
 	createEmptyUsers()
 
-	testES.BulkCreate(`/users`, []map[string]interface{}{
-		{`_id`: 1, `name`: `lilei`, `age`: 21},
-		{`_id`: 2, `name`: `hanmeimei`, `age`: 20},
-		{`_id`: 3, `name`: `tom`, `age`: 22},
+	testES.BulkCreate(`/users`, [][2]interface{}{
+		{1, map[string]interface{}{`name`: `lilei`, `age`: 21}},
+		{2, map[string]interface{}{`name`: `hanmeimei`, `age`: 20}},
+		{3, map[string]interface{}{`name`: `tom`, `age`: 22}},
 	})
 
 	testES.Delete(`/users/3`, nil)
 
-	testES.BulkUpdate(`/users`, []map[string]interface{}{
-		map[string]interface{}{`_id`: 1, `doc`: {`age`: 31}},
-		map[string]interface{}{`_id`: 2, `doc`: {`age`: 29}},
+	testES.BulkUpdate(`/users`, [][2]interface{}{
+		{1, map[string]map[string]interface{}{`doc`: {`age`: 31}}},
+		{2, map[string]map[string]interface{}{`doc`: {`age`: 29}}},
 	})
 
 	checkLiLeiAndHanMeiMei(t)
