@@ -22,7 +22,7 @@ type QueryHit struct {
 func (es *ES) Query(path string, bodyData interface{}) (
 	total int, data []map[string]interface{}, err error,
 ) {
-	result, err := es.getQueryResult(path, bodyData, false)
+	result, err := es.getQueryResult(path, `hits.total,hits.hits._source`, bodyData)
 	if err == nil {
 		total = result.Hits.Total
 		for _, hit := range result.Hits.Hits {
@@ -35,11 +35,13 @@ func (es *ES) Query(path string, bodyData interface{}) (
 func (es *ES) QueryWithId(path string, bodyData interface{}) (
 	total int, data []map[string]interface{}, err error,
 ) {
-	result, err := es.getQueryResult(path, bodyData, true)
-	total = result.Hits.Total
-	for _, hit := range result.Hits.Hits {
-		hit.Source[`_id`] = hit.Id
-		data = append(data, hit.Source)
+	result, err := es.getQueryResult(path, `hits.total,hits.hits._id,hits.hits._source`, bodyData)
+	if err == nil {
+		total = result.Hits.Total
+		for _, hit := range result.Hits.Hits {
+			hit.Source[`_id`] = hit.Id
+			data = append(data, hit.Source)
+		}
 	}
 	return
 }
@@ -47,36 +49,28 @@ func (es *ES) QueryWithId(path string, bodyData interface{}) (
 func (es *ES) QueryIds(path string, bodyData interface{}) (
 	total int, data []string, err error,
 ) {
-	uri, err := url.Parse(path + `/_search`)
-	if err != nil {
-		return
-	}
-	uri.Query().Set(`filter_path`, `hits.total,hits.hits._id`)
-
-	result := &QueryResult{}
-	if err = es.client.PostJson(es.Uri(uri.String()), nil, bodyData, result); err != nil {
-		return
-	}
-	total = result.Hits.Total
-	for _, hit := range result.Hits.Hits {
-		data = append(data, hit.Id)
+	result, err := es.getQueryResult(path, `hits.total,hits.hits._id`, bodyData)
+	if err == nil {
+		total = result.Hits.Total
+		for _, hit := range result.Hits.Hits {
+			data = append(data, hit.Id)
+		}
 	}
 	return
 }
 
-func (es *ES) getQueryResult(path string, bodyData interface{}, withId bool) (*QueryResult, error) {
-	uri, err := url.Parse(path + `/_search`)
+func (es *ES) getQueryResult(path, filterPath string, bodyData interface{}) (*QueryResult, error) {
+	uri, err := url.Parse(es.Uri(path))
 	if err != nil {
 		return nil, err
 	}
-	if withId {
-		uri.Query().Set(`filter_path`, `hits.total,hits.hits._id,hits.hits._source`)
-	} else {
-		uri.Query().Set(`filter_path`, `hits.total,hits.hits._source`)
-	}
+	uri.Path += `/_search`
+	q := uri.Query()
+	q.Set(`filter_path`, filterPath)
+	uri.RawQuery = q.Encode()
 
 	result := &QueryResult{}
-	if err = es.client.PostJson(es.Uri(uri.String()), nil, bodyData, result); err != nil {
+	if err = es.client.PostJson(uri.String(), nil, bodyData, result); err != nil {
 		return nil, err
 	}
 	return result, nil

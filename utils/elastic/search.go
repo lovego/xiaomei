@@ -1,5 +1,7 @@
 package elastic
 
+import "net/url"
+
 type SearchResult struct {
 	Took    int          `json:"took"`
 	Timeout bool         `json:"time_out"`
@@ -27,8 +29,13 @@ type SearchHit struct {
 }
 
 func (es *ES) Search(path string, bodyData interface{}) (*SearchResult, error) {
+	uri, err := url.Parse(es.Uri(path))
+	if err != nil {
+		return nil, err
+	}
+	uri.Path += `/_search`
 	result := &SearchResult{}
-	if err := es.client.PostJson(es.Uri(path+`/_search`), nil, bodyData, result); err != nil {
+	if err := es.client.PostJson(uri.String(), nil, bodyData, result); err != nil {
 		return nil, err
 	}
 	return result, nil

@@ -1,5 +1,7 @@
 package elastic
 
+import "net/url"
+
 type BulkResult struct {
 	Errors bool                                `json:"errors"`
 	Items  []map[string]map[string]interface{} `json:"items"`
@@ -28,8 +30,14 @@ func (es *ES) BulkUpdate(path string, data [][2]interface{}) error {
 }
 
 func (es *ES) BulkDo(path string, body, typ string, data [][2]interface{}) error {
+	uri, err := url.Parse(es.Uri(path))
+	if err != nil {
+		return err
+	}
+	uri.Path += `/_bulk`
+
 	result := BulkResult{}
-	if err := es.client.PostJson(es.Uri(path+`/_bulk`), nil, body, &result); err != nil {
+	if err := es.client.PostJson(uri.String(), nil, body, &result); err != nil {
 		return err
 	}
 	if !result.Errors {
@@ -39,6 +47,12 @@ func (es *ES) BulkDo(path string, body, typ string, data [][2]interface{}) error
 }
 
 func (es *ES) BulkDelete(path string, data []string) error {
+	uri, err := url.Parse(es.Uri(path))
+	if err != nil {
+		return err
+	}
+	uri.Path += `/_bulk`
+
 	if len(data) <= 0 {
 		return nil
 	}
@@ -48,7 +62,7 @@ func (es *ES) BulkDelete(path string, data []string) error {
 	}
 
 	result := BulkResult{}
-	if err := es.client.PostJson(es.Uri(path+`/_bulk`), nil, body, &result); err != nil {
+	if err := es.client.PostJson(uri.String(), nil, body, &result); err != nil {
 		return err
 	}
 	if !result.Errors {

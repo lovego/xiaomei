@@ -25,7 +25,7 @@ type RawQueryHit struct {
 func (es *ES) QueryRaw(path string, bodyData interface{}) (
 	total int, data []RawQueryHit, err error,
 ) {
-	result, err := es.getRawQueryResult(path, bodyData, true)
+	result, err := es.getRawQueryResult(path, `hits.total,hits.hits._id,hits.hits._source`, bodyData)
 	if err == nil {
 		total = result.Hits.Total
 		data = result.Hits.Hits
@@ -36,7 +36,8 @@ func (es *ES) QueryRaw(path string, bodyData interface{}) (
 func (es *ES) QueryData(path string, bodyData interface{}, data interface{}) (
 	total int, err error,
 ) {
-	result, err := es.getRawQueryResult(path, bodyData, true)
+	result, err := es.getRawQueryResult(path, `hits.total,hits.hits._source`, bodyData)
+
 	if err == nil {
 		total = result.Hits.Total
 		err = parseSource(result.Hits.Hits, data)
@@ -48,7 +49,7 @@ func (es *ES) QueryData(path string, bodyData interface{}, data interface{}) (
 func (es *ES) QueryDataWithId(path string, bodyData interface{}, data interface{}) (
 	total int, err error,
 ) {
-	result, err := es.getRawQueryResult(path, bodyData, true)
+	result, err := es.getRawQueryResult(path, `hits.total,hits.hits._id,hits.hits._source`, bodyData)
 	if err == nil {
 		total = result.Hits.Total
 		err = parseSource(result.Hits.Hits, data)
@@ -60,19 +61,18 @@ func (es *ES) QueryDataWithId(path string, bodyData interface{}, data interface{
 	return
 }
 
-func (es *ES) getRawQueryResult(path string, bodyData interface{}, withId bool) (*RawQueryResult, error) {
-	uri, err := url.Parse(path + `/_search`)
+func (es *ES) getRawQueryResult(path, filterPath string, bodyData interface{}) (*RawQueryResult, error) {
+	uri, err := url.Parse(es.Uri(path))
 	if err != nil {
 		return nil, err
 	}
-	if withId {
-		uri.Query().Set(`filter_path`, `hits.total,hits.hits._id,hits.hits._source`)
-	} else {
-		uri.Query().Set(`filter_path`, `hits.total,hits.hits._source`)
-	}
+	uri.Path += `/_search`
+	q := uri.Query()
+	q.Set(`filter_path`, filterPath)
+	uri.RawQuery = q.Encode()
 
 	result := &RawQueryResult{}
-	if err = es.client.PostJson(es.Uri(uri.String()), nil, bodyData, result); err != nil {
+	if err = es.client.PostJson(uri.String(), nil, bodyData, result); err != nil {
 		return nil, err
 	}
 	return result, nil

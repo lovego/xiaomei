@@ -2,6 +2,7 @@ package elastic
 
 import (
 	"net/http"
+	"net/url"
 )
 
 // 覆盖
@@ -18,7 +19,12 @@ func (es *ES) Put(path string, bodyData, data interface{}) error {
 
 // 创建
 func (es *ES) Create(path string, bodyData, data interface{}) error {
-	resp, err := es.client.Put(es.Uri(path+`/_create`), nil, bodyData)
+	uri, err := url.Parse(es.Uri(path))
+	if err != nil {
+		return err
+	}
+	uri.Path += `/_create`
+	resp, err := es.client.Put(uri.String(), nil, bodyData)
 	if err != nil {
 		return err
 	}
@@ -35,7 +41,12 @@ func (es *ES) Delete(path string, data interface{}) error {
 
 // 更新
 func (es *ES) Update(path string, bodyData, data interface{}) error {
-	return es.client.PostJson(es.Uri(path+`/_update`), nil, bodyData, data)
+	uri, err := url.Parse(es.Uri(path))
+	if err != nil {
+		return err
+	}
+	uri.Path += `/_update`
+	return es.client.PostJson(uri.String(), nil, bodyData, data)
 }
 
 // Create if not Exist
