@@ -100,7 +100,7 @@ func makeBodyReader(data interface{}) (io.Reader, error) {
 			reader = bytes.NewBuffer(body)
 		}
 	default:
-		if !reflect.ValueOf(body).IsNil() {
+		if !isNil(body) {
 			buf, err := json.Marshal(body)
 			if err != nil {
 				return nil, err
@@ -109,4 +109,14 @@ func makeBodyReader(data interface{}) (io.Reader, error) {
 		}
 	}
 	return reader, nil
+}
+
+func isNil(data interface{}) bool {
+	v := reflect.ValueOf(data)
+	switch v.Kind() {
+	case reflect.Ptr, reflect.Map, reflect.Slice, reflect.Chan, reflect.Func:
+		return v.IsNil()
+	default:
+		return false
+	}
 }
