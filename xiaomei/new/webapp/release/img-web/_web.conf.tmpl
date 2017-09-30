@@ -6,6 +6,10 @@ server {
 
   index index.html;
 
+  location ~ \.html {
+    add_header Cache-Control "must-revalidate";
+  }
+
   location ~ \.(js|css|png|gif|jpg|svg|ico|woff|woff2|ttf|eot|map|json)$ {
     expires max;
   }
