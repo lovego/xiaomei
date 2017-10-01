@@ -1,4 +1,4 @@
-FROM 192.168.202.12:5000/xiaomei/logc
+FROM hub.c.163.com/lovego/xiaomei/logc
 
 COPY logc.yml logrotate.conf ./
 WORKDIR /home/ubuntu/{{ .ProName }}_logs

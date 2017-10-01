@@ -1,11 +1,13 @@
 # xiaomei 小而美的go语言web框架。
 
-#### 安装
+[![GoDoc](https://godoc.org/github.com/lovego/xiaomei?status.svg)](https://godoc.org/github.com/lovego/xiaomei)
+
+## 安装
 ```
-  go get github.com/lovego/xiaomei
+  go get github.com/lovego/xiaomei/xiaomei
 ```
 
-#### 使用
+## 使用
 ```
   xiaomei new example       # 生成项目
   xiaomei app run           # 启动app服务器
@@ -37,7 +39,7 @@ xiaomei所有的运行环境都是基于docker的，在开发环境的产出都�
 
 现在xiaomei包含了这些镜像：
 1. app镜像运行项目编译出的二进制文件，用来服务动态内容或者运行定时任务等。
-2. web镜像运行nginx，它提供静态文件，并把其他请求转发给后端的app服务器。
+2. web镜像运行nginx，它服务静态文件。
 3. godoc镜像运行godoc工具，从golang源码提供文档。
 4. access镜像运行nginx，根据域名将请求转发到不同项目的服务。
 5. logc镜像运行logc工具，收集服务的日志，存储到ElasticSearch，供可视化展现。

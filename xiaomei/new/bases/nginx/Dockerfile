@@ -1,4 +1,4 @@
-FROM 192.168.202.12:5000/xiaomei/base
+FROM hub.c.163.com/lovego/xiaomei/base
 
 COPY sources.list /etc/apt/sources.list.d/nginx.list
 

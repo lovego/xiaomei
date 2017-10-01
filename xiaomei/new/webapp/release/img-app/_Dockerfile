@@ -1,4 +1,4 @@
-FROM 192.168.202.12:5000/xiaomei/appserver
+FROM hub.c.163.com/lovego/xiaomei/appserver
 
 RUN mkdir -p /home/ubuntu/{{ .ProName }}/log
 WORKDIR /home/ubuntu/{{ .ProName }}
