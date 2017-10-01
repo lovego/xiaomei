@@ -1,4 +1,11 @@
 #!/bin/bash
 
 cd $(dirname $0)
-docker build -t hub.c.163.com/lovego/xiaomei/tasks .
+
+name=hub.c.163.com/lovego/xiaomei/tasks
+
+docker build -t $name .
+
+if test "$1" = '-p'; then
+  docker push $name
+fi

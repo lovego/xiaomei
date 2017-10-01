@@ -1,6 +1,14 @@
 #!/bin/bash
-
 set -e
+
 cd $(dirname $0)
+
 test nginx-start.go -nt nginx-start && go build nginx-start.go
-docker build -t hub.c.163.com/lovego/xiaomei/nginx .
+
+name=hub.c.163.com/lovego/xiaomei/nginx
+
+docker build -t $name .
+
+if test "$1" = '-p'; then
+  docker push $name
+fi

@@ -2,5 +2,13 @@
 set -e
 
 cd $(dirname $0)
+
 test docker-kill.go -nt docker-kill && go build -v docker-kill.go
-docker build -t hub.c.163.com/lovego/xiaomei/logc .
+
+name=hub.c.163.com/lovego/xiaomei/logc
+
+docker build -t $name .
+
+if test "$1" = '-p'; then
+  docker push $name
+fi
