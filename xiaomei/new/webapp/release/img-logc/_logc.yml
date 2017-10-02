@@ -14,8 +14,8 @@ production:
 defaults: &defaults
   name: {{ .ProName }}
   files:
-    - { org: {{ .Domain }}, name: app-log, path: app.log, mapping: *mapping }
-    - { org: {{ .Domain }}, name: app-err, path: app.err, mapping: *mapping }
+    - { org: {{ .ProNameUrlSafe }}, name: app-log, path: app.log, mapping: *mapping }
+    - { org: {{ .ProNameUrlSafe }}, name: app-err, path: app.err, mapping: *mapping }
   rotateTime: "33 33 3 * * *"
   rotateCmd: [ logrotate, ../logrotate.conf ]
   mailer: "mailer://smtp.qq.com:25/?user=小美<xiaomei-go@qq.com>&pass=zjsbosjlhgugechh"

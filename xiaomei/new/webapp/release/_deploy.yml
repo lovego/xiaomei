@@ -12,24 +12,24 @@ production:
 defaults: &defaults
   services:
     app:
-      image: {{ .Registry }}{{ .Domain }}/app
+      image: {{ .Registry }}{{ .ProNameUrlSafe }}/app
       ports: "3001,4001"
       options: [ -v, "{{ .ProName }}_logs:/home/ubuntu/{{ .ProName }}/log" ]
   # tasks:
   #   nodes: { tasks: true }
-  #   image: {{ .Registry }}{{ .Domain }}/tasks
+  #   image: {{ .Registry }}{{ .ProNameUrlSafe }}/tasks
   #   options: [ -v, "{{ .ProName }}_logs:/home/ubuntu/{{ .ProName }}/log" ]
     web:
-      image: {{ .Registry }}{{ .Domain }}/web
+      image: {{ .Registry }}{{ .ProNameUrlSafe }}/web
       ports: "8001"
       options: [ -v, "{{ .ProName }}_logs:/var/log/nginx/{{ .ProName }}" ]
     logc:
-      image: {{ .Registry }}{{ .Domain }}/logc
+      image: {{ .Registry }}{{ .ProNameUrlSafe }}/logc
       options: [ -v, "{{ .ProName }}_logs:/home/ubuntu/{{ .ProName }}_logs",
                  -v, "/var/run/docker.sock:/var/run/docker.sock" ]
   # godoc:
   #   nodes: { godoc: true }
-  #   image: {{ .Registry }}{{ .Domain }}/godoc
+  #   image: {{ .Registry }}{{ .ProNameUrlSafe }}/godoc
   #   ports: "7001"
 
   volumesToCreate: [ {{ .ProName }}_logs ]
