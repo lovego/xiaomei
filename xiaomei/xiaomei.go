@@ -10,6 +10,7 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/images"
 	"github.com/lovego/xiaomei/xiaomei/new"
 	"github.com/lovego/xiaomei/xiaomei/release"
+	"github.com/lovego/xiaomei/xiaomei/workspace_godoc"
 	"github.com/spf13/cobra"
 )
 
@@ -24,7 +25,10 @@ func main() {
 	root.AddCommand(images.Cmds(``)...)
 	root.AddCommand(deploy.Cmds(``)...)
 	root.AddCommand(access.Cmds(``)...)
-	root.AddCommand(new.Cmd(), yamlCmd(), autoCompleteCmd(root), versionCmd())
+	root.AddCommand(
+		new.Cmd(), workspace_godoc.Cmd(),
+		yamlCmd(), autoCompleteCmd(root), versionCmd(),
+	)
 	if err := root.Execute(); err != nil {
 		os.Exit(1)
 	}
@@ -35,7 +39,7 @@ func versionCmd() *cobra.Command {
 		Use:   `version`,
 		Short: `show xiaomei version.`,
 		RunE: release.NoArgCall(func() error {
-			fmt.Println(`xiaomei version 17.10.2`)
+			fmt.Println(`xiaomei version 17.10.3`)
 			return nil
 		}),
 	}
