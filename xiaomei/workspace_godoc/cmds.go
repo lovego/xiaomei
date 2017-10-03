@@ -1,10 +1,6 @@
 package workspace_godoc
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/lovego/xiaomei/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/spf13/cobra"
 )
@@ -15,19 +11,26 @@ func Cmd() *cobra.Command {
 		Short: `deploy the workspace godoc server.`,
 		RunE:  release.NoArgCall(deploy),
 	}
+	cmd.AddCommand(accessCmd())
 	cmd.AddCommand(shellCmd())
 	return cmd
 }
 
-func deploy() error {
-	script := fmt.Sprintf(`
-  docker stop workspace-godoc >/dev/null 2>&1 && docker rm workspace-godoc
-	docker run --name=workspace-godoc -d --restart=always \
-	--network=host -e=GODOCPORT=1234 \
-	-v %s:/home/ubuntu/go hub.c.163.com/lovego/xiaomei/godoc
-	`, os.Getenv(`GOPATH`))
-	_, err := cmd.Run(cmd.O{}, `sh`, `-c`, script)
-	return err
+func accessCmd() *cobra.Command {
+	var setup bool
+	cmd := &cobra.Command{
+		Use:   `access [<env>]`,
+		Short: `access config for the workspace godoc server.`,
+		RunE: release.NoArgCall(func() error {
+			if setup {
+				return accessSetup()
+			} else {
+				return accessPrint()
+			}
+		}),
+	}
+	cmd.Flags().BoolVarP(&setup, `setup`, `s`, false, `setup access.`)
+	return cmd
 }
 
 func shellCmd() *cobra.Command {
@@ -37,11 +40,4 @@ func shellCmd() *cobra.Command {
 		RunE:  release.NoArgCall(shell),
 	}
 	return theCmd
-}
-
-func shell() error {
-	_, err := cmd.Run(cmd.O{}, `docker`, `exec`, `-it`,
-		`--detach-keys=ctrl-@`, `workspace-godoc`, `bash`,
-	)
-	return err
 }
