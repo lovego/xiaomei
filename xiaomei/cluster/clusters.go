@@ -37,11 +37,11 @@ var theEnvs []string
 func Envs() []string {
 	if theEnvs == nil {
 		envs := []string{}
-		if release.InProject() {
-			for env := range GetClusters() {
-				envs = append(envs, env)
-			}
+		// if release.InProject() {
+		for env := range GetClusters() {
+			envs = append(envs, env)
 		}
+		// }
 		theEnvs = envs
 	}
 	return theEnvs
