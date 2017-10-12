@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -23,7 +24,15 @@ func getLogWriter() (io.Writer, io.Writer) {
 		return os.Stdout, os.Stderr
 	}
 	path := filepath.Join(config.Root(), `log`, `app`)
-	return fs.NewLogFile(path + `.log`), fs.NewLogFile(path + `.err`)
+	accessLog, err := fs.NewLogFile(path + `.log`)
+	if err != nil {
+		log.Fatal(err)
+	}
+	errorLog, err := fs.NewLogFile(path + `.err`)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return accessLog, errorLog
 }
 
 func Write(req *xiaomei.Request, res *xiaomei.Response, t time.Time, err interface{}) {

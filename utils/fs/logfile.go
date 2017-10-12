@@ -15,10 +15,10 @@ type LogFile struct {
 	*os.File
 }
 
-func NewLogFile(path string) *LogFile {
+func NewLogFile(path string) (*LogFile, error) {
 	l := LogFile{path: path}
 	if err := l.open(); err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	ch := make(chan os.Signal)
 	signal.Notify(ch, syscall.SIGUSR1)
@@ -31,7 +31,7 @@ func NewLogFile(path string) *LogFile {
 			}
 		}
 	}()
-	return &l
+	return &l, nil
 }
 
 func (l *LogFile) open() error {

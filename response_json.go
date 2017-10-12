@@ -21,8 +21,7 @@ func (res *Response) Json2(data interface{}, err error) {
 	if err != nil {
 		res.LogError(err)
 	}
-	bytes, err := json.Marshal(data)
-	if err == nil {
+	if bytes, err := json.Marshal(data); err == nil {
 		res.Header().Set(`Content-Type`, `application/json; charset=utf-8`)
 		res.Write(bytes)
 	} else {
