@@ -33,7 +33,11 @@ func (c *Consume) Start() {
 		c.Logger.Panic(err)
 	}
 
-	c.logWriter = fs.NewLogFile(c.LogPath)
+	if logfile, err := fs.NewLogFile(c.LogPath); err == nil {
+		c.logWriter = logfile
+	} else {
+		c.Logger.Panic(err)
+	}
 
 	if c.OffsetsKey == `` {
 		c.OffsetsKey = `kafka-offsets-` + c.Topic + `-` + c.Group
