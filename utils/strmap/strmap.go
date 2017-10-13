@@ -19,6 +19,24 @@ func (s StrMap) Get(key string) StrMap {
 	return StrMap(value)
 }
 
+func (s StrMap) GetSlice(key string) (results []StrMap) {
+	if s == nil || s[key] == nil {
+		log.Panicf("no key: %s", key)
+	}
+	slice, err := cast.ToSliceE(s[key])
+	if err != nil {
+		log.Panic(err)
+	}
+	for _, v := range slice {
+		if value, err := cast.ToStringMapE(v); err == nil {
+			results = append(results, value)
+		} else {
+			log.Panic(err)
+		}
+	}
+	return
+}
+
 func (s StrMap) GetString(key string) string {
 	if s == nil || s[key] == nil {
 		log.Panicf("no key: %s", key)

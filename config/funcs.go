@@ -39,6 +39,10 @@ func Get(key string) strmap.StrMap {
 	return theData.Get(key)
 }
 
+func GetSlice(key string) []strmap.StrMap {
+	return theData.GetSlice(key)
+}
+
 func GetString(key string) string {
 	return theData.GetString(key)
 }
