@@ -18,6 +18,17 @@ func (es *ES) BulkCreate(path string, data [][2]interface{}) error {
 	return es.BulkDo(path, body, `create`, data)
 }
 
+func (es *ES) BulkIndex(path string, data [][2]interface{}) error {
+	if len(data) <= 0 {
+		return nil
+	}
+	body, err := makeBulkIndex(data)
+	if err != nil {
+		return err
+	}
+	return es.BulkDo(path, body, `index`, data)
+}
+
 func (es *ES) BulkUpdate(path string, data [][2]interface{}) error {
 	if len(data) <= 0 {
 		return nil

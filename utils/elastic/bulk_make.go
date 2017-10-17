@@ -36,6 +36,36 @@ func makeBulkCreate(rows [][2]interface{}) (result string, err error) {
 }
 
 /*
+	index es 格式：
+	{ "index" : {"_id" : "2"} }
+	{ "k": "v", ... }
+	args:
+	[ [ _id, data ], ...]
+*/
+func makeBulkIndex(rows [][2]interface{}) (result string, err error) {
+	for _, row := range rows {
+		id, data := row[0], row[1]
+		if id == nil {
+			if id, err = GenUUID(); err != nil {
+				return ``, err
+			}
+		}
+
+		meta, err := json.Marshal(map[string]map[string]interface{}{`index`: {`_id`: id}})
+		if err != nil {
+			return ``, err
+		}
+		dataStr, err := makeBulkData(data)
+		if err != nil {
+			return ``, err
+		}
+
+		result += string(meta) + "\n" + dataStr + "\n"
+	}
+	return
+}
+
+/*
 	upsert es 格式：
 	{ "update" : {"_id" : "2"} }
 	{ "doc" : {"field" : "value"}, "upsert" : {"field" : "value"}, ... }
