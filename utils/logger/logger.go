@@ -71,6 +71,18 @@ func (log *Logger) doAlarm(title string) {
 	log.alarm.Alarm(title, content, mergeKey)
 }
 
+func (log *Logger) Alarm(titleValue, contentValue interface{}) {
+	title := fmt.Sprint(titleValue)
+	content := fmt.Sprint(contentValue)
+	stack := utils.Stack(3)
+
+	content = log.output(title) + content + "\n" + stack
+	log.writer.Write([]byte(content))
+	title = log.prefix + title
+	mergeKey := title + "\n" + stack // 根据title和调用栈对报警消息进行合并
+	log.alarm.Alarm(title, content, mergeKey)
+}
+
 func (log *Logger) Recover() {
 	if err := recover(); err != nil {
 		log.doAlarm(fmt.Sprintf("PANIC: %v\n", err))
