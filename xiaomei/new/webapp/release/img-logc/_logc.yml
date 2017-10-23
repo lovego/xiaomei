@@ -1,6 +1,7 @@
 dev:
   logdAddr: logd.dev
   <<: *defaults
+  keepers: [ ]
 demo:
   logdAddr: logd.demo
   <<: *defaults

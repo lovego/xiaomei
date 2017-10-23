@@ -3,8 +3,6 @@ package xiaomei
 import (
 	"encoding/json"
 	"log"
-
-	"github.com/lovego/xiaomei/utils/errs"
 )
 
 func (res *Response) Json(data interface{}) {
@@ -29,75 +27,50 @@ func (res *Response) Json2(data interface{}, err error) {
 	}
 }
 
-func (res Response) Message(err error) {
-	type result struct {
-		Code    string `json:"code"`
-		Message string `json:"message"`
-	}
-	if err == nil {
-		res.Json(result{Code: `ok`, Message: `success`})
-	} else {
-		if e, ok := err.(errs.CodeMessageErr); ok {
-			res.Json(result{Code: e.Code(), Message: e.Message()})
-		} else {
-			res.LogError(err)
-			res.Json(result{Code: `error`, Message: err.Error()})
-		}
-	}
+func (res *Response) Data(data interface{}, err error) {
+	res.DataWithKey(data, err, `data`)
 }
 
-func (res Response) Data(data interface{}, err error) {
-	type dataT struct {
-		Code    string      `json:"code"`
-		Message string      `json:"message"`
-		Data    interface{} `json:"data,omitempty"`
-	}
-	if err == nil {
-		res.Json(dataT{Code: `ok`, Message: `success`, Data: data})
-	} else {
-		if e, ok := err.(errs.CodeMessageErr); ok {
-			res.Json(dataT{Code: e.Code(), Message: e.Message(), Data: data})
-		} else {
-			res.LogError(err)
-			res.Json(dataT{Code: `error`, Message: err.Error(), Data: data})
-		}
-	}
+func (res *Response) Result(data interface{}, err error) {
+	res.DataWithKey(data, err, `result`)
 }
 
-func (res Response) Result(data interface{}, err error) {
-	type dataT struct {
-		Code    string      `json:"code"`
-		Message string      `json:"message"`
-		Data    interface{} `json:"result,omitempty"`
-	}
+func (res *Response) DataWithKey(data interface{}, err error, key string) {
+	result := make(map[string]interface{})
 	if err == nil {
-		res.Json(dataT{Code: `ok`, Message: `success`, Data: data})
+		result[`code`] = `ok`
+		result[`message`] = `success`
 	} else {
-		if e, ok := err.(errs.CodeMessageErr); ok {
-			res.Json(dataT{Code: e.Code(), Message: e.Message(), Data: data})
+		if code, ok := err.(interface {
+			Code() string
+		}); ok {
+			result[`code`] = code.Code()
 		} else {
 			res.LogError(err)
-			res.Json(dataT{Code: `error`, Message: err.Error(), Data: data})
+			result[`code`] = `error`
 		}
-	}
-}
 
-func (res Response) Model(data interface{}, err error) {
-	type dataT struct {
-		Code    string      `json:"code"`
-		Message string      `json:"message"`
-		Data    interface{} `json:"model,omitempty"`
-	}
-	if err == nil {
-		res.Json(dataT{Code: `ok`, Message: `success`, Data: data})
-	} else {
-		if e, ok := err.(errs.CodeMessageErr); ok {
-			res.Json(dataT{Code: e.Code(), Message: e.Message(), Data: data})
+		if code, ok := err.(interface {
+			Message() string
+		}); ok {
+			result[`message`] = code.Message()
 		} else {
-			res.LogError(err)
-			res.Json(dataT{Code: `error`, Message: err.Error(), Data: data})
+			result[`message`] = `Server Error.`
 		}
 	}
+
+	if data != nil {
+		result[key] = data
+	} else if err != nil {
+		if datas, ok := err.(interface {
+			Data() interface{}
+		}); ok {
+			if data = datas.Data(); data != nil {
+				result[key] = data
+			}
+		}
+	}
+	res.Json(result)
 }
 
 func (res *Response) LogError(err error) {

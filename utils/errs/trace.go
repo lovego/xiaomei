@@ -6,32 +6,27 @@ import (
 	"runtime"
 )
 
-type TraceErr interface {
-	Stack() string
-	Error() string
+type TraceErr struct {
+	err, stack string
 }
 
 func Trace(err error) TraceErr {
-	if s, ok := err.(trace); ok {
-		return s
+	if trace, ok := err.(TraceErr); ok {
+		return trace
 	} else {
-		return trace{err: err.Error(), stack: getStack(1)}
+		return TraceErr{err: err.Error(), stack: getStack(1)}
 	}
 }
 
 func Tracef(format string, args ...interface{}) TraceErr {
-	return trace{err: fmt.Sprintf(format, args...), stack: getStack(1)}
+	return TraceErr{err: fmt.Sprintf(format, args...), stack: getStack(1)}
 }
 
-type trace struct {
-	err, stack string
-}
-
-func (s trace) Stack() string {
+func (s TraceErr) Stack() string {
 	return s.stack
 }
 
-func (s trace) Error() string {
+func (s TraceErr) Error() string {
 	return s.err
 }
 
