@@ -103,6 +103,11 @@ func setupDataIds(data interface{}, hits []RawQueryHit) {
 		if kind := v.Kind(); kind == reflect.Interface || kind == reflect.Ptr {
 			v = v.Elem()
 		}
-		v.FieldByName(`Id`).SetString(hits[i].Id)
+		switch v.Kind() {
+		case reflect.Struct:
+			v.FieldByName(`Id`).SetString(hits[i].Id)
+		case reflect.Map:
+			v.SetMapIndex(reflect.ValueOf(`id`), reflect.ValueOf(hits[i].Id))
+		}
 	}
 }
