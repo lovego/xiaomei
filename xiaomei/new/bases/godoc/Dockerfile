@@ -1,4 +1,4 @@
-FROM hub.c.163.com/lovego/xiaomei/base
+FROM hub.c.163.com/lovego/xiaomei/ubuntu
 
 COPY godoc godoc-start /usr/local/bin/
 COPY pkg.png /usr/local/go/doc/gopher/

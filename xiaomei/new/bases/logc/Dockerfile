@@ -1,4 +1,4 @@
-FROM hub.c.163.com/lovego/xiaomei/base
+FROM hub.c.163.com/lovego/xiaomei/ubuntu
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends logrotate \
