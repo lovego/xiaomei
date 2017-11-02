@@ -1,22 +1,29 @@
-dev:
-  logdAddr: logd.dev
-  <<: *defaults
-  keepers: [ ]
-demo:
-  logdAddr: logd.demo
-  <<: *defaults
-qa:
-  logdAddr: logd.qa
-  <<: *defaults
-production:
-  logdAddr: logd.com
-  <<: *defaults
+envs:
+  dev:
+    elasticsearch:
+      - http://log-es.wumart.com/logd-dev-
+    <<: *defaults
+    keepers: [ ]
+  demo:
+    elasticsearch:
+      - http://log-es.wumart.com/logd-demo-
+    <<: *defaults
+  qa:
+    elasticsearch:
+      - http://192.168.202.51:9200/logd-qa-
+      - http://192.168.202.52:9200/logd-qa-
+    <<: *defaults
+  production:
+    elasticsearch:
+      - http://192.168.202.51:9200/logd-
+      - http://192.168.202.52:9200/logd-
+    <<: *defaults
 
 defaults: &defaults
   name: {{ .ProName }}
   files:
-    - { org: {{ .ProNameUrlSafe }}, name: app-log, path: app.log, mapping: *mapping }
-    - { org: {{ .ProNameUrlSafe }}, name: app-err, path: app.err, mapping: *mapping }
+    - { path: app.log, index: {{ .ProNameUrlSafe }}, type: app-log, mapping: *mapping }
+    - { path: app.err, index: {{ .ProNameUrlSafe }}, type: app-err, mapping: *mapping }
   rotateTime: "33 33 3 * * *"
   rotateCmd: [ logrotate, ../logrotate.conf ]
   mailer: "mailer://smtp.qq.com:25/?user=小美<xiaomei-go@qq.com>&pass=zjsbosjlhgugechh"
