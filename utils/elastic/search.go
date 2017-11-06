@@ -1,31 +1,22 @@
 package elastic
 
-import "net/url"
+import (
+	"encoding/json"
+	"net/url"
+)
 
 type SearchResult struct {
-	Took    int          `json:"took"`
-	Timeout bool         `json:"time_out"`
-	Shards  SearchShards `json:"_shards"`
-	Hits    SearchHits   `json:"hits"`
+	Took         int             `json:"took"`
+	Timeout      bool            `json:"time_out"`
+	Shards       Shards          `json:"_shards"`
+	Hits         SearchHits      `json:"hits"`
+	Aggregations json.RawMessage `json:"aggregations"`
 }
 
-type SearchShards struct {
+type Shards struct {
 	Total      int `json:"total"`
 	Successful int `json:"successful"`
 	Failed     int `json:"failed"`
-}
-
-type SearchHits struct {
-	Total int         `json:"total"`
-	Hits  []SearchHit `json:"hits"`
-}
-
-type SearchHit struct {
-	Index  string                 `json:"_index"`
-	Type   string                 `json:"_type"`
-	Id     string                 `json:"_id"`
-	Score  string                 `json:"_score"`
-	Source map[string]interface{} `json:"_source"`
 }
 
 func (es *ES) Search(path string, bodyData interface{}) (*SearchResult, error) {

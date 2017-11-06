@@ -15,11 +15,8 @@ func createEmptyUsers() {
 	testES.Ensure(`/`, nil)
 	testES.Ensure(`/_mapping/users`, map[string]interface{}{
 		"properties": map[string]interface{}{
-			"name":       map[string]string{"type": "keyword"},
-			"age":        map[string]string{"type": "integer"},
-			"salt":       map[string]string{"type": "keyword"},
-			"password":   map[string]string{"type": "keyword"},
-			"created_at": map[string]string{"type": "date", "format": "yyyy-MM-dd'T'HH:mm:ssZ"},
+			"name": map[string]string{"type": "keyword"},
+			"age":  map[string]string{"type": "integer"},
 		},
 	})
 }
@@ -29,7 +26,7 @@ func checkLiLeiAndHanMeiMei(t *testing.T) {
 
 	total, docs, err := testES.Query(`/users`, map[string]map[string]string{`sort`: {`age`: `desc`}})
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 	expectTotal := 2
 	expectDocs := []map[string]interface{}{
