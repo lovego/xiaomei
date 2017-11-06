@@ -62,10 +62,7 @@ func (resp *Response) Json(data interface{}) error {
 	}
 	decoder := json.NewDecoder(resp.Body)
 	decoder.UseNumber()
-	if err := decoder.Decode(&data); err != nil {
-		return err
-	}
-	return nil
+	return decoder.Decode(&data)
 }
 
 func (resp *Response) Json2(data interface{}) error {
