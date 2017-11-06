@@ -15,7 +15,7 @@ type SearchHit struct {
 	Index  string          `json:"_index"`
 	Type   string          `json:"_type"`
 	Id     string          `json:"_id"`
-	Score  string          `json:"_score"`
+	Score  float64         `json:"_score"`
 	Source json.RawMessage `json:"_source"`
 }
 
@@ -35,7 +35,7 @@ func (h SearchHits) Sources(data interface{}) error {
 	return decoder.Decode(&data)
 }
 
-func (h SearchHits) Ids(path string, bodyData interface{}) (data []string) {
+func (h SearchHits) Ids() (data []string) {
 	for _, hit := range h.Hits {
 		data = append(data, hit.Id)
 	}
@@ -44,7 +44,7 @@ func (h SearchHits) Ids(path string, bodyData interface{}) (data []string) {
 
 func (h SearchHits) SourcesWithId(data interface{}, key string) error {
 	err := h.Sources(data)
-	if err != nil {
+	if err == nil {
 		h.SetIds(data, key)
 	}
 	return err

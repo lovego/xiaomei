@@ -56,11 +56,15 @@ func (resp *Response) CodeError() error {
 }
 
 func (resp *Response) Json(data interface{}) error {
-	defer resp.Body.Close()
 	if data == nil {
+		defer resp.Body.Close()
 		return nil
 	}
-	decoder := json.NewDecoder(resp.Body)
+	body, err := resp.GetBody()
+	if err != nil {
+		return err
+	}
+	decoder := json.NewDecoder(bytes.NewBuffer(body))
 	decoder.UseNumber()
 	return decoder.Decode(&data)
 }
