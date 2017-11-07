@@ -1,7 +1,15 @@
 #!/bin/bash
 
+# 1. 使用VirtualBox安装Ubuntu16.04 初始GuestOS
+# 2. 添加Host-only网卡
+# 3. 设置22端口转发，使用终端登录GuestOS
+# 4. 运行该脚本
+
+set -e
+
 main() {
   setup_sudo_no_password
+  setup_vbox_hostonly_network
 }
 
 setup_sudo_no_password() {
@@ -11,15 +19,17 @@ setup_sudo_no_password() {
 }
 
 setup_vbox_hostonly_network() {
+  file=/etc/network/interfaces.d/host-only
+  test -f $file && return
   # ls /sys/class/net
-echo '
-  auto enp0s8
-  iface enp0s8 inet static
-  address 192.168.56.15
-  netmask 255.255.255.0
-' | sudo tee --append /etc/network/interfaces > /dev/null
+  echo '
+auto enp0s8
+iface enp0s8 inet static
+address 192.168.56.15
+netmask 255.255.255.0
+' | sudo tee --append $file > /dev/null
+  sudo ifdown enp0s8 && sudo ifup enp0s8
 }
-
 
 setup_vbox_guest_addtions() {
   sudo apt-get install -y gcc make perl

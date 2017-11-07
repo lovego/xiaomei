@@ -1,10 +1,17 @@
 #!/bin/bash
 
 main() {
+  setup_sudo_no_password
   install_docker
   which nginx        || install nginx-core
   which git          || install git
   # install_databases
+}
+
+setup_sudo_no_password() {
+  username=$(id -nu)
+  local file="/etc/sudoers.d/$username"
+  test -f "$file"  || echo "$username  ALL=NOPASSWD: ALL" | sudo tee --append "$file" > /dev/null
 }
 
 install_docker() {
