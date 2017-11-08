@@ -8,3 +8,8 @@ CMD [ "./{{ .ProName }}" ]
 COPY {{ .ProName }} ./
 COPY config  ./config
 COPY views   ./views
+
+RUN sudo chmod 775 {{ .ProName }} \
+ && sudo find config views -type d -exec chmod 775 {} \+ \
+ && sudo find config views -type f -exec chmod 664 {} \+
+

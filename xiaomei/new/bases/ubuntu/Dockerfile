@@ -13,12 +13,12 @@ RUN ln -fs /usr/share/zoneinfo/Asia/Chongqing /etc/localtime \
 # install less, wget, net-tools
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
-  less wget ca-certificates net-tools iputils-ping dnsutils \
+  less wget sudo ca-certificates net-tools iputils-ping dnsutils \
   && rm -rf /var/lib/apt/lists/*
+
+# add user
+RUN useradd -ms /bin/bash ubuntu && echo "ubuntu  ALL=NOPASSWD: ALL" >> /etc/sudoers
 
 # set rlimit nofile
 # RUN echo 'ubuntu - nofile unlimited' > /etc/security/limits.d/99-ubuntu.conf
-
-# add user
-RUN useradd -ms /bin/bash ubuntu
 
