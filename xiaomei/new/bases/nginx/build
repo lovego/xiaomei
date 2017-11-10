@@ -7,7 +7,7 @@ test nginx-start.go -nt nginx-start && go build nginx-start.go
 
 name=hub.c.163.com/lovego/xiaomei/nginx
 
-docker build -t $name .
+docker build --pull -t $name .
 
 if test "$1" = '-p'; then
   docker push $name

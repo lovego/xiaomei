@@ -4,7 +4,7 @@ cd $(dirname $0)
 
 name=hub.c.163.com/lovego/xiaomei/tasks
 
-docker build -t $name .
+docker build --pull -t $name .
 
 if test "$1" = '-p'; then
   docker push $name
