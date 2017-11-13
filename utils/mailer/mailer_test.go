@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jordan-wright/email"
+	"github.com/lovego/email"
 )
 
 func TestSend(t *testing.T) {

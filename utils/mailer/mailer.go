@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jordan-wright/email"
+	"github.com/lovego/email"
 	"github.com/lovego/xiaomei/utils"
 	"io"
 )

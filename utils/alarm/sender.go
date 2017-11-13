@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/jordan-wright/email"
+	"github.com/lovego/email"
 	"github.com/lovego/xiaomei/utils/mailer"
 )
 
