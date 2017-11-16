@@ -47,14 +47,7 @@ func (es *ES) Get(path string, bodyData, data interface{}) error {
 }
 
 func (es *ES) Post(path string, bodyData, data interface{}) error {
-	resp, err := es.client.Post(es.Uri(path), nil, bodyData)
-	if err != nil {
-		return err
-	}
-	if err := resp.Ok(); err != nil {
-		return err
-	}
-	return resp.Json(data)
+	return es.client.PostJson(es.Uri(path), nil, bodyData, data)
 }
 
 func (es *ES) Uri(path string) string {
