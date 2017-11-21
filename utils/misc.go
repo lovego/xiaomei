@@ -42,7 +42,7 @@ func Stack(skip int) string {
 	frames := runtime.CallersFrames(callers[:n])
 	for {
 		if f, ok := frames.Next(); ok {
-			fmt.Fprintf(buf, "%s %s:%d (0x%x)\n", f.Function, f.File, f.Line, f.PC)
+			fmt.Fprintf(buf, "%s\n\t%s:%d (0x%x)\n", f.Function, f.File, f.Line, f.PC)
 		} else {
 			break
 		}

@@ -68,7 +68,9 @@ func (log *Logger) doAlarm(title string) {
 	log.writer.Write([]byte(content))
 	title = log.prefix + title
 	mergeKey := title + "\n" + stack // 根据title和调用栈对报警消息进行合并
-	log.alarm.Alarm(title, content, mergeKey)
+	if log.alarm != nil {
+		log.alarm.Alarm(title, content, mergeKey)
+	}
 }
 
 func (log *Logger) Alarm(titleValue, contentValue interface{}) {
@@ -80,7 +82,9 @@ func (log *Logger) Alarm(titleValue, contentValue interface{}) {
 	log.writer.Write([]byte(content))
 	title = log.prefix + title
 	mergeKey := title + "\n" + stack // 根据title和调用栈对报警消息进行合并
-	log.alarm.Alarm(title, content, mergeKey)
+	if log.alarm != nil {
+		log.alarm.Alarm(title, content, mergeKey)
+	}
 }
 
 func (log *Logger) Recover() {
@@ -106,7 +110,9 @@ func (log *Logger) doExit(title string) {
 	content := log.output(title) + stack
 	log.writer.Write([]byte(content))
 	title = log.prefix + title
-	log.alarm.Send(title, content)
+	if log.alarm != nil {
+		log.alarm.Send(title, content)
+	}
 	os.Exit(1)
 }
 
@@ -131,7 +137,9 @@ func (log *Logger) doPanic(title string) {
 		log.writer.Write([]byte(content))
 	}
 	title = log.prefix + title
-	log.alarm.Send(title, content)
+	if log.alarm != nil {
+		log.alarm.Send(title, content)
+	}
 
 	os.Stderr.Write([]byte(titleLine))
 	panic(title)
