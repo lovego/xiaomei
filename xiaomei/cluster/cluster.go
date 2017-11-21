@@ -4,7 +4,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/lovego/xiaomei/utils/cmd"
+	"github.com/lovego/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 )
 

@@ -11,8 +11,8 @@ import (
 
 	"github.com/lovego/xiaomei"
 	"github.com/lovego/xiaomei/config"
-	"github.com/lovego/xiaomei/utils"
-	"github.com/lovego/xiaomei/utils/fs"
+	"github.com/lovego/utils"
+	"github.com/lovego/utils/fs"
 )
 
 var isDevMode = config.DevMode()

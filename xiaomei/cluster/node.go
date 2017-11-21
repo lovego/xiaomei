@@ -5,8 +5,8 @@ import (
 	"os/user"
 	"strings"
 
-	"github.com/lovego/xiaomei/utils/cmd"
-	"github.com/lovego/xiaomei/utils/slice"
+	"github.com/lovego/utils/cmd"
+	"github.com/lovego/utils/slice"
 )
 
 type Node struct {

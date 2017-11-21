@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lovego/xiaomei/utils/fs"
+	"github.com/lovego/utils/fs"
 	"gopkg.in/yaml.v2"
 )
 

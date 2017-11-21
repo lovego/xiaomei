@@ -8,7 +8,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/lovego/xiaomei/utils/fs"
+	"github.com/lovego/utils/fs"
 )
 
 func walk(tmplsDir, proDir string, config *Config) error {

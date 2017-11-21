@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/lovego/xiaomei/utils/cmd"
+	"github.com/lovego/utils/cmd"
 )
 
 func deploy() error {

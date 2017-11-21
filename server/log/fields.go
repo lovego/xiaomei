@@ -6,7 +6,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/lovego/xiaomei"
-	"github.com/lovego/xiaomei/utils"
+	"github.com/lovego/utils"
 )
 
 func getFields(

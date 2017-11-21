@@ -3,8 +3,8 @@ package funcs
 import (
 	"strings"
 
-	"github.com/lovego/xiaomei/utils/slice/union"
-	"github.com/lovego/xiaomei/utils/strnum"
+	"github.com/lovego/utils/slice/union"
+	"github.com/lovego/utils/strnum"
 )
 
 func Index() map[string]interface{} {

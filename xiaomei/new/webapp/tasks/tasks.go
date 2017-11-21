@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/fatih/color"
-	"github.com/lovego/xiaomei/utils"
+	"github.com/lovego/utils"
 	"github.com/robfig/cron"
 )
 

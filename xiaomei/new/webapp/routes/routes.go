@@ -7,7 +7,7 @@ import (
 	"github.com/lovego/xiaomei"
 	"github.com/lovego/xiaomei/config"
 	"github.com/lovego/xiaomei/router"
-	"github.com/lovego/xiaomei/utils/errs"
+	"github.com/lovego/utils/errs"
 )
 
 type session struct {

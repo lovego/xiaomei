@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/lovego/xiaomei/utils"
+	"github.com/lovego/utils"
 	"github.com/gorilla/securecookie"
 )
 

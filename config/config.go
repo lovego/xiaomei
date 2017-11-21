@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/lovego/xiaomei/config/conf"
-	"github.com/lovego/xiaomei/utils/fs"
-	"github.com/lovego/xiaomei/utils/mailer"
+	"github.com/lovego/utils/fs"
+	"github.com/lovego/utils/mailer"
 )
 
 var theConf = conf.Get(Root()).Get(Env())
