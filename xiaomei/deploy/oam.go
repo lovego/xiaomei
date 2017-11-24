@@ -3,7 +3,7 @@ package deploy
 import (
 	"fmt"
 
-	"github.com/lovego/utils/cmd"
+	"github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/release"

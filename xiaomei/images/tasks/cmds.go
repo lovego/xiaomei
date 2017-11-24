@@ -2,11 +2,11 @@ package tasks
 
 import (
 	"errors"
+	"log"
 	"path/filepath"
 
 	"github.com/fatih/color"
-	"github.com/lovego/utils"
-	"github.com/lovego/utils/cmd"
+	"github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/spf13/cobra"
 )
@@ -22,7 +22,7 @@ func Cmds() []*cobra.Command {
 }
 
 func compile() error {
-	utils.Log(color.GreenString(`compile the tasks binary.`))
+	log.Println(color.GreenString(`compile the tasks binary.`))
 	if cmd.Ok(cmd.O{
 		Dir: filepath.Join(release.Root(), "../tasks"),
 		Env: []string{`GOBIN=` + filepath.Join(release.Root(), `img-app`)},

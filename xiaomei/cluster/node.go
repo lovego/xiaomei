@@ -5,8 +5,8 @@ import (
 	"os/user"
 	"strings"
 
-	"github.com/lovego/utils/cmd"
-	"github.com/lovego/utils/slice"
+	"github.com/lovego/cmd"
+	"github.com/lovego/slice"
 )
 
 type Node struct {

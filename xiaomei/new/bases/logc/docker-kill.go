@@ -11,7 +11,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/lovego/utils/httputil"
+	"github.com/lovego/httputil"
 )
 
 type Container struct {

@@ -6,8 +6,8 @@ import (
 	"path"
 	"strings"
 
-	"github.com/lovego/utils/cmd"
-	"github.com/lovego/utils/fs"
+	"github.com/lovego/cmd"
+	"github.com/lovego/fs"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/spf13/cobra"
 )

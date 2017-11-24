@@ -1,10 +1,10 @@
 package session
 
 import (
+	"log"
 	"net/http"
 	"time"
 
-	"github.com/lovego/utils"
 	"github.com/gorilla/securecookie"
 )
 
@@ -31,7 +31,7 @@ func (cs *CookieSession) Get(req *http.Request, p interface{}) bool {
 	ck, _ := req.Cookie(cs.cookie.Name)
 	if ck != nil && ck.Value != `` {
 		if err := cs.secure.Decode(ck.Name, ck.Value, p); err != nil {
-			utils.Log(err)
+			log.Println(err)
 		} else {
 			return true
 		}
@@ -48,7 +48,7 @@ func (cs *CookieSession) Set(res http.ResponseWriter, data interface{}) {
 		if encoded, err := cs.secure.Encode(cs.cookie.Name, data); err == nil {
 			ck.Value = encoded
 		} else {
-			utils.Log(err)
+			log.Println(err)
 			return
 		}
 	}

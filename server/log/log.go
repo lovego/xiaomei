@@ -9,10 +9,10 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/lovego/errs"
+	"github.com/lovego/fs"
 	"github.com/lovego/xiaomei"
 	"github.com/lovego/xiaomei/config"
-	"github.com/lovego/utils"
-	"github.com/lovego/utils/fs"
 )
 
 var isDevMode = config.DevMode()
@@ -39,7 +39,7 @@ func Write(req *xiaomei.Request, res *xiaomei.Response, t time.Time, err interfa
 	fields := getFields(req, res, t)
 	if err != nil {
 		fields[`err`] = fmt.Sprintf("Panic: %v", err)
-		fields[`stack`] = utils.Stack(3)
+		fields[`stack`] = errs.Stack(3)
 	} else if err = fields[`err`]; err != nil {
 		if _, ok := err.(string); !ok {
 			fields[`err`] = fmt.Sprint(err)
@@ -67,7 +67,7 @@ func serializeFields(fields map[string]interface{}) []byte {
 	}
 	line, err := json.Marshal(fields)
 	if err != nil {
-		utils.Log(`writeLog:` + err.Error())
+		log.Println(`writeLog:` + err.Error())
 	}
 	if len(line) > 0 {
 		line = append(line, '\n')

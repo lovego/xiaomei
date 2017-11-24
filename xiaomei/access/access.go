@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lovego/utils/cmd"
+	"github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 )
 

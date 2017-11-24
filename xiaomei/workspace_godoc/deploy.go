@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/lovego/utils/cmd"
+	"github.com/lovego/cmd"
 )
 
 func deploy() error {

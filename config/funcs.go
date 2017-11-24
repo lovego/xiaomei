@@ -3,8 +3,8 @@ package config
 import (
 	"time"
 
-	"github.com/lovego/utils/mailer"
-	"github.com/lovego/utils/strmap"
+	"github.com/lovego/mailer"
+	"github.com/lovego/strmap"
 )
 
 func Name() string {

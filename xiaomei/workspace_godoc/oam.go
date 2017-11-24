@@ -1,6 +1,6 @@
 package workspace_godoc
 
-import "github.com/lovego/utils/cmd"
+import "github.com/lovego/cmd"
 
 func shell() error {
 	_, err := cmd.Run(cmd.O{}, `docker`, `exec`, `-it`,

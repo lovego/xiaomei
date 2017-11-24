@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lovego/utils/cmd"
-	"github.com/lovego/utils/dsn"
+	"github.com/lovego/cmd"
+	"github.com/lovego/dsn"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/release"
 )

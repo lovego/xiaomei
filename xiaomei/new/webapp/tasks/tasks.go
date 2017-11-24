@@ -1,8 +1,9 @@
 package main
 
 import (
+	"log"
+
 	"github.com/fatih/color"
-	"github.com/lovego/utils"
 	"github.com/robfig/cron"
 )
 
@@ -12,10 +13,10 @@ func main() {
 		panic(err)
 	}
 	c.Start()
-	utils.Log(color.GreenString(`started.`))
+	log.Println(color.GreenString(`started.`))
 	select {}
 }
 
 func hello() {
-	utils.Log(`hello`)
+	log.Println(`hello`)
 }

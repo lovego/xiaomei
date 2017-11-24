@@ -1,9 +1,10 @@
 package images
 
 import (
+	"log"
+
 	"github.com/fatih/color"
-	"github.com/lovego/utils"
-	"github.com/lovego/utils/cmd"
+	"github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 )
 
@@ -16,7 +17,7 @@ func (i Image) build(env, timeTag string, pull bool) error {
 	if err := i.prepare(); err != nil {
 		return err
 	}
-	utils.Log(color.GreenString(`building ` + i.svcName + ` image.`))
+	log.Println(color.GreenString(`building ` + i.svcName + ` image.`))
 	args := []string{`build`}
 	if pull {
 		args = append(args, `--pull`)
@@ -28,7 +29,7 @@ func (i Image) build(env, timeTag string, pull bool) error {
 }
 
 func (i Image) push(env, timeTag string) error {
-	utils.Log(color.GreenString(`pushing ` + i.svcName + ` image.`))
+	log.Println(color.GreenString(`pushing ` + i.svcName + ` image.`))
 	imgName := conf.GetService(i.svcName, env).ImageNameWithTag(timeTag)
 	_, err := cmd.Run(cmd.O{Print: true}, `docker`, `push`, imgName)
 	return err

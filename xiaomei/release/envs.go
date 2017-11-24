@@ -3,7 +3,7 @@ package release
 import (
 	"fmt"
 
-	"github.com/lovego/utils/slice"
+	"github.com/lovego/slice"
 )
 
 var getEnvs func() []string

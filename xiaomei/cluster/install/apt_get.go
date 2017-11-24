@@ -4,7 +4,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/lovego/utils/cmd"
+	"github.com/lovego/cmd"
 )
 
 var aptGetNeedUpdate = true

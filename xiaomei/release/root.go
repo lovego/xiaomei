@@ -6,7 +6,7 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/lovego/utils/fs"
+	"github.com/lovego/fs"
 )
 
 var theRoot *string

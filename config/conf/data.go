@@ -5,7 +5,7 @@ import (
 	"log"
 	"path/filepath"
 
-	"github.com/lovego/utils/strmap"
+	"github.com/lovego/strmap"
 	"gopkg.in/yaml.v2"
 )
 

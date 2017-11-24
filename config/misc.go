@@ -4,8 +4,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/lovego/utils/alarm"
-	"github.com/lovego/utils/logger"
+	"github.com/lovego/alarm"
+	"github.com/lovego/logger"
 )
 
 func DevMode() bool {

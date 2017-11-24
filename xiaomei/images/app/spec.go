@@ -2,14 +2,14 @@ package app
 
 import (
 	"errors"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/lovego/utils"
-	"github.com/lovego/utils/cmd"
-	"github.com/lovego/utils/fs"
+	"github.com/lovego/cmd"
+	"github.com/lovego/fs"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/spf13/cobra"
 )
@@ -28,7 +28,7 @@ func specCmd() *cobra.Command {
 }
 
 func gospec(targets []string, onlyChanged bool) error {
-	utils.Log(color.GreenString(`check app code spec.`))
+	log.Println(color.GreenString(`check app code spec.`))
 	if err := os.Chdir(filepath.Join(release.Root(), `..`)); err != nil {
 		panic(err)
 	}
