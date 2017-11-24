@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lovego/xiaomei/config/conf"
 	"github.com/lovego/fs"
 	"github.com/lovego/mailer"
+	"github.com/lovego/xiaomei/config/conf"
 )
 
 var theConf = conf.Get(Root()).Get(Env())
@@ -23,20 +23,19 @@ func Root() string {
 		if err != nil {
 			log.Panic(err)
 		}
-		if strings.HasSuffix(program, `.test`) /* go test ... */ ||
-			strings.HasPrefix(program, `/tmp/`) /* go run ... */ {
+		if dir := filepath.Dir(program); fs.Exist(filepath.Join(dir, `config/config.yml`)) {
+			theRoot = dir
+		} else {
 			cwd, err := os.Getwd()
 			if err != nil {
 				log.Panic(err)
 			}
-			projectDir := fs.DetectDir(cwd, `release/deploy.yml`)
+			projectDir := fs.DetectDir(cwd, `release/img-app/config/config.yml`)
 			if projectDir != `` {
 				theRoot = filepath.Join(projectDir, `release/img-app`)
 			} else {
 				log.Panic(`app root not found.`)
 			}
-		} else { // project binary file
-			theRoot = filepath.Dir(program)
 		}
 	}
 	return theRoot
