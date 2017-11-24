@@ -23,11 +23,15 @@
 
 ### 一、app服务器
 
-1. Router 支持基于字符串和正则表达式的路由（express风格）。
+1. Router 支持基于字符串和正则表达式的路由（Express风格）。
 
 2. Renderer 支持layout和partial的模板渲染（Rails风格）。
 
 3. Request、Response 它们封装了http.Request、http.ResponseWriter、以及Renderer，以提供模板渲染等功能。
+
+4. Session 支持会话读写，且内置了基于加密cookie的会话。
+
+5. config  统一的配置结构和解析。
 
 ### 二、基于docker的开发、部署工具
 
@@ -40,7 +44,6 @@ xiaomei所有的运行环境都是基于docker的，在开发环境的产出都�
 现在xiaomei包含了这些镜像：
 1. app镜像运行项目编译出的二进制文件，用来服务动态内容或者运行定时任务等。
 2. web镜像运行nginx，它服务静态文件。
-3. godoc镜像运行godoc工具，从golang源码提供文档。
-4. access镜像运行nginx，根据域名将请求转发到不同项目的服务。
-5. logc镜像运行logc工具，收集服务的日志，存储到ElasticSearch，供可视化展现。
+3. logc镜像运行logc工具，收集服务的日志，存储到ElasticSearch，供Kibana可视化展现。
+4. godoc镜像运行godoc工具，从golang源码提供文档。
 
