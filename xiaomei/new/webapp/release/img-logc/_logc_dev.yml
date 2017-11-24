@@ -1,4 +1,4 @@
-name: {{ .ProName }}_production # name used to alarm
+name: {{ .ProName }}_dev # name used to alarm
 mailer: "mailer://smtp.qq.com:25/?user=小美<xiaomei-go@qq.com>&pass=zjsbosjlhgugechh"
 keepers: [ "小美<xiaomei-go@qq.com>" ]
 rotate:
@@ -11,7 +11,7 @@ files:
     es:
       "@type": elastic-search
       addrs:
-        - http://127.0.0.1:9200/logc-
+        - http://127.0.0.1:9200/logc-dev-
 
       # index can be time series index or regular index.
       # index doesn't contain "<" and ">" acts as a regular index.
@@ -32,7 +32,7 @@ files:
     es:
       "@type": elastic-search
       addrs:
-        - http://127.0.0.1:9200/logc-
+        - http://127.0.0.1:9200/logc-dev-
       index: {{ .ProNameUrlSafe }}-app.<2006.01>
       type: app-err
       mapping: *mapping

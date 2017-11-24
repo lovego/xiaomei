@@ -8,4 +8,3 @@ COPY logc docker-kill /usr/local/bin/
 
 WORKDIR /home/ubuntu
 
-CMD [ "logc", "../logc.yml" ]

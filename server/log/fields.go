@@ -6,14 +6,13 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/lovego/xiaomei"
-	"github.com/lovego/xiaomei/utils"
 )
 
 func getFields(
 	req *xiaomei.Request, res *xiaomei.Response, t time.Time,
 ) map[string]interface{} {
 	m := map[string]interface{}{
-		`at`:       t.Format(utils.ISO8601),
+		`at`:       t.Format(time.RFC3339),
 		`duration`: fmt.Sprintf(`%.6f`, time.Since(t).Seconds()),
 		`host`:     req.Host,
 		`method`:   req.Method,

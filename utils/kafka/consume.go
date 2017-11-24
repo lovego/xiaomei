@@ -7,7 +7,6 @@ import (
 
 	"github.com/Shopify/sarama"
 	"github.com/garyburd/redigo/redis"
-	"github.com/lovego/xiaomei/utils"
 	"github.com/lovego/xiaomei/utils/fs"
 	"github.com/lovego/xiaomei/utils/logger"
 )
@@ -69,7 +68,7 @@ func (c *Consume) startPartition(n int32) {
 func (c *Consume) process(pc sarama.PartitionConsumer, n int32, message *sarama.ConsumerMessage) {
 	logMap := map[string]interface{}{
 		`partition`: n,
-		`at`:        time.Now().Format(utils.ISO8601),
+		`at`:        time.Now().Format(time.RFC3339),
 		`now`:       message.Offset,
 		`max`:       pc.HighWaterMarkOffset(),
 		`bytes`:     len(message.Value),
