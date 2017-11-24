@@ -1,7 +1,7 @@
 package cluster
 
 import (
-	"github.com/lovego/xiaomei/utils/cmd"
+	"github.com/lovego/utils/cmd"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/spf13/cobra"
 )

@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 
 	"github.com/lovego/xiaomei/config/conf"
-	"github.com/lovego/xiaomei/utils/fs"
-	"github.com/lovego/xiaomei/utils/strmap"
+	"github.com/lovego/utils/fs"
+	"github.com/lovego/utils/strmap"
 )
 
 var theName string

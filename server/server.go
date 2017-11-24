@@ -59,7 +59,7 @@ func (s *Server) ListenAndServe() {
 	s.Server.Handler = s.Handler()
 
 	ch := make(chan os.Signal)
-	signal.Notify(ch, syscall.SIGTERM)
+	signal.Notify(ch, syscall.SIGTERM, os.Interrupt)
 
 	go func() {
 		err := s.Server.Serve(getListener())

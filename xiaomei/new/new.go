@@ -3,7 +3,7 @@ package new
 import (
 	"path/filepath"
 
-	"github.com/lovego/xiaomei/utils/fs"
+	"github.com/lovego/utils/fs"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/spf13/cobra"
 )

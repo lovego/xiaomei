@@ -5,7 +5,7 @@ import (
 	"log"
 	"path/filepath"
 
-	"github.com/lovego/xiaomei/utils/strmap"
+	"github.com/lovego/utils/strmap"
 	"gopkg.in/yaml.v2"
 )
 

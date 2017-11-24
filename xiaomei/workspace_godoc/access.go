@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lovego/xiaomei/utils/cmd"
+	"github.com/lovego/utils/cmd"
 )
 
 const nginxConf = `# vim: set ft=nginx:

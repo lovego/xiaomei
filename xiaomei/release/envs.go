@@ -3,7 +3,7 @@ package release
 import (
 	"fmt"
 
-	"github.com/lovego/xiaomei/utils/slice"
+	"github.com/lovego/utils/slice"
 )
 
 var getEnvs func() []string

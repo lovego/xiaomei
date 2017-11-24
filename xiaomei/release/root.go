@@ -6,7 +6,7 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/lovego/xiaomei/utils/fs"
+	"github.com/lovego/utils/fs"
 )
 
 var theRoot *string

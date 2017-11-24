@@ -5,9 +5,9 @@ import (
 	"path"
 	"strings"
 
-	"github.com/lovego/xiaomei/utils/cmd"
-	"github.com/lovego/xiaomei/utils/fs"
-	"github.com/lovego/xiaomei/utils/slice"
+	"github.com/lovego/utils/cmd"
+	"github.com/lovego/utils/fs"
+	"github.com/lovego/utils/slice"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/spf13/cobra"
 )
