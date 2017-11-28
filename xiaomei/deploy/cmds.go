@@ -16,6 +16,7 @@ func Cmds(svcName string) (cmds []*cobra.Command) {
 		deployCmdFor(svcName),
 		rmDeployCmdFor(svcName),
 		psCmdFor(svcName),
+		restartCmdFor(svcName),
 		logsCmdFor(svcName),
 	)
 	return
@@ -63,6 +64,19 @@ func deployCmdFor(svcName string) *cobra.Command {
 				}
 			}
 			return deploy(svcName, env, timeTag, filter)
+		}),
+	}
+	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
+	return cmd
+}
+
+func restartCmdFor(svcName string) *cobra.Command {
+	var filter string
+	cmd := &cobra.Command{
+		Use:   `restart [<env>]`,
+		Short: `restart container of the ` + desc(svcName) + `.`,
+		RunE: release.EnvCall(func(env string) error {
+			return restart(svcName, env, filter)
 		}),
 	}
 	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)

@@ -27,6 +27,15 @@ done
 	return eachNodeRun(env, script, feature)
 }
 
+func restart(svcName, env, feature string) error {
+	script := fmt.Sprintf(`
+for name in $(docker ps -af name=%s --format '{{.Names}}'); do
+	docker restart $name
+done
+`, release.ServiceName(svcName, env))
+	return eachNodeRun(env, script, feature)
+}
+
 func rmDeploy(svcName, env, feature string) error {
 	script := fmt.Sprintf(`
 for name in $(docker ps -af name=%s --format '{{.Names}}'); do
