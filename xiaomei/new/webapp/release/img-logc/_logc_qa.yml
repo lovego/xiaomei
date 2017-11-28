@@ -9,35 +9,31 @@ files:
     # collector id, it will be use as part of offset file path, so it should be path safe.
     # make sure different collectors of the same file has unique id.
     es:
-      "@type": elastic-search
-      addrs:
-        - http://127.0.0.1:9200/logc-qa-
-
-      # index can be time series index or regular index.
-      # index doesn't contain "<" and ">" acts as a regular index.
-      # in time series index, string between "<" and ">" acts as time layout.
-      # see https://golang.org/pkg/time/#Parse for time layout format.
-      index: {{ .ProNameUrlSafe }}-app.<2006.01>
-
+      <<: *app
       type: app-log
-      mapping: *mapping
-
-      ### the following fields is effective only when "index" field is a time series index. ###
-
-      # field used to determine which time series index to write to.
-      timeField: at
-      # the number of latest time series indices to keep. old indices will be deleted.
-      indexKeep: 6
   app.err:
     es:
-      "@type": elastic-search
-      addrs:
-        - http://127.0.0.1:9200/logc-qa-
-      index: {{ .ProNameUrlSafe }}-app.<2006.01>
+      <<: *app
       type: app-err
-      mapping: *mapping
-      timeField: at
-      indexKeep: 6
+
+app: &app
+  "@type": elastic-search
+  addrs:
+    - http://127.0.0.1:9200/logc-qa-
+  # index can be time series index or regular index.
+  # index doesn't contain "<" and ">" acts as a regular index.
+  # in time series index, string between "<" and ">" acts as time layout.
+  # see https://golang.org/pkg/time/#Parse for time layout format.
+  index: {{ .ProNameUrlSafe }}-app.<2006.01>
+  mapping: *mapping
+
+  ### the following fields is effective only when "index" field is a time series index. ###
+
+  # field used to determine which time series index to write to.
+  timeField: at
+  # the number of latest time series indices to keep. old indices will be deleted.
+  indexKeep: 6
+
 
 mapping: &mapping
   at: { type: date }
