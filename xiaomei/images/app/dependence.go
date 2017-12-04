@@ -25,18 +25,18 @@ func depsCmd() *cobra.Command {
 
 func listDeps() {
 	deps := getAllDeps()
-	vendorDeps := []string{}
-	notVendorDeps := []string{}
+	inVendor := []string{}
+	notInVendor := []string{}
 	for _, dep := range deps {
 		i := strings.Index(dep, `vendor/`)
 		if i > -1 {
-			vendorDeps = append(vendorDeps, dep[i+7:]) // 7 = len(`vendor/`)
+			inVendor = append(inVendor, dep[i+7:]) // 7 = len(`vendor/`)
 		} else {
-			notVendorDeps = append(notVendorDeps, dep)
+			notInVendor = append(notInVendor, dep)
 		}
 	}
-	fmt.Printf("\ndependece in vendor:\n%s\n", strings.Join(vendorDeps, "\n"))
-	fmt.Printf("\ndependece not in vendor:\n%s\n", strings.Join(notVendorDeps, "\n"))
+	fmt.Printf("<dependence in vendor>:\n%s\n", strings.Join(inVendor, "\n"))
+	fmt.Printf("<dependence not in vendor>:\n%s\n", strings.Join(notInVendor, "\n"))
 }
 
 func getAllDeps() []string {
