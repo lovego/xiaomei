@@ -69,7 +69,8 @@ func (s *Server) ListenAndServe() {
 	}()
 
 	<-ch
-	ctx, _ := context.WithDeadline(context.Background(), time.Now().Add(7*time.Second))
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(7*time.Second))
+	defer cancel()
 	if err := s.Server.Shutdown(ctx); err == nil {
 		log.Println(`shutdown`)
 	} else {
