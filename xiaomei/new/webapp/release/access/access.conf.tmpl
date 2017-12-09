@@ -1,7 +1,7 @@
 {{- if .App.Upstream -}}
 upstream {{ .App.Upstream }} {
   {{- range .App.Addrs }}
-  server {{ . }} fail_timeout=1;
+  server {{ . }} fail_timeout=3m;
   {{- end }}
 }
 {{ end -}}
@@ -9,7 +9,7 @@ upstream {{ .App.Upstream }} {
 {{- if .Web.Upstream -}}
 upstream {{ .Web.Upstream }} {
   {{- range .Web.Addrs }}
-  server {{ . }} fail_timeout=1;
+  server {{ . }} fail_timeout=3m;
   {{- end }}
 }
 {{ end -}}
@@ -38,6 +38,7 @@ server {
   proxy_set_header X-Real-IP $remote_addr;
   proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
   proxy_set_header X-Forwarded-Proto $scheme;
+  proxy_connect_timeout 3s;
 
   access_log /var/log/nginx/{{ .Domain }}/access.log;
   error_log  /var/log/nginx/{{ .Domain }}/access.err;
