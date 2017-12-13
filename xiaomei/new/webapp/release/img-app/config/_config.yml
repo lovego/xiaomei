@@ -17,7 +17,7 @@ envs:
   preview:
     <<: *defaults
     domain: {{ .ProNameUrlSafe }}.preview
-  prouduction:
+  production:
     <<: *defaults
     domain: {{ .ProNameUrlSafe }}.com
     secret: {{ .Secret }}
