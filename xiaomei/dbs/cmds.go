@@ -1,4 +1,4 @@
-package db
+package dbs
 
 import (
 	"errors"
@@ -8,12 +8,13 @@ import (
 )
 
 func Cmds() []*cobra.Command {
+	mysqlCmd := makeCmd(`mysql`, `enter mysql cli.`, Mysql)
+	mysqlCmd.AddCommand(makeCmd(`dump`, `mysqldump to stdout.`, MysqlDump), mysqlSetupCmd())
+
 	return []*cobra.Command{
-		makeCmd(`mysql`, `enter mysql cli.`, Mysql),
-		makeCmd(`mysqldump`, `mysqldump to stdout.`, MysqlDump),
+		mysqlCmd,
 		makeCmd(`mongo`, `enter mongo cli.`, Mongo),
 		makeCmd(`redis`, `enter redis cli.`, Redis),
-		setupMysqlCmd(),
 	}
 }
 
@@ -33,9 +34,9 @@ func makeCmd(name, short string, fun func(env, key string, print bool) error) *c
 	return cmd
 }
 
-func setupMysqlCmd() *cobra.Command {
+func mysqlSetupCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   `setup-mysql <sql-file> <env> <key>`,
+		Use:   `setup <sql-file> <env> <key>`,
 		Short: `create mysql databases and tables.`,
 		RunE: func(c *cobra.Command, args []string) error {
 			if len(args) == 0 {

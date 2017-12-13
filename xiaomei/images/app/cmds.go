@@ -7,13 +7,12 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/lovego/cmd"
-	"github.com/lovego/xiaomei/xiaomei/images/app/db"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/spf13/cobra"
 )
 
 func Cmds() []*cobra.Command {
-	return append([]*cobra.Command{
+	return []*cobra.Command{
 		{
 			Use:   `compile`,
 			Short: `compile the app server binary.`,
@@ -22,7 +21,7 @@ func Cmds() []*cobra.Command {
 		specCmd(),
 		depsCmd(),
 		copy2vendorCmd(),
-	}, db.Cmds()...)
+	}
 }
 
 func compile() error {
