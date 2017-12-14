@@ -69,6 +69,10 @@ type accessConfig struct {
 	App, Web *service
 }
 
+func (a accessConfig) DeployName() string {
+	return release.AppConf(a.Env).DeployName()
+}
+
 func (a accessConfig) Domain() string {
 	return release.AppConf(a.Env).Domain
 }

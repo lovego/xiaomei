@@ -47,39 +47,20 @@ func (s *service) Nodes() (nodes []cluster.Node) {
 	if s == nil {
 		return nil
 	}
-	service := conf.GetService(s.svcName, s.Env)
+	nodesCondition := conf.GetService(s.svcName, s.Env).Nodes
 	for _, node := range cluster.Get(s.Env).GetNodes(``) {
-		if node.Match(service.Nodes) {
+		if node.Match(nodesCondition) {
 			nodes = append(nodes, node)
 		}
 	}
 	return nodes
 }
 
-func (s *service) Upstream() (string, error) {
+func (s *service) DeployName() string {
 	if s == nil {
-		return ``, nil
+		return ``
 	}
-	if addrs, err := s.Addrs(); err != nil {
-		return ``, err
-	} else if len(addrs) > 1 {
-		return release.AppConf(s.Env).DeployName() + `_` + s.svcName, nil
-	} else {
-		return ``, nil
-	}
-}
-
-func (s *service) ProxyPass() (string, error) {
-	if s == nil {
-		return ``, nil
-	}
-	if addrs, err := s.Addrs(); err != nil {
-		return ``, err
-	} else if len(addrs) == 1 {
-		return addrs[0], nil
-	} else {
-		return s.Upstream()
-	}
+	return release.AppConf(s.Env).DeployName()
 }
 
 func (s *service) Domain() string {

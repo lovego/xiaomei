@@ -1,17 +1,15 @@
-{{- if .Upstream -}}
-upstream {{ .Upstream }} {
+upstream {{ .DeployName }}_godoc {
   {{- range .Addrs }}
-  server {{ . }} max_fails=0;
+  server {{ . }};
   {{- end }}
 }
-{{ end -}}
 
 server {
   listen 80;
   server_name {{ .Domain }};
 
   location / {
-    proxy_pass http://{{ .ProxyPass }};
+    proxy_pass http://{{ .DeployName }}_godoc;
   }
 
   proxy_set_header Host $http_host;
