@@ -3,6 +3,7 @@ package deploy
 import (
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/images"
+	"github.com/lovego/xiaomei/xiaomei/images/registry"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/spf13/cobra"
 )
@@ -62,6 +63,7 @@ func deployCmdFor(svcName string) *cobra.Command {
 				if err := images.Push(svcName, env, timeTag); err != nil {
 					return err
 				}
+				registry.PruneTimeTags(svcName, env, 10)
 			}
 			return deploy(svcName, env, timeTag, filter)
 		}),

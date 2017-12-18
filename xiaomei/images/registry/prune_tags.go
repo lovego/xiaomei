@@ -21,29 +21,50 @@ func pruneTimeTags(svcName, env string, n int) {
 	if len(tags) <= n {
 		return
 	}
-	removeTimeTags(svcName, env, tags[n:])
+	imgName := conf.GetService(svcName, env).ImageName()
+	reserved := uniqDigestByTags(imgName, env, tags[:n])
+	toRemove := uniqDigestByTags(imgName, env, tags[n:])
+	for digest, _ := range toRemove {
+		if reserved[digest] == nil {
+			delete(toRemove, digest)
+		}
+	}
+	removeTimeTags(imgName, toRemove)
 }
 
 func RemoveTimeTags(svcName, env string, tags []string) {
 	if svcName == `` {
 		for _, svcName := range conf.ServiceNames(env) {
-			removeTimeTags(svcName, env, tags)
+			imgName := conf.GetService(svcName, env).ImageName()
+			removeTimeTags(imgName, uniqDigestByTags(imgName, env, tags))
 		}
 	} else {
-		removeTimeTags(svcName, env, tags)
+		imgName := conf.GetService(svcName, env).ImageName()
+		removeTimeTags(imgName, uniqDigestByTags(imgName, env, tags))
 	}
 }
 
-func removeTimeTags(svcName, env string, tags []string) {
-	imgName := conf.GetService(svcName, env).ImageName()
-	for _, tag := range tags {
-		if digest := Digest(imgName, env+tag); digest != `` {
-			// TODO
-			// it actually delete the image identified by the digest.
-			// so the other tags on the same image are also deleted.
-			// we want to just delete the tag. but we didn't see a remove tag registry api.
-			Remove(imgName, digest)
-			log.Printf("removed %s:%s\n", imgName, env+tag)
+func removeTimeTags(imgName string, toRemove map[string][]string) {
+	for digest, envTags := range toRemove {
+		Remove(imgName, digest)
+		for _, envTag := range envTags {
+			log.Printf("removed %s:%s\n", imgName, envTag)
 		}
 	}
+}
+
+func uniqDigestByTags(imgName, env string, tags []string) map[string][]string {
+	digestMap := make(map[string][]string)
+	for _, tag := range tags {
+		envTag := env + tag
+		digest := Digest(imgName, envTag)
+		envTags := digestMap[digest]
+		if envTags == nil {
+			envTags = []string{envTag}
+		} else {
+			envTags = append(envTags, envTag)
+		}
+		digestMap[digest] = envTags
+	}
+	return digestMap
 }
