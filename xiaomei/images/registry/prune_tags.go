@@ -74,9 +74,12 @@ func filterNotRemove(svcName string, toRemove, reserved, otherEnvTags map[string
 			continue
 		}
 		for tagEnv, envTags := range otherEnvTags {
+			if len(envTags) > 10 {
+				envTags = envTags[:10]
+			}
 			// 默认判断其他环境前10个tag
 			imgName := conf.GetService(svcName, tagEnv).ImageName()
-			top10Digests := uniqDigestByTags(imgName, tagEnv, envTags[:10])
+			top10Digests := uniqDigestByTags(imgName, tagEnv, envTags)
 			if top10Digests[digest] != nil {
 				delete(toRemove, digest)
 			}
