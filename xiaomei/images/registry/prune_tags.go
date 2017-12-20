@@ -17,18 +17,16 @@ func PruneTimeTags(svcName, env string, n int) {
 }
 
 func pruneTimeTags(svcName, env string, n int) {
-	tags := getTimeTagsSlice(svcName, env)
-	if len(tags) <= n {
+	envTagsMap := getEnvTimeTagsMap(svcName, env)
+	curEnvTags := envTagsMap[env]
+	if len(curEnvTags) <= n {
 		return
 	}
+	delete(envTagsMap, env)
 	imgName := conf.GetService(svcName, env).ImageName()
-	reserved := uniqDigestByTags(imgName, env, tags[:n])
-	toRemove := uniqDigestByTags(imgName, env, tags[n:])
-	for digest, _ := range toRemove {
-		if reserved[digest] == nil {
-			delete(toRemove, digest)
-		}
-	}
+	reserved := uniqDigestByTags(imgName, env, curEnvTags[:n])
+	toRemove := uniqDigestByTags(imgName, env, curEnvTags[n:])
+	filterNotRemove(svcName, toRemove, reserved, envTagsMap)
 	removeTimeTags(imgName, toRemove)
 }
 
@@ -67,4 +65,21 @@ func uniqDigestByTags(imgName, env string, tags []string) map[string][]string {
 		digestMap[digest] = envTags
 	}
 	return digestMap
+}
+
+func filterNotRemove(svcName string, toRemove, reserved, otherEnvTags map[string][]string) {
+	for digest, _ := range toRemove {
+		if reserved[digest] != nil {
+			delete(toRemove, digest)
+			continue
+		}
+		for tagEnv, envTags := range otherEnvTags {
+			// 默认判断其他环境前10个tag
+			imgName := conf.GetService(svcName, tagEnv).ImageName()
+			top10Digests := uniqDigestByTags(imgName, tagEnv, envTags[:10])
+			if top10Digests[digest] != nil {
+				delete(toRemove, digest)
+			}
+		}
+	}
 }

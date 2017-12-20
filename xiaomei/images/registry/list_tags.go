@@ -14,8 +14,8 @@ func ListTimeTags(svcName, env string) {
 	if svcName == `` {
 		listSvcsTimeTags(env)
 	} else {
-		tags := getTimeTagsSlice(svcName, env)
-		fmt.Println(strings.Join(tags, "\n"))
+		envTagsMap := getEnvTimeTagsMap(svcName, env)
+		fmt.Println(strings.Join(envTagsMap[env], "\n"))
 	}
 }
 
@@ -75,12 +75,31 @@ func getTimeTagsMap(svcName, env string) map[string]bool {
 	return tags
 }
 
-func getTimeTagsSlice(svcName, env string) (tags []string) {
+func getEnvTimeTagsMap(svcName, env string) map[string][]string {
+	envTagsMap := make(map[string][]string)
 	for _, tag := range Tags(conf.GetService(svcName, env).ImageName()) {
-		if strings.HasPrefix(tag, env) && tag != env {
-			tags = append(tags, tag[len(env):])
+		tagEnv, timeTag := splitTag(tag)
+		if timeTag == `` {
+			continue
 		}
+		envTags := envTagsMap[tagEnv]
+		if envTags == nil {
+			envTags = []string{timeTag}
+		} else {
+			envTags = append(envTags, timeTag)
+		}
+		envTagsMap[tagEnv] = envTags
 	}
-	sort.Sort(sort.Reverse(sort.StringSlice(tags)))
-	return tags
+	for _, envTags := range envTagsMap {
+		sort.Sort(sort.Reverse(sort.StringSlice(envTags)))
+	}
+	return envTagsMap
+}
+
+func splitTag(tag string) (string, string) {
+	tagLen := len(tag)
+	if tagLen < 13 {
+		return tag, ``
+	}
+	return tag[:tagLen-13], tag[tagLen-13:]
 }
