@@ -25,7 +25,10 @@ func compile() error {
 	log.Println(color.GreenString(`compile the tasks binary.`))
 	if cmd.Ok(cmd.O{
 		Dir: filepath.Join(release.Root(), "../tasks"),
-		Env: []string{`GOBIN=` + filepath.Join(release.Root(), `img-app`)},
+		Env: []string{
+			`GOOS=linux`, `GOARCH=amd64`,
+			`GOBIN=` + filepath.Join(release.Root(), `img-app`),
+		},
 	}, `go`, `install`, `-v`) {
 		return nil
 	}
