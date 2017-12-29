@@ -3,7 +3,7 @@ set -e
 
 cd $(dirname $0)
 
-test docker-kill.go -nt docker-kill && go build -v docker-kill.go
+test docker-kill.go -nt docker-kill && GOOS=linux GOARCH=amd64 go build -v docker-kill.go
 
 name=hub.c.163.com/lovego/xiaomei/logc
 

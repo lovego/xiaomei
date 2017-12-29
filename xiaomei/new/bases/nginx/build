@@ -3,7 +3,7 @@ set -e
 
 cd $(dirname $0)
 
-test nginx-start.go -nt nginx-start && go build nginx-start.go
+test nginx-start.go -nt nginx-start && GOOS=linux GOARCH=amd64 go build nginx-start.go
 
 name=hub.c.163.com/lovego/xiaomei/nginx
 
