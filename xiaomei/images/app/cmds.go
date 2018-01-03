@@ -28,11 +28,8 @@ func compile() error {
 	log.Println(color.GreenString(`compile the app server binary.`))
 	if cmd.Ok(cmd.O{
 		Dir: filepath.Join(release.Root(), `..`),
-		Env: []string{
-			`GOOS=linux`, `GOARCH=amd64`,
-			`GOBIN=` + filepath.Join(release.Root(), `img-app`),
-		},
-	}, `go`, `install`, `-v`) {
+		Env: []string{`GOOS=linux`, `GOARCH=amd64`},
+	}, `go`, `build`, `-i`, `-v`, `-o`, filepath.Join(release.Root(), `img-app`, release.Name())) {
 		return gospec(nil, true)
 	}
 	return errors.New(`compile the app server binary failed.`)
