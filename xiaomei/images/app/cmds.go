@@ -29,7 +29,6 @@ func compile() error {
 	if cmd.Ok(cmd.O{
 		Dir: filepath.Join(release.Root(), `..`),
 		Env: []string{
-			`GOOS=linux`, `GOARCH=amd64`,
 			`GOBIN=` + filepath.Join(release.Root(), `img-app`),
 		},
 	}, `go`, `install`, `-v`) {
