@@ -69,12 +69,14 @@ func (s *Server) ListenAndServe() {
 	}()
 
 	<-ch
-	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(7*time.Second))
-	defer cancel()
-	if err := s.Server.Shutdown(ctx); err == nil {
-		log.Println(`shutdown`)
-	} else {
-		log.Printf("shutdown error: %v", err)
+	if runtime.GOOS == "linux" {
+		ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(7*time.Second))
+		defer cancel()
+		if err := s.Server.Shutdown(ctx); err == nil {
+			log.Println(`shutdown`)
+		} else {
+			log.Printf("shutdown error: %v", err)
+		}
 	}
 }
 
