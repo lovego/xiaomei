@@ -3,6 +3,8 @@ package tasks
 import (
 	"errors"
 	"log"
+	"os"
+	"os/signal"
 	"path/filepath"
 
 	"github.com/fatih/color"
@@ -30,6 +32,7 @@ func execCmd() *cobra.Command {
 			if err := compile(); err != nil {
 				return err
 			}
+			signal.Ignore(os.Interrupt)
 			_, err := cmd.Run(cmd.O{
 				Dir: filepath.Join(release.Root(), `..`),
 				Env: []string{
