@@ -13,6 +13,7 @@ import (
 
 func Cmds() []*cobra.Command {
 	return []*cobra.Command{
+		execCmd(),
 		{
 			Use:   `compile`,
 			Short: `compile the app server binary.`,
@@ -22,6 +23,26 @@ func Cmds() []*cobra.Command {
 		depsCmd(),
 		copy2vendorCmd(),
 	}
+}
+
+func execCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   `exec [<env>]`,
+		Short: `compile and execute the app server binary.`,
+		RunE: release.EnvCall(func(env string) error {
+			if err := compile(); err != nil {
+				return err
+			}
+			_, err := cmd.Run(cmd.O{
+				Dir: filepath.Join(release.Root(), `..`),
+				Env: []string{
+					`GODEV=true`, Image{}.EnvironmentEnvName() + `=` + env,
+				},
+			}, filepath.Join(release.Root(), `img-app`, release.Name()))
+			return err
+		}),
+	}
+	return cmd
 }
 
 func compile() error {

@@ -18,7 +18,28 @@ func Cmds() []*cobra.Command {
 			Short: `compile the tasks binary.`,
 			RunE:  release.NoArgCall(compile),
 		},
+		execCmd(),
 	}
+}
+
+func execCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   `exec [<env>]`,
+		Short: `compile and execute the app server binary.`,
+		RunE: release.EnvCall(func(env string) error {
+			if err := compile(); err != nil {
+				return err
+			}
+			_, err := cmd.Run(cmd.O{
+				Dir: filepath.Join(release.Root(), `..`),
+				Env: []string{
+					`GODEV=true`, Image{}.EnvironmentEnvName() + `=` + env,
+				},
+			}, filepath.Join(release.Root(), `img-app/tasks`))
+			return err
+		}),
+	}
+	return cmd
 }
 
 func compile() error {
