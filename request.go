@@ -1,6 +1,8 @@
 package xiaomei
 
 import (
+	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
 	"reflect"
@@ -71,6 +73,17 @@ func (req *Request) SetSession(i interface{}) {
 		req.sessData = v
 		req.sessParsed = true
 	}
+}
+
+func (req *Request) GetBody() []byte {
+	buf, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		log.Printf("read http body error: %v", err)
+	}
+	if err := req.Body.Close(); err != nil {
+		log.Printf("close http body error: %v", err)
+	}
+	return buf
 }
 
 func (req *Request) GetLog() map[string]interface{} {
