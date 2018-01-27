@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	_ "github.com/lib/pg"
+	_ "github.com/lib/pq"
 	"github.com/lovego/xiaomei/config"
 )
 
