@@ -1,21 +1,19 @@
 package postgres
 
 import (
-	"database/sql"
 	"log"
 	"sync"
-	"time"
 
-	_ "github.com/lib/pq"
+	"github.com/go-pg/pg"
 	"github.com/lovego/xiaomei/config"
 )
 
 var postgresDBs = struct {
 	sync.Mutex
-	m map[string]*sql.DB
-}{m: make(map[string]*sql.DB)}
+	m map[string]*pg.DB
+}{m: make(map[string]*pg.DB)}
 
-func DB(name string) *sql.DB {
+func DB(name string) *pg.DB {
 	postgresDBs.Lock()
 	defer postgresDBs.Unlock()
 	db := postgresDBs.m[name]
@@ -26,16 +24,11 @@ func DB(name string) *sql.DB {
 	return db
 }
 
-func newDB(name string) *sql.DB {
-	db, err := sql.Open(`postgres`, config.Get(`postgres`).GetString(name))
+func newDB(name string) *pg.DB {
+	options, err := pg.ParseURL(config.Get(`postgres`).GetString(name))
 	if err != nil {
 		log.Panic(err)
 	}
-	if err := db.Ping(); err != nil {
-		log.Panic(err)
-	}
-	db.SetConnMaxLifetime(time.Minute * 10)
-	db.SetMaxIdleConns(5)
-	db.SetMaxOpenConns(50)
+	db := pg.Connect(options)
 	return db
 }
