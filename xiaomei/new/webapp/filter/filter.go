@@ -16,11 +16,7 @@ func Process(req *xiaomei.Request, res *xiaomei.Response) bool {
 }
 
 var theAllowedOrigins = map[string]bool{
-	`http://risks-ctrl.wumart.com`:     true,
-	`http://qa-risks-ctrl.wumart.com`:  true,
-	`http://dev-risks-ctrl.wumart.com`: true,
-	`http://local.wumart.com`:          true,
-	`http://qa.static.wumart.com`:      true,
+	`http://www.example.com`: true,
 }
 
 func returnCORS(req *xiaomei.Request, res *xiaomei.Response) bool {

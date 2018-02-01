@@ -2,24 +2,24 @@ name: {{ .ProName }}
 envs:
   dev:
     <<: *defaults
-    domain: {{ .ProNameUrlSafe }}.dev
+    domain: {{ .ProNameUrlSafe }}.dev.example.com
     keepers: [ ]
   test:
     <<: *defaults
-    domain: {{ .ProNameUrlSafe }}.test
+    domain: {{ .ProNameUrlSafe }}.test.example.com
     keepers: [ ]
   demo:
     <<: *defaults
-    domain: {{ .ProNameUrlSafe }}.demo
+    domain: {{ .ProNameUrlSafe }}.demo.example.com
   qa:
     <<: *defaults
-    domain: {{ .ProNameUrlSafe }}.qa
+    domain: {{ .ProNameUrlSafe }}.qa.example.com
   preview:
     <<: *defaults
-    domain: {{ .ProNameUrlSafe }}.preview
+    domain: {{ .ProNameUrlSafe }}.preview.example.com
   production:
     <<: *defaults
-    domain: {{ .ProNameUrlSafe }}.com
+    domain: {{ .ProNameUrlSafe }}.example.com
     secret: {{ .Secret }}
 
 defaults: &defaults

@@ -80,9 +80,6 @@ func (req *Request) GetBody() []byte {
 	if err != nil {
 		log.Printf("read http body error: %v", err)
 	}
-	if err := req.Body.Close(); err != nil {
-		log.Printf("close http body error: %v", err)
-	}
 	return buf
 }
 
