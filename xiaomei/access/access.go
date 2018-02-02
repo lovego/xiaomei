@@ -2,14 +2,14 @@ package access
 
 import (
 	"fmt"
-	"strings"
-
-	"github.com/lovego/cmd"
-	"github.com/lovego/xiaomei/xiaomei/cluster"
 )
 
 func accessPrint(env, svcName string) error {
-	nginxConf, _, err := getNginxConf(env, svcName)
+	data, err := getConfig(env, svcName)
+	if err != nil {
+		return err
+	}
+	nginxConf, err := getNginxConf(svcName, data)
 	if err != nil {
 		return err
 	}
@@ -18,26 +18,13 @@ func accessPrint(env, svcName string) error {
 }
 
 func accessSetup(env, svcName, feature string) error {
-	nginxConf, fileName, err := getNginxConf(env, svcName)
+	data, err := getConfig(env, svcName)
 	if err != nil {
 		return err
 	}
-	script := fmt.Sprintf(`
-	sudo tee /etc/nginx/sites-enabled/%s.conf > /dev/null &&
-	sudo mkdir -p /var/log/nginx/%s &&
-	sudo nginx -t && {
-		sudo service nginx reload || which reload-nginx && reload-nginx
+	nginxConf, err := getNginxConf(svcName, data)
+	if err != nil {
+		return err
 	}
-	`, fileName, fileName,
-	)
-	for _, node := range cluster.Get(env).GetNodes(feature) {
-		if node.Labels[`access`] == `true` {
-			if _, err := node.Run(
-				cmd.O{Stdin: strings.NewReader(nginxConf)}, script,
-			); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
+	return setupNginx(env, feature, nginxConf, data)
 }

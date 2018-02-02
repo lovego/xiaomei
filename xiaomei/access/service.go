@@ -4,20 +4,21 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/lovego/xiaomei/config/conf"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
-	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
+	deployConf "github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
 type service struct {
-	Env     string
+	*conf.Conf
 	svcName string
 	addrs   []string
 }
 
 func newService(svcName, env string) *service {
-	if conf.HasService(svcName, env) {
-		return &service{Env: env, svcName: svcName}
+	if deployConf.HasService(svcName, env) {
+		return &service{Conf: release.AppConf(env), svcName: svcName}
 	} else {
 		return nil
 	}
@@ -29,7 +30,7 @@ func (s *service) Addrs() ([]string, error) {
 	}
 	if s.addrs == nil {
 		addrs := []string{}
-		instances := conf.GetService(s.svcName, s.Env).Instances()
+		instances := deployConf.GetService(s.svcName, s.Env).Instances()
 		for _, node := range s.Nodes() {
 			for _, instance := range instances {
 				addrs = append(addrs, node.GetListenAddr()+`:`+instance)
@@ -47,7 +48,7 @@ func (s *service) Nodes() (nodes []cluster.Node) {
 	if s == nil {
 		return nil
 	}
-	nodesCondition := conf.GetService(s.svcName, s.Env).Nodes
+	nodesCondition := deployConf.GetService(s.svcName, s.Env).Nodes
 	for _, node := range cluster.Get(s.Env).GetNodes(``) {
 		if node.Match(nodesCondition) {
 			nodes = append(nodes, node)

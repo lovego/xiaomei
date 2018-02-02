@@ -57,4 +57,10 @@ server {
 
   access_log /var/log/nginx/{{ .Domain }}/access.log;
   error_log  /var/log/nginx/{{ .Domain }}/access.err;
+
+  {{ if .Https -}}
+  location /.well-known {
+    root /var/www/letsencrypt;
+  }
+  {{- end }}
 }
