@@ -32,8 +32,9 @@ func accessSetup() error {
 	script := `
 	sudo tee /etc/nginx/sites-enabled/godoc.dev.conf > /dev/null &&
 	sudo mkdir -p /var/log/nginx/godoc.dev &&
-	sudo nginx -t &&
-	sudo service nginx reload
+	sudo nginx -t && {
+		sudo service nginx reload || which reload-nginx && reload-nginx
+	}
 	`
 	_, err := cmd.Run(
 		cmd.O{Stdin: strings.NewReader(nginxConf)}, `bash`, `-c`, script,

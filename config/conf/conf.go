@@ -7,6 +7,7 @@ import (
 type Conf struct {
 	Name   string `yaml:"-"`
 	Env    string `yaml:"-"`
+	Https  bool   `yaml:"https"`
 	Domain string `yaml:"domain"`
 	Secret string `yaml:"secret"`
 

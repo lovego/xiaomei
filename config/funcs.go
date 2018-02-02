@@ -15,6 +15,10 @@ func DeployName() string {
 	return theConf.DeployName()
 }
 
+func Https() bool {
+	return theConf.Https
+}
+
 func Domain() string {
 	return theConf.Domain
 }

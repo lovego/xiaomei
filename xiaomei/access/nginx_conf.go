@@ -73,6 +73,10 @@ func (a accessConfig) DeployName() string {
 	return release.AppConf(a.Env).DeployName()
 }
 
+func (a accessConfig) Https() bool {
+	return release.AppConf(a.Env).Https
+}
+
 func (a accessConfig) Domain() string {
 	return release.AppConf(a.Env).Domain
 }

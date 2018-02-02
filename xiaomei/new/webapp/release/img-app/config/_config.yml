@@ -13,12 +13,15 @@ envs:
     domain: {{ .ProNameUrlSafe }}.demo.example.com
   qa:
     <<: *defaults
+    https: true
     domain: {{ .ProNameUrlSafe }}.qa.example.com
   preview:
     <<: *defaults
+    https: true
     domain: {{ .ProNameUrlSafe }}.preview.example.com
   production:
     <<: *defaults
+    https: true
     domain: {{ .ProNameUrlSafe }}.example.com
     secret: {{ .Secret }}
 

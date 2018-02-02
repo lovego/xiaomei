@@ -25,8 +25,9 @@ func accessSetup(env, svcName, feature string) error {
 	script := fmt.Sprintf(`
 	sudo tee /etc/nginx/sites-enabled/%s.conf > /dev/null &&
 	sudo mkdir -p /var/log/nginx/%s &&
-	sudo nginx -t &&
-	sudo service nginx reload
+	sudo nginx -t && {
+		sudo service nginx reload || which reload-nginx && reload-nginx
+	}
 	`, fileName, fileName,
 	)
 	for _, node := range cluster.Get(env).GetNodes(feature) {
