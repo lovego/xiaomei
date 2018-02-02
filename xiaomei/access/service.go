@@ -11,14 +11,15 @@ import (
 )
 
 type service struct {
+	CheckCert bool
 	*conf.Conf
 	svcName string
 	addrs   []string
 }
 
-func newService(svcName, env string) *service {
+func newService(svcName, env string, checkCert bool) *service {
 	if deployConf.HasService(svcName, env) {
-		return &service{Conf: release.AppConf(env), svcName: svcName}
+		return &service{CheckCert: checkCert, Conf: release.AppConf(env), svcName: svcName}
 	} else {
 		return nil
 	}

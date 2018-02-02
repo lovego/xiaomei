@@ -3,35 +3,49 @@ package access
 import (
 	"bytes"
 	"io/ioutil"
+	"log"
 	"path/filepath"
 	"strings"
 	"text/template"
 
+	"github.com/fatih/color"
 	"github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-var nginxSetupScriptTmpl = template.Must(template.New(``).Parse(`
+var setupScriptTmpl = template.Must(template.New(``).Parse(`
   set -e
-  {{ if .Https }}
-	# sudo mkir -p /var/www/letsencrypt
-	# sudo certbot certonly --webroot -w /var/www/letsencrypt -d {{ .Domain }}
-	{{ end }}
+	{{ if .CheckCert -}}
+	test -e /letsencrypt/live/{{ .Domain }} && exit 0
+	{{- end }}
 	sudo tee /etc/nginx/sites-enabled/{{ .Domain }}.conf > /dev/null
 	sudo mkdir -p /var/log/nginx/{{ .Domain }}
 	sudo nginx -t
-	sudo service nginx reload || which reload-nginx && reload-nginx
+	sudo service nginx reload || { which reload-nginx && sudo reload-nginx; }
+	{{ if .CheckCert -}}
+	sudo mkdir -p /var/www/letsencrypt
+	sudo certbot certonly --webroot -w /var/www/letsencrypt -d {{ .Domain }}
+	{{- end }}
 `))
 
-func setupNginx(env, feature, nginxConf string, data interface{}) error {
+func setupNginx(env, svcName, feature string, checkCert bool) error {
+	data, err := getConfig(env, svcName, checkCert)
+	if err != nil {
+		return err
+	}
+	nginxConf, err := getNginxConf(svcName, data)
+	if err != nil {
+		return err
+	}
 	var script bytes.Buffer
-	if err := nginxSetupScriptTmpl.Execute(&script, data); err != nil {
+	if err := setupScriptTmpl.Execute(&script, data); err != nil {
 		return err
 	}
 
 	for _, node := range cluster.Get(env).GetNodes(feature) {
 		if node.Labels[`access`] == `true` {
+			log.Println(color.GreenString(node.SshAddr()))
 			if _, err := node.Run(
 				cmd.O{Stdin: strings.NewReader(nginxConf)}, script.String(),
 			); err != nil {

@@ -2,10 +2,12 @@ package access
 
 import (
 	"fmt"
+
+	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
 func accessPrint(env, svcName string) error {
-	data, err := getConfig(env, svcName)
+	data, err := getConfig(env, svcName, false)
 	if err != nil {
 		return err
 	}
@@ -18,13 +20,10 @@ func accessPrint(env, svcName string) error {
 }
 
 func accessSetup(env, svcName, feature string) error {
-	data, err := getConfig(env, svcName)
-	if err != nil {
-		return err
+	if release.AppConf(env).Https {
+		if err := setupNginx(env, svcName, feature, true); err != nil {
+			return err
+		}
 	}
-	nginxConf, err := getNginxConf(svcName, data)
-	if err != nil {
-		return err
-	}
-	return setupNginx(env, feature, nginxConf, data)
+	return setupNginx(env, svcName, feature, false)
 }

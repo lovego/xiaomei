@@ -7,31 +7,29 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-func getConfig(env, svcName string) (interface{}, error) {
+type Config struct {
+	CheckCert bool
+	*conf.Conf
+	App, Web *service
+}
+
+func getConfig(env, svcName string, checkCert bool) (interface{}, error) {
 	if svcName == `` {
 		data := Config{
-			Conf: release.AppConf(env),
-			App:  newService(`app`, env),
-			Web:  newService(`web`, env),
+			CheckCert: checkCert,
+			Conf:      release.AppConf(env),
+			App:       newService(`app`, env, checkCert),
+			Web:       newService(`web`, env, checkCert),
 		}
 		if data.App == nil && data.Web == nil {
 			return nil, fmt.Errorf(`neither app nor web service defined.`, svcName)
 		}
 		return data, nil
 	} else {
-		data := newService(svcName, env)
+		data := newService(svcName, env, checkCert)
 		if data == nil {
 			return nil, fmt.Errorf(`%s service not defined.`, svcName)
 		}
 		return data, nil
 	}
-}
-
-type Config struct {
-	*conf.Conf
-	App, Web *service
-}
-
-func (c Config) Domain() string {
-	return c.Conf.Domain
 }
