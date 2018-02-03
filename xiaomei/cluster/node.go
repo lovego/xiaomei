@@ -47,15 +47,15 @@ func (n Node) GetListenAddr() string {
 
 func (n Node) Run(o cmd.O, script string) (string, error) {
 	var isLocal bool
-	if ok, err := IsCurrentUser(n.user); err != nil {
+	// if ok, err := IsCurrentUser(n.user); err != nil {
+	// 	return ``, err
+	// } else if ok {
+	if ok, err := IsLocalHost(n.Addr); err != nil {
 		return ``, err
-	} else if ok {
-		if ok, err := IsLocalHost(n.Addr); err != nil {
-			return ``, err
-		} else {
-			isLocal = ok
-		}
+	} else {
+		isLocal = ok
 	}
+	// }
 	if isLocal {
 		return cmd.Run(o, `bash`, `-c`, script)
 	} else {

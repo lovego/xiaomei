@@ -12,6 +12,7 @@ func Cmds() []*cobra.Command {
 	mysqlCmd.AddCommand(makeCmd(`dump`, `mysqldump to stdout.`, MysqlDump), mysqlSetupCmd())
 
 	return []*cobra.Command{
+		makeCmd(`psql`, `enter psql cli.`, Psql),
 		mysqlCmd,
 		makeCmd(`mongo`, `enter mongo cli.`, Mongo),
 		makeCmd(`redis`, `enter redis cli.`, Redis),

@@ -10,6 +10,16 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
+func Psql(env, key string, printCmd bool) error {
+	command := `psql ` + release.AppData(env).Get(`postgres`).GetString(key)
+	if printCmd {
+		fmt.Println(command)
+		return nil
+	}
+	_, err := cluster.Get(env).Run(``, cmd.O{}, command)
+	return err
+}
+
 func Mysql(env, key string, printCmd bool) error {
 	flags := dsn.Mysql(release.AppData(env).Get(`mysql`).GetString(key)).Flags()
 	command := `mysql --pager=less -SX ` + strings.Join(flags, ` `)
