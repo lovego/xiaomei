@@ -19,7 +19,7 @@ var setupScriptTmpl = template.Must(template.New(``).Parse(`
 	{{ if .CheckCert -}}
 	test -e /letsencrypt/live/{{ .Domain }} && exit 0
 	{{- end }}
-	sudo tee /etc/nginx/sites-enabled/{{ .Domain }}.conf > /dev/null
+	sudo tee /etc/nginx/sites-enabled/{{ .Domain }} > /dev/null
 	sudo mkdir -p /var/log/nginx/{{ .Domain }}
 	sudo nginx -t
 	sudo service nginx reload || { which reload-nginx && sudo reload-nginx; }
