@@ -15,18 +15,17 @@ import (
 )
 
 var setupScriptTmpl = template.Must(template.New(``).Parse(`
-  set -e
-	{{ if .CheckCert -}}
-	test -e /letsencrypt/live/{{ .Domain }} && exit 0
-	{{- end }}
-	sudo tee /etc/nginx/sites-enabled/{{ .Domain }} > /dev/null
-	sudo mkdir -p /var/log/nginx/{{ .Domain }}
-	sudo nginx -t
-	sudo service nginx reload || { which reload-nginx && sudo reload-nginx; }
-	{{ if .CheckCert -}}
-	sudo mkdir -p /var/www/letsencrypt
-	sudo certbot certonly --webroot -w /var/www/letsencrypt -d {{ .Domain }}
-	{{- end }}
+set -e
+{{ if .CheckCert -}}
+sudo test -e /etc/letsencrypt/live/{{ .Domain }} && exit 0
+{{ end -}}
+sudo tee /etc/nginx/sites-enabled/{{ .Domain }} > /dev/null
+sudo mkdir -p /var/log/nginx/{{ .Domain }}
+sudo systemctl reload nginx || sudo reload-nginx || sudo service nginx reload
+{{ if .CheckCert -}}
+sudo mkdir -p /var/www/letsencrypt
+sudo certbot certonly --webroot -w /var/www/letsencrypt -d {{ .Domain }}
+{{ end -}}
 `))
 
 func setupNginx(env, svcName, feature string, checkCert bool) error {
