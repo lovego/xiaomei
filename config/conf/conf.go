@@ -28,8 +28,8 @@ func (c *Conf) DeployName() string {
 
 func (c *Conf) Url() string {
 	if c.Https {
-		return "https://" + c.Domain + "/"
+		return "https://" + c.Domain
 	} else {
-		return "http://" + c.Domain + "/"
+		return "http://" + c.Domain
 	}
 }
