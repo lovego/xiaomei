@@ -1,7 +1,7 @@
 FROM hub.c.163.com/lovego/xiaomei/logc
 
 COPY logc*.yml logrotate.conf ./
-WORKDIR /home/ubuntu/{{ .ProName }}_logs
+WORKDIR /home/ubuntu/{{ .ProName }}-logs
 RUN chown ubuntu:ubuntu . && chmod 644 ../logrotate.conf
 
 CMD file="../logc_${GOENV:-dev}.yml"; \
