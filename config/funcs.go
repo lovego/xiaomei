@@ -23,6 +23,10 @@ func Domain() string {
 	return theConf.Domain
 }
 
+func Url() string {
+	return theConf.Url()
+}
+
 func Secret() string {
 	return theConf.Secret
 }

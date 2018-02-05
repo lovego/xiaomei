@@ -25,3 +25,11 @@ type timeZone struct {
 func (c *Conf) DeployName() string {
 	return c.Name + `_` + c.Env
 }
+
+func (c *Conf) Url() string {
+	if c.Https {
+		return "https://" + c.Domain + "/"
+	} else {
+		return "http://" + c.Domain + "/"
+	}
+}
