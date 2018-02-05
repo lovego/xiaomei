@@ -114,7 +114,7 @@ func (svc Service) Instances() (instances []string) {
 }
 
 func (svc Service) FirstContainerName() string {
-	name := release.AppConf(svc.env).DeployName() + `_` + svc.name
+	name := release.AppConf(svc.env).DeployName() + `-` + svc.name
 	if instances := svc.Instances(); len(instances) > 0 {
 		name += `.` + instances[0]
 	}

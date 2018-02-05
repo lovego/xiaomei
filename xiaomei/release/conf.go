@@ -3,9 +3,9 @@ package release
 import (
 	"path/filepath"
 
-	"github.com/lovego/xiaomei/config/conf"
 	"github.com/lovego/fs"
 	"github.com/lovego/strmap"
+	"github.com/lovego/xiaomei/config/conf"
 )
 
 var theName string
@@ -35,7 +35,7 @@ func AppConf(env string) *conf.Conf {
 }
 
 func ServiceName(svcName, env string) string {
-	return AppConf(env).DeployName() + `_` + svcName
+	return AppConf(env).DeployName() + `-` + svcName
 }
 
 func AppData(env string) strmap.StrMap {

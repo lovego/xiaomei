@@ -1,4 +1,4 @@
-upstream {{ .DeployName }}_godoc {
+upstream {{ .DeployName }}-godoc {
   {{- range .Addrs }}
   server {{ . }};
   {{- end }}
@@ -10,7 +10,7 @@ server {
   server_name {{ .Domain }};
 
   location / {
-    proxy_pass http://{{ .DeployName }}_godoc;
+    proxy_pass http://{{ .DeployName }}-godoc;
   }
 
   proxy_http_version 1.1;

@@ -1,5 +1,5 @@
 {{- if .App -}}
-upstream {{ .DeployName }}_app {
+upstream {{ .DeployName }}-app {
   {{- range .App.Addrs }}
   server {{ . }} fail_timeout=3m;
   {{- end }}
@@ -8,7 +8,7 @@ upstream {{ .DeployName }}_app {
 {{ end -}}
 
 {{- if .Web -}}
-upstream {{ .DeployName }}_web {
+upstream {{ .DeployName }}-web {
   {{- range .Web.Addrs }}
   server {{ . }} fail_timeout=3m;
   {{- end }}
@@ -31,17 +31,17 @@ server {
 
   {{ if and .App .Web -}}
   location = / {
-    proxy_pass http://{{ .DeployName }}_web;
+    proxy_pass http://{{ .DeployName }}-web;
   }
   location ~ \.(html|js|css|png|gif|jpg|svg|ico|woff|woff2|ttf|eot|map|json)$ {
-    proxy_pass http://{{ .DeployName }}_web;
+    proxy_pass http://{{ .DeployName }}-web;
   }
   location / {
-    proxy_pass http://{{ .DeployName }}_app;
+    proxy_pass http://{{ .DeployName }}-app;
   }
   {{- else -}}
   location / {
-    proxy_pass http://{{ .DeployName }}_{{ if .App }}app{{ else }}web{{ end }};
+    proxy_pass http://{{ .DeployName }}-{{ if .App }}app{{ else }}web{{ end }};
   }
   {{- end }}
 

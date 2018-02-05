@@ -23,7 +23,7 @@ type timeZone struct {
 }
 
 func (c *Conf) DeployName() string {
-	return c.Name + `_` + c.Env
+	return c.Name + `-` + c.Env
 }
 
 func (c *Conf) Url() string {
