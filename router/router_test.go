@@ -29,15 +29,15 @@ var testRoutes = []testRouteData{
 	testRouteData{`postx`, `/(\d+)/destroy`, `destroy`},
 }
 
-func TestNewRouter(t *testing.T) {
-	var r *Router = NewRouter()
+func TestNew(t *testing.T) {
+	var r *Router = New()
 	if r == nil || r.strRoutes == nil || r.regRoutes == nil {
 		t.Error()
 	}
 }
 
 func TestRouter(t *testing.T) {
-	r := NewRouter()
+	r := New()
 	matched := make(map[string]bool)
 	for _, route := range testRoutes {
 		testAddRoute(r, route, matched, t)
@@ -48,7 +48,7 @@ func TestRouter(t *testing.T) {
 func TestGroupRouter(t *testing.T) {
 	var prefix = `/admin`
 
-	r := NewRouter()
+	r := New()
 	g := r.Group(prefix)
 	matched := make(map[string]bool)
 	for _, route := range testRoutes {
@@ -84,7 +84,7 @@ func testHandleReq(
 	method := strings.Replace(route.method, `x`, ``, 1)
 	path := strings.Replace(route.path, `(\d+)`, `123`, 1)
 	req, _ := http.NewRequest(method, prefix+path, nil)
-	r.Handle(&Request{Request: req}, nil)
+	r.Handle(&xiaomei.Request{Request: req}, nil)
 	if !matched[route.name] {
 		t.Errorf(`%s not matched`, prefix+path)
 	}

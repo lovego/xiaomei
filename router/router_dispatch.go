@@ -38,7 +38,8 @@ func (r *Router) regRoutesMatch(method string, path string, req *xiaomei.Request
 	if routes == nil {
 		return false
 	}
-	for p := path; p != ``; {
+	p := path
+	for {
 		if slice := routes[p]; slice != nil {
 			mp := path[len(p):]
 			for _, route := range slice {
@@ -47,6 +48,9 @@ func (r *Router) regRoutesMatch(method string, path string, req *xiaomei.Request
 					return true
 				}
 			}
+		}
+		if p == `` {
+			return false
 		}
 		// 上一层路径
 		if i := strings.LastIndexByte(p, '/'); i > 0 {
