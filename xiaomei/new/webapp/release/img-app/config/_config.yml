@@ -6,7 +6,7 @@ envs:
     keepers: [ ]
   test:
     <<: *defaults
-    domain: {{ .ProNameUrlSafe }}.test.example.com
+    domain: localhost:3000
     keepers: [ ]
   demo:
     <<: *defaults
