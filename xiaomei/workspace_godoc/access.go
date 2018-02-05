@@ -33,7 +33,13 @@ func accessSetup() error {
 set -e
 sudo tee /etc/nginx/sites-enabled/godoc.dev.conf > /dev/null
 sudo mkdir -p /var/log/nginx/godoc.dev
-sudo systemctl reload nginx || sudo reload-nginx || sudo service nginx reload
+if test -f /lib/systemd/system/nginx.service; then
+	sudo systemctl reload nginx
+elif test -x /etc/init.d/nginx; then
+	sudo service nginx reload
+else
+	sudo reload-nginx
+fi
 `
 	_, err := cmd.Run(
 		cmd.O{Stdin: strings.NewReader(nginxConf)}, `bash`, `-c`, script,

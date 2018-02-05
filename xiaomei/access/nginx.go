@@ -21,7 +21,13 @@ sudo test -e /etc/letsencrypt/live/{{ .Domain }} && exit 0
 {{ end -}}
 sudo tee /etc/nginx/sites-enabled/{{ .Domain }} > /dev/null
 sudo mkdir -p /var/log/nginx/{{ .Domain }}
-sudo systemctl reload nginx || sudo reload-nginx || sudo service nginx reload
+if test -f /lib/systemd/system/nginx.service; then
+	sudo systemctl reload nginx
+elif test -x /etc/init.d/nginx; then
+	sudo service nginx reload
+else
+	sudo reload-nginx
+fi
 {{ if .CheckCert -}}
 sudo mkdir -p /var/www/letsencrypt
 sudo certbot certonly --webroot -w /var/www/letsencrypt -d {{ .Domain }}
