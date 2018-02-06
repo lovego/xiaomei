@@ -3,6 +3,7 @@ package postgres
 import (
 	"log"
 	"sync"
+	"time"
 
 	"github.com/go-pg/pg"
 	"github.com/lovego/xiaomei/config"
@@ -30,5 +31,15 @@ func newDB(name string) *pg.DB {
 		log.Panic(err)
 	}
 	db := pg.Connect(options)
+
+	if config.Env() == "dev" || config.Env() == "test" {
+		db.OnQueryProcessed(func(event *pg.QueryProcessedEvent) {
+			query, err := event.FormattedQuery()
+			if err != nil {
+				panic(err)
+			}
+			log.Printf("Postgres: %s %s", time.Since(event.StartTime), query)
+		})
+	}
 	return db
 }
