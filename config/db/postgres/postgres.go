@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"log"
+	"os"
 	"sync"
 	"time"
 
@@ -32,11 +33,11 @@ func newDB(name string) *pg.DB {
 	}
 	db := pg.Connect(options)
 
-	if config.Env() == "dev" || config.Env() == "test" {
+	if os.Getenv("DebugPg") != "" {
 		db.OnQueryProcessed(func(event *pg.QueryProcessedEvent) {
 			query, err := event.FormattedQuery()
 			if err != nil {
-				panic(err)
+				log.Println(err)
 			}
 			log.Printf("Postgres: %s %s", time.Since(event.StartTime), query)
 		})
