@@ -47,7 +47,7 @@ func (res *Response) DataWithKey(data interface{}, err error, key string) {
 			result[`code`] = code.Code()
 		} else {
 			res.LogError(err)
-			result[`code`] = `error`
+			result[`code`] = `server-err`
 		}
 
 		if code, ok := err.(interface {

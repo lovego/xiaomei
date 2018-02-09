@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/go-pg/pg"
 	"github.com/lovego/xiaomei/config"
 )
@@ -39,7 +40,7 @@ func newDB(name string) *pg.DB {
 			if err != nil {
 				log.Println(err)
 			}
-			log.Printf("Postgres: %s %s", time.Since(event.StartTime), query)
+			log.Printf("Postgres: %s %s", time.Since(event.StartTime), color.GreenString(query))
 		})
 	}
 	return db
