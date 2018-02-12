@@ -6,17 +6,15 @@ import (
 	"github.com/lovego/xiaomei"
 )
 
-func Process(req *xiaomei.Request, res *xiaomei.Response) bool {
-	/*
-		if returnCORS(req, res) {
-			return false
-		}
-	*/
-	return true
-}
-
 var theAllowedOrigins = map[string]bool{
 	`http://www.example.com`: true,
+}
+
+func Process(req *xiaomei.Request, res *xiaomei.Response) bool {
+	if returnCORS(req, res) {
+		return false
+	}
+	return true
 }
 
 func returnCORS(req *xiaomei.Request, res *xiaomei.Response) bool {
