@@ -12,11 +12,12 @@ import (
 
 func Psql(env, key string, printCmd bool) error {
 	command := `psql ` + release.AppData(env).Get(`postgres`).GetString(key)
+	envs := []string{"PAGER=less", "LESS=-iMSx4 -FX"}
 	if printCmd {
-		fmt.Println(command)
+		fmt.Println(strings.Join(envs, " "), command)
 		return nil
 	}
-	_, err := cluster.Get(env).Run(``, cmd.O{}, command)
+	_, err := cluster.Get(env).Run(``, cmd.O{Env: envs}, command)
 	return err
 }
 
