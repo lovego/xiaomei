@@ -11,7 +11,11 @@ import (
 
 func shell(svcName, env, feature string) error {
 	_, err := cluster.Get(env).ServiceRun(svcName, feature, cmd.O{},
-		`docker exec -it --detach-keys='ctrl-@' `+conf.GetService(svcName, env).FirstContainerName()+` bash`,
+		fmt.Sprintf(
+			"docker exec -it -e LINES=$(tput lines) -e COLUMNS=$(tput cols) "+
+				"--detach-keys='ctrl-@' %s bash",
+			conf.GetService(svcName, env).FirstContainerName(),
+		),
 	)
 	return err
 }
