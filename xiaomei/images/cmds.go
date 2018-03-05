@@ -66,7 +66,7 @@ func pruneCmdFor(svcName string) *cobra.Command {
 			return nil
 		}),
 	}
-	cmd.Flags().Uint8Var(&n, `n`, 10, `the number of time tags to keep.`)
+	cmd.Flags().Uint8VarP(&n, `number`, `n`, 10, `the number of time tags to keep.`)
 	return cmd
 }
 

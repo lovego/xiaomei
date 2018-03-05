@@ -17,25 +17,22 @@ docker volume create {{ . }}
 {{- end }}
 
 deploy() {
-  local name=$1
-  local args=$2
-  docker stop $name >/dev/null 2>&1 && docker rm $name
-  id=$(docker run --name=$name -d --restart=always $args)
-  while status=$(docker ps -f id="$id" --format {{ "'{{.Status}}'" }}); do
-    echo "$name: $status"
-    case "$status" in
-      "Up "*" (health: starting)" ) sleep 1 ;;
-      "Up "*                      ) break   ;;
-           *                      ) docker logs "$id"; exit  1 ;;
-    esac
-  done
+	local type=$1
+	local name=$2
+	local args=$3
+	docker stop $name >/dev/null 2>&1 && docker rm $name
+	id=$(docker run --name=$name -d --restart=always $args)
+	echo -n "$name starting "
+	test "$type" = app && until docker exec "$id" sh -c 'wget -qO- http://localhost:${GOPORT:-3000}/_alive'; do
+	  echo -n .; sleep 1s;
+	done; echo
 }
 
 {{ range .Services -}}
 args='{{.CommonArgs}}'
 {{ $svc := . -}}
 {{ range .Instances -}}
-deploy {{$svc.Name}}.{{.}} "-e {{$svc.InstanceEnvName}}={{.}} $args"
+deploy {{$svc.Type}} {{$svc.Name}}.{{.}} "-e {{$svc.InstanceEnvName}}={{.}} $args"
 {{ else -}}
 deploy {{.Name}} "$args"
 {{ end }}
@@ -56,8 +53,8 @@ type deployConfig struct {
 	Services        []serviceConfig
 }
 type serviceConfig struct {
-	Name, InstanceEnvName, CommonArgs string
-	Instances                         []string
+	Type, Name, InstanceEnvName, CommonArgs string
+	Instances                               []string
 }
 
 func getDeployConfig(svcNames []string, env, timeTag string) deployConfig {
@@ -73,6 +70,7 @@ func getDeployConfig(svcNames []string, env, timeTag string) deployConfig {
 func getServiceConf(svcName, env, timeTag string) serviceConfig {
 	commonArgs := getCommonArgs(svcName, env, timeTag)
 	data := serviceConfig{
+		Type:            svcName,
 		Name:            release.ServiceName(svcName, env),
 		InstanceEnvName: images.Get(svcName).InstanceEnvName(),
 		CommonArgs:      strings.Join(commonArgs, ` `),

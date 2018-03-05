@@ -39,7 +39,7 @@ func versionCmd() *cobra.Command {
 		Use:   `version`,
 		Short: `show xiaomei version.`,
 		RunE: release.NoArgCall(func() error {
-			fmt.Println(`xiaomei version 18.2.5`)
+			fmt.Println(`xiaomei version 18.3.5`)
 			return nil
 		}),
 	}
