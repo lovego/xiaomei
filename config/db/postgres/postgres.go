@@ -32,6 +32,10 @@ func newDB(name string) *pg.DB {
 	if err != nil {
 		log.Panic(err)
 	}
+
+	options.DialTimeout = 5 * time.Second
+	options.ReadTimeout = 5 * time.Second
+	options.WriteTimeout = 5 * time.Second
 	db := pg.Connect(options)
 
 	if os.Getenv("DebugPg") != "" {
