@@ -7,9 +7,17 @@ import (
 )
 
 func PrintJson(v interface{}) {
-	if data, err := json.MarshalIndent(v, ``, `  `); err != nil {
+	data, err := json.MarshalIndent(v, ``, `  `)
+	if err != nil {
 		log.Panic(err)
-	} else {
-		fmt.Println(string(data))
 	}
+	fmt.Println(string(data))
+}
+
+func SprintJson(v interface{}) string {
+	data, err := json.MarshalIndent(v, ``, `  `)
+	if err != nil {
+		log.Panic(err)
+	}
+	return string(data)
 }
