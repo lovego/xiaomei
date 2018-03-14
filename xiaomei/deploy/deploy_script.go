@@ -34,7 +34,7 @@ args='{{.CommonArgs}}'
 {{ range .Instances -}}
 deploy {{$svc.Type}} {{$svc.Name}}.{{.}} "-e {{$svc.InstanceEnvName}}={{.}} $args"
 {{ else -}}
-deploy {{.Name}} "$args"
+deploy {{$svc.Type}} {{.Name}} "$args"
 {{ end }}
 {{ end -}}
 `
