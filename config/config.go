@@ -11,8 +11,8 @@ import (
 	"github.com/lovego/xiaomei/config/conf"
 )
 
-var theConf = conf.Get(Root()).Get(Env())
-var theData = conf.Data(Root(), Env())
+var theConf = conf.Get(filepath.Join(Root(), `config/config.yml`)).Get(Env())
+var theData = conf.Data(filepath.Join(Root(), `config/envs/`+Env()+`.yml`))
 var theMailer = getMailer()
 
 var theRoot string

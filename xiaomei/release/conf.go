@@ -14,7 +14,7 @@ var appData = map[string]strmap.StrMap{}
 
 func Name() string {
 	if theName == `` {
-		if fs.IsDir(filepath.Join(Root(), `img-app`)) {
+		if AppConfig() != nil {
 			theName = AppConfig().Name
 		} else {
 			theName = filepath.Base(Root())
@@ -25,7 +25,11 @@ func Name() string {
 
 func AppConfig() *conf.Config {
 	if appConfig == nil {
-		appConfig = conf.Get(filepath.Join(Root(), `img-app`))
+		if fs.Exist(filepath.Join(Root(), `img-app`)) {
+			appConfig = conf.Get(filepath.Join(Root(), `img-app/config/config.yml`))
+		} else {
+			appConfig = conf.Get(filepath.Join(Root(), `config.yml`))
+		}
 	}
 	return appConfig
 }
@@ -40,7 +44,11 @@ func ServiceName(svcName, env string) string {
 
 func AppData(env string) strmap.StrMap {
 	if data := appData[env]; data == nil {
-		data = conf.Data(filepath.Join(Root(), `img-app`), env)
+		if fs.Exist(filepath.Join(Root(), `img-app`)) {
+			data = conf.Data(filepath.Join(Root(), `img-app/config/envs/`+env+`.yml`))
+		} else {
+			data = conf.Data(filepath.Join(Root(), `envs/`+env+`.yml`))
+		}
 		appData[env] = data
 		return data
 	} else {

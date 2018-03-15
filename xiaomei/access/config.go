@@ -21,9 +21,11 @@ func getConfig(env, svcName string, checkCert bool) (interface{}, error) {
 			App:       newService(`app`, env, checkCert),
 			Web:       newService(`web`, env, checkCert),
 		}
-		if data.App == nil && data.Web == nil {
-			return nil, fmt.Errorf(`neither app nor web service defined.`, svcName)
-		}
+		/*
+			if data.App == nil && data.Web == nil {
+				return nil, fmt.Error(`neither app nor web service defined.`)
+			}
+		*/
 		return data, nil
 	} else {
 		data := newService(svcName, env, checkCert)

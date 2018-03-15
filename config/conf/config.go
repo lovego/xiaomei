@@ -3,7 +3,6 @@ package conf
 import (
 	"io/ioutil"
 	"log"
-	"path/filepath"
 	"time"
 
 	"gopkg.in/yaml.v2"
@@ -14,8 +13,7 @@ type Config struct {
 	Envs map[string]*Conf
 }
 
-func Get(root string) *Config {
-	path := filepath.Join(root, `config/config.yml`)
+func Get(path string) *Config {
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
 		log.Fatal(err)
@@ -23,7 +21,7 @@ func Get(root string) *Config {
 	config := &Config{}
 	err = yaml.Unmarshal(content, config)
 	if err != nil {
-		log.Fatalf("parse config/config.yml: %v", err)
+		log.Fatalf("parse %s: %v", path, err)
 	}
 	for env, conf := range config.Envs {
 		conf.Name = config.Name
