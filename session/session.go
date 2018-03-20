@@ -31,7 +31,7 @@ func (cs *CookieSession) Get(req *http.Request, p interface{}) bool {
 	ck, _ := req.Cookie(cs.cookie.Name)
 	if ck != nil && ck.Value != `` {
 		if err := cs.secure.Decode(ck.Name, ck.Value, p); err != nil {
-			log.Println(err)
+			log.Println("CookieSession Decode: ", err)
 		} else {
 			return true
 		}
@@ -40,17 +40,23 @@ func (cs *CookieSession) Get(req *http.Request, p interface{}) bool {
 }
 
 func (cs *CookieSession) Set(res http.ResponseWriter, data interface{}) {
+	if ck, err := cs.Make(data); err != nil {
+		log.Println("CookieSession Encode: ", err)
+		return
+	} else {
+		http.SetCookie(res, ck)
+	}
+}
+
+func (cs *CookieSession) Make(data interface{}) (*http.Cookie, error) {
 	ck := cs.cookie // make a copy
 	if data == nil {
 		ck.MaxAge = -1
 		ck.Expires = time.Unix(1, 0)
+	} else if encoded, err := cs.secure.Encode(cs.cookie.Name, data); err == nil {
+		ck.Value = encoded
 	} else {
-		if encoded, err := cs.secure.Encode(cs.cookie.Name, data); err == nil {
-			ck.Value = encoded
-		} else {
-			log.Println(err)
-			return
-		}
+		return nil, err
 	}
-	http.SetCookie(res, &ck)
+	return &ck, nil
 }
