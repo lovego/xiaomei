@@ -2,6 +2,7 @@ package release
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/lovego/slice"
 )
@@ -13,6 +14,9 @@ func RegisterEnvsGetter(getter func() []string) {
 }
 
 func CheckEnv(env string) (string, error) {
+	if env == `` {
+		env = os.Getenv(`GOENV`)
+	}
 	if env == `` {
 		env = `dev`
 	}
