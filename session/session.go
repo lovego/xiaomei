@@ -60,3 +60,7 @@ func (cs *CookieSession) Make(data interface{}) (*http.Cookie, error) {
 	}
 	return &ck, nil
 }
+
+func (cs *CookieSession) Decode(value string, p interface{}) error {
+	return cs.secure.Decode(cs.cookie.Name, value, p)
+}
