@@ -17,7 +17,7 @@ files:
       type: app-err
 
 app: &app
-  "@type": elastic-search
+  "@type": elasticsearch
   addrs:
     - http://127.0.0.1:9200/logc-
   # index can be time series index or regular index.
