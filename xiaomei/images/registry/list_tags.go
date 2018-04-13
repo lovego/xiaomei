@@ -21,7 +21,7 @@ func ListTimeTags(svcName, env string) {
 
 func listSvcsTimeTags(env string) {
 	svcs := conf.ServiceNames(env)
-	svcsTags := make(map[string]map[string]bool)
+	svcsTags := make(map[string]map[string]bool) // map[svcName][env]tag
 	for _, svcName := range svcs {
 		svcsTags[svcName] = getTimeTagsMap(svcName, env)
 	}
@@ -69,7 +69,10 @@ func getTimeTagsMap(svcName, env string) map[string]bool {
 	tags := make(map[string]bool)
 	for _, tag := range Tags(conf.GetService(svcName, env).ImageName()) {
 		if strings.HasPrefix(tag, env) && tag != env {
-			tags[tag[len(env):]] = true
+			tagEnv, timeTag := splitTag(tag)
+			if timeTag != `` && tagEnv == env {
+				tags[timeTag] = true
+			}
 		}
 	}
 	return tags
@@ -79,7 +82,7 @@ func getEnvTimeTagsMap(svcName, env string) map[string][]string {
 	envTagsMap := make(map[string][]string)
 	for _, tag := range Tags(conf.GetService(svcName, env).ImageName()) {
 		tagEnv, timeTag := splitTag(tag)
-		if timeTag == `` {
+		if timeTag == `` || tagEnv != env {
 			continue
 		}
 		envTags := envTagsMap[tagEnv]
@@ -98,8 +101,14 @@ func getEnvTimeTagsMap(svcName, env string) map[string][]string {
 
 func splitTag(tag string) (string, string) {
 	tagLen := len(tag)
-	if tagLen < 13 {
+	if tagLen < 14 {
 		return tag, ``
 	}
-	return tag[:tagLen-13], tag[tagLen-13:]
+	var tagEnv, timeTag string
+	if strings.Index(tag, `-`) < len(tag)-7 {
+		tagEnv, timeTag = tag[:len(tag)-14], tag[len(tag)-13:]
+	} else {
+		tagEnv, timeTag = tag[:len(tag)-13], tag[len(tag)-13:]
+	}
+	return tagEnv, timeTag
 }

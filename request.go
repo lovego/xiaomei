@@ -25,9 +25,12 @@ func NewRequest(request *http.Request, sess session.Session) *Request {
 
 func (req *Request) ClientAddr() string {
 	if addrs := req.Header.Get("X-Forwarded-For"); addrs != `` {
-		return strings.SplitN(addrs, `, `, 2)[0]
+		addr := strings.SplitN(addrs, `, `, 2)[0]
+		if addr != `unknown` {
+			return addr
+		}
 	}
-	if addr := req.Header.Get("X-Real-IP"); addr != `` {
+	if addr := req.Header.Get("X-Real-IP"); addr != `` && addr != `unknown` {
 		return addr
 	}
 	host, _, _ := net.SplitHostPort(req.RemoteAddr)

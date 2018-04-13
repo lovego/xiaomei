@@ -86,7 +86,7 @@ func (svc Service) ImageNameWithTag(timeTag string) string {
 	if timeTag == `` {
 		return svc.Image
 	} else {
-		return svc.Image + `:` + svc.env + timeTag
+		return svc.Image + `:` + svc.env + `-` + timeTag
 	}
 }
 
