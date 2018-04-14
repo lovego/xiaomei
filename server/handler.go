@@ -64,6 +64,6 @@ func handleNotFound(req *xiaomei.Request, res *xiaomei.Response) {
 func handleServerError(req *xiaomei.Request, res *xiaomei.Response) {
 	res.WriteHeader(500)
 	if res.Size() <= 0 {
-		res.Json(map[string]string{"code": "500", "message": "Application Server Error."})
+		res.Json(map[string]string{"code": "server-err", "message": "Fatal Server Error."})
 	}
 }

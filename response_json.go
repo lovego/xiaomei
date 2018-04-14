@@ -46,6 +46,7 @@ func (res *Response) DataWithKey(data interface{}, err error, key string) {
 		}); ok {
 			result[`code`] = code.Code()
 		} else {
+			res.WriteHeader(500)
 			res.LogError(err)
 			result[`code`] = `server-err`
 		}
