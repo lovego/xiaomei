@@ -38,6 +38,7 @@ func newDB(name string) *pg.DB {
 	options.WriteTimeout = 5 * time.Second
 	options.IdleTimeout = time.Minute
 	options.MaxAge = time.Hour
+	options.PoolSize = 100
 
 	db := pg.Connect(options)
 
