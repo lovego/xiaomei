@@ -1,22 +1,22 @@
 package postgres
 
 import (
+	"database/sql"
 	"log"
-	"os"
 	"sync"
 	"time"
 
-	"github.com/fatih/color"
-	"github.com/go-pg/pg"
+	_ "github.com/lib/pq"
+	"github.com/lovego/bsql"
 	"github.com/lovego/xiaomei/config"
 )
 
 var postgresDBs = struct {
 	sync.Mutex
-	m map[string]*pg.DB
-}{m: make(map[string]*pg.DB)}
+	m map[string]*bsql.DB
+}{m: make(map[string]*bsql.DB)}
 
-func DB(name string) *pg.DB {
+func GetDB(name string) *bsql.DB {
 	postgresDBs.Lock()
 	defer postgresDBs.Unlock()
 	db := postgresDBs.m[name]
@@ -27,29 +27,16 @@ func DB(name string) *pg.DB {
 	return db
 }
 
-func newDB(name string) *pg.DB {
-	options, err := pg.ParseURL(config.Get(`postgres`).GetString(name))
+func newDB(name string) *bsql.DB {
+	db, err := sql.Open(`postgres`, config.Get(`postgres`).GetString(name))
 	if err != nil {
 		log.Panic(err)
 	}
-
-	options.DialTimeout = 5 * time.Second
-	options.ReadTimeout = 5 * time.Second
-	options.WriteTimeout = 5 * time.Second
-	options.IdleTimeout = time.Minute
-	options.MaxAge = time.Hour
-	options.PoolSize = 100
-
-	db := pg.Connect(options)
-
-	if os.Getenv("DebugPg") != "" {
-		db.OnQueryProcessed(func(event *pg.QueryProcessedEvent) {
-			query, err := event.FormattedQuery()
-			if err != nil {
-				log.Println(err)
-			}
-			log.Printf("Postgres: %s %s", time.Since(event.StartTime), color.GreenString(query))
-		})
+	if err := db.Ping(); err != nil {
+		log.Panic(err)
 	}
-	return db
+	db.SetConnMaxLifetime(time.Minute * 10)
+	db.SetMaxIdleConns(5)
+	db.SetMaxOpenConns(50)
+	return &bsql.DB{db, 5 * time.Second}
 }
