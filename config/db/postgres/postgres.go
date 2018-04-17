@@ -16,7 +16,7 @@ var postgresDBs = struct {
 	m map[string]*bsql.DB
 }{m: make(map[string]*bsql.DB)}
 
-func GetDB(name string) *bsql.DB {
+func DB(name string) *bsql.DB {
 	postgresDBs.Lock()
 	defer postgresDBs.Unlock()
 	db := postgresDBs.m[name]
