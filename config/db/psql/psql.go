@@ -3,6 +3,7 @@ package postgresql
 import (
 	"database/sql"
 	"log"
+	"strings"
 	"sync"
 	"time"
 
@@ -38,4 +39,27 @@ func newDB(name string) *sql.DB {
 	db.SetMaxIdleConns(5)
 	db.SetMaxOpenConns(50)
 	return db
+}
+
+func RunInTransaction(db *sql.DB, fn func(*sql.Tx) error) error {
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if err := recover(); err != nil {
+			_ = tx.Rollback()
+			panic(err)
+		}
+	}()
+	if err := fn(tx); err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+	return tx.Commit()
+}
+
+func Q(q string) string {
+	return `'` + strings.Replace(q, `'`, `"`, -1) + `'`
 }
