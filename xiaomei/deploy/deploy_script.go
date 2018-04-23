@@ -24,7 +24,10 @@ deploy() {
 	id=$(docker run --name=$name -d --restart=always $args)
 	echo -n "$name starting "
 	test "$type" = app && until docker exec "$id" sh -c 'wget -qO- http://localhost:${GOPORT:-3000}/_alive'; do
-	  echo -n .; sleep 1s;
+		case $(docker ps --format {{ "'{{.Status}}'" }} --filter "id=$id") in
+		Up* ) echo -n .; sleep 1s ;;
+		*   ) docker logs "$id"; sleep 5s ;;
+		esac
 	done; echo
 }
 
