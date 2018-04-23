@@ -13,7 +13,7 @@ func getFields(
 ) map[string]interface{} {
 	m := map[string]interface{}{
 		`at`:       t.Format(time.RFC3339),
-		`duration`: fmt.Sprintf(`%.6f`, time.Since(t).Seconds()),
+		`duration`: fmt.Sprintf(`%.2f`, float64(time.Since(t))/1e6),
 		`host`:     req.Host,
 		`method`:   req.Method,
 		`path`:     req.URL.Path,
