@@ -71,11 +71,11 @@ query: %s
 status: %d
 req_body: %d
 res_body: %d
-proto: %d
+proto: %s
 ip: %s
 agent: %s
 refer: %s
-session: %v
+session: %+v
 children: %+v
 tags: %v
 `, f.Duration, f.Host, f.Method, f.Path, f.Query, f.Status,

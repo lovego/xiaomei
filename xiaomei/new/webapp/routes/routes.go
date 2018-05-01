@@ -4,10 +4,11 @@ import (
 	"errors"
 	"time"
 
+	"github.com/lovego/errs"
+	"github.com/lovego/tracer"
 	"github.com/lovego/xiaomei"
 	"github.com/lovego/xiaomei/config"
 	"github.com/lovego/xiaomei/router"
-	"github.com/lovego/errs"
 )
 
 type session struct {
@@ -20,8 +21,9 @@ func Routes() *router.Router {
 	routes := router.New()
 
 	routes.Get(`/`, func(req *xiaomei.Request, res *xiaomei.Response) {
+		ctx := req.Context()
+		tracer.Tag(ctx, `hello`, `world`)
 		res.Json(map[string]string{`hello`: config.DeployName()})
-		req.Log(map[string]interface{}{`hello`: `world`, `i'm`: `xiaomei`})
 	})
 
 	routes.Get(`/result`, func(req *xiaomei.Request, res *xiaomei.Response) {
