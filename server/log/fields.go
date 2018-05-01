@@ -2,89 +2,92 @@ package log
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/fatih/color"
+	"github.com/lovego/tracer"
 	"github.com/lovego/xiaomei"
 )
 
-func getFields(
-	req *xiaomei.Request, res *xiaomei.Response, t time.Time,
-) map[string]interface{} {
-	m := map[string]interface{}{
-		`at`:       t.Format(time.RFC3339),
-		`duration`: fmt.Sprintf(`%.2f`, float64(time.Since(t))/float64(time.Millisecond)),
-		`host`:     req.Host,
-		`method`:   req.Method,
-		`path`:     req.URL.Path,
-		`query`:    req.URL.RawQuery,
-		`status`:   res.Status(),
+type logFields struct {
+	*tracer.Span
 
-		`req_body`: req.ContentLength,
-		`res_body`: res.Size(),
-		`proto`:    req.Proto,
-		`ip`:       req.ClientAddr(),
-		`agent`:    req.UserAgent(),
-		`refer`:    req.Referer(),
-	}
+	Host   string `json:"host"`
+	Method string `json:"method"`
+	Path   string `json:"path"`
+	Query  string `json:"query"`
+	Status int64  `json:"status"`
 
+	ReqBody int64  `json:"req_body"`
+	ResBody int64  `json:"res_body"`
+	Proto   string `json:"proto"`
+	Ip      string `json:"ip"`
+	Agent   string `json:"agent"`
+	Refer   string `json:"refer"`
+
+	Session interface{} `json:"session,omitempty"`
+	Error   string      `json:"error,omitempty"`
+	Stack   string      `json:"stack,omitempty"`
+}
+
+func getFields(req *xiaomei.Request, res *xiaomei.Response) *logFields {
 	var sess interface{}
 	req.Session(&sess)
-	if sess != nil {
-		m[`session`] = sess
-	}
 
-	// custom log fields
-	for k, v := range req.GetLog() {
-		m[k] = v
+	return &logFields{
+		Span: req.Span,
+
+		Host:   req.Host,
+		Method: req.Method,
+		Path:   req.URL.Path,
+		Query:  req.URL.RawQuery,
+		Status: res.Status(),
+
+		ReqBody: req.ContentLength,
+		ResBody: res.Size(),
+		Proto:   req.Proto,
+		Ip:      req.ClientAddr(),
+		Agent:   req.UserAgent(),
+		Refer:   req.Referer(),
+		Session: sess,
+
+		Error: req.Error,
+		Stack: req.Stack,
 	}
-	return m
 }
 
-var fieldsAry = []string{
-	`duration`, `host`, `method`, `path`, `query`, `status`,
-	`req_body`, `res_body`, `proto`, `ip`, `agent`, `refer`,
-}
-var fieldsMap = makeFieldsMap(fieldsAry)
-
-func formatFields(fields map[string]interface{}, highlight bool) (result string) {
+func formatFields(f *logFields, highlight bool) (result string) {
 	if highlight {
-		result += color.GreenString("at: %v\n", fields[`at`])
+		result += color.GreenString("at: %v", f.At)
 	} else {
-		result += fmt.Sprintf("at: %v\n", fields[`at`])
+		result += fmt.Sprintf("at: %v", f.At)
 	}
 
-	for _, k := range fieldsAry {
-		result += fmt.Sprintf("%s: %v\n", k, fields[k])
+	result += fmt.Sprintf(`
+duration: %v
+host: %s
+method: %s
+path: %s
+query: %s
+status: %d
+req_body: %d
+res_body: %d
+proto: %d
+ip: %s
+agent: %s
+refer: %s
+session: %v
+children: %+v
+tags: %v
+`, f.Duration, f.Host, f.Method, f.Path, f.Query, f.Status,
+		f.ReqBody, f.ResBody, f.Proto, f.Ip, f.Agent, f.Refer, f.Session,
+		f.Children, f.Tags,
+	)
+
+	if f.Error != "" {
+		result += f.Error + "\n"
 	}
-	for k, v := range fields {
-		if !fieldsMap[k] {
-			result += fmt.Sprintf("%s: %v\n", k, v)
-		}
-	}
-	if err := fields[`err`]; err != nil {
-		if errStr, ok := err.(string); ok {
-			result += errStr + "\n"
-		} else {
-			result += fmt.Sprint(err) + "\n"
-		}
-	}
-	if stack := fields[`stack`]; stack != nil {
-		if stackStr, ok := stack.(string); ok {
-			result += stackStr + "\n"
-		} else {
-			result += fmt.Sprint(stack) + "\n"
-		}
+	if f.Stack != "" {
+		result += f.Stack + "\n"
 	}
 	return
-}
-
-func makeFieldsMap(ary []string) map[string]bool {
-	m := map[string]bool{`at`: true}
-	for _, k := range ary {
-		m[k] = true
-	}
-	m[`err`] = true
-	m[`stack`] = true
-	return m
 }

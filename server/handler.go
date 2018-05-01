@@ -24,14 +24,14 @@ func (s *Server) Handler() (handler http.Handler) {
 
 func (s *Server) ServeHTTP(response http.ResponseWriter, request *http.Request) {
 	startTime := time.Now()
-	psData.Add(request.Method, request.URL.Path, startTime)
-	defer psData.Remove(request.Method, request.URL.Path, startTime)
-
-	req := xiaomei.NewRequest(request, s.Session)
+	req := xiaomei.NewRequest(request, s.Session, startTime)
 	res := xiaomei.NewResponse(response, req, s.Session, s.Renderer, s.LayoutDataFunc)
 
 	var notFound bool
-	defer handleError(startTime, req, res, &notFound)
+	defer handleError(req, res, &notFound)
+
+	psData.Add(request.Method, request.URL.Path, startTime)
+	defer psData.Remove(request.Method, request.URL.Path, startTime)
 
 	// 如果返回true，继续交给路由处理
 	if strings.HasPrefix(req.URL.Path, `/_`) || s.FilterFunc == nil || s.FilterFunc(req, res) {
@@ -39,7 +39,7 @@ func (s *Server) ServeHTTP(response http.ResponseWriter, request *http.Request) 
 	}
 }
 
-func handleError(t time.Time, req *xiaomei.Request, res *xiaomei.Response, notFound *bool) {
+func handleError(req *xiaomei.Request, res *xiaomei.Response, notFound *bool) {
 	if *notFound {
 		handleNotFound(req, res)
 	}
@@ -51,7 +51,8 @@ func handleError(t time.Time, req *xiaomei.Request, res *xiaomei.Response, notFo
 	if err == nil && strings.HasPrefix(req.URL.Path, `/_`) {
 		return
 	}
-	log.Write(req, res, t, err)
+	req.Span.Finish()
+	log.Write(req, res, err)
 }
 
 func handleNotFound(req *xiaomei.Request, res *xiaomei.Response) {

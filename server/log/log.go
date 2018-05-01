@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/lovego/errs"
 	"github.com/lovego/fs"
@@ -35,33 +34,26 @@ func getLogWriter() (io.Writer, io.Writer) {
 	return accessLog, errorLog
 }
 
-func Write(req *xiaomei.Request, res *xiaomei.Response, t time.Time, err interface{}) {
-	fields := getFields(req, res, t)
-	if err != nil {
-		fields[`err`] = fmt.Sprintf("Panic: %v", err)
-		fields[`stack`] = errs.Stack(3)
-	} else if err = fields[`err`]; err != nil {
-		if _, ok := err.(string); !ok {
-			fields[`err`] = fmt.Sprint(err)
-		}
+func Write(req *xiaomei.Request, res *xiaomei.Response, panicError interface{}) {
+	fields := getFields(req, res)
+	if panicError != nil {
+		fields.Error = fmt.Sprintf("Panic: %v", panicError)
+		fields.Stack = errs.Stack(3)
 	}
-
 	if line := serializeFields(fields); len(line) > 0 {
-		if err != nil {
+		if fields.Error != "" {
 			theErrorLog.Write(line)
 		} else {
 			theAccessLog.Write(line)
 		}
 	}
 
-	if err != nil {
-		errStr := fields[`err`].(string)
-		errStack, _ := fields[`stack`].(string)
-		alarm.Alarm(errStr, formatFields(fields, false), errStr+` `+errStack)
+	if fields.Error != "" {
+		alarm.Alarm(fields.Error, formatFields(fields, false), fields.Error+` `+fields.Stack)
 	}
 }
 
-func serializeFields(fields map[string]interface{}) []byte {
+func serializeFields(fields *logFields) []byte {
 	if isDevMode {
 		return []byte(formatFields(fields, true))
 	}

@@ -1,26 +1,30 @@
 package xiaomei
 
 import (
+	"context"
 	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"reflect"
 	"strings"
+	"time"
 
+	"github.com/lovego/tracer"
 	"github.com/lovego/xiaomei/session"
 )
 
 type Request struct {
 	*http.Request
-	sess       session.Session
-	sessParsed bool
-	sessData   reflect.Value
-	log        map[string]interface{}
+	sess         session.Session
+	sessParsed   bool
+	sessData     reflect.Value
+	Span         *tracer.Span
+	Error, Stack string
 }
 
-func NewRequest(request *http.Request, sess session.Session) *Request {
-	return &Request{Request: request, sess: sess}
+func NewRequest(request *http.Request, sess session.Session, at time.Time) *Request {
+	return &Request{Request: request, sess: sess, Span: &tracer.Span{At: at}}
 }
 
 func (req *Request) ClientAddr() string {
@@ -78,23 +82,14 @@ func (req *Request) SetSession(i interface{}) {
 	}
 }
 
+func (req *Request) Context() context.Context {
+	return tracer.Context(context.Background(), req.Span)
+}
+
 func (req *Request) GetBody() []byte {
 	buf, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Printf("read http body error: %v", err)
 	}
 	return buf
-}
-
-func (req *Request) GetLog() map[string]interface{} {
-	return req.log
-}
-
-func (req *Request) Log(m map[string]interface{}) {
-	if req.log == nil {
-		req.log = make(map[string]interface{})
-	}
-	for k, v := range m {
-		req.log[k] = v
-	}
 }

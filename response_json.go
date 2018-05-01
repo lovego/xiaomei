@@ -78,11 +78,10 @@ func (res *Response) LogError(err error) {
 	if err == nil {
 		return
 	}
-	log := map[string]interface{}{`err`: err}
+	res.Request.Error = err.Error()
 	if stack, ok := err.(interface {
 		Stack() string
 	}); ok {
-		log[`stack`] = stack.Stack()
+		res.Request.Stack = stack.Stack()
 	}
-	res.Log(log)
 }
