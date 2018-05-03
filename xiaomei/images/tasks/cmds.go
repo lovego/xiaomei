@@ -10,6 +10,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/xiaomei/release"
+	"github.com/lovego/xiaomei/xiaomei/spec"
 	"github.com/spf13/cobra"
 )
 
@@ -53,7 +54,7 @@ func compile() error {
 			`GOBIN=` + filepath.Join(release.Root(), `img-app`),
 		},
 	}, `go`, `install`, `-v`) {
-		return nil
+		return spec.RunAll()
 	}
 	return errors.New(`compile the tasks binary failed.`)
 }

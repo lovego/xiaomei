@@ -17,8 +17,9 @@ import (
 func main() {
 	cobra.EnableCommandSorting = false
 	root := &cobra.Command{
-		Use:   `xiaomei`,
-		Short: `be small and beautiful.`,
+		Use:          `xiaomei`,
+		Short:        `be small and beautiful.`,
+		SilenceUsage: true,
 	}
 	root.AddCommand(serviceCmds()...)
 	root.AddCommand(cluster.Cmds()...)
