@@ -76,8 +76,8 @@ method: %s
 path: %s
 query: %s
 status: %d
-req_body: %d
-res_body: %d
+req_body_size: %d
+res_body_size: %d
 proto: %s
 ip: %s
 agent: %s
@@ -86,7 +86,7 @@ session: %+v
 children: %+v
 tags: %v
 `, f.Duration, f.Host, f.Method, f.Path, f.Query, f.Status,
-		f.ReqBody, f.ResBody, f.Proto, f.Ip, f.Agent, f.Refer, f.Session,
+		f.ReqBodySize, f.ResBodySize, f.Proto, f.Ip, f.Agent, f.Refer, f.Session,
 		f.Children, f.Tags,
 	)
 	if logBody {
