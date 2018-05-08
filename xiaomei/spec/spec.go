@@ -1,4 +1,4 @@
-package app
+package spec
 
 import (
 	"errors"
@@ -14,20 +14,24 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func specCmd() *cobra.Command {
+func Cmd() *cobra.Command {
 	var onlyChanged bool
 	cmd := &cobra.Command{
 		Use:   `spec`,
 		Short: `check code spec.`,
 		RunE: func(c *cobra.Command, args []string) error {
-			return gospec(args, onlyChanged)
+			return Run(args, onlyChanged)
 		},
 	}
-	cmd.Flags().BoolVarP(&onlyChanged, `only-changed`, `c`, true, `only check the changed files.`)
+	cmd.Flags().BoolVarP(&onlyChanged, `only-changed`, `c`, false, `only check the changed files.`)
 	return cmd
 }
 
-func gospec(targets []string, onlyChanged bool) error {
+func RunAll() error {
+	return Run(nil, false)
+}
+
+func Run(targets []string, onlyChanged bool) error {
 	log.Println(color.GreenString(`check app code spec.`))
 	if err := os.Chdir(filepath.Join(release.Root(), `..`)); err != nil {
 		panic(err)

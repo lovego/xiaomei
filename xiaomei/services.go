@@ -10,6 +10,7 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/images/logc"
 	"github.com/lovego/xiaomei/xiaomei/images/tasks"
 	"github.com/lovego/xiaomei/xiaomei/images/web"
+	"github.com/lovego/xiaomei/xiaomei/spec"
 	"github.com/spf13/cobra"
 )
 
@@ -20,6 +21,7 @@ func serviceCmds() []*cobra.Command {
 		serviceCmd(`web`, `the web server.`, web.Cmds()),
 		serviceCmd(`logc`, `the log collector.`, logc.Cmds()),
 		serviceCmd(`godoc`, `the godoc server.`, godoc.Cmds()),
+		spec.Cmd(),
 	}, dbs.Cmds()...)
 }
 
