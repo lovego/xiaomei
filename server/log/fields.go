@@ -17,14 +17,14 @@ type logFields struct {
 	Query  string `json:"query"`
 	Status int64  `json:"status"`
 
-	ReqBody     string `json:"req_body"`
-	ReqBodySize int64  `json:"req_body_size"`
-	ResBody     string `json:"res_body"`
-	ResBodySize int64  `json:"res_body_size"`
-	Proto       string `json:"proto"`
-	Ip          string `json:"ip"`
-	Agent       string `json:"agent"`
-	Refer       string `json:"refer"`
+	ReqBody     interface{} `json:"req_body,omitempty"`
+	ReqBodySize int64       `json:"req_body_size"`
+	ResBody     interface{} `json:"res_body,omitempty"`
+	ResBodySize int64       `json:"res_body_size"`
+	Proto       string      `json:"proto"`
+	Ip          string      `json:"ip"`
+	Agent       string      `json:"agent"`
+	Refer       string      `json:"refer"`
 
 	Session interface{} `json:"session,omitempty"`
 	Error   string      `json:"error,omitempty"`
@@ -90,7 +90,7 @@ tags: %v
 		f.Children, f.Tags,
 	)
 	if logBody {
-		line += fmt.Sprintf("req_body: %s\nres_body: %s\n", f.ReqBody, f.ResBody)
+		line += fmt.Sprintf("req_body: %v\nres_body: %v\n", f.ReqBody, f.ResBody)
 	}
 	result += line
 
