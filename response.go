@@ -20,6 +20,7 @@ type Response struct {
 	sess           session.Session
 	renderer       *renderer.Renderer
 	layoutDataFunc LayoutDataFunc
+	body           []byte
 }
 
 func NewResponse(
@@ -44,6 +45,11 @@ func (res *Response) GetLayoutData(layout string, data interface{}) interface{} 
 		return data
 	}
 	return res.layoutDataFunc(layout, data, res.Request, res)
+}
+
+func (res *Response) Write(content []byte) (int, error) {
+	res.body = append(res.body, content...)
+	return res.ResponseWriter.Write(content)
 }
 
 func (res *Response) Render(path string, data interface{}, options ...renderer.O) {
@@ -82,6 +88,10 @@ func (res *Response) Status() int64 {
 	} else {
 		return 0
 	}
+}
+
+func (res *Response) GetBody() []byte {
+	return res.body
 }
 
 func (res *Response) Size() int64 {

@@ -34,13 +34,13 @@ func getLogWriter() (io.Writer, io.Writer) {
 	return accessLog, errorLog
 }
 
-func Write(req *xiaomei.Request, res *xiaomei.Response, panicError interface{}) {
-	fields := getFields(req, res)
+func Write(req *xiaomei.Request, res *xiaomei.Response, panicError interface{}, logBody bool) {
+	fields := getFields(req, res, logBody)
 	if panicError != nil {
 		fields.Error = fmt.Sprintf("Panic: %v", panicError)
 		fields.Stack = errs.Stack(3)
 	}
-	if line := serializeFields(fields); len(line) > 0 {
+	if line := serializeFields(fields, logBody); len(line) > 0 {
 		if fields.Error != "" {
 			theErrorLog.Write(line)
 		} else {
@@ -49,13 +49,13 @@ func Write(req *xiaomei.Request, res *xiaomei.Response, panicError interface{}) 
 	}
 
 	if fields.Error != "" {
-		alarm.Alarm(fields.Error, formatFields(fields, false), fields.Error+` `+fields.Stack)
+		alarm.Alarm(fields.Error, formatFields(fields, false, logBody), fields.Error+` `+fields.Stack)
 	}
 }
 
-func serializeFields(fields *logFields) []byte {
+func serializeFields(fields *logFields, logBody bool) []byte {
 	if isDevMode {
-		return []byte(formatFields(fields, true))
+		return []byte(formatFields(fields, true, logBody))
 	}
 	line, err := json.Marshal(fields)
 	if err != nil {

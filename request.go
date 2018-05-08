@@ -1,6 +1,7 @@
 package xiaomei
 
 import (
+	"bytes"
 	"context"
 	"io/ioutil"
 	"log"
@@ -21,10 +22,13 @@ type Request struct {
 	sessData     reflect.Value
 	Span         *tracer.Span
 	Error, Stack string
+	body         []byte
 }
 
 func NewRequest(request *http.Request, sess session.Session, at time.Time) *Request {
-	return &Request{Request: request, sess: sess, Span: &tracer.Span{At: at}}
+	req := &Request{Request: request, sess: sess, Span: &tracer.Span{At: at}}
+	req.cloneBody()
+	return req
 }
 
 func (req *Request) ClientAddr() string {
@@ -87,9 +91,21 @@ func (req *Request) Context() context.Context {
 }
 
 func (req *Request) GetBody() []byte {
+	if req.body != nil {
+		return req.body
+	}
 	buf, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Printf("read http body error: %v", err)
 	}
 	return buf
+}
+
+func (req *Request) cloneBody() {
+	body := req.GetBody()
+	req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+	if len(body) == 0 {
+		return
+	}
+	req.body = body
 }

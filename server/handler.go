@@ -52,7 +52,7 @@ func handleError(req *xiaomei.Request, res *xiaomei.Response, notFound *bool) {
 		return
 	}
 	req.Span.Finish()
-	log.Write(req, res, err)
+	log.Write(req, res, err, logBody)
 }
 
 func handleNotFound(req *xiaomei.Request, res *xiaomei.Response) {

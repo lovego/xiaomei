@@ -14,6 +14,8 @@ import (
 
 const pprofPath = `/_pprof`
 
+var logBody = false
+
 func sysRoutes(router *router.Router) {
 	router.Root().
 		// 存活检测
@@ -24,6 +26,12 @@ func sysRoutes(router *router.Router) {
 		Get(`/_ps`, func(req *xiaomei.Request, res *xiaomei.Response) {
 			res.Write(psData.ToJson())
 		}).
+		// 修改是否记录request body和response body的标记
+		GetX(`/_log_body/(true|false)`,
+			func(req *xiaomei.Request, res *xiaomei.Response, params []string) {
+				logBody = params[1] == `true`
+				res.Write([]byte(`ok`))
+			}).
 		// 性能分析
 		Group(pprofPath).Get(`/`, routePprofIndex).GetX(`/(.+)`, routePprofGet)
 }

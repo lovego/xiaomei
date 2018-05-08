@@ -38,5 +38,5 @@ func newDB(name string) *bsql.DB {
 	db.SetConnMaxLifetime(time.Minute * 10)
 	db.SetMaxIdleConns(5)
 	db.SetMaxOpenConns(50)
-	return &bsql.DB{db, 5 * time.Second}
+	return bsql.New(db, 5*time.Second)
 }
