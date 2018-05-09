@@ -4,11 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/fatih/color"
+	"github.com/lovego/slice"
 	"github.com/lovego/tracer"
 	"github.com/lovego/xiaomei"
 )
+
+var allowMethods = []string{http.MethodPost, http.MethodDelete, http.MethodPut}
 
 type logFields struct {
 	*tracer.Span
@@ -57,7 +61,7 @@ func getFields(req *xiaomei.Request, res *xiaomei.Response, logBody bool) *logFi
 		Error: req.Error,
 		Stack: req.Stack,
 	}
-	if logBody {
+	if logBody && slice.ContainsString(allowMethods, req.Method) {
 		fields.ReqBody = string(req.GetBody())
 		fields.ResBody = string(res.GetBody())
 	}

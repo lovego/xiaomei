@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
+	"os"
 	"runtime"
 	"runtime/pprof"
 	"strconv"
@@ -14,7 +15,7 @@ import (
 
 const pprofPath = `/_pprof`
 
-var logBody = false
+var logBody = true
 
 func sysRoutes(router *router.Router) {
 	router.Root().
@@ -26,6 +27,15 @@ func sysRoutes(router *router.Router) {
 		Get(`/_ps`, func(req *xiaomei.Request, res *xiaomei.Response) {
 			res.Write(psData.ToJson())
 		}).
+		// 返回当前机器是否记录的标记
+		GetX(`/_log_body`,
+			func(req *xiaomei.Request, res *xiaomei.Response, params []string) {
+				hostname, err := os.Hostname()
+				res.Data(struct {
+					HostName string
+					LogBody  bool
+				}{hostname, logBody}, err)
+			}).
 		// 修改是否记录request body和response body的标记
 		GetX(`/_log_body/(true|false)`,
 			func(req *xiaomei.Request, res *xiaomei.Response, params []string) {
