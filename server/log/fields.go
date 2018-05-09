@@ -1,7 +1,9 @@
 package log
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 
 	"github.com/fatih/color"
 	"github.com/lovego/tracer"
@@ -69,6 +71,14 @@ func formatFields(f *logFields, highlight, logBody bool) (result string) {
 		result += fmt.Sprintf("at: %v", f.At)
 	}
 
+	children, err := json.Marshal(f.Children)
+	if err != nil {
+		log.Println(err)
+	}
+	tags, err := json.Marshal(f.Tags)
+	if err != nil {
+		log.Println(err)
+	}
 	line := fmt.Sprintf(`
 duration: %v
 host: %s
@@ -83,11 +93,11 @@ ip: %s
 agent: %s
 refer: %s
 session: %+v
-children: %+v
-tags: %v
+children: %s
+tags: %s
 `, f.Duration, f.Host, f.Method, f.Path, f.Query, f.Status,
 		f.ReqBodySize, f.ResBodySize, f.Proto, f.Ip, f.Agent, f.Refer, f.Session,
-		f.Children, f.Tags,
+		children, tags,
 	)
 	if logBody {
 		line += fmt.Sprintf("req_body: %v\nres_body: %v\n", f.ReqBody, f.ResBody)
