@@ -1,8 +1,8 @@
 FROM hub.c.163.com/lovego/xiaomei/godoc
 
-WORKDIR /home/ubuntu/go/src/{{ .ProPath }}
+WORKDIR /home/ubuntu/go/src
 
-COPY routes ./routes
-COPY models ./models
-COPY filter ./filter
-COPY helpers ./helpers
+COPY {{ .ProPath }}/routes ./routes
+COPY {{ .ProPath }}/models ./models
+COPY {{ .ProPath }}/filter ./filter
+COPY {{ .ProPath }}/helpers ./helpers

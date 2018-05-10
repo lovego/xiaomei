@@ -24,7 +24,7 @@ app: &app
   # index doesn't contain "<" and ">" acts as a regular index.
   # in time series index, string between "<" and ">" acts as time layout.
   # see https://golang.org/pkg/time/#Parse for time layout format.
-  index: {{ .ProNameUrlSafe }}-app.<2006.01>
+  index: {{ .ProNameUrlSafe }}-app.<2006.01.02>
   mapping: *mapping
 
   ### the following fields is effective only when "index" field is a time series index. ###
@@ -32,7 +32,7 @@ app: &app
   # field used to determine which time series index to write to.
   timeField: at
   # the number of latest time series indices to keep. old indices will be deleted.
-  indexKeep: 6
+  indexKeep: 3
 
 
 mapping: &mapping
@@ -43,8 +43,10 @@ mapping: &mapping
   path: { type: text, fields: { raw: { type: keyword } } }
   query: { type: text }
   status: { type: keyword }
-  req_body: { type: integer }
-  res_body: { type: integer }
+  req_body_size: { type: integer }
+  req_body: { type: text }
+  res_body_size: { type: integer }
+  res_body: { type: text }
   ip: { type: ip }
   refer: { type: text }
   agent: { type: text }
