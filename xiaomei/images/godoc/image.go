@@ -3,6 +3,8 @@ package godoc
 import (
 	"os"
 	"path/filepath"
+
+	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
 type Image struct {
@@ -17,5 +19,5 @@ func (i Image) BuildDir() string {
 }
 
 func (i Image) Dockerfile() string {
-	return `release/img-godoc/Dockerfile`
+	return filepath.Join(release.Root(), `img-godoc/Dockerfile`)
 }
