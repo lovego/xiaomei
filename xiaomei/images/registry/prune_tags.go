@@ -86,7 +86,7 @@ func reservedDigest(svcName, curEnv string, envTagsMap map[string][]string) map[
 func uniqDigestByTags(imgName, env string, tags []string) map[string][]string {
 	digestMap := make(map[string][]string)
 	for _, tag := range tags {
-		envTag := env + tag
+		envTag := env + `-` + tag
 		digest := Digest(imgName, envTag)
 		envTags := digestMap[digest]
 		if envTags == nil {
