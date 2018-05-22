@@ -2,13 +2,12 @@ package filter
 
 import (
 	"net/http"
+	"net/url"
+	"strings"
 
 	"github.com/lovego/xiaomei"
+	"github.com/lovego/xiaomei/config"
 )
-
-var theAllowedOrigins = map[string]bool{
-	`http://www.example.com`: true,
-}
 
 func Process(req *xiaomei.Request, res *xiaomei.Response) bool {
 	if returnCORS(req, res) {
@@ -22,7 +21,7 @@ func returnCORS(req *xiaomei.Request, res *xiaomei.Response) bool {
 	if origin == `` {
 		return false
 	}
-	if !theAllowedOrigins[origin] {
+	if !isAllowed(origin) {
 		res.WriteHeader(http.StatusForbidden)
 		res.Write([]byte(`origin not allowed.`))
 		return true
@@ -35,6 +34,18 @@ func returnCORS(req *xiaomei.Request, res *xiaomei.Response) bool {
 	if req.Method == `OPTIONS` { // preflight 预检请求
 		res.Header().Set(`Access-Control-Max-Age`, `86400`)
 		res.Header().Set(`Access-Control-Allow-Methods`, `GET, POST, PUT, DELETE`)
+		return true
+	}
+	return false
+}
+
+func isAllowed(origin string) bool {
+	u, err := url.Parse(origin)
+	if err != nil {
+		return false
+	}
+	hostname := u.Hostname()
+	if strings.HasSuffix(hostname, config.Domain()) || hostname == `localhost` {
 		return true
 	}
 	return false
