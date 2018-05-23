@@ -1,9 +1,9 @@
 # POST /example/path（API文档样例）
 
 ## 请求头说明
-| Header名称   | Header值   | 必需 | 说明
+| Header       | 中文名称   | 必需 | 说明
 | ------------ | --------   | ---- | -----------------
-| Header1      | token=XXXX | 是   | Header1的说明
+| Header1      | 请求头1    | 是   | Header1的说明
 
 ## Query参数说明
 | 参数        | 中文名称     | 类型    | 必需 | 校验规则
@@ -24,14 +24,14 @@
   "field2": [            # 字段2的说明
     { 
       "field3": "value3",    # 字段3的说明
-      "field4": "value4",    # 字段4的说明
+      "field4": "value4"     # 字段4的说明
     },
     ......
   ]
 }
 ```
 
-## 返回体说明
+## 返回体说明 (application/json编码)
 ```
 {
     "code": "ok",           # ok 表示成功，其他表示错误代码
@@ -42,11 +42,13 @@
 
 ## 请求示例
 ```
-curl -XPOST 'https://goods-stocks.qa.hztl3.com/company-parts/alliances' \
-  -H 'Cookie: token=MTUxNzMwNjc5OHxleUpWYzJWeVNXUWlPakV3TURJMWZRbz18rPAiX1orjeaL4RfwRkmV5GZobu2jBR7Vbf19obxORI8=' \
+curl -XPOST 'https://example.com/exmaple/path?param1=v1&param2=v2' -H 'Header1: value' \
   -d'{
-		"swPartIds": [1001, 1002, 1003, 1004],
-		"allianceIds": [21, 22]
+    "field1": "value1",
+    "field2": [
+      { "field3": "...", "field4": "..." },
+      { "field3": "...", "field4": "..." }
+    ]
 	}'; echo
 ```
 
