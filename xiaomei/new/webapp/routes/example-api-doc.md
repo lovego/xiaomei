@@ -49,7 +49,7 @@ curl -XPOST 'https://example.com/exmaple/path?param1=v1&param2=v2' -H 'Header1: 
       { "field3": "...", "field4": "..." },
       { "field3": "...", "field4": "..." }
     ]
-	}'; echo
+  }'; echo
 ```
 
 ## 返回示例
