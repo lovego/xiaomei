@@ -17,11 +17,12 @@ var allowMethods = []string{http.MethodPost, http.MethodDelete, http.MethodPut}
 type logFields struct {
 	*tracer.Span
 
-	Host   string `json:"host"`
-	Method string `json:"method"`
-	Path   string `json:"path"`
-	Query  string `json:"query"`
-	Status int64  `json:"status"`
+	Host     string `json:"host"`
+	Method   string `json:"method"`
+	Path     string `json:"path"`
+	rawQuery string
+	Query    map[string][]string `json:"query"`
+	Status   int64               `json:"status"`
 
 	ReqBody     interface{} `json:"req_body,omitempty"`
 	ReqBodySize int64       `json:"req_body_size"`
@@ -44,11 +45,12 @@ func getFields(req *xiaomei.Request, res *xiaomei.Response, logBody bool) *logFi
 	fields := &logFields{
 		Span: req.Span,
 
-		Host:   req.Host,
-		Method: req.Method,
-		Path:   req.URL.Path,
-		Query:  req.URL.RawQuery,
-		Status: res.Status(),
+		Host:     req.Host,
+		Method:   req.Method,
+		Path:     req.URL.Path,
+		rawQuery: req.URL.RawQuery,
+		Query:    req.URL.Query(),
+		Status:   res.Status(),
 
 		ReqBodySize: req.ContentLength,
 		ResBodySize: res.Size(),
@@ -99,12 +101,15 @@ refer: %s
 session: %+v
 children: %s
 tags: %s
-`, f.Duration, f.Host, f.Method, f.Path, f.Query, f.Status,
+`, f.Duration, f.Host, f.Method, f.Path, f.rawQuery, f.Status,
 		f.ReqBodySize, f.ResBodySize, f.Proto, f.Ip, f.Agent, f.Refer, f.Session,
 		children, tags,
 	)
-	if logBody {
-		line += fmt.Sprintf("req_body: %v\nres_body: %v\n", f.ReqBody, f.ResBody)
+	if f.ReqBody != nil {
+		line += fmt.Sprintf("req_body: %v\n", f.ReqBody)
+	}
+	if f.ResBody != nil {
+		line += fmt.Sprintf("res_body: %v\n", f.ResBody)
 	}
 	result += line
 
