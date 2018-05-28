@@ -32,9 +32,9 @@ func sysRoutes(router *router.Router) {
 			func(req *xiaomei.Request, res *xiaomei.Response, params []string) {
 				hostname, err := os.Hostname()
 				res.Data(struct {
-					HostName string
-					LogBody  bool
-				}{hostname, logBody}, err)
+					Host    string
+					LogBody bool
+				}{hostname + `:` + os.Getenv(`GOPORT`), logBody}, err)
 			}).
 		// 修改是否记录request body和response body的标记
 		GetX(`/_log_body/(true|false)`,

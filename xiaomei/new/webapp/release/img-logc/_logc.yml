@@ -45,7 +45,7 @@ app: &app
   # field used to determine which time series index to write to.
   timeField: at
   # the number of latest time series indices to keep. old indices will be deleted.
-  indexKeep: 6
+  indexKeep: 3
 
 files:
   app.log: # file path, required, either relative or absolute is ok.
