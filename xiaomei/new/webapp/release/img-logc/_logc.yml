@@ -1,7 +1,7 @@
 addrs: &addrs
   - http://127.0.0.1:9200/logc-dev-
 
-name: {{ .ProName }}_dev # name used to alarm
+name: {{ .ProName }}-dev # name used to alarm
 mailer: "mailer://smtp.qq.com:25/?user=小美<xiaomei-go@qq.com>&pass=zjsbosjlhgugechh"
 keepers: [ "小美<xiaomei-go@qq.com>" ]
 rotate:

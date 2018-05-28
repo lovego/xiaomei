@@ -17,7 +17,6 @@ type Config struct {
 	ProPath        string `yaml:"-"`
 	ProName        string `yaml:"-"`
 	ProNameUrlSafe string `yaml:"-"`
-	Secret         string `yaml:"-"`
 	Registry       string `yaml:"registry"`
 }
 
@@ -33,7 +32,6 @@ func getConfig(proDir string) (*Config, error) {
 	config.ProPath = proPath
 	config.ProName = filepath.Base(proPath)
 	config.ProNameUrlSafe = strings.Replace(config.ProName, `_`, `-`, -1)
-	config.Secret = genSecret()
 	return config, nil
 }
 

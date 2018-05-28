@@ -39,7 +39,9 @@ func copyFile(src, dst string, info os.FileInfo, config *Config) error {
 }
 
 func renderTmpl(tmplPath string, config *Config) ([]byte, error) {
-	tmpl, err := template.ParseFiles(tmplPath)
+	tmpl, err := template.New(filepath.Base(tmplPath)).Funcs(template.FuncMap{
+		"genSecret": genSecret,
+	}).ParseFiles(tmplPath)
 	if err != nil {
 		return nil, err
 	}
