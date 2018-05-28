@@ -14,7 +14,7 @@ mapping: &mapping
     host: { type: keyword }
     method: { type: keyword }
     path: { type: text, fields: { raw: { type: keyword } } }
-    query: { type: text }
+    query: { type: object }
     status: { type: keyword }
     req_body_size: { type: integer }
     res_body_size: { type: integer }
