@@ -41,39 +41,32 @@ func (res *Response) DataWithKey(data interface{}, err error, key string) {
 		result[`code`] = `ok`
 		result[`message`] = `success`
 	} else {
-		if e, ok := err.(interface {
+		if erro, ok := err.(interface {
 			Code() string
-		}); ok {
-			if e2, ok := err.(interface {
-				LogError() bool
-			}); ok && e2.LogError() {
+			Message() string
+		}); ok && erro.Code() != "" {
+			result[`code`] = erro.Code()
+			result[`message`] = erro.Message()
+			if e, ok := err.(interface {
+				Err() error
+			}); ok && e.Err() != nil {
 				res.LogError(err)
 			}
-			result[`code`] = e.Code()
 		} else {
 			res.WriteHeader(500)
-			res.LogError(err)
 			result[`code`] = `server-err`
-		}
-
-		if e, ok := err.(interface {
-			Message() string
-		}); ok {
-			result[`message`] = e.Message()
-		} else {
 			result[`message`] = `Server Error.`
+			res.LogError(err)
 		}
 	}
 
 	if data != nil {
 		result[key] = data
 	} else if err != nil {
-		if datas, ok := err.(interface {
+		if erro, ok := err.(interface {
 			Data() interface{}
-		}); ok {
-			if data = datas.Data(); data != nil {
-				result[key] = data
-			}
+		}); ok && erro.Data() != nil {
+			result[key] = erro.Data()
 		}
 	}
 	res.Json(result)
