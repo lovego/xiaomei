@@ -8,16 +8,20 @@ import (
 	"github.com/lovego/logger"
 )
 
-func DevMode() bool {
-	return os.Getenv(`GODEV`) == `true`
-}
-
 var theAlarm = alarm.New(DeployName(), alarm.MailSender{
 	Receivers: Keepers(),
 	Mailer:    Mailer(),
 }, 0, 5*time.Second, 30*time.Second)
 
-var theLogger = logger.New(``, os.Stderr, theAlarm)
+var theLogger = logger.New(os.Stderr)
+
+func init() {
+	theLogger.SetAlarm(theAlarm)
+}
+
+func DevMode() bool {
+	return os.Getenv(`GODEV`) == `true`
+}
 
 func Alarm() *alarm.Alarm {
 	return theAlarm

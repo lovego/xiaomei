@@ -9,24 +9,21 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
-	"time"
 
-	"github.com/lovego/tracer"
 	"github.com/lovego/xiaomei/session"
 )
 
 type Request struct {
 	*http.Request
-	sess         session.Session
-	sessParsed   bool
-	sessData     reflect.Value
-	Span         *tracer.Span
-	Error, Stack string
-	body         []byte
+	sess       session.Session
+	sessParsed bool
+	sessData   reflect.Value
+	body       []byte
+	ctx        context.Context
 }
 
-func NewRequest(request *http.Request, sess session.Session, at time.Time) *Request {
-	req := &Request{Request: request, sess: sess, Span: &tracer.Span{At: at}}
+func NewRequest(request *http.Request, sess session.Session) *Request {
+	req := &Request{Request: request, sess: sess}
 	req.cloneBody()
 	return req
 }
@@ -86,26 +83,26 @@ func (req *Request) SetSession(i interface{}) {
 	}
 }
 
-func (req *Request) Context() context.Context {
-	return tracer.Context(context.Background(), req.Span)
-}
-
 func (req *Request) GetBody() []byte {
-	if req.body != nil {
-		return req.body
-	}
-	buf, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		log.Printf("read http body error: %v", err)
-	}
-	return buf
+	return req.body
 }
 
 func (req *Request) cloneBody() {
-	body := req.GetBody()
-	req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
-	if len(body) == 0 {
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		log.Printf("read http body error: %v", err)
 		return
 	}
-	req.body = body
+	if len(body) > 0 {
+		req.body = body
+	}
+	req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+}
+
+func (req *Request) SetContext(ctx context.Context) {
+	req.ctx = ctx
+}
+
+func (req *Request) Context() context.Context {
+	return req.ctx
 }

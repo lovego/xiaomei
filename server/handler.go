@@ -1,13 +1,14 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 
+	loggerPkg "github.com/lovego/logger"
+	"github.com/lovego/tracer"
 	"github.com/lovego/xiaomei"
-	"github.com/lovego/xiaomei/server/log"
 )
 
 func (s *Server) Handler() (handler http.Handler) {
@@ -23,46 +24,36 @@ func (s *Server) Handler() (handler http.Handler) {
 }
 
 func (s *Server) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-	startTime := time.Now()
-	req := xiaomei.NewRequest(request, s.Session, startTime)
+	req := xiaomei.NewRequest(request, s.Session)
 	res := xiaomei.NewResponse(response, req, s.Session, s.Renderer, s.LayoutDataFunc)
 
-	var notFound bool
-	defer handleError(req, res, &notFound)
+	debug := req.URL.Query()["_debug"] != nil
+	logger.Record(debug, func(ctx context.Context) error {
+		startTime := tracer.GetSpan(ctx).At
+		psData.Add(request.Method, request.URL.Path, startTime)
+		defer psData.Remove(request.Method, request.URL.Path, startTime)
 
-	psData.Add(request.Method, request.URL.Path, startTime)
-	defer psData.Remove(request.Method, request.URL.Path, startTime)
-
-	// 如果返回true，继续交给路由处理
-	if strings.HasPrefix(req.URL.Path, `/_`) || s.FilterFunc == nil || s.FilterFunc(req, res) {
-		notFound = !s.Router.Handle(req, res)
-	}
+		if strings.HasPrefix(req.URL.Path, `/_`) || s.FilterFunc == nil || s.FilterFunc(req, res) {
+			if !s.Router.Handle(req, res) {
+				handleNotFound(res)
+			}
+		}
+		return res.GetError()
+	}, func() {
+		handleServerError(res)
+	}, func(fields *loggerPkg.Fields) {
+		logFields(fields, req, res, debug)
+	})
 }
 
-func handleError(req *xiaomei.Request, res *xiaomei.Response, notFound *bool) {
-	if *notFound {
-		handleNotFound(req, res)
-	}
-
-	err := recover()
-	if err != nil {
-		handleServerError(req, res)
-	}
-	if err == nil && strings.HasPrefix(req.URL.Path, `/_`) {
-		return
-	}
-	req.Span.Finish()
-	log.Write(req, res, err, logBody)
-}
-
-func handleNotFound(req *xiaomei.Request, res *xiaomei.Response) {
+func handleNotFound(res *xiaomei.Response) {
 	res.WriteHeader(404)
 	if res.Size() <= 0 {
 		res.Json(map[string]string{"code": "404", "message": "Not Found."})
 	}
 }
 
-func handleServerError(req *xiaomei.Request, res *xiaomei.Response) {
+func handleServerError(res *xiaomei.Response) {
 	res.WriteHeader(500)
 	if res.Size() <= 0 {
 		res.Json(map[string]string{"code": "server-err", "message": "Fatal Server Error."})

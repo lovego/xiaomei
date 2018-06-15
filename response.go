@@ -21,6 +21,7 @@ type Response struct {
 	renderer       *renderer.Renderer
 	layoutDataFunc LayoutDataFunc
 	body           []byte
+	err            error
 }
 
 func NewResponse(

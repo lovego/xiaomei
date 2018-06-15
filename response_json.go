@@ -73,13 +73,9 @@ func (res *Response) DataWithKey(data interface{}, err error, key string) {
 }
 
 func (res *Response) LogError(err error) {
-	if err == nil {
-		return
-	}
-	res.Request.Error = err.Error()
-	if stack, ok := err.(interface {
-		Stack() string
-	}); ok {
-		res.Request.Stack = stack.Stack()
-	}
+	res.err = err
+}
+
+func (res *Response) GetError() error {
+	return res.err
 }
