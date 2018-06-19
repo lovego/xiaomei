@@ -14,8 +14,16 @@ import (
 	"github.com/lovego/xiaomei/config"
 )
 
-var logger = loggerPkg.New(getLogWriter())
+var logger = getLogger()
 var logBodyMethods = []string{http.MethodPost, http.MethodDelete, http.MethodPut}
+
+func getLogger() *loggerPkg.Logger {
+	logger := loggerPkg.New(getLogWriter())
+	logger.SetAlarm(config.Alarm())
+	logger.SetMachineName()
+	logger.SetMachineIP()
+	return logger
+}
 
 func getLogWriter() io.Writer {
 	if config.DevMode() {

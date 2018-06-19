@@ -17,6 +17,8 @@ var theLogger = logger.New(os.Stderr)
 
 func init() {
 	theLogger.SetAlarm(theAlarm)
+	theLogger.SetMachineName()
+	theLogger.SetMachineIP()
 }
 
 func DevMode() bool {
