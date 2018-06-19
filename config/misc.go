@@ -2,10 +2,12 @@ package config
 
 import (
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/lovego/alarm"
-	"github.com/lovego/logger"
+	"github.com/lovego/fs"
+	loggerPkg "github.com/lovego/logger"
 )
 
 var theAlarm = alarm.New(DeployName(), alarm.MailSender{
@@ -13,7 +15,7 @@ var theAlarm = alarm.New(DeployName(), alarm.MailSender{
 	Mailer:    Mailer(),
 }, 0, 5*time.Second, 30*time.Second)
 
-var theLogger = logger.New(os.Stderr)
+var theLogger = loggerPkg.New(os.Stderr)
 
 func init() {
 	theLogger.SetAlarm(theAlarm)
@@ -29,8 +31,22 @@ func Alarm() *alarm.Alarm {
 	return theAlarm
 }
 
-func Logger() *logger.Logger {
+func Logger() *loggerPkg.Logger {
 	return theLogger
+}
+
+func NewLogger(paths ...string) *loggerPkg.Logger {
+	file, err := fs.NewLogFile(filepath.Join(
+		append([]string{Root(), `log`}, paths...)...,
+	))
+	if err != nil {
+		Logger().Fatal(err)
+	}
+	logger := loggerPkg.New(file)
+	logger.SetAlarm(Alarm())
+	logger.SetMachineName()
+	logger.SetMachineIP()
+	return logger
 }
 
 func Protect(fn func()) {
