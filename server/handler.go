@@ -33,6 +33,7 @@ func (s *Server) ServeHTTP(response http.ResponseWriter, request *http.Request) 
 		psData.Add(request.Method, request.URL.Path, startTime)
 		defer psData.Remove(request.Method, request.URL.Path, startTime)
 
+		req.SetContext(ctx)
 		if strings.HasPrefix(req.URL.Path, `/_`) || s.FilterFunc == nil || s.FilterFunc(req, res) {
 			if !s.Router.Handle(req, res) {
 				handleNotFound(res)
