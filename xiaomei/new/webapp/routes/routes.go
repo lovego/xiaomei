@@ -26,20 +26,20 @@ func Routes() *router.Router {
 		res.Json(map[string]string{`hello`: config.DeployName()})
 	})
 
-	routes.Get(`/result`, func(req *xiaomei.Request, res *xiaomei.Response) {
-		res.Result([]string{`hello`, `world`}, nil)
+	routes.Get(`/data`, func(req *xiaomei.Request, res *xiaomei.Response) {
+		res.Data([]string{`hello`, `world`}, nil)
 	})
 
-	routes.Get(`/result2`, func(req *xiaomei.Request, res *xiaomei.Response) {
-		res.Result([]string{`hello`, `world`}, errs.New(`captcha-err`, `验证码错误`))
+	routes.Get(`/business-error`, func(req *xiaomei.Request, res *xiaomei.Response) {
+		res.Data([]string{`hello`, `world`}, errs.New(`captcha-err`, `验证码错误`))
 	})
 
-	routes.Get(`/result-err`, func(req *xiaomei.Request, res *xiaomei.Response) {
-		res.Result([]string{`hello`, `world`}, errors.New(`unknown error`))
+	routes.Get(`/other-error`, func(req *xiaomei.Request, res *xiaomei.Response) {
+		res.Data([]string{`hello`, `world`}, errs.Trace(errors.New(`unknown error`)))
 	})
 
 	routes.Get(`/json-err`, func(req *xiaomei.Request, res *xiaomei.Response) {
-		res.Result([]string{`hello`, `world`}, errs.Trace(errors.New(`unknown error`)))
+		res.Json2([]string{`hello`, `world`}, errs.Trace(errors.New(`unknown error`)))
 	})
 
 	routes.Get(`/session-get`, func(req *xiaomei.Request, res *xiaomei.Response) {
