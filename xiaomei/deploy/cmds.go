@@ -17,9 +17,9 @@ func Cmds(svcName string) (cmds []*cobra.Command) {
 		deployCmdFor(svcName),
 		rmDeployCmdFor(svcName),
 		psCmdFor(svcName),
-		restartCmdFor(svcName),
 		logsCmdFor(svcName),
 	)
+	cmds = append(cmds, operationCmdFor(svcName)...)
 	return
 }
 
@@ -72,19 +72,6 @@ func deployCmdFor(svcName string) *cobra.Command {
 	return cmd
 }
 
-func restartCmdFor(svcName string) *cobra.Command {
-	var filter string
-	cmd := &cobra.Command{
-		Use:   `restart [<env>]`,
-		Short: `restart container of the ` + desc(svcName) + `.`,
-		RunE: release.EnvCall(func(env string) error {
-			return restart(svcName, env, filter)
-		}),
-	}
-	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
-	return cmd
-}
-
 func rmDeployCmdFor(svcName string) *cobra.Command {
 	var filter string
 	cmd := &cobra.Command{
@@ -120,6 +107,28 @@ func logsCmdFor(svcName string) *cobra.Command {
 		Short: `list logs  of the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			return logs(svcName, env, filter)
+		}),
+	}
+	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
+	return cmd
+}
+
+func operationCmdFor(svcName string) []*cobra.Command {
+	var operations = []string{`start`, `stop`, `restart`}
+	cmds := make([]*cobra.Command, len(operations), len(operations))
+	for i, operation := range operations {
+		cmds[i] = makeOperationCmd(operation, svcName)
+	}
+	return cmds
+}
+
+func makeOperationCmd(operation, svcName string) *cobra.Command {
+	var filter string
+	cmd := &cobra.Command{
+		Use:   operation + ` [<env>]`,
+		Short: operation + ` container of the ` + desc(svcName) + `.`,
+		RunE: release.EnvCall(func(env string) error {
+			return operate(operation, svcName, env, filter)
 		}),
 	}
 	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)

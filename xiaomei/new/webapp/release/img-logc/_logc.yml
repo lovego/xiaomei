@@ -1,7 +1,7 @@
 addrs: &addrs
-  - http://127.0.0.1:9200/logc-dev-
+  - http://127.0.0.1:9200/logc-
 
-name: {{ .ProName }}-dev # name used to alarm
+name: {{ .ProName }} # name used to alarm
 mailer: "mailer://smtp.qq.com:25/?user=小美<xiaomei-go@qq.com>&pass=zjsbosjlhgugechh"
 keepers: [ "小美<xiaomei-go@qq.com>" ]
 rotate:
@@ -37,7 +37,7 @@ app: &app
   # index doesn't contain "<" and ">" acts as a regular index.
   # in time series index, string between "<" and ">" acts as time layout.
   # see https://golang.org/pkg/time/#Parse for time layout format.
-  index: {{ .ProNameUrlSafe }}-app.<2006.01>
+  index: {{ .ProNameUrlSafe }}-app.<2006.01.02>
   mapping: *mapping
 
   ### the following fields is effective only when "index" field is a time series index. ###
@@ -56,5 +56,5 @@ files:
   app.err:
     es:
       <<: *app
-      index: {{ .ProNameUrlSafe }}-app.<2006.01>
+      index: {{ .ProNameUrlSafe }}-app.<2006.01.02>
 
