@@ -31,12 +31,15 @@ done
 	return eachNodeRun(env, script, feature)
 }
 
-func restart(svcName, env, feature string) error {
+func operate(operation, svcName, env, feature string) error {
+	if operation != `start` && operation != `stop` && operation != `restart` {
+		return fmt.Errorf("invalid operation of %s", operation)
+	}
 	script := fmt.Sprintf(`
 for name in $(docker ps -af name=%s --format '{{.Names}}'); do
-	docker restart $name
+	docker %s $name
 done
-`, release.ServiceName(svcName, env))
+`, release.ServiceName(svcName, env), operation)
 	return eachNodeRun(env, script, feature)
 }
 
