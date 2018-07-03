@@ -21,6 +21,7 @@ sudo test -e /etc/letsencrypt/live/{{ .Domain }} && exit 0
 {{ end -}}
 sudo tee /etc/nginx/sites-enabled/{{ .Domain }} > /dev/null
 sudo mkdir -p /var/log/nginx/{{ .Domain }}
+sudo nginx -t
 if test -f /lib/systemd/system/nginx.service; then
 	sudo systemctl reload nginx
 elif test -x /etc/init.d/nginx; then
