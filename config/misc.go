@@ -10,10 +10,10 @@ import (
 	loggerPkg "github.com/lovego/logger"
 )
 
-var theAlarm = alarm.New(DeployName(), alarm.MailSender{
+var theAlarm = alarm.New(alarm.MailSender{
 	Receivers: Keepers(),
 	Mailer:    Mailer(),
-}, 0, 5*time.Second, 30*time.Second)
+}, 0, 5*time.Second, 30*time.Second, alarm.SetPrefix(DeployName()))
 
 var theLogger = loggerPkg.New(os.Stderr)
 
