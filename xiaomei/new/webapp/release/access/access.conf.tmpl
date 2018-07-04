@@ -1,7 +1,7 @@
 {{- if .App -}}
 upstream {{ .DeployName }}-app {
   {{- range .App.Addrs }}
-  server {{ . }} fail_timeout=3m;
+  server {{ . }};
   {{- end }}
   keepalive 1;
 }
