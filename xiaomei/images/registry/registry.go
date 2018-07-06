@@ -23,7 +23,7 @@ func Remove(imgName, digest string) {
 	resp := getResponse(http.MethodDelete, imgName+`/manifests/`+digest)
 	if resp.StatusCode != http.StatusAccepted {
 		content, err := ioutil.ReadAll(resp.Body)
-		log.Panicf("unexpected response: %s\n%s\n%v", resp.Status, content, err)
+		log.Printf("unexpected response: %s\n%s\n%v", resp.Status, content, err)
 	}
 }
 
