@@ -21,9 +21,9 @@ func accessCmd(svcName string) *cobra.Command {
 		Short: `access config for the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			if setup {
-				return accessSetup(env, svcName, filter)
+				return setupNginx(env, svcName, filter)
 			} else {
-				return accessPrint(env, svcName)
+				return printNginxConf(env, svcName)
 			}
 		}),
 	}

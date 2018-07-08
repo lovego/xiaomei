@@ -8,18 +8,16 @@ import (
 )
 
 type Config struct {
-	CheckCert bool
 	*conf.Conf
 	App, Web *service
 }
 
-func getConfig(env, svcName string, checkCert bool) (interface{}, error) {
+func getConfig(env, svcName string) (interface{}, error) {
 	if svcName == `` {
 		data := Config{
-			CheckCert: checkCert,
-			Conf:      release.AppConf(env),
-			App:       newService(`app`, env, checkCert),
-			Web:       newService(`web`, env, checkCert),
+			Conf: release.AppConf(env),
+			App:  newService(`app`, env),
+			Web:  newService(`web`, env),
 		}
 		/*
 			if data.App == nil && data.Web == nil {
@@ -28,7 +26,7 @@ func getConfig(env, svcName string, checkCert bool) (interface{}, error) {
 		*/
 		return data, nil
 	} else {
-		data := newService(svcName, env, checkCert)
+		data := newService(svcName, env)
 		if data == nil {
 			return nil, fmt.Errorf(`%s service not defined.`, svcName)
 		}

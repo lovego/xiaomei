@@ -2,6 +2,7 @@ package access
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"path/filepath"
@@ -16,9 +17,6 @@ import (
 
 var setupScriptTmpl = template.Must(template.New(``).Parse(`
 set -e
-{{ if .CheckCert -}}
-sudo test -e /etc/letsencrypt/live/{{ .Domain }} && exit 0
-{{ end -}}
 sudo tee /etc/nginx/sites-enabled/{{ .Domain }} > /dev/null
 sudo mkdir -p /var/log/nginx/{{ .Domain }}
 sudo nginx -t
@@ -29,14 +27,10 @@ elif test -x /etc/init.d/nginx; then
 else
 	sudo reload-nginx
 fi
-{{ if .CheckCert -}}
-sudo mkdir -p /var/www/letsencrypt
-sudo certbot certonly --webroot -w /var/www/letsencrypt -d {{ .Domain }}
-{{ end -}}
 `))
 
-func setupNginx(env, svcName, feature string, checkCert bool) error {
-	data, err := getConfig(env, svcName, checkCert)
+func setupNginx(env, svcName, feature string) error {
+	data, err := getConfig(env, svcName)
 	if err != nil {
 		return err
 	}
@@ -59,6 +53,19 @@ func setupNginx(env, svcName, feature string, checkCert bool) error {
 			}
 		}
 	}
+	return nil
+}
+
+func printNginxConf(env, svcName string) error {
+	data, err := getConfig(env, svcName)
+	if err != nil {
+		return err
+	}
+	nginxConf, err := getNginxConf(svcName, data)
+	if err != nil {
+		return err
+	}
+	fmt.Print(nginxConf)
 	return nil
 }
 
