@@ -22,15 +22,13 @@ sudo mkdir -p /var/log/nginx/{{ .Domain }}
 sudo nginx -t
 if test -f /lib/systemd/system/nginx.service; then
 	sudo systemctl reload nginx
-elif test -x /etc/init.d/nginx; then
-	sudo service nginx reload
 else
-	sudo reload-nginx
+	sudo service nginx reload
 fi
 `))
 
-func setupNginx(env, svcName, feature string) error {
-	data, err := getConfig(env, svcName)
+func SetupNginx(env, svcName, feature, downAddr string) error {
+	data, err := getConfig(env, svcName, downAddr)
 	if err != nil {
 		return err
 	}
@@ -57,7 +55,7 @@ func setupNginx(env, svcName, feature string) error {
 }
 
 func printNginxConf(env, svcName string) error {
-	data, err := getConfig(env, svcName)
+	data, err := getConfig(env, svcName, "")
 	if err != nil {
 		return err
 	}

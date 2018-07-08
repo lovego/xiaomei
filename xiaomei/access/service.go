@@ -12,13 +12,14 @@ import (
 
 type service struct {
 	*conf.Conf
-	svcName string
-	addrs   []string
+	svcName  string
+	downAddr string
+	addrs    []string
 }
 
-func newService(svcName, env string) *service {
+func newService(svcName, env, downAddr string) *service {
 	if deployConf.HasService(svcName, env) {
-		return &service{Conf: release.AppConf(env), svcName: svcName}
+		return &service{Conf: release.AppConf(env), svcName: svcName, downAddr: downAddr}
 	} else {
 		return nil
 	}
@@ -33,7 +34,11 @@ func (s *service) Addrs() ([]string, error) {
 		instances := deployConf.GetService(s.svcName, s.Env).Instances()
 		for _, node := range s.Nodes() {
 			for _, instance := range instances {
-				addrs = append(addrs, node.GetListenAddr()+`:`+instance)
+				upstreamAddr := node.GetListenAddr() + `:` + instance
+				if s.downAddr != "" && s.downAddr == node.Addr {
+					upstreamAddr += " down"
+				}
+				addrs = append(addrs, upstreamAddr)
 			}
 		}
 		s.addrs = addrs
