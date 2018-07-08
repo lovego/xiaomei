@@ -3,6 +3,7 @@ package deploy
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/fatih/color"
 	"github.com/lovego/cmd"
@@ -21,6 +22,7 @@ func deploy(svcName, env, timeTag, feature string) error {
 			if err := access.SetupNginx(env, "", "", node.Addr); err != nil {
 				return err
 			}
+			time.Sleep(time.Second) // wait for nginx reloading finished.
 		}
 		if err := deployNode(svcs, env, timeTag, node, psScript); err != nil {
 			return err
