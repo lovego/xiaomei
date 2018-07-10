@@ -5,6 +5,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/lovego/cmd"
 	"github.com/lovego/fs"
 	"github.com/lovego/slice"
@@ -27,16 +28,19 @@ func listDeps() {
 	deps := getAllDeps()
 	inVendor := []string{}
 	notInVendor := []string{}
+	vendorPrefix := release.Path() + `/vendor/`
 	for _, dep := range deps {
-		i := strings.Index(dep, `vendor/`)
-		if i > -1 {
-			inVendor = append(inVendor, dep[i+7:]) // 7 = len(`vendor/`)
+		if strings.HasPrefix(dep, vendorPrefix) {
+			inVendor = append(inVendor, strings.TrimPrefix(dep, vendorPrefix))
 		} else {
 			notInVendor = append(notInVendor, dep)
 		}
 	}
-	fmt.Printf("<dependence in vendor>:\n%s\n", strings.Join(inVendor, "\n"))
-	fmt.Printf("<dependence not in vendor>:\n%s\n", strings.Join(notInVendor, "\n"))
+
+	color.Green("<dependences in vendor>:\n")
+	fmt.Println(strings.Join(inVendor, "\n"))
+	color.Green("<dependences not in vendor>:\n")
+	fmt.Println(strings.Join(notInVendor, "\n"))
 }
 
 func getAllDeps() []string {
@@ -61,7 +65,7 @@ func getDirDeps(dir string) []string {
 	deps := filterStandard(strings.Split(result, "\n"))
 	for _, depPath := range deps {
 		if strings.HasPrefix(depPath, release.Path()) {
-			childDeps := filterStandard(getDirDeps(path.Join(goSrcPath, depPath)))
+			childDeps := getDirDeps(path.Join(goSrcPath, depPath))
 			for _, childDep := range childDeps {
 				if !slice.ContainsString(deps, childDep) {
 					deps = append(deps, childDep)
