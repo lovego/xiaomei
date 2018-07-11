@@ -27,6 +27,13 @@ func (res *Response) Json2(data interface{}, err error) {
 	}
 }
 
+func (res *Response) Ok(message string) {
+	result := make(map[string]interface{})
+	result["code"] = "ok"
+	result["message"] = message
+	res.Json(result)
+}
+
 func (res *Response) Data(data interface{}, err error) {
 	res.DataWithKey(data, err, `data`)
 }
