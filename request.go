@@ -20,12 +20,22 @@ type Request struct {
 	sessData   reflect.Value
 	body       []byte
 	ctx        context.Context
+	container map[string]interface{}
 }
 
 func NewRequest(request *http.Request, sess session.Session) *Request {
 	req := &Request{Request: request, sess: sess}
 	req.cloneBody()
 	return req
+}
+
+func (req *Request) Set(k string, v interface{}) {
+	req.container[k] = v
+}
+
+func (req *Request) Get(k string) (v interface{}, ok bool) {
+	v, ok = req.container[k]
+	return
 }
 
 func (req *Request) ClientAddr() string {
