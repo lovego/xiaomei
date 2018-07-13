@@ -1,13 +1,31 @@
 # xiaomei 小而美的go语言web框架。
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/lovego/xiaomei)](https://goreportcard.com/report/github.com/lovego/xiaomei)
 [![GoDoc](https://godoc.org/github.com/lovego/xiaomei?status.svg)](https://godoc.org/github.com/lovego/xiaomei)
 
-## 安装
+
+### 快速入门
+- [安装](#install)
+
+### 文档
+- [配置](./config)
+- [路由](./router)
+- [请求](./request.md)
+- [回应](./response.md)
+- [会话](./session)
+- [渲染](./renderer)
+- [数据库连接](./config/db)
+- [日志](./server)
+
+
+
+
+### 安装
 ```
   go get github.com/lovego/xiaomei/xiaomei
 ```
 
-## 使用
+## 基本使用
 ```
   xiaomei new example       # 生成项目
   xiaomei app run           # 启动app服务器
