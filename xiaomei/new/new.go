@@ -24,18 +24,6 @@ func New(proDir string) error {
 	if err != nil {
 		return err
 	}
-	tmplsDir, err := getTemplatesDir()
-	if err != nil {
-		return err
-	}
+	tmplsDir := filepath.Join(fs.GetGoSrcPath(), `github.com/lovego/xiaomei/xiaomei/new/webapp`)
 	return walk(tmplsDir, proDir, config)
-}
-
-func getTemplatesDir() (string, error) {
-	srcPath, err := fs.GetGoSrcPath()
-	if err != nil {
-		return ``, err
-	}
-	tmplsDir := filepath.Join(srcPath, `github.com/lovego/xiaomei/xiaomei/new`)
-	return filepath.Join(tmplsDir, `webapp`), nil
 }

@@ -47,11 +47,7 @@ func getProjectPath(proDir string) (string, error) {
 		}
 	}
 
-	srcPath, err := fs.GetGoSrcPath()
-	if err != nil {
-		return ``, err
-	}
-
+	srcPath := fs.GetGoSrcPath()
 	proPath, err := filepath.Rel(srcPath, proDir)
 	if err != nil {
 		return ``, err

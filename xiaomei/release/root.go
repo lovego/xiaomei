@@ -50,10 +50,7 @@ func Path() string {
 		}
 	}
 
-	srcPath, err := fs.GetGoSrcPath()
-	if err != nil {
-		panic(err)
-	}
+	srcPath := fs.GetGoSrcPath()
 
 	proPath, err := filepath.Rel(srcPath, proDir)
 	if err != nil {
