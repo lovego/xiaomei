@@ -1,29 +1,40 @@
 # xiaomei 小而美的go语言web框架。
+一个来源于实际需求，
+
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/lovego/xiaomei)](https://goreportcard.com/report/github.com/lovego/xiaomei)
 [![GoDoc](https://godoc.org/github.com/lovego/xiaomei?status.svg)](https://godoc.org/github.com/lovego/xiaomei)
 
 
-### 快速入门
+快速入门
 - [安装](#install)
+- [生成项目](#new)
+- [运行项目](#run)
+- [部署项目](#deploy)
 
-### 文档
+参考文档
 - [配置](./config)
+- [过滤器](./server/filter.md)
 - [路由](./router)
 - [请求](./request.md)
-- [回应](./response.md)
+- [应答（自动报警）](./response.md)
 - [会话](./session)
-- [渲染](./renderer)
+- [模版渲染](./renderer)
 - [数据库连接](./config/db)
-- [日志](./server)
-
-
+- [日志](./server/log.md)
 
 
 ### 安装
-```
+```shell
   go get github.com/lovego/xiaomei/xiaomei
 ```
+执行如上`go get`命令即可将xiaomei安装到$GOPATH/bin目录中，如果$GOPATH/bin已经在$PATH搜索路径中，你可以输入以下命令来检查xiaomei是否已经安装成功。
+
+```shell
+  xiaomei version
+```
+输出类似"xiaomei version 18.7.13"的版本信息，说明已经安装成功了。
+
 
 ## 基本使用
 ```
