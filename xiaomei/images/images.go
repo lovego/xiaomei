@@ -10,11 +10,11 @@ import (
 )
 
 var imagesMap = map[string]Image{
-	`app`:   Image{svcName: `app`, image: app.Image{}},
-	`tasks`: Image{svcName: `tasks`, image: tasks.Image{}},
-	`web`:   Image{svcName: `web`, image: web.Image{}},
-	`logc`:  Image{svcName: `logc`, image: logc.Image{}},
-	`godoc`: Image{svcName: `godoc`, image: godoc.Image{}},
+	`app`:   {svcName: `app`, image: app.Image{}},
+	`tasks`: {svcName: `tasks`, image: tasks.Image{}},
+	`web`:   {svcName: `web`, image: web.Image{}},
+	`logc`:  {svcName: `logc`, image: logc.Image{}},
+	`godoc`: {svcName: `godoc`, image: godoc.Image{}},
 }
 
 func Get(svcName string) Image {

@@ -58,7 +58,7 @@ func getUniqTimeTags(svcsTags map[string]map[string]bool) []string {
 		}
 	}
 	slice := make([]string, 0, len(m))
-	for key, _ := range m {
+	for key := range m {
 		slice = append(slice, key)
 	}
 	sort.Sort(sort.Reverse(sort.StringSlice(slice)))

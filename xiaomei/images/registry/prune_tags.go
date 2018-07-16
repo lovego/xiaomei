@@ -26,7 +26,7 @@ func pruneTimeTags(svcName, env string, n int) {
 	imgName := conf.GetService(svcName, env).ImageName()
 	toRemove := uniqDigestByTags(imgName, env, curEnvTags[n:])
 	reserved := reservedDigest(svcName, env, reservedTags)
-	for digest, _ := range toRemove {
+	for digest := range toRemove {
 		if reserved[digest] {
 			delete(toRemove, digest)
 		}
@@ -76,7 +76,7 @@ func reservedDigest(svcName, curEnv string, envTagsMap map[string][]string) map[
 		}
 		imgName := conf.GetService(svcName, tagEnv).ImageName()
 		digestTagsMap := uniqDigestByTags(imgName, tagEnv, envTags)
-		for digest, _ := range digestTagsMap {
+		for digest := range digestTagsMap {
 			envDigest[digest] = true
 		}
 	}

@@ -59,5 +59,4 @@ func (r *Router) regRoutesMatch(method string, path string, req *xiaomei.Request
 			p = ``
 		}
 	}
-	return false
 }

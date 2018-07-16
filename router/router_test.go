@@ -20,13 +20,13 @@ type testRouteData struct {
 }
 
 var testRoutes = []testRouteData{
-	testRouteData{`get`, `/`, `index`},
-	testRouteData{`get`, `/new`, `new`},
-	testRouteData{`post`, `/`, `create`},
-	testRouteData{`getx`, `/(\d+)`, `show`},
-	testRouteData{`getx`, `/(\d+)/edit`, `edit`},
-	testRouteData{`postx`, `/(\d+)/update`, `update`},
-	testRouteData{`postx`, `/(\d+)/destroy`, `destroy`},
+	{`get`, `/`, `index`},
+	{`get`, `/new`, `new`},
+	{`post`, `/`, `create`},
+	{`getx`, `/(\d+)`, `show`},
+	{`getx`, `/(\d+)/edit`, `edit`},
+	{`postx`, `/(\d+)/update`, `update`},
+	{`postx`, `/(\d+)/destroy`, `destroy`},
 }
 
 func TestNew(t *testing.T) {
