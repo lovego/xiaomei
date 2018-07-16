@@ -20,7 +20,7 @@ type Request struct {
 	sessData   reflect.Value
 	body       []byte
 	ctx        context.Context
-	container map[string]interface{}
+	container  map[string]interface{}
 }
 
 func NewRequest(request *http.Request, sess session.Session) *Request {
