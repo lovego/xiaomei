@@ -19,7 +19,7 @@ func buildCmdFor(svcName string) *cobra.Command {
 	var tag, pull bool
 	cmd := &cobra.Command{
 		Use:   `build [<env>]`,
-		Short: `build  ` + imageDesc(svcName) + `.`,
+		Short: `[image] build  ` + imageDesc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			timeTag := ``
 			if tag {
@@ -36,7 +36,7 @@ func buildCmdFor(svcName string) *cobra.Command {
 func pushCmdFor(svcName string) *cobra.Command {
 	return &cobra.Command{
 		Use:   `push [<env> [<tag>]]`,
-		Short: `push   ` + imageDesc(svcName) + `.`,
+		Short: `[image] push   ` + imageDesc(svcName) + `.`,
 		RunE: release.Env1Call(func(env, timeTag string) error {
 			return Push(svcName, env, timeTag)
 		}),
@@ -46,7 +46,7 @@ func pushCmdFor(svcName string) *cobra.Command {
 func tagsCmdFor(svcName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `tags [<env>]`,
-		Short: `list registry time tags of ` + imageDesc(svcName) + `.`,
+		Short: `[image] list time tags of ` + imageDesc(svcName) + ` in registry.`,
 		RunE: release.EnvCall(func(env string) error {
 			registry.ListTimeTags(svcName, env)
 			return nil

@@ -23,7 +23,7 @@ func makeCmd(name, short string, fun func(env, key string, print bool) error) *c
 	var print bool
 	cmd := &cobra.Command{
 		Use:   name + ` [<env> [<key>]]`,
-		Short: short,
+		Short: `[db] ` + short,
 		RunE: release.Env1Call(func(env, key string) error {
 			if key == `` {
 				key = `default`

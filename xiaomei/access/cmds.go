@@ -5,12 +5,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Run, Deploy, Ps, Logs commands
-func Cmds(svcName string) (cmds []*cobra.Command) {
+// access commands
+func Cmd(svcName string) *cobra.Command {
 	if svcName == `` || svcName == `app` || svcName == `web` || svcName == `godoc` {
-		cmds = append(cmds, accessCmd(svcName))
+		return accessCmd(svcName)
 	}
-	return
+	return nil
 }
 
 func accessCmd(svcName string) *cobra.Command {

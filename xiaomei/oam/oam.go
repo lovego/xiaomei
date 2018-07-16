@@ -1,4 +1,4 @@
-package deploy
+package oam
 
 import (
 	"fmt"
@@ -40,15 +40,6 @@ for name in $(docker ps -af name=%s --format '{{.Names}}'); do
 	docker %s $name
 done
 `, release.ServiceName(svcName, env), operation)
-	return eachNodeRun(env, script, feature)
-}
-
-func rmDeploy(svcName, env, feature string) error {
-	script := fmt.Sprintf(`
-for name in $(docker ps -af name=%s --format '{{.Names}}'); do
-	docker stop $name >/dev/null 2>&1 && docker rm $name
-done
-`, release.ServiceName(svcName, env))
 	return eachNodeRun(env, script, feature)
 }
 
