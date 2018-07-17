@@ -1,4 +1,4 @@
-package workspace_godoc
+package godoc
 
 import (
 	"github.com/lovego/xiaomei/xiaomei/release"
@@ -7,8 +7,8 @@ import (
 
 func Cmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   `workspace-godoc`,
-		Short: `[service] the workspace godoc server. [Management Command]`,
+		Use:   `godoc`,
+		Short: `[service] the workspace godoc server.`,
 	}
 	cmd.AddCommand(deployCmd())
 	cmd.AddCommand(accessCmd())

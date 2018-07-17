@@ -1,4 +1,4 @@
-package workspace_godoc
+package godoc
 
 import "github.com/lovego/cmd"
 

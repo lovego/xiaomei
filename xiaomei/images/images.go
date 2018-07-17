@@ -3,18 +3,14 @@ package images
 import (
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/images/app"
-	"github.com/lovego/xiaomei/xiaomei/images/godoc"
 	"github.com/lovego/xiaomei/xiaomei/images/logc"
-	"github.com/lovego/xiaomei/xiaomei/images/tasks"
 	"github.com/lovego/xiaomei/xiaomei/images/web"
 )
 
 var imagesMap = map[string]Image{
-	`app`:   {svcName: `app`, image: app.Image{}},
-	`tasks`: {svcName: `tasks`, image: tasks.Image{}},
-	`web`:   {svcName: `web`, image: web.Image{}},
-	`logc`:  {svcName: `logc`, image: logc.Image{}},
-	`godoc`: {svcName: `godoc`, image: godoc.Image{}},
+	`app`:  {svcName: `app`, image: app.Image{}},
+	`web`:  {svcName: `web`, image: web.Image{}},
+	`logc`: {svcName: `logc`, image: logc.Image{}},
 }
 
 func Get(svcName string) Image {

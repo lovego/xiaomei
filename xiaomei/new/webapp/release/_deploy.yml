@@ -15,10 +15,6 @@ defaults: &defaults
       image: {{ .Registry }}{{ .ProNameUrlSafe }}/app
       ports: "3001,4001"
       options: [ -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}/log" ]
-  # tasks:
-  #   nodes: { tasks: true }
-  #   image: {{ .Registry }}{{ .ProNameUrlSafe }}/tasks
-  #   options: [ -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}/log" ]
     web:
       image: {{ .Registry }}{{ .ProNameUrlSafe }}/web
       ports: "8001"
@@ -27,9 +23,5 @@ defaults: &defaults
       image: {{ .Registry }}{{ .ProNameUrlSafe }}/logc
       options: [ -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}-logs",
                  -v, "/var/run/docker.sock:/var/run/docker.sock" ]
-  # godoc:
-  #   nodes: { godoc: true }
-  #   image: {{ .Registry }}{{ .ProNameUrlSafe }}/godoc
-  #   ports: "7001"
 
   volumesToCreate: [ {{ .ProName }}-logs ]
