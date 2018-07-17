@@ -1,30 +1,24 @@
-package main
+package tasks
 
 import (
 	"context"
-	"log"
 	"os"
-	"runtime"
 
-	"github.com/fatih/color"
 	loggerPkg "github.com/lovego/logger"
+	"github.com/lovego/redis-cron"
 	"github.com/lovego/xiaomei/config"
-	"github.com/robfig/cron"
+	"github.com/lovego/xiaomei/config/db/redisdb"
 )
 
 var logger = config.NewLogger("cron.log")
 var debug = os.Getenv("debugTasks") != ""
 
-func main() {
-	runtime.GOMAXPROCS(1)
-
-	c := cron.New()
+func Run() {
+	c := cron.New(redisdb.Pool("default"))
 	if err := c.AddFunc("0 * * * * *", exampleTask); err != nil {
-		panic(err)
+		logger.Panic(err)
 	}
-	c.Start()
-	log.Println(color.GreenString(`started.`))
-	select {}
+	c.Run()
 }
 
 func exampleTask() {

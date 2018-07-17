@@ -7,6 +7,7 @@ import (
 
 	"{{ .ProPath }}/filter"
 	"{{ .ProPath }}/routes"
+	// "{{ .ProPath }}/tasks"
 	"github.com/lovego/xiaomei"
 	"github.com/lovego/xiaomei/server"
 )
@@ -19,6 +20,7 @@ func main() {
 		Renderer:       server.NewRenderer(),
 		LayoutDataFunc: layoutData,
 	}
+  // go tasks.Run()
 	svr.ListenAndServe()
 }
 
