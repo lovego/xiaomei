@@ -1,31 +1,19 @@
 # vim: set ft=nginx:
 
-upstream app {
-{{- range .BackendAddrs }}
-  server {{ . }};
-{{- end }}
-}
-
 server {
-  listen {{ .ListenPort }} default_server;
+  listen {{ `{{ .ListenPort }}` }} default_server;
   root /var/www/example;
 
-  location = / {
-    try_files /index.html @app;
-  }
-  location / {
-    try_files $uri @app;
-  }
-  location @app {
-    proxy_pass   http://app;
+  index index.html;
+
+  location ~ \.html {
+    add_header Cache-Control "must-revalidate";
   }
 
-  location ~ \.html$ {
+  location ~ \.(js|css|png|gif|jpg|svg|ico|woff|woff2|ttf|eot|map|json)$ {
+    expires max;
   }
-	location ~ \.(js|css|png|gif|jpg|svg|ico|woff|woff2|ttf|eot|map|json)$ {
-		expires max;
-	}
-
-  access_log /var/log/nginx/web.log std;
-  error_log  /var/log/nginx/web.err;
+  {{ if .SendfileOff }}sendfile off;{{ end }}
+  access_log /var/log/nginx/example/web.log std;
+  error_log  /var/log/nginx/example/web.err;
 }

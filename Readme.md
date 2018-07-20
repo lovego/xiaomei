@@ -1,6 +1,8 @@
 # xiaomei（小美）
-一个简单、实用的go语言web框架，注重日志、报警、部署、尽可能的自动化。
+一个简单、实用的go语言web框架，注重报警、日志、部署、尽可能的自动化。
 
+[![Build Status](https://travis-ci.org/lovego/xiaomei.svg?branch=master)](https://travis-ci.org/lovego/xiaomei)
+[![Coverage Status](https://coveralls.io/repos/github/lovego/xiaomei/badge.svg?branch=master)](https://coveralls.io/github/lovego/xiaomei?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/lovego/xiaomei)](https://goreportcard.com/report/github.com/lovego/xiaomei)
 [![GoDoc](https://godoc.org/github.com/lovego/xiaomei?status.svg)](https://godoc.org/github.com/lovego/xiaomei)
 
@@ -17,7 +19,7 @@
 - [最简单的过滤器](./server/filter.md)
 - [Express风格的路由](./router)
 - [请求](./request.md)
-- [包含自动邮件报警的应答](./response.md)
+- [包含自动报警的应答](./response.md)
 - [会话](./session)
 - [模版渲染](./renderer)
 - [统一的配置](./config)
