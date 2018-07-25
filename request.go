@@ -24,7 +24,7 @@ type Request struct {
 }
 
 func NewRequest(request *http.Request, sess session.Session) *Request {
-	req := &Request{Request: request, sess: sess}
+	req := &Request{Request: request, sess: sess, container: make(map[string]interface{})}
 	req.cloneBody()
 	return req
 }
