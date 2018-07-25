@@ -34,6 +34,7 @@ func returnCORS(req *xiaomei.Request, res *xiaomei.Response) bool {
 	if req.Method == `OPTIONS` { // preflight 预检请求
 		res.Header().Set(`Access-Control-Max-Age`, `86400`)
 		res.Header().Set(`Access-Control-Allow-Methods`, `GET, POST, PUT, DELETE`)
+		res.Header().Set(`Access-Control-Allow-Headers`, `Content-Type`)
 		return true
 	}
 	return false
