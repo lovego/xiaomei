@@ -35,7 +35,7 @@
 ```
 {
     "code": "ok",           # ok 表示成功，其他表示错误代码
-    "message": "success"    # 用户友好的描述性信息，可以直接显示给用户
+    "message": "success"    # 与code对应的描述信息
 }
 ```
 
