@@ -10,7 +10,8 @@ rotate:
 
 mapping: &mapping
   properties:
-    at: { type: date } duration: { type: float }
+    at: { type: date }
+    duration: { type: float }
     host: { type: keyword }
     method: { type: keyword }
     path: { type: text, fields: { raw: { type: keyword } } }
