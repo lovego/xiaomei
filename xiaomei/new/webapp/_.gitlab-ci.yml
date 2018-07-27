@@ -1,0 +1,36 @@
+# simple CI with build and test
+stages:
+  - build
+  - test
+services:
+  # postgres connect url: postgres://develop:develop@test-postgres/database?sslmode=disable
+  - name: postgres:10 # postgres:<version>, the docker image of postgres.
+    alias: test-postgres
+  # redis connect url: redis://:@test-redis/0
+  - name: redis:3.2 # redis:<version>, the docker image of redis.
+    alias: test-redis
+variables:
+  POSTGRES_DB: database
+  POSTGRES_USER: develop
+  POSTGRES_PASSWORD: develop
+before_script:
+  # link project to $GOPATH, and cd to project to run build and test stages.
+  # and you should add script which creates databases and tables for build and test if need.
+  - mkdir -p /go/src/github.com/lovego
+  - ln -sf /builds/go/<project> /go/src/github.com/lovego/<project> && cd /go/src/github.com/lovego/<project>
+build:
+  stage: build
+  script:
+    # stage command, such as:
+    - go build
+  tags:
+    - docker # docker runner tag in gitlab.
+test:
+  stage: test
+  script:
+    - GOENV=citest go test ./models/... -p 1 -coverprofile .testCoverage.out
+    - go tool cover -func=.testCoverage.out -o .testCoverage.txt
+    - tail -n 1 .testCoverage.txt
+  coverage: '/(\d+.\d+\%)/'
+  tags:
+    - docker
