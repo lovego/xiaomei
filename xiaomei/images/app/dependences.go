@@ -12,25 +12,30 @@ import (
 )
 
 const (
-	invender    = 0
-	notinvender = 1
-	depsTest    = 2
+	invender    = 1
+	notinvender = 2
+	depsTest    = 3
 )
 
 func depsCmd() *cobra.Command {
 	var shortNameCmd int
-	cmd := &cobra.Command{
+
+	var cmd = &cobra.Command{
 		Use:   `deps`,
 		Short: "list dependence packages.",
-		Run: func(c *cobra.Command, args []string) {
-			deps := getDeps(shortNameCmd)
-			fmt.Println(strings.Join(deps, "\n"))
-		},
+	}
+
+	cmd.Flags().IntVarP(&shortNameCmd, `in-vendor`, `v`, 1, `list dependences in vendor dir.`)
+	cmd.Flags().IntVarP(&shortNameCmd, `exclude-test`, `t`, 3, `list dependences in test dir.`)
+	fmt.Println("test111111", shortNameCmd)
+
+	cmd.Run = func(c *cobra.Command, args []string) {
+		fmt.Println("test2222222", shortNameCmd)
+		deps := getDeps(shortNameCmd)
+		fmt.Println(strings.Join(deps, "\n"))
 	}
 	fmt.Println("test ===---", cmd)
 
-	cmd.Flags().IntVarP(&shortNameCmd, `in-vendor`, `v`, 0, `list dependences in vendor dir.`)
-	cmd.Flags().IntVarP(&shortNameCmd, `exclude-test`, `t`, 2, `list dependences in test dir.`)
 	return cmd
 }
 
@@ -89,5 +94,6 @@ func testDeps() (deps []string) {
 			deps = append(deps, pkg)
 		}
 	}
+	fmt.Println("result ==", deps, path.Join(release.Root(), `../`))
 	return
 }
