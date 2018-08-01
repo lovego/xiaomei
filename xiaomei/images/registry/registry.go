@@ -30,20 +30,16 @@ func Remove(imgName, digest string) {
 func Digest(imgName, tag string) string {
 	resp := getResponse(http.MethodHead, imgName+`/manifests/`+tag)
 	digest := resp.Header.Get(`Docker-Content-Digest`)
-	/*
-		if digest == `` {
-			log.Panicf("get image digest faild for: %s:%s ", imgName, tag)
-		}
-	*/
+	if digest == `` {
+		log.Printf("get image digest faild for: %s:%s\n", imgName, tag)
+	}
 	return digest
 }
 
 var httpClient = http.Client{Timeout: 5 * time.Second}
 
 func getResponse(method, resource string) *http.Response {
-	// TODO: https or http check.
-	// TODO: https://registry.hub.docker.com/v2/
-	uri, err := url.Parse(`http://` + resource)
+	uri, err := url.Parse(`https://` + resource)
 	if err != nil {
 		log.Panic(err)
 	}

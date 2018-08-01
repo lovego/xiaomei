@@ -1,8 +1,11 @@
 package registry
 
 import (
+	"fmt"
 	"log"
+	"strings"
 
+	"github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 )
 
@@ -49,10 +52,20 @@ func RemoveTimeTags(svcName, env string, tags []string) {
 func removeTimeTags(imgName string, toRemove map[string][]string) {
 	for digest, envTags := range toRemove {
 		Remove(imgName, digest)
-		for _, envTag := range envTags {
-			log.Printf("removed %s:%s\n", imgName, envTag)
-		}
+		removeLocalImagesByTags(imgName, envTags)
 	}
+}
+
+func removeLocalImagesByTags(imgName string, tags []string) {
+	if len(tags) == 0 {
+		return
+	}
+	images := []string{}
+	for _, tag := range tags {
+		images = append(images, fmt.Sprintf(" %s:%s", imgName, tag))
+	}
+	cmd.Run(cmd.O{}, `bash`, `-c`, `docker image rm -f`+strings.Join(images, ``))
+	log.Printf("removed %s", strings.Join(images, "\n"))
 }
 
 // 当前环境前n个tag、其他环境前10个tag reserved

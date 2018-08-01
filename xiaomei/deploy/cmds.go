@@ -39,6 +39,7 @@ func deployCmdFor(svcName string) *cobra.Command {
 		Use:   `deploy [<env> [<tag>]]`,
 		Short: `deploy the ` + desc(svcName) + `.`,
 		RunE: release.Env1Call(func(env, timeTag string) error {
+			noTag := timeTag == ``
 			if timeTag == `` {
 				timeTag = conf.TimeTag(env)
 				if err := images.Build(svcName, env, timeTag, true); err != nil {
@@ -47,9 +48,14 @@ func deployCmdFor(svcName string) *cobra.Command {
 				if err := images.Push(svcName, env, timeTag); err != nil {
 					return err
 				}
+			}
+			if err := deploy(svcName, env, timeTag, filter); err != nil {
+				return err
+			}
+			if noTag {
 				registry.PruneTimeTags(svcName, env, 10)
 			}
-			return deploy(svcName, env, timeTag, filter)
+			return nil
 		}),
 	}
 	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
