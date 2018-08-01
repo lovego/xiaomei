@@ -11,21 +11,41 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	invender    = 0
+	notinvender = 1
+	depsTest    = 2
+)
+
 func depsCmd() *cobra.Command {
-	var inVendor bool
+	var shortNameCmd int
 	cmd := &cobra.Command{
 		Use:   `deps`,
 		Short: "list dependence packages.",
 		Run: func(c *cobra.Command, args []string) {
-			deps := getDeps(inVendor)
+			deps := getDeps(shortNameCmd)
 			fmt.Println(strings.Join(deps, "\n"))
 		},
 	}
-	cmd.Flags().BoolVarP(&inVendor, `in-vendor`, `v`, false, `list dependences in vendor dir.`)
+	fmt.Println("test ===---", cmd)
+
+	cmd.Flags().IntVarP(&shortNameCmd, `in-vendor`, `v`, 0, `list dependences in vendor dir.`)
+	cmd.Flags().IntVarP(&shortNameCmd, `exclude-test`, `t`, 2, `list dependences in test dir.`)
 	return cmd
 }
 
-func getDeps(inVendor bool) (deps []string) {
+func getDeps(shortNameCmd int) []string {
+	fmt.Println("test ===", shortNameCmd)
+	switch shortNameCmd {
+	case invender, notinvender:
+		return invenderDeps(shortNameCmd)
+	case depsTest:
+		return testDeps()
+	}
+	return []string{}
+}
+
+func invenderDeps(shortNameCmd int) (deps []string) {
 	result, err := cmd.Run(
 		cmd.O{Output: true, Dir: path.Join(release.Root(), `../`)},
 		`go`, `list`, `-e`, `-f`, `{{join .Deps "\n"}}`,
@@ -37,7 +57,7 @@ func getDeps(inVendor bool) (deps []string) {
 
 	projectPath := release.Path()
 	vendorPath := path.Join(projectPath, `vendor`)
-	if inVendor {
+	if shortNameCmd == invender {
 		for _, pkg := range pkgs {
 			if strings.HasPrefix(pkg, vendorPath) {
 				deps = append(deps, pkg)
@@ -48,6 +68,25 @@ func getDeps(inVendor bool) (deps []string) {
 			if strings.Contains(pkg, `.`) && !strings.HasPrefix(pkg, projectPath) {
 				deps = append(deps, pkg)
 			}
+		}
+	}
+	return
+}
+
+func testDeps() (deps []string) {
+	result, err := cmd.Run(
+		cmd.O{Output: true, Dir: path.Join(release.Root(), `../`)},
+		`go`, `list`, `-e`, `-f`, `{{ join .TestImports "\n" }}`, `./models/...`,
+	)
+	if err != nil {
+		log.Panic(err)
+	}
+	pkgs := strings.Split(result, "\n")
+
+	projectPath := release.Path()
+	for _, pkg := range pkgs {
+		if strings.Contains(pkg, `.`) && !strings.HasPrefix(pkg, projectPath) {
+			deps = append(deps, pkg)
 		}
 	}
 	return
