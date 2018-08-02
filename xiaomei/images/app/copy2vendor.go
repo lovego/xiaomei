@@ -13,6 +13,7 @@ import (
 
 func copy2vendorCmd() *cobra.Command {
 	var all bool
+	var excludeTest bool
 	cmd := &cobra.Command{
 		Use:   `copy2vendor [<package-path>] ...`,
 		Short: `copy the specified packages to vendor dir.`,
@@ -20,16 +21,20 @@ func copy2vendorCmd() *cobra.Command {
 			if len(args) == 0 && !all {
 				return errors.New(`no package path provided.`)
 			}
-			return copy2Vendor(args)
+			return copy2Vendor(args, excludeTest)
 		},
 	}
 	cmd.Flags().BoolVarP(&all, `all`, `a`, false, `copy all dependences.`)
+	cmd.Flags().BoolVarP(&excludeTest, `exclude-test`, `e`, false, `copy dependences exclude test.`)
 	return cmd
 }
 
-func copy2Vendor(pkgs []string) error {
+func copy2Vendor(pkgs []string, excludeTest bool) error {
 	if len(pkgs) == 0 {
 		pkgs = getDeps(false)
+	}
+	if !excludeTest {
+		pkgs = append(pkgs, testDeps(false)...)
 	}
 	goSrcDir := fs.GetGoSrcPath()
 	vendorDir := filepath.Join(release.Root(), `../vendor`)
