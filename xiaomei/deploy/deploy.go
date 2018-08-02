@@ -56,9 +56,7 @@ func deployNode(svcs []string, env, timeTag string, node cluster.Node, psScript 
 	if err != nil {
 		return err
 	}
-	println(`111111`)
 	_, err = node.Run(cmd.O{}, deployScript+psScript)
-	println(`222222`)
 	return err
 }
 

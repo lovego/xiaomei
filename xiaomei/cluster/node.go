@@ -2,6 +2,8 @@ package cluster
 
 import (
 	"net"
+	"os"
+	"os/signal"
 	"os/user"
 	"strings"
 
@@ -51,6 +53,11 @@ func (n Node) Run(o cmd.O, script string) (string, error) {
 		return ``, err
 	}
 	if isLocal {
+		c := make(chan os.Signal, 1)
+		if o.Stdin == nil {
+			signal.Notify(c, os.Interrupt)
+			defer signal.Stop(c)
+		}
 		return cmd.Run(o, `bash`, `-c`, script)
 	} else {
 		if n.jumpAddr == `` {
