@@ -31,10 +31,7 @@ func copy2vendorCmd() *cobra.Command {
 
 func copy2Vendor(pkgs []string, excludeTest bool) error {
 	if len(pkgs) == 0 {
-		pkgs = getDeps(false)
-	}
-	if !excludeTest {
-		pkgs = append(pkgs, testDeps(false)...)
+		pkgs = getDeps(false, excludeTest)
 	}
 	goSrcDir := fs.GetGoSrcPath()
 	vendorDir := filepath.Join(release.Root(), `../vendor`)

@@ -13,22 +13,21 @@ import (
 
 func depsCmd() *cobra.Command {
 	var inVendor bool
-	var exclude bool
+	var excludeTest bool
 	cmd := &cobra.Command{
 		Use:   `deps`,
 		Short: "list dependence packages.",
 		Run: func(c *cobra.Command, args []string) {
-			deps := append(getDeps(inVendor), testDeps(exclude)...)
+			deps := getDeps(inVendor, excludeTest)
 			fmt.Println(strings.Join(deps, "\n"))
 		},
 	}
 	cmd.Flags().BoolVarP(&inVendor, `in-vendor`, `v`, false, `list dependences in vendor dir.`)
-	cmd.Flags().BoolVarP(&exclude, `exclude-test`, `e`, false,
-		`list dependences in vendor dir exclude test.`)
+	cmd.Flags().BoolVarP(&excludeTest, `exclude-test`, `e`, false, `list dependences exclude test.`)
 	return cmd
 }
 
-func getDeps(inVendor bool) (deps []string) {
+func getDeps(inVendor, excludeTest bool) (deps []string) {
 	result, err := cmd.Run(
 		cmd.O{Output: true, Dir: path.Join(release.Root(), `../`)},
 		`go`, `list`, `-e`, `-f`, `{{join .Deps "\n"}}`,
@@ -53,14 +52,14 @@ func getDeps(inVendor bool) (deps []string) {
 			}
 		}
 	}
+	if !excludeTest {
+		deps = append(deps, getTestDeps()...)
+	}
 
 	return
 }
 
-func testDeps(exclude bool) (deps []string) {
-	if exclude {
-		return
-	}
+func getTestDeps() (deps []string) {
 	result, err := cmd.Run(
 		cmd.O{Output: true, Dir: path.Join(release.Root(), `../`)},
 		`go`, `list`, `-e`, `-f`, `{{join .TestImports "\n"}}`, `./models/...`,
