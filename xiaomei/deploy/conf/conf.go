@@ -5,7 +5,7 @@ import (
 	"log"
 	"path/filepath"
 	"regexp"
-	"strings"
+	"strconv"
 	"time"
 
 	"github.com/fatih/color"
@@ -21,7 +21,8 @@ type Conf struct {
 type Service struct {
 	name, env        string
 	Nodes            map[string]string
-	Image, Ports     string
+	Image            string
+	Ports            []uint16
 	Command, Options []string
 }
 
@@ -98,25 +99,10 @@ func TimeTag(env string) string {
 
 var rePort = regexp.MustCompile(`^\d+$`)
 
-func (svc Service) Instances() (instances []string) {
-	if svc.Ports == `` {
-		return
-	}
-	for _, instance := range strings.Split(svc.Ports, `,`) {
-		instance = strings.TrimSpace(instance)
-		if rePort.MatchString(instance) {
-			instances = append(instances, instance)
-		} else {
-			log.Panicf(`deploy.yml: %s.instances: illegal format.`, svc.name)
-		}
-	}
-	return
-}
-
 func (svc Service) FirstContainerName() string {
 	name := release.AppConf(svc.env).DeployName() + `-` + svc.name
-	if instances := svc.Instances(); len(instances) > 0 {
-		name += `.` + instances[0]
+	if ports := svc.Ports; len(ports) > 0 {
+		name += `.` + strconv.FormatInt(int64(ports[0]), 10)
 	}
 	return name
 }

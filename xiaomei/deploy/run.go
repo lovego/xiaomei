@@ -2,6 +2,7 @@ package deploy
 
 import (
 	"fmt"
+	"runtime"
 
 	"github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
@@ -18,9 +19,14 @@ func run(env, svcName string) error {
 	args := []string{
 		`run`, `-it`, `--rm`, `--name=` + release.ServiceName(svcName, env) + `.run`,
 	}
-	if instanceEnvName := image.InstanceEnvName(); instanceEnvName != `` {
-		if instances := conf.GetService(svcName, env).Instances(); len(instances) > 0 {
-			args = append(args, `-e`, fmt.Sprintf(`%s=%s`, instanceEnvName, instances[0]))
+	if runtime.GOOS == `linux` { // only linux support host network
+		args = append(args, `--network=host`)
+	}
+	if portEnvVar := image.PortEnvVar(); portEnvVar != `` {
+		runPort := getRunPort(image, env, svcName)
+		args = append(args, `-e`, fmt.Sprintf(`%s=%d`, portEnvVar, runPort))
+		if runtime.GOOS != "linux" {
+			args = append(args, fmt.Sprintf(`--publish=%d:%d`, runPort, runPort))
 		}
 	}
 	if options := image.OptionsForRun(); len(options) > 0 {
@@ -30,4 +36,11 @@ func run(env, svcName string) error {
 	args = append(args, getCommonArgs(svcName, env, ``)...)
 	_, err := cmd.Run(cmd.O{}, `docker`, args...)
 	return err
+}
+
+func getRunPort(image images.Image, env, svcName string) uint16 {
+	if ports := conf.GetService(svcName, env).Ports; len(ports) > 0 {
+		return ports[0]
+	}
+	return image.DefaultPort()
 }

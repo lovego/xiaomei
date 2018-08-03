@@ -10,7 +10,11 @@ import (
 type Image struct {
 }
 
-func (i Image) InstanceEnvName() string {
+func (i Image) DefaultPort() uint16 {
+	return 80
+}
+
+func (i Image) PortEnvVar() string {
 	return `NGINXPORT`
 }
 

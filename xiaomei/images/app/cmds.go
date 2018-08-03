@@ -20,7 +20,9 @@ func Cmds() []*cobra.Command {
 		{
 			Use:   `compile`,
 			Short: `compile the app server binary.`,
-			RunE:  release.NoArgCall(compile),
+			RunE: release.NoArgCall(func() error {
+				return compile(false)
+			}),
 		},
 		depsCmd(),
 		copy2vendorCmd(),
@@ -32,14 +34,14 @@ func execCmd() *cobra.Command {
 		Use:   `exec [<env>]`,
 		Short: `compile and execute the app server binary.`,
 		RunE: release.EnvCall(func(env string) error {
-			if err := compile(); err != nil {
+			if err := compile(false); err != nil {
 				return err
 			}
 			signal.Ignore(os.Interrupt)
 			_, err := cmd.Run(cmd.O{
 				Dir: filepath.Join(release.Root(), `..`),
 				Env: []string{
-					`GODEV=true`, Image{}.EnvironmentEnvName() + `=` + env,
+					`GODEV=true`, Image{}.EnvironmentEnvVar() + `=` + env,
 				},
 			}, filepath.Join(release.Root(), `img-app`, release.Name()))
 			return err
@@ -48,14 +50,13 @@ func execCmd() *cobra.Command {
 	return cmd
 }
 
-func compile() error {
+func compile(linuxAMD64 bool) error {
 	log.Println(color.GreenString(`compile the app server binary.`))
-	if cmd.Ok(cmd.O{
-		Dir: filepath.Join(release.Root(), `..`),
-		Env: []string{
-			`GOBIN=` + filepath.Join(release.Root(), `img-app`),
-		},
-	}, `go`, `install`, `-v`) {
+	o := cmd.O{Dir: filepath.Join(release.Root(), `..`)}
+	if linuxAMD64 {
+		o.Env = []string{"GOOS=linux", "GOARCH=amd64"}
+	}
+	if cmd.Ok(o, `go`, `build`, `-v`, `-o`, `release/img-app/`+release.Name()) {
 		return spec.RunAll()
 	}
 	return errors.New(`compile the app server binary failed.`)

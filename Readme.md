@@ -105,6 +105,13 @@ example
 ```
 它包含了一个可立即运行、立即部署的"hello world"项目，基于这个基础来增加自己的功能即可。
 
+<a name="run"></a>
+### 运行项目
+```shell
+xiaomei app run
+```
+在项目内执行以上命令，就可以运行应用服务器，截图如下：
+
 <a name="deploy"></a>
 ### 基于Docker的部署
 xiaomei所有的运行环境都是基于docker的，在开发环境的产出都是docker镜像，然后再将这些镜像部署到其他环境来提供服务。

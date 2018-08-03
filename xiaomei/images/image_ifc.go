@@ -8,27 +8,37 @@ import (
 
 // the 7 interfaces, image driver choose to implement.
 
-// 1. instance env variable name
-func (i Image) InstanceEnvName() string {
+// 1. environment env variable name
+func (i Image) EnvironmentEnvVar() string {
 	if img, ok := i.image.(interface {
-		InstanceEnvName() string
+		EnvironmentEnvVar() string
 	}); ok {
-		return img.InstanceEnvName()
+		return img.EnvironmentEnvVar()
 	}
 	return ``
 }
 
-// 2. environment env variable name
-func (i Image) EnvironmentEnvName() string {
+// 2. instance env variable name
+func (i Image) PortEnvVar() string {
 	if img, ok := i.image.(interface {
-		EnvironmentEnvName() string
+		PortEnvVar() string
 	}); ok {
-		return img.EnvironmentEnvName()
+		return img.PortEnvVar()
 	}
 	return ``
 }
 
-// 3. options for run
+// 3. default port number
+func (i Image) DefaultPort() uint16 {
+	if img, ok := i.image.(interface {
+		DefaultPort() uint16
+	}); ok {
+		return img.DefaultPort()
+	}
+	return 0
+}
+
+// 4. options for run
 func (i Image) OptionsForRun() []string {
 	if img, ok := i.image.(interface {
 		OptionsForRun() []string
@@ -38,7 +48,7 @@ func (i Image) OptionsForRun() []string {
 	return nil
 }
 
-// 4. prepare files for build
+// 5. prepare files for build
 func (i Image) prepare() error {
 	if img, ok := i.image.(interface {
 		Prepare() error
@@ -48,7 +58,7 @@ func (i Image) prepare() error {
 	return nil
 }
 
-// 5. dir for build
+// 6. dir for build
 func (i Image) buildDir() string {
 	if img, ok := i.image.(interface {
 		BuildDir() string
@@ -58,7 +68,7 @@ func (i Image) buildDir() string {
 	return filepath.Join(release.Root(), `img-`+i.svcName)
 }
 
-// 6. dockerfile for build
+// 7. dockerfile for build
 func (i Image) dockerfile() string {
 	if img, ok := i.image.(interface {
 		Dockerfile() string

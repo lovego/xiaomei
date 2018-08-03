@@ -17,7 +17,6 @@ import (
 	"github.com/lovego/xiaomei/config"
 	"github.com/lovego/xiaomei/renderer"
 	"github.com/lovego/xiaomei/router"
-	"github.com/lovego/xiaomei/server/funcs"
 	"github.com/lovego/xiaomei/session"
 )
 
@@ -48,7 +47,7 @@ func NewSession() session.Session {
 
 func NewRenderer() *renderer.Renderer {
 	return renderer.New(
-		path.Join(config.Root(), `views`), `layout/default`, !config.DevMode(), funcs.Index(),
+		path.Join(config.Root(), `views`), `layout/default`, !config.DevMode(),
 	)
 }
 

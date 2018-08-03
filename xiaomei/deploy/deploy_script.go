@@ -10,35 +10,46 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-// TODO: keep container history
 const deployScriptTmpl = `set -e
 {{ range .VolumesToCreate }}
 docker volume create {{ . }}
 {{- end }}
+test $(uname) = Linux && isLinux=true || isLinux=false
 
 deploy() {
-	local type=$1
-	local name=$2
-	local args=$3
-	docker stop $name >/dev/null 2>&1 && docker rm $name
-	id=$(docker run --name=$name -d --restart=always $args)
-	echo -n "$name starting "
-	test "$type" = app && until docker exec "$id" sh -c 'wget -qO- http://localhost:${GOPORT:-3000}/_alive'; do
-		case $(docker ps --format {{ "'{{.Status}}'" }} --filter "id=$id") in
-		Up* ) echo -n .; sleep 1s ;;
-		*   ) docker logs "$id"; sleep 5s ;;
-		esac
-	done; echo
+  local name=$1
+  local args=$2
+  local portEnvVar=$3
+  local port=$4
+
+  $isLinux && args+=' --network=host'
+  if test -n "$portEnvVar"; then
+    args="-e $portEnvVar=$port $args"
+    $isLinux || args="-p $port:$port $args"
+  fi
+
+  docker stop $name >/dev/null 2>&1 && docker rm $name
+  id=$(docker run --name=$name -d --restart=always $args)
+  echo -n "$name starting "
+
+  until docker logs $id 2>&1 | fgrep started.; do
+    case $(docker ps --format {{ "'{{.Status}}'" }} --filter "id=$id") in
+    Up* ) echo -n .; sleep 1s ;;
+    *   ) echo; docker logs "$id"; sleep 5s ;;
+    esac
+  done
 }
 
 {{ range .Services -}}
-args='{{.CommonArgs}}'
-{{ $svc := . -}}
-{{ range .Instances -}}
-deploy {{$svc.Type}} {{$svc.Name}}.{{.}} "-e {{$svc.InstanceEnvName}}={{.}} $args"
-{{ else -}}
-deploy {{$svc.Type}} {{.Name}} "$args"
-{{ end }}
+  args='{{ .CommonArgs }}'{{"\n"}}
+  {{- $svc := . -}}
+  {{ if .PortEnvVar -}}
+    {{ range .Ports -}}
+      deploy {{$svc.Name}}.{{.}} "$args" "{{$svc.PortEnvVar}}" {{.}}{{"\n"}}
+    {{- end -}}
+  {{- else -}}
+    deploy {{$svc.Name}} "$args"{{"\n"}}
+  {{- end -}}
 {{ end -}}
 `
 
@@ -56,8 +67,8 @@ type deployConfig struct {
 	Services        []serviceConfig
 }
 type serviceConfig struct {
-	Type, Name, InstanceEnvName, CommonArgs string
-	Instances                               []string
+	Name, CommonArgs, PortEnvVar string
+	Ports                        []uint16
 }
 
 func getDeployConfig(svcNames []string, env, timeTag string) deployConfig {
@@ -73,13 +84,12 @@ func getDeployConfig(svcNames []string, env, timeTag string) deployConfig {
 func getServiceConf(svcName, env, timeTag string) serviceConfig {
 	commonArgs := getCommonArgs(svcName, env, timeTag)
 	data := serviceConfig{
-		Type:            svcName,
-		Name:            release.ServiceName(svcName, env),
-		InstanceEnvName: images.Get(svcName).InstanceEnvName(),
-		CommonArgs:      strings.Join(commonArgs, ` `),
+		Name:       release.ServiceName(svcName, env),
+		CommonArgs: strings.Join(commonArgs, ` `),
+		PortEnvVar: images.Get(svcName).PortEnvVar(),
 	}
-	if data.InstanceEnvName != `` {
-		data.Instances = conf.GetService(svcName, env).Instances()
+	if data.PortEnvVar != `` {
+		data.Ports = conf.GetService(svcName, env).Ports
 	}
 	return data
 }

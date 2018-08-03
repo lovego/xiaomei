@@ -3,6 +3,6 @@ package logc
 type Image struct {
 }
 
-func (i Image) EnvironmentEnvName() string {
+func (i Image) EnvironmentEnvVar() string {
 	return `GOENV`
 }

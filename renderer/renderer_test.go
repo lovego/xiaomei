@@ -12,7 +12,7 @@ type testData struct {
 }
 
 var r = New(
-	path.Join(path.Dir(sourcePath()), `renderer_test`), `layout`, true, nil,
+	path.Join(path.Dir(sourcePath()), `renderer_test`), `layout`, true,
 )
 
 func TestRenderer1(t *testing.T) {

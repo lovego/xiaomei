@@ -2,6 +2,7 @@ package access
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 
 	"github.com/lovego/xiaomei/config/conf"
@@ -31,10 +32,10 @@ func (s *service) Addrs() ([]string, error) {
 	}
 	if s.addrs == nil {
 		addrs := []string{}
-		instances := deployConf.GetService(s.svcName, s.Env).Instances()
+		ports := deployConf.GetService(s.svcName, s.Env).Ports
 		for _, node := range s.Nodes() {
-			for _, instance := range instances {
-				upstreamAddr := node.GetListenAddr() + `:` + instance
+			for _, port := range ports {
+				upstreamAddr := node.GetListenAddr() + `:` + strconv.FormatInt(int64(port), 10)
 				if s.downAddr != "" && s.downAddr == node.Addr {
 					upstreamAddr += " down"
 				}

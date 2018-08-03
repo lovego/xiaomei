@@ -13,11 +13,11 @@ defaults: &defaults
   services:
     app:
       image: {{ .Registry }}{{ .ProNameUrlSafe }}/app
-      ports: "3001,4001"
+      ports: [ 3001, 4001 ]
       options: [ -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}/log" ]
     web:
       image: {{ .Registry }}{{ .ProNameUrlSafe }}/web
-      ports: "8001"
+      ports: [ 8001 ]
       options: [ -v, "{{ .ProName }}-logs:/var/log/nginx/{{ .ProName }}" ]
     logc:
       image: {{ .Registry }}{{ .ProNameUrlSafe }}/logc

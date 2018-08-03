@@ -3,12 +3,16 @@ package app
 type Image struct {
 }
 
-func (i Image) InstanceEnvName() string {
+func (i Image) EnvironmentEnvVar() string {
+	return `GOENV`
+}
+
+func (i Image) PortEnvVar() string {
 	return `GOPORT`
 }
 
-func (i Image) EnvironmentEnvName() string {
-	return `GOENV`
+func (i Image) DefaultPort() uint16 {
+	return 3000
 }
 
 func (i Image) OptionsForRun() []string {
@@ -16,7 +20,7 @@ func (i Image) OptionsForRun() []string {
 }
 
 func (i Image) Prepare() error {
-	if err := compile(); err != nil {
+	if err := compile(true); err != nil {
 		return err
 	}
 	/*

@@ -17,11 +17,10 @@ type Renderer struct {
 	Funcs template.FuncMap
 }
 
-func New(root, layout string, cache bool, funcs template.FuncMap) *Renderer {
+func New(root, layout string, cache bool) *Renderer {
 	r := &Renderer{
 		Root:   filepath.Clean(root),
 		Layout: filepath.Clean(layout),
-		Funcs:  funcs,
 	}
 	if cache {
 		r.Templates = make(map[string]*template.Template)
