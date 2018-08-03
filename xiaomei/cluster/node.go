@@ -48,7 +48,7 @@ func (n Node) GetListenAddr() string {
 }
 
 func (n Node) Run(o cmd.O, script string) (string, error) {
-	isLocal, err := IsLocalHost(n.Addr)
+	isLocal, err := n.IsLocalHost()
 	if err != nil {
 		return ``, err
 	}
@@ -68,21 +68,8 @@ func (n Node) Run(o cmd.O, script string) (string, error) {
 	}
 }
 
-func IsCurrentUser(users string) (bool, error) {
-	u, err := user.Current()
-	if u == nil || err != nil {
-		return false, err
-	}
-	for _, user := range strings.Split(users, `,`) {
-		if u.Username == user || u.Name == user {
-			return true, nil
-		}
-	}
-	return false, nil
-}
-
-func IsLocalHost(addr string) (bool, error) {
-	ips, err := net.LookupIP(addr)
+func (n Node) IsLocalHost() (bool, error) {
+	ips, err := net.LookupIP(n.Addr)
 	if err != nil {
 		return false, err
 	}
@@ -94,6 +81,19 @@ func IsLocalHost(addr string) (bool, error) {
 	machineAddrs := MachineAddrs()
 	for _, ip := range ips {
 		if slice.ContainsString(machineAddrs, ip.String()) {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func IsCurrentUser(users string) (bool, error) {
+	u, err := user.Current()
+	if u == nil || err != nil {
+		return false, err
+	}
+	for _, user := range strings.Split(users, `,`) {
+		if u.Username == user || u.Name == user {
 			return true, nil
 		}
 	}
