@@ -20,7 +20,9 @@ var theLogger = loggerPkg.New(os.Stderr)
 func init() {
 	theLogger.SetAlarm(theAlarm)
 	theLogger.SetMachineName()
-	theLogger.SetMachineIP()
+	if DevMode() {
+		theLogger.SetLevel(loggerPkg.Debug)
+	}
 }
 
 func DevMode() bool {
@@ -45,7 +47,9 @@ func NewLogger(paths ...string) *loggerPkg.Logger {
 	logger := loggerPkg.New(file)
 	logger.SetAlarm(Alarm())
 	logger.SetMachineName()
-	logger.SetMachineIP()
+	if DevMode() {
+		theLogger.SetLevel(loggerPkg.Debug)
+	}
 	return logger
 }
 
