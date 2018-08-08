@@ -1,3 +1,5 @@
+// +build registry
+
 package registry
 
 import (
