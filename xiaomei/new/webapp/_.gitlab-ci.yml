@@ -17,7 +17,7 @@ before_script:
   # link project to $GOPATH, and cd to project to run build and test stages.
   # and you should add script which creates databases and tables for build and test if need.
   - mkdir -p /go/src/github.com/lovego
-  - ln -sf /builds/go/<project> /go/src/github.com/lovego/<project> && cd /go/src/github.com/lovego/<project>
+  - ln -sf /builds/go/{{ .ProName }} /go/src/github.com/lovego/{{ .ProName }} && cd /go/src/github.com/lovego/{{ .ProName }}
 build:
   stage: build
   script:

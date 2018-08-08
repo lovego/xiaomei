@@ -1,3 +1,9 @@
+defaults: &defaults
+  timeZone: { name: China, offset: 28800 }
+  # mailer://smtp.exmail.qq.com:587/?user=报警<alarm@exmaple.com>&pass=123456
+  mailer: "mailer://smtp.qq.com:25/?user=小美<xiaomei-go@qq.com>&pass=zjsbosjlhgugechh"
+  keepers: [ "小美<xiaomei-go@qq.com>" ]
+
 name: {{ .ProName }}
 envs:
   dev:
@@ -29,10 +35,3 @@ envs:
     https: true
     domain: {{ .ProNameUrlSafe }}.example.com
     secret: {{ genSecret }}
-
-defaults: &defaults
-  timeZone: { name: China, offset: 28800 }
-  # mailer://smtp.exmail.qq.com:587/?user=报警<alarm@exmaple.com>&pass=123456
-  mailer: "mailer://smtp.qq.com:25/?user=小美<xiaomei-go@qq.com>&pass=zjsbosjlhgugechh"
-  keepers: [ "小美<xiaomei-go@qq.com>" ]
-

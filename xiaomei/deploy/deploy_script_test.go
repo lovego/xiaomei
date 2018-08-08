@@ -53,10 +53,10 @@ func ExampleDeployScript() {
 	//   fi
 	//
 	//   docker stop $name >/dev/null 2>&1 && docker rm $name
-	//   id=$(docker run --name=$name $args -d --restart=always)
+	//   id=$(docker run --name=$name -d --restart=always $args)
 	//   echo -n "$name starting "
 	//
-	//   until "docker logs $id | fgrep started."; do
+	//   until docker logs $id 2>&1 | fgrep ' started.'; do
 	//     case $(docker ps --format '{{.Status}}' --filter "id=$id") in
 	//     Up* ) echo -n .; sleep 1s ;;
 	//     *   ) echo; docker logs "$id"; sleep 5s ;;

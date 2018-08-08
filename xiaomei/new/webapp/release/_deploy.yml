@@ -1,14 +1,3 @@
-dev:
-  <<: *defaults
-demo:
-  <<: *defaults
-qa:
-  <<: *defaults
-preview:
-  <<: *defaults
-production:
-  <<: *defaults
-
 defaults: &defaults
   services:
     app:
@@ -25,3 +14,15 @@ defaults: &defaults
                  -v, "/var/run/docker.sock:/var/run/docker.sock" ]
 
   volumesToCreate: [ {{ .ProName }}-logs ]
+
+dev:
+  <<: *defaults
+demo:
+  <<: *defaults
+qa:
+  <<: *defaults
+preview:
+  <<: *defaults
+production:
+  <<: *defaults
+
