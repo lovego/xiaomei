@@ -37,7 +37,7 @@ func ExampleDeployScript() {
 	// Output:
 	// set -e
 	//
-	// docker volume create example-logs
+	// docker volume create example-logs >/dev/null
 	// test $(uname) = Linux && isLinux=true || isLinux=false
 	//
 	// deploy() {
@@ -52,16 +52,10 @@ func ExampleDeployScript() {
 	//     $isLinux || args="-p $port:$port $args"
 	//   fi
 	//
-	//   docker stop $name >/dev/null 2>&1 && docker rm $name
-	//   id=$(docker run --name=$name -d --restart=always $args)
-	//   echo -n "$name starting "
-	//
-	//   until docker logs $id 2>&1 | fgrep ' started.'; do
-	//     case $(docker ps --format '{{.Status}}' --filter "id=$id") in
-	//     Up* ) echo -n .; sleep 1s ;;
-	//     *   ) echo; docker logs "$id"; sleep 5s ;;
-	//     esac
-	//   done
+	//   docker stop $name >/dev/null 2>&1 && docker rm $name >/dev/null
+	//   id=$(docker run --name=$name -dt --restart=always $args)
+	//   echo $name
+	//   docker logs -f $id 2>&1 | { sed '/started./q'; pkill -P $$ docker; }
 	// }
 	//
 	// args='-e GOENV=production -v example-logs:/home/ubuntu/logs registry.example.com/example/app:production-180803-141210'

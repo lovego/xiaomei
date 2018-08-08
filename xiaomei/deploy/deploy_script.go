@@ -12,7 +12,7 @@ import (
 
 const deployScriptTmpl = `set -e
 {{ range .VolumesToCreate }}
-docker volume create {{ . }}
+docker volume create {{ . }} >/dev/null
 {{- end }}
 test $(uname) = Linux && isLinux=true || isLinux=false
 
@@ -22,22 +22,16 @@ deploy() {
   local portEnvVar=$3
   local port=$4
 
-  $isLinux && args+=' --network=host'
+  $isLinux && args=" --network=host $args"
   if test -n "$portEnvVar"; then
     args="-e $portEnvVar=$port $args"
     $isLinux || args="-p $port:$port $args"
   fi
 
-  docker stop $name >/dev/null 2>&1 && docker rm $name
-  id=$(docker run --name=$name -d --restart=always $args)
-  echo -n "$name starting "
-
-  until docker logs $id 2>&1 | fgrep ' started.'; do
-    case $(docker ps --format {{ "'{{.Status}}'" }} --filter "id=$id") in
-    Up* ) echo -n .; sleep 1s ;;
-    *   ) echo; docker logs "$id"; sleep 5s ;;
-    esac
-  done
+  docker stop $name >/dev/null 2>&1 && docker rm $name >/dev/null
+  id=$(docker run --name=$name -dt --restart=always $args)
+  echo $name
+  docker logs -f $id 2>&1 | { sed '/started./q'; pkill -P $$ docker; }
 }
 
 {{ range .Services -}}

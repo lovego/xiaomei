@@ -10,13 +10,14 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/access"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
+	"github.com/lovego/xiaomei/xiaomei/oam"
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
 func deploy(svcName, env, timeTag, feature string) error {
 	svcs := getServices(env, svcName)
 	ha := expectHighAvailable(env, svcs)
-	psScript := fmt.Sprintf(`watch docker ps -f name=%s`, release.ServiceName(svcName, env))
+	psScript := fmt.Sprintf(oam.WatchCmd()+` docker ps -f name=%s`, release.ServiceName(svcName, env))
 	for _, node := range cluster.Get(env).GetNodes(feature) {
 		if ha {
 			if err := access.SetupNginx(env, "", "", node.Addr); err != nil {

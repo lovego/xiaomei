@@ -44,11 +44,23 @@ done
 }
 
 func ps(svcName, env, feature string, watch bool) error {
-	script := fmt.Sprintf(`docker ps -f name=%s`, release.ServiceName(svcName, env))
+	script := fmt.Sprintf(` docker ps -f name=%s`, release.ServiceName(svcName, env))
 	if watch {
-		script = `watch ` + script
+		script = WatchCmd() + script
 	}
 	return eachNodeRun(env, script, feature)
+}
+
+func WatchCmd() string {
+	return `which watch >/dev/null || watch() {
+  trap "echo; exit 0" INT
+  while true; do
+   clear
+   "$@"
+   sleep 2
+  done
+}
+watch`
 }
 
 func eachNodeRun(env, script, feature string) error {
