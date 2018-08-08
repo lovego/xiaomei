@@ -46,7 +46,7 @@ func ExampleDeployScript() {
 	//   local portEnvVar=$3
 	//   local port=$4
 	//
-	//   $isLinux && args+=' --network=host'
+	//   $isLinux && args=" --network=host $args"
 	//   if test -n "$portEnvVar"; then
 	//     args="-e $portEnvVar=$port $args"
 	//     $isLinux || args="-p $port:$port $args"
