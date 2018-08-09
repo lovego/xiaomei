@@ -19,12 +19,26 @@
 - [最简单的过滤器](./server/filter.md)
 - [Express风格的路由](./router)
 - [请求](./request.md)
-- [包含自动报警的应答](./response.md)
+- [应答（自动报警）](./response.md)
 - [会话](./session)
 - [模版渲染](./renderer)
 - [统一的配置](./config)
 - [常见数据库连接](./config/db)
-
+<style>
+ .code {
+    padding: 16px;
+    margin-bottom: 16px;
+    overflow: auto;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: #f6f8fa;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  }
+  .green {
+    color: #0d0;
+  }
+</style>
 <a name="install"></a>
 ### 安装
 ```shell
@@ -52,12 +66,17 @@ xiaomei access -s qa         # 设置QA环境的Nginx接入层
 xiaomei deploy production    # 部署所有服务到生产环境
 xiaomei access -s production # 设置生产环境的Nginx接入层
 ```
+现在xiaomei包含了这些服务：
+1. app服务：运行项目编译出的二进制文件，用来服务HTTP请求、执行定时任务等。
+2. web服务：运行nginx，用来服务项目内的静态文件。
+3. logc服务：运行logc日志收集工具，存储到ElasticSearch，供Kibana可视化展现。
+
 xiaomei的完整命令行用法可以使用`xiaomei --help`来查看。
 
 <a name="new"></a>
 ### 生成项目
 ```shell
-xiaomei new example
+MacBook:~/go/src/example$ xiaomei new example
 ```
 执行以上命令，在当前目录生成了一个名为example的项目。项目目录结构如下：
 ```
@@ -108,16 +127,32 @@ example
 <a name="run"></a>
 ### 运行项目
 ```shell
-xiaomei app run
+MacBook:~/go/src/example$ xiaomei app exec
+2018/08/09 09:16:58 compile the app server binary.
+2018/08/09 09:17:00 check app code spec.
+2018/08/09 09:17:00 starting.(dev)
+2018/08/09 09:17:00 started.(:3000)
 ```
-在项目内执行以上命令，就可以运行应用服务器，截图如下：
+在项目内执行以上命令，就可以运行应用服务器，该命令编译项目为可执行文件，然后执行它。
+如果本机已经安装好了Docker，也可以执行如下命令来运行项目：
+
+<div class="code">
+MacBook:~/go/src/example$ xiaomei app run<br>
+2018/08/09 09:11:15 <span class="green">compile the app server binary.</span><br>
+2018/08/09 09:11:17 check app code spec.<br>
+2018/08/09 09:11:17 building app image.<br>
+docker build --pull --file=Dockerfile --tag=registry.example.com/example/app .<br>
+... # 此处省略若干构建镜像过程中的输出<br>
+Successfully built 3f8020e2c72a<br>
+Successfully tagged registry.hztl3.com/example/app:latest<br>
+2018/08/09 09:11:25 starting.(dev)<br>
+2018/08/09 09:11:25 started.(:3001)<br>
+</div>
+该命令编译项目为可执行文件，然后构建并运行Docker镜像。因为部署时也使用Docker镜像的方式，
+因此`run`比`exec`更加接近真实的部署环境，但是因为每次都要构建镜像，所以比`exec`慢一些。
 
 <a name="deploy"></a>
 ### 基于Docker的部署
-xiaomei所有的运行环境都是基于docker的，在开发环境的产出都是docker镜像，然后再将这些镜像部署到其他环境来提供服务。
+xiaomei的部署是基于docker的，首先基于项目构建docker镜像，再将镜像推送到registry，
+然后在目标部署机器上拉取并运行这些镜像。
 
-现在xiaomei包含了这些镜像：
-1. app镜像运行项目编译出的二进制文件，用来服务动态内容或者运行定时任务等。
-2. web镜像运行nginx，它服务静态文件。
-3. logc镜像运行logc工具，收集服务的日志，存储到ElasticSearch，供Kibana可视化展现。
-4. godoc镜像运行godoc工具，从golang源码提供文档。
