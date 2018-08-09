@@ -65,7 +65,7 @@ func GetService(svcName, env string) *Service {
 
 func ServiceNames(env string) (names []string) {
 	services := Get(env).Services
-	for _, svcName := range []string{`app`, `tasks`, `web`, `logc`, `godoc`} {
+	for _, svcName := range []string{`app`, `web`, `logc`} {
 		if _, ok := services[svcName]; ok {
 			names = append(names, svcName)
 		}

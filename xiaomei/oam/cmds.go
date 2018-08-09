@@ -65,7 +65,7 @@ func psCmdFor(svcName string) *cobra.Command {
 	var watch bool
 	cmd := &cobra.Command{
 		Use:   `ps [<env>]`,
-		Short: `[oam] list tasks of the ` + desc(svcName) + `.`,
+		Short: `[oam] list containers of the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			return ps(svcName, env, filter, watch)
 		}),
