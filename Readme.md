@@ -8,12 +8,12 @@
 
 命令相关文档
 - [安装](#install)
-- [概览](#overview)
+- [概览](./xiaomei)
 - [生成项目](#new)
 - [运行项目](#run)
 - [基于Docker的部署](#deploy)
 - [基于Nginx的接入层（负载均衡）](#access)
-- [JSON格式的日志记录、实时收集](./server/log.md)
+- [JSON格式的日志记录、实时收集](#logging)
 
 代码相关文档
 - [最简单的过滤器](./server/filter.md)
@@ -26,7 +26,7 @@
 - [常见数据库连接](./config/db)
 
 <a name="install"></a>
-### 安装
+## 安装
 ```shell
 go get github.com/lovego/xiaomei/xiaomei
 ```
@@ -34,7 +34,7 @@ go get github.com/lovego/xiaomei/xiaomei
 如果`$GOPATH/bin`已经在`$PATH`搜索路径中，你可以输入`xiaomei version`命令来检查xiaomei是否已经安装成功。如果输出类似"xiaomei version 18.7.13"的版本信息，就说明已经安装成功了。
 
 <a name="overview"></a>
-### 概览
+## 概览
 在项目的开发流程中常用的命令如下：
 ```shell
 xiaomei new example          # 生成项目
@@ -60,7 +60,7 @@ xiaomei access -s production # 设置生产环境的Nginx接入层
 xiaomei的完整命令行用法可以使用`xiaomei --help`来查看。
 
 <a name="new"></a>
-### 生成项目
+## 生成项目
 ```shell
 MacBook:~/go/src/example$ xiaomei new example
 ```
@@ -111,7 +111,7 @@ example
 它包含了一个可立即运行、立即部署的"hello world"项目，基于这个基础来增加自己的功能即可。
 
 <a name="run"></a>
-### 运行项目
+## 运行项目
 ```shell
 MacBook:~/go/src/example$ xiaomei app exec
 2018/08/09 09:16:58 compile the app server binary.
@@ -138,10 +138,10 @@ Successfully tagged registry.example.com/example/app:latest
 因此`run`比`exec`更加接近真实的部署环境，但是因为每次都要构建镜像，所以比`exec`慢一些。`run`跟部署一样，需要注意[非Linux环境宿主机访问限制](#host-network)。
 
 <a name="deploy"></a>
-### 基于Docker的部署
+## 基于Docker的部署
 xiaomei的部署是基于docker的，首先基于项目构建docker镜像，再将镜像推送到registry，
 然后在目标部署机器上拉取并运行这些镜像。
-release/clusters.yml包含了部署机器的配置，release/deploy.yml包含了每台机器上部署服务的配置。
+release/clusters.yml是部署机器的配置文件，release/deploy.yml每台机器上部署的服务的配置文件。
 
 ```shell
 MacBook:~/go/src/example$ xiaomei app deploy
@@ -167,9 +167,87 @@ example-dev-app.4001
 ```
 如上是部署到开发环境的命令及输出。
 
-#### <a name="host-network">非Linux环境宿主机访问限制</a>
+### <a name="host-network">非Linux环境宿主机访问限制</a>
 需要注意，在Linux环境下使用了`--network=host`的Docker网络模式，因此可以在容器内直接使用localhost或127.0.0.1来访问宿主机。在非Linux环境下，Docker不支持`--network=host`，所以则不能使用localhost或127.0.0.1来访问宿主机,，而需要使用宿主机的其他IP来访问。
 
 <a name="access"></a>
-### 基于Nginx的接入层（负载均衡）
+## 基于Nginx的接入层（负载均衡）
+xiaomei使用Nginx作为接入层和负载均衡。release/access.conf.tmpl是Nginx配置的模板文件，可以根据你的需求修改。xiaomei根据该模板生成Nginx配置。 使用如下命令可查看生成的nginx配置。
+```
+MacBook:~/go/src/example$ xiaomei access
+upstream example-dev-app {
+  server 127.0.0.1:3001;
+  server 127.0.0.1:4001;
+  keepalive 1;
+}
+upstream example-dev-web {
+  server 127.0.0.1:8001 fail_timeout=3m;
+  keepalive 1;
+}
+server {
+  listen 80;
+  server_name example.dev.example.com;
+  
+  location = / {
+    proxy_pass http://example-dev-web;
+  }
+  location ~ \.(html|js|css|png|gif|jpg|svg|ico|woff|woff2|ttf|eot|map|json)$ {
+    proxy_pass http://example-dev-web;
+  }
+  location / {
+    proxy_pass http://example-dev-app;
+  }
 
+  proxy_http_version 1.1;
+  proxy_set_header Connection "";
+  proxy_set_header Host $http_host;
+  proxy_set_header X-Real-IP $remote_addr;
+  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_set_header X-Forwarded-Proto $scheme;
+  proxy_connect_timeout 3s;
+
+  access_log /var/log/nginx/example.dev.example.com/access.log;
+  error_log  /var/log/nginx/example.dev.example.com/access.err;
+}
+```
+使用`xiaomei access -s`命令则可以将Nginx配置写到接入层机器的`/etc/nginx/sites-enabled/<domain>`这个文件内，并且重新加载Nginx配置。
+1. release/clusters.yml文件中`labels.access`为`true`的机器就是需要配置接入层的机器。
+2. 重新加载Nginx配置通过执行 `sudo systemctl reload nginx` 或 `sudo service nginx reload` 命令来完成，因此`xiaomei access -s`是只支持Linux系统的。
+3. Ubuntu的Nginx的主配置文件默认包含`include /etc/nginx/sites-enabled/*;`这条配置，所以/etc/nginx/sites-enabled目录下的所有配置文件都会生效。其他Linux发行版，如果没有这条配置，需要自行添加。
+4. 其中`<domain>`代表项目的域名，在release/img-app/config/config.yml配置文件中配置。
+
+```
+ubuntu@ubuntu:~/go/src/example$ xiaomei access -s
+2018/08/11 17:41:00 ubuntu@127.0.0.1
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+```
+
+<a name="logging"></a>
+## JSON格式的日志记录、实时收集
+```
+{
+  "agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36",
+  "at": "2018-08-11T18:11:36.052356321+08:00",
+  "duration": 0.067402,
+  "host": "localhost:3000",
+  "ip": "::1",
+  "level": "info",
+  "machineName": "MacBook",
+  "method": "GET",
+  "path": "/",
+  "query": {
+    "name": [
+      "value"
+    ]
+  },
+  "rawQuery": "name=value",
+  "refer": "",
+  "reqBodySize": 0,
+  "resBodySize": 23,
+  "status": 200,
+  "tags": {
+    "hello": "world"
+  }
+}
+```

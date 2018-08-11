@@ -21,7 +21,6 @@ func getLogger() *loggerPkg.Logger {
 	logger := loggerPkg.New(getLogWriter())
 	logger.SetAlarm(config.Alarm())
 	logger.SetMachineName()
-	logger.SetMachineIP()
 	return logger
 }
 
