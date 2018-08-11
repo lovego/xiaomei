@@ -72,7 +72,7 @@ func getNginxConf(svcName string, data interface{}) (string, error) {
 	if name == `` {
 		name = `access`
 	}
-	file := filepath.Join(release.Root(), `access`, name+`.conf.tmpl`)
+	file := filepath.Join(release.Root(), name+`.conf.tmpl`)
 	content, err := ioutil.ReadFile(file)
 	if err != nil {
 		return ``, err
