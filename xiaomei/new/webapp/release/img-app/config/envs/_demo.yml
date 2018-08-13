@@ -1,0 +1,9 @@
+postgres:
+  default: postgres://postgres:@localhost/{{.ProName}}_demo
+mysql:
+  default: root:root@tcp(127.0.0.1:3306)/{{.ProName}}_demo
+mongo:
+  default: mongodb://127.0.0.1/{{.ProName}}_demo
+redis:
+  default: redis://:@localhost:6379/0
+

@@ -1,8 +1,0 @@
-mysql:
-  default: root:root@tcp(127.0.0.1:3306)/dbname
-postgres:
-  default: postgres://develop:@localhost/dbname
-redis:
-  default: redis://:@localhost:6379/0
-mongo:
-  default: mongodb://10.249.6.30/dbname
