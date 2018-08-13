@@ -9,6 +9,7 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/images/logc"
 	"github.com/lovego/xiaomei/xiaomei/images/web"
 	"github.com/lovego/xiaomei/xiaomei/oam"
+	"github.com/lovego/xiaomei/xiaomei/run"
 	"github.com/spf13/cobra"
 )
 
@@ -26,6 +27,7 @@ func serviceCmd(name, desc string, cmds []*cobra.Command) *cobra.Command {
 		Use:   name,
 		Short: desc,
 	}
+	theCmd.AddCommand(run.Cmds(name)...)
 	theCmd.AddCommand(deploy.Cmds(name)...)
 	if cmd := access.Cmd(name); cmd != nil {
 		theCmd.AddCommand(cmd)

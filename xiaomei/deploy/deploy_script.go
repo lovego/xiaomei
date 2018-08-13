@@ -76,7 +76,7 @@ func getDeployConfig(svcNames []string, env, timeTag string) deployConfig {
 }
 
 func getServiceConf(svcName, env, timeTag string) serviceConfig {
-	commonArgs := getCommonArgs(svcName, env, timeTag)
+	commonArgs := GetCommonArgs(svcName, env, timeTag)
 	data := serviceConfig{
 		Name:       release.ServiceName(svcName, env),
 		CommonArgs: strings.Join(commonArgs, ` `),

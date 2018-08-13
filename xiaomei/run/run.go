@@ -1,10 +1,11 @@
-package deploy
+package run
 
 import (
 	"fmt"
 	"runtime"
 
 	"github.com/lovego/cmd"
+	"github.com/lovego/xiaomei/xiaomei/deploy"
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/images"
 	"github.com/lovego/xiaomei/xiaomei/release"
@@ -33,7 +34,7 @@ func run(env, svcName string) error {
 		args = append(args, options...)
 	}
 
-	args = append(args, getCommonArgs(svcName, env, ``)...)
+	args = append(args, deploy.GetCommonArgs(svcName, env, ``)...)
 	_, err := cmd.Run(cmd.O{}, `docker`, args...)
 	return err
 }

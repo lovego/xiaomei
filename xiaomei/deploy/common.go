@@ -6,7 +6,7 @@ import (
 	//	"github.com/lovego/xiaomei/xiaomei/registry"
 )
 
-func getCommonArgs(svcName, env, timeTag string) []string {
+func GetCommonArgs(svcName, env, timeTag string) []string {
 	service := conf.GetService(svcName, env)
 
 	args := []string{}

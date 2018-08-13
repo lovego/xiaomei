@@ -10,27 +10,10 @@ import (
 
 // Run, Deploy, Ps, Logs commands
 func Cmds(svcName string) (cmds []*cobra.Command) {
-	if svcName != `` {
-		cmds = append(cmds, runCmdFor(svcName))
-	}
-	cmds = append(cmds,
+	return []*cobra.Command{
 		deployCmdFor(svcName),
 		rmDeployCmdFor(svcName),
-	)
-	return
-}
-
-func runCmdFor(svcName string) *cobra.Command {
-	// var publish []string
-	cmd := &cobra.Command{
-		Use:   `run [<env>]`,
-		Short: `run    the ` + desc(svcName) + `.`,
-		RunE: release.EnvCall(func(env string) error {
-			return run(env, svcName)
-		}),
 	}
-	// cmd.Flags().StringSliceVarP(&publish, `publish`, `p`, nil, `publish ports for container.`)
-	return cmd
 }
 
 func deployCmdFor(svcName string) *cobra.Command {

@@ -17,3 +17,5 @@ xiaomei access -s qa         # 设置QA环境的Nginx接入层
 xiaomei deploy production    # 部署所有服务到生产环境
 xiaomei access -s production # 设置生产环境的Nginx接入层
 ```
+
+xiaomei的完整命令行用法可以使用`xiaomei --help`来查看。
