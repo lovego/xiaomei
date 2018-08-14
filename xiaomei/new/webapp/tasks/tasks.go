@@ -13,12 +13,12 @@ import (
 var logger = config.NewLogger("cron.log")
 var debug = os.Getenv("debugTasks") != ""
 
-func Run() {
+func Start() {
 	c := cron.New(redisdb.Pool("default"))
 	if err := c.AddFunc("0 * * * * *", exampleTask); err != nil {
 		logger.Panic(err)
 	}
-	c.Run()
+	c.Start()
 }
 
 func exampleTask() {

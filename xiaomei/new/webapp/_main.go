@@ -20,7 +20,7 @@ func main() {
 		Renderer:       server.NewRenderer(),
 		LayoutDataFunc: layoutData,
 	}
-  // go tasks.Run()
+  // tasks.Start()
 	svr.ListenAndServe()
 }
 
