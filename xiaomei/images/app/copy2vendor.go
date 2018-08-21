@@ -24,7 +24,7 @@ func copy2vendorCmd() *cobra.Command {
 			return copy2Vendor(args, excludeTest)
 		},
 	}
-	cmd.Flags().BoolVarP(&all, `all`, `a`, false, `copy all dependences not aready in vendor dir.`)
+	cmd.Flags().BoolVarP(&all, `all`, `a`, false, `copy all dependences not in vendor dir.`)
 	cmd.Flags().BoolVarP(&excludeTest, `exclude-test`, `e`, false, `exclude test dependences.`)
 	return cmd
 }
