@@ -64,7 +64,7 @@ func logFields(f *loggerPkg.Fields, req *xiaomei.Request, res *xiaomei.Response,
 func tryUnmarshal(b []byte) interface{} {
 	var v map[string]interface{}
 	err := json.Unmarshal(b, &v)
-	if err != nil {
+	if err == nil {
 		return v
 	} else {
 		return string(b)
