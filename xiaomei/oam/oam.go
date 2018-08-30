@@ -22,7 +22,7 @@ func shell(svcName, env, feature string) error {
 
 func logs(svcName, env, feature string) error {
 	script := fmt.Sprintf(`
-for name in $(docker ps -af name=%s --format '{{.Names}}'); do
+for name in $(docker ps -af name=^/%s --format '{{.Names}}'); do
 	echo -e "\033[32m$name\033[0m"
 	docker logs $name
 	echo
@@ -36,7 +36,7 @@ func operate(operation, svcName, env, feature string) error {
 		return fmt.Errorf("invalid operation of %s", operation)
 	}
 	script := fmt.Sprintf(`
-for name in $(docker ps -af name=%s --format '{{.Names}}'); do
+for name in $(docker ps -af name=^/%s --format '{{.Names}}'); do
 	docker %s $name
 done
 `, release.ServiceName(svcName, env), operation)
@@ -44,7 +44,7 @@ done
 }
 
 func ps(svcName, env, feature string, watch bool) error {
-	script := fmt.Sprintf(` docker ps -f name=%s`, release.ServiceName(svcName, env))
+	script := fmt.Sprintf(` docker ps -f name=^/%s`, release.ServiceName(svcName, env))
 	if watch {
 		script = WatchCmd() + script
 	}
