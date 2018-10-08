@@ -17,7 +17,7 @@ import (
 func deploy(svcName, env, timeTag, feature string) error {
 	svcs := getServices(env, svcName)
 	ha := expectHighAvailable(env, svcs)
-	psScript := fmt.Sprintf(oam.WatchCmd()+` docker ps -f name=%s`, release.ServiceName(svcName, env))
+	psScript := fmt.Sprintf(oam.WatchCmd()+` docker ps -f name=^/%s`, release.ServiceName(svcName, env))
 	for _, node := range cluster.Get(env).GetNodes(feature) {
 		if ha {
 			if err := access.SetupNginx(env, "", "", node.Addr); err != nil {

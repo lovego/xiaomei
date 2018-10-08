@@ -12,6 +12,7 @@ import (
 	"github.com/lovego/slice"
 	"github.com/lovego/xiaomei"
 	"github.com/lovego/xiaomei/config"
+	"encoding/json"
 )
 
 var logger = getLogger()
@@ -55,7 +56,17 @@ func logFields(f *loggerPkg.Fields, req *xiaomei.Request, res *xiaomei.Response,
 	}
 
 	if logBody && slice.ContainsString(logBodyMethods, req.Method) || debug {
-		f.With("reqBody", string(req.GetBody()))
-		f.With("resBody", string(res.GetBody()))
+		f.With("reqBody", tryUnmarshal(req.GetBody()))
+		f.With("resBody", tryUnmarshal(res.GetBody()))
+	}
+}
+
+func tryUnmarshal(b []byte) interface{} {
+	var v map[string]interface{}
+	err := json.Unmarshal(b, &v)
+	if err == nil {
+		return v
+	} else {
+		return string(b)
 	}
 }
