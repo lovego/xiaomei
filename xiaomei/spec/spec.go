@@ -67,7 +67,7 @@ func specTargets() []string {
 	for _, v := range matches {
 		if v != `release` && v != `vendor` {
 			if fs.IsDir(v) {
-				v = v + `/`
+				v = v + `/...`
 			}
 			targets = append(targets, v)
 		}
