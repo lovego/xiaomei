@@ -4,12 +4,32 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"strings"
 
-	"github.com/lovego/cmd"
+	cmdPkg "github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/xiaomei/release"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 )
+
+func coverCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   `cover [package] ...`,
+		Short: `show coverage details for packages.`,
+		RunE: func(_ *cobra.Command, args []string) error {
+			_, err := cmdPkg.Run(cmdPkg.O{}, "sh", "-c", fmt.Sprintf(`
+rm /tmp/go-cover.out && {
+  go test -coverprofile /tmp/go-cover.out %s
+  test -f /tmp/go-cover.out && {
+    go tool cover -func /tmp/go-cover.out | tail -n 1
+    go tool cover -html /tmp/go-cover.out
+  }
+}`, strings.Join(args, " ")))
+			return err
+		},
+	}
+	return cmd
+}
 
 func yamlCmd() *cobra.Command {
 	var goSyntax bool
@@ -50,7 +70,7 @@ func autoCompleteCmd(rootCmd *cobra.Command) *cobra.Command {
 			if err := rootCmd.GenBashCompletion(&buf); err != nil {
 				return err
 			}
-			cmd.SudoWriteFile(`/etc/bash_completion.d/xiaomei`, &buf)
+			cmdPkg.SudoWriteFile(`/etc/bash_completion.d/xiaomei`, &buf)
 			return nil
 		}),
 	}
