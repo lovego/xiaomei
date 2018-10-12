@@ -61,6 +61,29 @@ func (cs *CookieSession) Make(data interface{}) (*http.Cookie, error) {
 	return &ck, nil
 }
 
+func (cs *CookieSession) SetWithDomain(res http.ResponseWriter, data interface{}, domain string) {
+	if ck, err := cs.MakeWithDomain(data, domain); err != nil {
+		log.Println("CookieSession Encode: ", err)
+		return
+	} else {
+		http.SetCookie(res, ck)
+	}
+}
+
+func (cs *CookieSession) MakeWithDomain(data interface{}, domain string) (*http.Cookie, error) {
+	ck := cs.cookie // make a copy
+	ck.Domain = domain
+	if data == nil {
+		ck.MaxAge = -1
+		ck.Expires = time.Unix(1, 0)
+	} else if encoded, err := cs.secure.Encode(cs.cookie.Name, data); err == nil {
+		ck.Value = encoded
+	} else {
+		return nil, err
+	}
+	return &ck, nil
+}
+
 func (cs *CookieSession) Decode(value string, p interface{}) error {
 	return cs.secure.Decode(cs.cookie.Name, value, p)
 }
