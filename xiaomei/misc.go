@@ -19,7 +19,7 @@ func coverCmd() *cobra.Command {
 		RunE: func(_ *cobra.Command, args []string) error {
 			_, err := cmdPkg.Run(cmdPkg.O{}, "sh", "-c", fmt.Sprintf(`
 rm -f /tmp/go-cover.out && {
-  go test --gcflags=-l -coverprofile /tmp/go-cover.out %s
+  go test -p 1 --gcflags=-l -coverprofile /tmp/go-cover.out %s
   test -f /tmp/go-cover.out && (($(wc -c </tmp/go-cover.out) > 10)) && {
     go tool cover -func /tmp/go-cover.out | tail -n 1
     go tool cover -html /tmp/go-cover.out
