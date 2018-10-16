@@ -51,3 +51,4 @@ nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
 nginx: configuration file /etc/nginx/nginx.conf test is successful
 ```
 
+`xiaomei acces -r` 默认将cluster配置的相应环境所有的nodes的nginx reload， 可以配合`-r`选项匹配对应的node

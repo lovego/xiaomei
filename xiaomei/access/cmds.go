@@ -16,19 +16,23 @@ func Cmd(svcName string) *cobra.Command {
 func accessCmd(svcName string) *cobra.Command {
 	var setup bool
 	var filter string
+	var reload bool
 	cmd := &cobra.Command{
 		Use:   `access [<env>]`,
 		Short: `access config for the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			if setup {
 				return SetupNginx(env, svcName, filter, "")
-			} else {
+			}else if reload{
+			    return ReloadNginx(env, filter)
+            }else {
 				return printNginxConf(env, svcName)
 			}
 		}),
 	}
 	cmd.Flags().BoolVarP(&setup, `setup`, `s`, false, `setup access.`)
 	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
+	cmd.Flags().BoolVarP(&reload, `reload`, `r`, false, `reload nginx`)
 	return cmd
 }
 

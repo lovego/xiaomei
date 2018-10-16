@@ -15,17 +15,35 @@ import (
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
-var setupScriptTmpl = template.Must(template.New(``).Parse(`
-set -e
-sudo tee /etc/nginx/sites-enabled/{{ .Domain }} > /dev/null
-sudo mkdir -p /var/log/nginx/{{ .Domain }}
-sudo nginx -t
+var reloadScript = `
 if test -f /lib/systemd/system/nginx.service; then
 	sudo systemctl reload nginx
 else
 	sudo service nginx reload
-fi
-`))
+fi`
+
+var setupScriptTmpl = template.Must(template.New(``).Parse(`
+set -e
+sudo tee /etc/nginx/sites-enabled/{{ .Domain }} > /dev/null
+sudo mkdir -p /var/log/nginx/{{ .Domain }}
+sudo nginx -t` + reloadScript))
+
+
+func clusterRun(env, feature, input, cmdStr string)error{
+    for _, node := range cluster.Get(env).GetNodes(feature) {
+        if node.Labels[`access`] == `true` {
+            log.Println(color.GreenString(node.SshAddr()))
+            cmdOpt := cmd.O{}
+            if input != ""{
+                cmdOpt.Stdin = strings.NewReader(input)
+            }
+            if _, err := node.Run(cmdOpt, cmdStr); err != nil {
+                return err
+            }
+        }
+    }
+    return nil
+}
 
 func SetupNginx(env, svcName, feature, downAddr string) error {
 	data, err := getConfig(env, svcName, downAddr)
@@ -40,18 +58,7 @@ func SetupNginx(env, svcName, feature, downAddr string) error {
 	if err := setupScriptTmpl.Execute(&script, data); err != nil {
 		return err
 	}
-
-	for _, node := range cluster.Get(env).GetNodes(feature) {
-		if node.Labels[`access`] == `true` {
-			log.Println(color.GreenString(node.SshAddr()))
-			if _, err := node.Run(
-				cmd.O{Stdin: strings.NewReader(nginxConf)}, script.String(),
-			); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
+	return clusterRun(env, feature, nginxConf, script.String())
 }
 
 func printNginxConf(env, svcName string) error {
@@ -87,4 +94,8 @@ func getNginxConf(svcName string, data interface{}) (string, error) {
 		return ``, err
 	}
 	return buf.String(), nil
+}
+
+func ReloadNginx(env, feature string) error{
+    return clusterRun(env, feature, "", reloadScript)
 }
