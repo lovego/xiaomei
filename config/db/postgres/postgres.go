@@ -61,8 +61,10 @@ func newDataSource(urlStr string) dataSource {
 	if str := q.Get("maxIdle"); str != "" {
 		q.Del("maxIdle")
 		ds.maxIdle = parseInt(str)
-	} else {
+	} else if config.Env() == "production" {
 		ds.maxIdle = 1
+	} else {
+		ds.maxIdle = 0
 	}
 
 	if str := q.Get("maxOpen"); str != "" {
