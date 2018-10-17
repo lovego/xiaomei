@@ -26,23 +26,23 @@ var setupScriptTmpl = template.Must(template.New(``).Parse(`
 set -e
 sudo tee /etc/nginx/sites-enabled/{{ .Domain }} > /dev/null
 sudo mkdir -p /var/log/nginx/{{ .Domain }}
-sudo nginx -t` + reloadScript))
+sudo nginx -t
+` + reloadScript))
 
-
-func clusterRun(env, feature, input, cmdStr string)error{
-    for _, node := range cluster.Get(env).GetNodes(feature) {
-        if node.Labels[`access`] == `true` {
-            log.Println(color.GreenString(node.SshAddr()))
-            cmdOpt := cmd.O{}
-            if input != ""{
-                cmdOpt.Stdin = strings.NewReader(input)
-            }
-            if _, err := node.Run(cmdOpt, cmdStr); err != nil {
-                return err
-            }
-        }
-    }
-    return nil
+func clusterRun(env, feature, input, cmdStr string) error {
+	for _, node := range cluster.Get(env).GetNodes(feature) {
+		if node.Labels[`access`] == `true` {
+			log.Println(color.GreenString(node.SshAddr()))
+			cmdOpt := cmd.O{}
+			if input != "" {
+				cmdOpt.Stdin = strings.NewReader(input)
+			}
+			if _, err := node.Run(cmdOpt, cmdStr); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func SetupNginx(env, svcName, feature, downAddr string) error {
@@ -96,6 +96,6 @@ func getNginxConf(svcName string, data interface{}) (string, error) {
 	return buf.String(), nil
 }
 
-func ReloadNginx(env, feature string) error{
-    return clusterRun(env, feature, "", reloadScript)
+func ReloadNginx(env, feature string) error {
+	return clusterRun(env, feature, "", reloadScript)
 }

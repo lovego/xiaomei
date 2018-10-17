@@ -33,7 +33,7 @@ done
 
 func operate(operation, svcName, env, feature string) error {
 	if operation != `start` && operation != `stop` && operation != `restart` {
-		return fmt.Errorf("invalid operation of %s", operation)
+		return fmt.Errorf("invalid operation: %s", operation)
 	}
 	script := fmt.Sprintf(`
 for name in $(docker ps -af name=^/%s --format '{{.Names}}'); do
