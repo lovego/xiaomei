@@ -11,7 +11,7 @@ import (
 )
 
 func Psql(env, key string, printCmd bool) error {
-	command := `PAGER=less LESS='-iMSx4 -FX' psql ` +
+	command := `PAGER=less LESS='-iFMSXx4' psql ` +
 		release.AppData(env).Get(`postgres`).GetString(key)
 	if printCmd {
 		fmt.Println(command)

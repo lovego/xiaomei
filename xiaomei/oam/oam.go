@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/lovego/cmd"
+	"github.com/lovego/xiaomei/xiaomei/access"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 	"github.com/lovego/xiaomei/xiaomei/release"
@@ -40,7 +41,15 @@ for name in $(docker ps -af name=^/%s --format '{{.Names}}'); do
 	docker %s $name
 done
 `, release.ServiceName(svcName, env), operation)
-	return eachNodeRun(env, script, feature)
+	for _, node := range cluster.Get(env).GetNodes(feature) {
+		if _, err := node.Run(cmd.O{}, script); err != nil {
+			return err
+		}
+		if err := access.ReloadNginx(env, feature); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func ps(svcName, env, feature string, watch bool) error {
