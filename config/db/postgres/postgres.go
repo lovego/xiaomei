@@ -80,7 +80,7 @@ func newDataSource(urlStr string) dataSource {
 	} else {
 		ds.maxLife = 10 * time.Minute
 	}
-
+	ds.url.RawQuery = q.Encode()
 	return ds
 }
 
