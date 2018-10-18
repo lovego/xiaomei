@@ -45,8 +45,10 @@ done
 		if _, err := node.Run(cmd.O{}, script); err != nil {
 			return err
 		}
-		if err := access.ReloadNginx(env, feature); err != nil {
-			return err
+		if access.HasAccess(node.Services(env, svcName)) {
+			if err := access.ReloadNginx(env, feature); err != nil {
+				return err
+			}
 		}
 	}
 	return nil

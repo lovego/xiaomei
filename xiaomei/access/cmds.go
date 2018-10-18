@@ -7,7 +7,7 @@ import (
 
 // access commands
 func Cmd(svcName string) *cobra.Command {
-	if svcName == `` || svcName == `app` || svcName == `web` || svcName == `godoc` {
+	if svcName == `` || svcName == `godoc` {
 		return accessCmd(svcName)
 	}
 	return nil

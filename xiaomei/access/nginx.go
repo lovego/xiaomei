@@ -29,20 +29,17 @@ sudo mkdir -p /var/log/nginx/{{ .Domain }}
 sudo nginx -t
 ` + reloadScript))
 
-func clusterRun(env, feature, input, cmdStr string) error {
-	for _, node := range cluster.Get(env).GetNodes(feature) {
-		if node.Labels[`access`] == `true` {
-			log.Println(color.GreenString(node.SshAddr()))
-			cmdOpt := cmd.O{}
-			if input != "" {
-				cmdOpt.Stdin = strings.NewReader(input)
-			}
-			if _, err := node.Run(cmdOpt, cmdStr); err != nil {
-				return err
-			}
+func HasAccess(svcs []string) bool {
+	for _, svcName := range svcs {
+		if svcName == "app" || svcName == "web" || svcName == "godoc" {
+			return true
 		}
 	}
-	return nil
+	return false
+}
+
+func ReloadNginx(env, feature string) error {
+	return clusterRun(env, feature, "", reloadScript)
 }
 
 func SetupNginx(env, svcName, feature, downAddr string) error {
@@ -59,6 +56,22 @@ func SetupNginx(env, svcName, feature, downAddr string) error {
 		return err
 	}
 	return clusterRun(env, feature, nginxConf, script.String())
+}
+
+func clusterRun(env, feature, input, cmdStr string) error {
+	for _, node := range cluster.Get(env).GetNodes(feature) {
+		if node.Labels[`access`] == `true` {
+			log.Println(color.GreenString(node.SshAddr()))
+			cmdOpt := cmd.O{}
+			if input != "" {
+				cmdOpt.Stdin = strings.NewReader(input)
+			}
+			if _, err := node.Run(cmdOpt, cmdStr); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func printNginxConf(env, svcName string) error {
@@ -94,8 +107,4 @@ func getNginxConf(svcName string, data interface{}) (string, error) {
 		return ``, err
 	}
 	return buf.String(), nil
-}
-
-func ReloadNginx(env, feature string) error {
-	return clusterRun(env, feature, "", reloadScript)
 }

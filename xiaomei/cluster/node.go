@@ -9,6 +9,7 @@ import (
 
 	"github.com/lovego/cmd"
 	"github.com/lovego/slice"
+	"github.com/lovego/xiaomei/xiaomei/deploy/conf"
 )
 
 type Node struct {
@@ -17,6 +18,23 @@ type Node struct {
 	Addr       string            `yaml:"addr"`
 	Labels     map[string]string `yaml:"labels"`
 	ListenAddr string            `yaml:"listenAddr"` // only for manager
+}
+
+func (n Node) Services(env, svcName string) []string {
+	var svcNames []string
+	if svcName == `` {
+		svcNames = conf.ServiceNames(env)
+	} else {
+		svcNames = []string{svcName}
+	}
+	var svcs []string
+	for _, svcName := range svcNames {
+		service := conf.GetService(svcName, env)
+		if n.Match(service.Nodes) {
+			svcs = append(svcs, svcName)
+		}
+	}
+	return svcs
 }
 
 func (n Node) Match(labels map[string]string) bool {
