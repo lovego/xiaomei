@@ -6,13 +6,14 @@ import (
 
 	"github.com/lovego/cmd"
 	"github.com/lovego/dsn"
+	"github.com/lovego/xiaomei/config/db/dburl"
 	"github.com/lovego/xiaomei/xiaomei/cluster"
 	"github.com/lovego/xiaomei/xiaomei/release"
 )
 
 func Psql(env, key string, printCmd bool) error {
-	command := `PAGER=less LESS='-iFMSXx4' psql ` +
-		release.AppData(env).Get(`postgres`).GetString(key)
+	url := dburl.Parse(release.AppData(env).Get(`postgres`).GetString(key)).URL.String()
+	command := fmt.Sprintf("PAGER=less LESS='-iFMSXx4' psql '%s'", url)
 	if printCmd {
 		fmt.Println(command)
 		return nil
