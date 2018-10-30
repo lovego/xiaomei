@@ -31,31 +31,29 @@ mapping: &mapping
         path_match: "query.*"
         mapping: { type: text, fields: { raw: { type: keyword } } }
 
-app: &app
+default: &default
   "@type": elasticsearch
   addrs: *addrs
-  # index can be time series index or regular index.
-  # index doesn't contain "<" and ">" acts as a regular index.
-  # in time series index, string between "<" and ">" acts as time layout.
-  # see https://golang.org/pkg/time/#Parse for time layout format.
-  index: {{ .ProNameUrlSafe }}-app.<2006.01.02>
-  mapping: *mapping
 
   ### the following fields is effective only when "index" field is a time series index. ###
-
   # field used to determine which time series index to write to.
   timeField: at
   # the number of latest time series indices to keep. old indices will be deleted.
   indexKeep: 3
 
+  # add field name suffix accordding to it's data type
+  addTypeSuffix: true
+
 files:
-  app.log: # file path, required, either relative or absolute is ok.
+  http.log: # file path, required, either relative or absolute is ok.
     # collector id, it will be use as part of offset file path, so it should be path safe.
     # make sure different collectors of the same file has unique id.
     es:
-      <<: *app
-  app.err:
-    es:
-      <<: *app
-      index: {{ .ProNameUrlSafe }}-app.<2006.01.02>
+      <<: *default
+      # index can be time series index or regular index.
+      # index doesn't contain "<" and ">" acts as a regular index.
+      # in time series index, string between "<" and ">" acts as time layout.
+      # see https://golang.org/pkg/time/#Parse for time layout format.
+      index: {{ .ProNameUrlSafe }}-http.<2006.01.02>
+      mapping: *mapping
 
