@@ -11,13 +11,7 @@
 | param1      | 参数1        | bool    | 否   | param1校验规则说明
 | param2      | 参数2        | string  | 否   | param2校验规则说明
 
-## 请求体说明 (application/x-www-form-urlencoded编码) （与json编码二选一，请删掉此备注）
-| 参数        | 中文名称     | 类型    | 必需 | 校验规则
-| --------    | --------     | ------- | ---- | -------------------
-| param1      | 参数1        | bool    | 否   | param1校验规则说明
-| param2      | 参数2        | string  | 否   | param2校验规则说明
-
-## 请求体说明 (application/json编码) （与urlencoded编码二选一，请删掉此备注）
+## 请求体说明 (application/json编码) 
 ```
 {
   "field1": "value1",    # 字段1的说明

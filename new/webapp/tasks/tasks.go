@@ -2,16 +2,14 @@ package tasks
 
 import (
 	"context"
-	"os"
 
+	"github.com/lovego/config"
+	"github.com/lovego/config/db/redisdb"
 	loggerPkg "github.com/lovego/logger"
 	"github.com/lovego/redis-cron"
-	"github.com/lovego/xiaomei/config"
-	"github.com/lovego/xiaomei/config/db/redisdb"
 )
 
 var logger = config.NewLogger("cron.log")
-var debug = os.Getenv("debugTasks") != ""
 
 func Start() {
 	c := cron.New(redisdb.Pool("default"))
@@ -22,7 +20,7 @@ func Start() {
 }
 
 func exampleTask() {
-	logger.Record(debug, func(ctx context.Context) error {
+	logger.Record(func(ctx context.Context) error {
 		// work to do goes here
 		return nil
 	}, nil, func(l *loggerPkg.Fields) {

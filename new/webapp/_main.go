@@ -1,36 +1,29 @@
 package main
 
 import (
-	_ "github.com/lovego/xiaomei/server/init" // this package must be the first.
+	_ "github.com/lovego/config/init" // this package must be the first.
 
-	"strings"
+  "runtime"
 
-	"{{ .ProPath }}/filter"
+	"github.com/lovego/goa"
+	"github.com/lovego/goa/server"
+	"{{ .ProPath }}/middlewares"
 	"{{ .ProPath }}/routes"
 	// "{{ .ProPath }}/tasks"
-	"github.com/lovego/xiaomei"
-	"github.com/lovego/xiaomei/server"
 )
 
 func main() {
-	svr := &server.Server{
-		FilterFunc:     filter.Process,
-		Router:         routes.Routes(),
-		Session:        server.NewSession(),
-		Renderer:       server.NewRenderer(),
-		LayoutDataFunc: layoutData,
-	}
+  if n := runtime.NumCPU() - 1; n >= 1 {
+   runtime.GOMAXPROCS(n)
+  }
+
+	router := goa.New()
+  router.Use(middlewares.Logger.Record)
+  router.Use(middlewares.CORS.Check)
+  router.Use(middlewares.ParseSession)
+  routes.Setup(router)
+
   // tasks.Start()
-	svr.ListenAndServe()
+	server.ListenAndServe(router)
 }
 
-func layoutData(
-	layout string, data interface{}, req *xiaomei.Request, res *xiaomei.Response,
-) interface{} {
-	if strings.HasPrefix(layout, `layout/`) {
-		return struct {
-			Data interface{}
-		}{data}
-	}
-	return data
-}
