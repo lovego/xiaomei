@@ -19,13 +19,13 @@ go get github.com/lovego/xiaomei
 3. logc服务：运行logc日志收集工具，存储到ElasticSearch，供Kibana可视化展现。
 
 ## 文档
-- [命令概览](./xiaomei)
-- [生成项目](./xiaomei/new)
-- [运行项目](./xiaomei/run)
-- [基于Docker的部署](./xiaomei/deploy)
-- [基于Nginx的接入层（负载均衡）](./xiaomei/access)
+- [命令概览](#overview)
+- [生成项目](./new)
+- [运行项目](./run)
+- [基于Docker的部署](./deploy)
+- [基于Nginx的接入层（负载均衡）](./access)
 
-<a name="oo"></a>
+<a name="overview"></a>
 ## 概览
 
 在项目的开发流程中常用的命令如下：
