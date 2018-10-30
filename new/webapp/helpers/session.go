@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/lovego/config"
 	"github.com/lovego/goa"
 	"github.com/lovego/sessions/cookiestore"
 	"github.com/lovego/tracer"
@@ -13,7 +14,7 @@ var Cookie = &http.Cookie{
 	Name:   "session",
 	MaxAge: 86400 * 30,
 }
-var CookieStore = cookiestore.New("session")
+var CookieStore = cookiestore.New(config.Secret())
 
 type Session struct {
 	UserId    int
@@ -32,7 +33,7 @@ func GetSession(c *goa.Context) Session {
 func SaveSession(c *goa.Context, data Session) {
 	err := CookieStore.Save(c.ResponseWriter, Cookie, data)
 	if err != nil {
-		tracer.Log(c.Context(), "save session error:", err)
+		tracer.Log(c.Context(), "save session: ", err)
 	}
 }
 

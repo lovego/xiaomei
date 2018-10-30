@@ -34,12 +34,13 @@ func Setup(router *goa.Router)  {
 	})
 
 	router.Get(`/session-set`, func(c *goa.Context) {
-    sess := helpers.Session{UserId: 1, UserName: `xiaomei`, LoginTime: time.Now()}
-    helpers.SaveSession(c, sess)
-		c.Json(sess)
+		sess := helpers.Session{UserId: 100, UserName: `xiaomei`, LoginTime: time.Now()}
+		helpers.SaveSession(c, sess)
+		c.Write([]byte(`ok`))
 	})
 
 	router.Get(`/session-delete`, func(c *goa.Context) {
-    helpers.DeleteSession(c)
+		helpers.DeleteSession(c)
+		c.Write([]byte(`ok`))
 	})
 }

@@ -3,7 +3,7 @@ package middlewares
 import (
 	"github.com/lovego/goa"
 	"github.com/lovego/tracer"
-	"github.com/lovego/xiaomei/new/webapp/helpers"
+	"{{ .ProPath }}/helpers"
 )
 
 func ParseSession(c *goa.Context) {
@@ -12,11 +12,7 @@ func ParseSession(c *goa.Context) {
 }
 
 func parseSession(c *goa.Context) {
-	ck, err := c.Request.Cookie(helpers.Cookie.Name)
-	if err != nil {
-		tracer.Log(c.Context(), "get session cookie error:", err)
-		return
-	}
+	ck, _ := c.Request.Cookie(helpers.Cookie.Name)
 	if ck == nil || ck.Value == "" {
 		return
 	}
@@ -24,7 +20,7 @@ func parseSession(c *goa.Context) {
 
 	var data helpers.Session
 	if err := helpers.CookieStore.Get(ck, &data); err != nil {
-		tracer.Log(c.Context(), "get session error:", err)
+		tracer.Log(c.Context(), "session: ", err)
 		return
 	}
 
