@@ -15,20 +15,20 @@ import (
 )
 
 func main() {
-  if n := runtime.NumCPU() - 1; n >= 1 {
-   runtime.GOMAXPROCS(n)
-  }
+	if n := runtime.NumCPU() - 1; n >= 1 {
+		runtime.GOMAXPROCS(n)
+  	}
 
 	router := goa.New()
-  router.Use(middlewares.Logger.Record)
-  middles.SetupProcessingList(router)
-  router.Use(middlewares.ParseSession)
-  router.Use(middlewares.CORS.Check)
+  	router.Use(middlewares.Logger.Record)
+  	middles.SetupProcessingList(router)
+  	router.Use(middlewares.ParseSession)
+  	router.Use(middlewares.CORS.Check)
 
-  utilroutes.Setup(router)
-  routes.Setup(router)
+  	utilroutes.Setup(router)
+  	routes.Setup(router)
 
-  // tasks.Start()
+  	// tasks.Start()
 	server.ListenAndServe(router)
 }
 
