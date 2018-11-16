@@ -3,7 +3,7 @@ package main
 import (
 	_ "github.com/lovego/config/init" // this package must be the first.
 
-  "runtime"
+	"runtime"
 
 	"github.com/lovego/goa"
 	middles "github.com/lovego/goa/middlewares"
@@ -15,20 +15,19 @@ import (
 )
 
 func main() {
-  if n := runtime.NumCPU() - 1; n >= 1 {
-   runtime.GOMAXPROCS(n)
-  }
+	if n := runtime.NumCPU() - 1; n >= 1 {
+		runtime.GOMAXPROCS(n)
+	}
 
 	router := goa.New()
-  router.Use(middlewares.Logger.Record)
-  middles.SetupProcessingList(router)
-  router.Use(middlewares.SessionParse)
-  router.Use(middlewares.CORS.Check)
+	router.Use(middlewares.Logger.Record)
+	middles.SetupProcessingList(router)
+	router.Use(middlewares.SessionParse)
+	router.Use(middlewares.CORS.Check)
 
-  utilroutes.Setup(router)
-  routes.Setup(router)
+	utilroutes.Setup(router)
+	routes.Setup(router)
 
-  // tasks.Start()
+	// tasks.Start()
 	server.ListenAndServe(router)
 }
-
