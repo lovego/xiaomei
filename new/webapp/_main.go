@@ -22,7 +22,7 @@ func main() {
 	router := goa.New()
   router.Use(middlewares.Logger.Record)
   middles.SetupProcessingList(router)
-  router.Use(middlewares.ParseSession)
+  router.Use(middlewares.SessionParse)
   router.Use(middlewares.CORS.Check)
 
   utilroutes.Setup(router)

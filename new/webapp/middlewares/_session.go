@@ -6,7 +6,7 @@ import (
 	"{{ .ProPath }}/helpers"
 )
 
-func ParseSession(c *goa.Context) {
+func SessionParse(c *goa.Context) {
 	parseSession(c)
 	c.Next()
 }
