@@ -1,5 +1,5 @@
 addrs: &addrs
-  - http://127.0.0.1:9200/logc-
+  - http://127.0.0.1:9200/logc-${LOGCENV}-
 
 name: {{ .ProName }} # name used to alarm
 mailer: "mailer://smtp.qq.com:25/?user=小美<xiaomei-go@qq.com>&pass=zjsbosjlhgugechh"
@@ -15,7 +15,6 @@ mapping: &mapping
     host: { type: keyword }
     method: { type: keyword }
     path: { type: text, fields: { raw: { type: keyword } } }
-    query: { type: object }
     status: { type: keyword }
     req_body_size: { type: integer }
     res_body_size: { type: integer }
@@ -25,7 +24,8 @@ mapping: &mapping
     refer: { type: text }
     agent: { type: text }
     proto: { type: keyword }
-    # session: sess
+    rawQuery: { type: text }
+    query: { type: object }
   dynamic_templates:
     - query:
         path_match: "query.*"
@@ -39,7 +39,7 @@ default: &default
   # field used to determine which time series index to write to.
   timeField: at
   # the number of latest time series indices to keep. old indices will be deleted.
-  indexKeep: 3
+  indexKeep: 2
 
   # add field name suffix accordding to it's data type
   addTypeSuffix: true
@@ -54,6 +54,6 @@ files:
       # index doesn't contain "<" and ">" acts as a regular index.
       # in time series index, string between "<" and ">" acts as time layout.
       # see https://golang.org/pkg/time/#Parse for time layout format.
-      index: {{ .ProNameUrlSafe }}-http.<2006.01.02>
+      index: {{ .ProNameUrlSafe }}-http.<2006.01>
       mapping: *mapping
 

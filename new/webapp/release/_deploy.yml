@@ -1,28 +1,45 @@
-defaults: &defaults
-  services:
-    app:
-      image: {{ .Registry }}{{ .ProNameUrlSafe }}/app
-      ports: [ 3001, 4001 ]
-      options: [ -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}/log" ]
-    web:
-      image: {{ .Registry }}{{ .ProNameUrlSafe }}/web
-      ports: [ 8001 ]
-      options: [ -v, "{{ .ProName }}-logs:/var/log/nginx/{{ .ProName }}" ]
-    logc:
-      image: {{ .Registry }}{{ .ProNameUrlSafe }}/logc
-      options: [ -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}-logs",
-                 -v, "/var/run/docker.sock:/var/run/docker.sock" ]
-
-  volumesToCreate: [ {{ .ProName }}-logs ]
+services: &services
+  app:
+    image: "{{ .Registry }}{{ .ProNameUrlSafe }}/app"
+    ports: [ 3001, 4001 ]
+    options: [ -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}/log" ]
+  web:
+    image: "{{ .Registry }}{{ .ProNameUrlSafe }}/web"
+    ports: [ 8001 ]
+    options: [ -v, "{{ .ProName }}-logs:/var/log/nginx/{{ .ProName }}" ]
+  logc:
+    image: "{{ .Registry }}{{ .ProNameUrlSafe }}/logc"
+    options: [
+      -e, "LOGCENV=common",
+      -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}-logs",
+      -v, "/var/run/docker.sock:/var/run/docker.sock"
+    ]
 
 dev:
-  <<: *defaults
+  services:
+    <<: *services
+  volumesToCreate: [ "{{ .ProName }}-logs" ]
 demo:
-  <<: *defaults
+  services:
+    <<: *services
+  volumesToCreate: [ "{{ .ProName }}-logs" ]
 qa:
-  <<: *defaults
+  services:
+    <<: *services
+  volumesToCreate: [ "{{ .ProName }}-logs" ]
 preview:
-  <<: *defaults
+  services:
+    <<: *services
+  volumesToCreate: [ "{{ .ProName }}-logs" ]
 production:
-  <<: *defaults
+  services:
+    <<: *services
+    logc:
+      image: "{{ .Registry }}{{ .ProNameUrlSafe }}/logc"
+      options: [
+        -e, "LOGCENV=production",
+        -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}-logs",
+        -v, "/var/run/docker.sock:/var/run/docker.sock"
+      ]
+  volumesToCreate: [ "{{ .ProName }}-logs" ]
 
