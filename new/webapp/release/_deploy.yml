@@ -7,29 +7,21 @@ services: &services
     image: "{{ .Registry }}{{ .ProNameUrlSafe }}/web"
     ports: [ 8001 ]
     options: [ -v, "{{ .ProName }}-logs:/var/log/nginx/{{ .ProName }}" ]
-  logc:
-    image: "{{ .Registry }}{{ .ProNameUrlSafe }}/logc"
-    options: [
-      -e, "LOGCENV=common",
-      -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}-logs",
-      -v, "/var/run/docker.sock:/var/run/docker.sock"
-    ]
 
 dev:
-  services:
-    <<: *services
-  volumesToCreate: [ "{{ .ProName }}-logs" ]
-demo:
   services:
     <<: *services
   volumesToCreate: [ "{{ .ProName }}-logs" ]
 qa:
   services:
     <<: *services
-  volumesToCreate: [ "{{ .ProName }}-logs" ]
-preview:
-  services:
-    <<: *services
+    logc:
+      image: "{{ .Registry }}{{ .ProNameUrlSafe }}/logc"
+      options: [
+        -e, "LOGCENV=common",
+        -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}-logs",
+        -v, "/var/run/docker.sock:/var/run/docker.sock"
+      ]
   volumesToCreate: [ "{{ .ProName }}-logs" ]
 production:
   services:
