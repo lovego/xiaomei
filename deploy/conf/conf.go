@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"path/filepath"
@@ -26,26 +27,27 @@ type Service struct {
 	Command, Options []string
 }
 
-var theConf *Conf
+var envConfs map[string]*Conf
 
 func Get(env string) *Conf {
-	if theConf == nil {
+	if envConfs == nil {
 		if content, err := ioutil.ReadFile(filepath.Join(release.Root(), `deploy.yml`)); err != nil {
 			log.Panic(err)
 		} else {
-			envConfs := map[string]*Conf{}
+			envConfs = map[string]*Conf{}
 			if err = yaml.Unmarshal(content, &envConfs); err != nil {
 				log.Panic(err)
 			}
-			theConf = envConfs[env]
-			if theConf == nil {
-				log.Fatalf(`deploy.yml: %s: undefined.`, env)
-			}
-			for name, svc := range theConf.Services {
-				svc.name = name
-				svc.env = env
-			}
 		}
+	}
+	theConf := envConfs[env]
+	if theConf == nil {
+		log.Fatalf(`deploy.yml: %s: undefined.`, env)
+	}
+	fmt.Println(env, theConf.Services[`logc`])
+	for name, svc := range theConf.Services {
+		svc.name = name
+		svc.env = env
 	}
 	return theConf
 }
