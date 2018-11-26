@@ -1,7 +1,6 @@
 package conf
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"path/filepath"
@@ -44,7 +43,6 @@ func Get(env string) *Conf {
 	if theConf == nil {
 		log.Fatalf(`deploy.yml: %s: undefined.`, env)
 	}
-	fmt.Println(env, theConf.Services[`logc`])
 	for name, svc := range theConf.Services {
 		svc.name = name
 		svc.env = env
