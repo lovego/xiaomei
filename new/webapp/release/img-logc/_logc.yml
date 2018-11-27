@@ -20,7 +20,6 @@ defaults: &defaults
   # the number of latest time series indices to keep. old indices will be deleted.
   indexKeep: 2
 
-
 files:
   http.log: # file path, required, either relative or absolute is ok.
     # collector id, it will be use as part of offset file path, so it should be path safe.
@@ -28,10 +27,10 @@ files:
     es:
       <<: *defaults
       # index can be time series index or regular index.
-      # index doesn't contain "<" and ">" acts as a regular index.
+      # index without "<" and ">" acts as a regular index.
       # in time series index, string between "<" and ">" acts as time layout.
       # see https://golang.org/pkg/time/#Parse for time layout format.
-      index: "{{ .ProNameUrlSafe }}-http.<2006.01>"
+      index: "http-log.<2006.01>"
       mapping:
         properties:
           at: { type: date }
