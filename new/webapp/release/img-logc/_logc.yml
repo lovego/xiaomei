@@ -35,14 +35,16 @@ files:
         properties:
           at: { type: date }
           duration: { type: float }
+          project: { type: keyword }
+          env: { type: keyword }
+          level: { type: keyword }
+          machineName: { type: keyword }
           host: { type: keyword }
           method: { type: keyword }
           path: { type: text, fields: { raw: { type: keyword } } }
           status: { type: keyword }
-          req_body_size: { type: integer }
-          res_body_size: { type: integer }
-          req_body: { type: text }
-          res_body: { type: text }
+          reqBodySize: { type: integer }
+          resBodySize: { type: integer }
           ip: { type: ip }
           refer: { type: text }
           agent: { type: text }
