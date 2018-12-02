@@ -41,6 +41,7 @@ func Get(env string) *Conf {
 	}
 	theConf := envConfs[env]
 	if theConf == nil {
+		panic(env)
 		log.Fatalf(`deploy.yml: %s: undefined.`, env)
 	}
 	for name, svc := range theConf.Services {

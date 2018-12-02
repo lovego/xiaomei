@@ -15,7 +15,7 @@ type Cluster struct {
 	Nodes    []Node `yaml:"nodes"`
 }
 
-func Get(env string) Cluster {
+func Get(env string) *Cluster {
 	cluster, ok := GetClusters()[env]
 	if !ok {
 		log.Fatalf("empty cluster config for env: %v", env)
