@@ -16,6 +16,7 @@ import (
 )
 
 var reloadScript = `
+sudo nginx -t
 if test -f /lib/systemd/system/nginx.service; then
 	sudo systemctl reload nginx
 else
@@ -26,7 +27,6 @@ var setupScriptTmpl = template.Must(template.New(``).Parse(`
 set -e
 sudo tee /etc/nginx/sites-enabled/{{ .Domain }} > /dev/null
 sudo mkdir -p /var/log/nginx/{{ .Domain }}
-sudo nginx -t
 ` + reloadScript))
 
 func HasAccess(svcs []string) bool {
