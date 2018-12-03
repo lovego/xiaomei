@@ -16,10 +16,11 @@ type Cluster struct {
 }
 
 func Get(env string) *Cluster {
-	cluster, ok := GetClusters()[env]
-	if !ok {
+	cluster := GetClusters()[env]
+	if cluster == nil {
 		log.Fatalf("empty cluster config for env: %v", env)
 	}
+	cluster.init(env)
 	return cluster
 }
 

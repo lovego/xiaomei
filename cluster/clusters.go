@@ -20,14 +20,10 @@ func GetClusters() map[string]*Cluster {
 		if err != nil {
 			panic(err)
 		}
-		clusters := make(map[string]*Cluster)
-		if err := yaml.Unmarshal(content, clusters); err != nil {
+		theClusters = make(map[string]*Cluster)
+		if err := yaml.Unmarshal(content, theClusters); err != nil {
 			panic(err)
 		}
-		for env, cluster := range clusters {
-			cluster.init(env)
-		}
-		theClusters = clusters
 	}
 	return theClusters
 }
