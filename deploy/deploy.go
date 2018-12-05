@@ -15,14 +15,15 @@ import (
 
 func deploy(svcName, env, timeTag, feature string) error {
 	psScript := fmt.Sprintf(oam.WatchCmd()+` docker ps -f name=^/%s`, release.ServiceName(svcName, env))
-	var hasAccess bool
+	expectHighAvailable := len(cluster.Get(env).GetNodes("")) >= 2
+	var recoverAccess bool
 	for _, node := range cluster.Get(env).GetNodes(feature) {
 		if svcs := node.Services(env, svcName); len(svcs) > 0 {
-			if access.HasAccess(svcs) {
+			if expectHighAvailable && access.HasAccess(svcs) {
 				if err := access.SetupNginx(env, "", "", node.Addr); err != nil {
 					return err
 				}
-				hasAccess = true
+				recoverAccess = true
 				time.Sleep(time.Second) // wait for nginx reloading finished.
 			}
 			if err := deployNode(svcs, env, timeTag, node, psScript); err != nil {
@@ -30,7 +31,7 @@ func deploy(svcName, env, timeTag, feature string) error {
 			}
 		}
 	}
-	if hasAccess {
+	if recoverAccess {
 		return access.SetupNginx(env, "", "", "")
 	}
 	return nil
