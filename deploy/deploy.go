@@ -19,12 +19,14 @@ func deploy(svcName, env, timeTag, feature string) error {
 	var recoverAccess bool
 	for _, node := range cluster.Get(env).GetNodes(feature) {
 		if svcs := node.Services(env, svcName); len(svcs) > 0 {
-			if expectHighAvailable && access.HasAccess(svcs) {
-				if err := access.SetupNginx(env, "", "", node.Addr); err != nil {
-					return err
+			if access.HasAccess(svcs) {
+				if expectHighAvailable {
+					if err := access.SetupNginx(env, "", "", node.Addr); err != nil {
+						return err
+					}
+					time.Sleep(time.Second) // wait for nginx reloading finished.
 				}
 				recoverAccess = true
-				time.Sleep(time.Second) // wait for nginx reloading finished.
 			}
 			if err := deployNode(svcs, env, timeTag, node, psScript); err != nil {
 				return err
@@ -32,7 +34,11 @@ func deploy(svcName, env, timeTag, feature string) error {
 		}
 	}
 	if recoverAccess {
-		return access.SetupNginx(env, "", "", "")
+		if expectHighAvailable {
+			return access.SetupNginx(env, "", "", "")
+		} else {
+			return access.ReloadNginx(env, "")
+		}
 	}
 	return nil
 }
