@@ -8,7 +8,7 @@ name: {{ .ProName }}
 envs:
   dev:
     <<: *defaults
-    domain: {{ .ProNameUrlSafe }}.dev.example.com
+    domain: {{ .ProNameUrlSafe }}.api-dev.example.com
     secret: {{ genSecret }}
     keepers: [ ]
   test:
@@ -18,20 +18,20 @@ envs:
     keepers: [ ]
   demo:
     <<: *defaults
-    domain: {{ .ProNameUrlSafe }}.demo.example.com
+    domain: {{ .ProNameUrlSafe }}.api-demo.example.com
     secret: {{ genSecret }}
   qa:
     <<: *defaults
     https: true
-    domain: {{ .ProNameUrlSafe }}.qa.example.com
+    domain: {{ .ProNameUrlSafe }}.api-qa.example.com
     secret: {{ genSecret }}
   preview:
     <<: *defaults
     https: true
-    domain: {{ .ProNameUrlSafe }}.preview.example.com
+    domain: {{ .ProNameUrlSafe }}.api-preview.example.com
     secret: {{ genSecret }}
   production:
     <<: *defaults
     https: true
-    domain: {{ .ProNameUrlSafe }}.example.com
+    domain: {{ .ProNameUrlSafe }}.api.example.com
     secret: {{ genSecret }}
