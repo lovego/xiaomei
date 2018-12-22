@@ -55,7 +55,7 @@ done
 }
 
 func ps(svcName, env, feature string, watch bool) error {
-	script := fmt.Sprintf(` docker ps -f name=^/%s`, release.ServiceName(svcName, env))
+	script := fmt.Sprintf(` docker ps -af name=^/%s`, release.ServiceName(svcName, env))
 	if watch {
 		script = WatchCmd() + script
 	}
