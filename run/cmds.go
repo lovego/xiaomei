@@ -1,6 +1,7 @@
 package run
 
 import (
+	"github.com/lovego/xiaomei/images"
 	"github.com/lovego/xiaomei/release"
 	"github.com/spf13/cobra"
 )
@@ -18,7 +19,10 @@ func runCmdFor(svcName string) *cobra.Command {
 		Use:   `run [<env>]`,
 		Short: `run    the ` + svcName + ` service.`,
 		RunE: release.EnvCall(func(env string) error {
-			return run(env, svcName, pull)
+			if err := images.Build(svcName, env, ``, pull); err != nil {
+				return err
+			}
+			return run(env, svcName)
 		}),
 	}
 	cmd.Flags().BoolVarP(&pull, `pull`, `p`, true, `pull base image.`)

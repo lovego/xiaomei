@@ -18,7 +18,7 @@ func Cmds(svcName string) (cmds []*cobra.Command) {
 
 func deployCmdFor(svcName string) *cobra.Command {
 	var filter string
-	var pull bool
+	var pull, push bool
 	cmd := &cobra.Command{
 		Use:   `deploy [<env> [<tag>]]`,
 		Short: `deploy the ` + desc(svcName) + `.`,
@@ -29,8 +29,10 @@ func deployCmdFor(svcName string) *cobra.Command {
 				if err := images.Build(svcName, env, timeTag, pull); err != nil {
 					return err
 				}
-				if err := images.Push(svcName, env, timeTag); err != nil {
-					return err
+				if push {
+					if err := images.Push(svcName, env, timeTag); err != nil {
+						return err
+					}
 				}
 			}
 			if err := deploy(svcName, env, timeTag, filter); err != nil {
@@ -44,6 +46,7 @@ func deployCmdFor(svcName string) *cobra.Command {
 	}
 	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
 	cmd.Flags().BoolVarP(&pull, `pull`, `p`, true, `pull base image.`)
+	cmd.Flags().BoolVarP(&push, `push`, `P`, true, `push the built images to registry.`)
 	return cmd
 }
 

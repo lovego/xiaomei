@@ -11,10 +11,7 @@ import (
 	"github.com/lovego/xiaomei/release"
 )
 
-func run(env, svcName string, pull bool) error {
-	if err := images.Build(svcName, env, ``, pull); err != nil {
-		return err
-	}
+func run(env, svcName string) error {
 	image := images.Get(svcName)
 
 	args := []string{
