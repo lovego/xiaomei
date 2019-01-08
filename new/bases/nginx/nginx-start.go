@@ -2,12 +2,13 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
+	"log"
+	"net"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
-	"syscall"
 	"text/template"
 	"time"
 
@@ -17,9 +18,30 @@ import (
 func main() {
 	confData := getConfData()
 	generateConf(confData)
-	log(color.GreenString(`started. (:%s)`, confData.ListenPort))
-	if err := syscall.Exec(`/usr/sbin/nginx`, []string{`nginx`}, nil); err != nil {
-		panic(err)
+
+	cmd := exec.Command(`/usr/sbin/nginx`)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	go func() {
+		if err := cmd.Run(); err != nil {
+			log.Println(err)
+			os.Exit(1)
+		}
+	}()
+
+	waitPort(":" + confData.ListenPort)
+	log.Println(color.GreenString(`started. (:%s)`, confData.ListenPort))
+
+	select {}
+}
+
+func waitPort(port string) {
+	for {
+		if conn, _ := net.DialTimeout("tcp", port, time.Second); conn != nil {
+			conn.Close()
+			return
+		}
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 
@@ -58,10 +80,4 @@ func makeConf(file string, confData configData) []byte {
 		panic(err)
 	}
 	return buf.Bytes()
-}
-
-const ISO8601 = `2006-01-02T15:04:05Z0700`
-
-func log(msg interface{}) {
-	fmt.Println(time.Now().Format(ISO8601), msg)
 }
