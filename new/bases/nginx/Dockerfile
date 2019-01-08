@@ -12,6 +12,5 @@ COPY nginx-start /usr/local/bin/
 
 STOPSIGNAL SIGQUIT
 CMD [ "nginx-start" ]
-EXPOSE 80 443
 WORKDIR /var/log/nginx
 
