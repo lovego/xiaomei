@@ -16,12 +16,30 @@ import (
 )
 
 func main() {
-	confData := getConfData()
-	generateConf(confData)
+	port := os.Getenv(`NGINXPORT`)
+	if port == `` {
+		port = `8000`
+	}
+	if conn, _ := net.DialTimeout("tcp", port, time.Second); conn != nil {
+		conn.Close()
+		log.Printf("port %s is adready bound by other process.", port)
+		return
+	}
+
+	startNginx(port)
+	waitPortReady(":" + port)
+
+	log.Println(color.GreenString(`started. (:%s)`, port))
+	select {}
+}
+
+func startNginx(port string) *exec.Cmd {
+	generateConf(port)
 
 	cmd := exec.Command(`/usr/sbin/nginx`)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+
 	go func() {
 		if err := cmd.Run(); err != nil {
 			log.Println(err)
@@ -29,20 +47,7 @@ func main() {
 		}
 	}()
 
-	waitPort(":" + confData.ListenPort)
-	log.Println(color.GreenString(`started. (:%s)`, confData.ListenPort))
-
-	select {}
-}
-
-func waitPort(port string) {
-	for {
-		if conn, _ := net.DialTimeout("tcp", port, time.Second); conn != nil {
-			conn.Close()
-			return
-		}
-		time.Sleep(100 * time.Millisecond)
-	}
+	return cmd
 }
 
 type configData struct {
@@ -50,21 +55,14 @@ type configData struct {
 	SendfileOff bool
 }
 
-func getConfData() configData {
-	port := os.Getenv(`NGINXPORT`)
-	if port == `` {
-		port = `8000`
-	}
-	return configData{
-		ListenPort:  port,
-		SendfileOff: os.Getenv(`SendfileOff`) == `true`,
-	}
-}
-
-func generateConf(confData configData) {
+func generateConf(port string) {
 	tmplFiles, err := filepath.Glob(`/etc/nginx/sites-available/*.conf.tmpl`)
 	if err != nil {
 		panic(err)
+	}
+	confData := configData{
+		ListenPort:  port,
+		SendfileOff: os.Getenv(`SendfileOff`) == `true`,
 	}
 	for _, tmplFile := range tmplFiles {
 		confFile := `/etc/nginx/sites-enabled/` + strings.TrimSuffix(filepath.Base(tmplFile), `.tmpl`)
@@ -80,4 +78,14 @@ func makeConf(file string, confData configData) []byte {
 		panic(err)
 	}
 	return buf.Bytes()
+}
+
+func waitPortReady(port string) {
+	for {
+		time.Sleep(100 * time.Millisecond)
+		if conn, _ := net.DialTimeout("tcp", port, time.Second); conn != nil {
+			conn.Close()
+			return
+		}
+	}
 }
