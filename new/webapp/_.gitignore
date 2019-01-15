@@ -1,6 +1,7 @@
 .*.swp
 *.test
 .DS_Store
+.idea
 tmp
 /{{ .ProName }}
 /release/img-app/{{ .ProName }}
