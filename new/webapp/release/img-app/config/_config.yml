@@ -16,9 +16,9 @@ envs:
     domain: localhost:3000
     secret: {{ genSecret }}
     keepers: [ ]
-  demo:
+  ci:
     <<: *defaults
-    domain: {{ .ProNameUrlSafe }}.api-demo.example.com
+    domain: localhost:3000
     secret: {{ genSecret }}
   qa:
     <<: *defaults
@@ -35,3 +35,4 @@ envs:
     https: true
     domain: {{ .ProNameUrlSafe }}.api.example.com
     secret: {{ genSecret }}
+
