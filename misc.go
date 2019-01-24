@@ -7,10 +7,32 @@ import (
 	"strings"
 
 	cmdPkg "github.com/lovego/cmd"
+	"github.com/lovego/config/conf"
 	"github.com/lovego/xiaomei/release"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 )
+
+func timestampSignCmd() *cobra.Command {
+	var secret string
+	cmd := &cobra.Command{
+		Use:   `timestamp-sign [<env>]`,
+		Short: `generate Timestamp and Sign headers for curl command.`,
+		RunE: release.EnvCall(func(env string) error {
+			var ts int64
+			var sign string
+			if secret != "" {
+				ts, sign = conf.TimestampSign(secret)
+			} else {
+				ts, sign = release.AppConf(env).TimestampSign()
+			}
+			fmt.Printf("-H Timestamp:%d -H Sign:%s\n", ts, sign)
+			return nil
+		}),
+	}
+	cmd.Flags().StringVarP(&secret, `secret`, `s`, ``, `secret used to generate sign`)
+	return cmd
+}
 
 func coverCmd() *cobra.Command {
 	cmd := &cobra.Command{
