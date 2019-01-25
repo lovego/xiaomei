@@ -26,19 +26,20 @@ func deployCmd() *cobra.Command {
 }
 
 func accessCmd() *cobra.Command {
-	var setup bool
 	cmd := &cobra.Command{
 		Use:   `access`,
 		Short: `access config for the workspace godoc server.`,
 		RunE: release.NoArgCall(func() error {
-			if setup {
-				return accessSetup()
-			} else {
-				return accessPrint()
-			}
+			return accessPrint()
 		}),
 	}
-	cmd.Flags().BoolVarP(&setup, `setup`, `s`, false, `setup access.`)
+	cmd.AddCommand(&cobra.Command{
+		Use:   `setup`,
+		Short: `setup access config for the workspace godoc server.`,
+		RunE: release.NoArgCall(func() error {
+			return accessSetup()
+		}),
+	})
 	return cmd
 }
 

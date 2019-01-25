@@ -8,6 +8,7 @@ import (
 	cmdPkg "github.com/lovego/cmd"
 	"github.com/lovego/config/conf"
 	"github.com/lovego/xiaomei/misc/dbs"
+	"github.com/lovego/xiaomei/misc/godoc"
 	"github.com/lovego/xiaomei/release"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
@@ -16,7 +17,7 @@ import (
 func Cmds(rootCmd *cobra.Command) []*cobra.Command {
 	return append(
 		dbs.Cmds(),
-		specCmd(), timestampSignCmd(), coverCmd(), yamlCmd(), bashCompletionCmd(rootCmd),
+		godoc.Cmd(), timestampSignCmd(), specCmd(), coverCmd(), yamlCmd(), bashCompletionCmd(rootCmd),
 	)
 }
 
