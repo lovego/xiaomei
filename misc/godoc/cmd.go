@@ -37,7 +37,7 @@ func deployCmd() *cobra.Command {
 
 func rmDeployCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   `deploy`,
+		Use:   `rm-deploy`,
 		Short: `remove deployment of the workspace godoc server.`,
 		RunE:  release.NoArgCall(deploy),
 	}
