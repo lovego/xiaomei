@@ -16,8 +16,8 @@ import (
 
 func Cmds(rootCmd *cobra.Command) []*cobra.Command {
 	return append(
-		dbs.Cmds(),
-		godoc.Cmd(), timestampSignCmd(), specCmd(), coverCmd(), yamlCmd(), bashCompletionCmd(rootCmd),
+		dbs.Cmds(), godoc.Cmd(), timestampSignCmd(),
+		specCmd(), coverCmd(), yamlCmd(), bashCompletionCmd(rootCmd),
 	)
 }
 
