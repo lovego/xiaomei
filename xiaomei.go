@@ -5,13 +5,10 @@ import (
 	"os"
 
 	"github.com/lovego/xiaomei/access"
-	"github.com/lovego/xiaomei/dbs"
-	"github.com/lovego/xiaomei/deploy"
-	"github.com/lovego/xiaomei/images"
+	"github.com/lovego/xiaomei/misc"
 	"github.com/lovego/xiaomei/new"
-	"github.com/lovego/xiaomei/oam"
 	"github.com/lovego/xiaomei/release"
-	"github.com/lovego/xiaomei/spec"
+	"github.com/lovego/xiaomei/services"
 	"github.com/spf13/cobra"
 )
 
@@ -22,16 +19,13 @@ func main() {
 		Short:        `be small and beautiful.`,
 		SilenceUsage: true,
 	}
-	root.AddCommand(serviceCmds()...)
-	root.AddCommand(deploy.Cmds(``)...)
-	root.AddCommand(access.Cmd(``))
-	root.AddCommand(oam.Cmds(``)...)
-	root.AddCommand(dbs.Cmds()...)
-	root.AddCommand(images.Cmds(``)...)
-	root.AddCommand(
-		new.Cmd(), spec.Cmd(), timestampSignCmd(),
-		coverCmd(), yamlCmd(), autoCompleteCmd(root), versionCmd(),
-	)
+
+	root.AddCommand(new.Cmd())
+	root.AddCommand(services.Cmds()...)
+	root.AddCommand(access.Cmd())
+	root.AddCommand(misc.Cmds(root)...)
+	root.AddCommand(versionCmd())
+
 	if err := root.Execute(); err != nil {
 		os.Exit(1)
 	}

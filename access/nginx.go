@@ -11,8 +11,8 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/lovego/cmd"
-	"github.com/lovego/xiaomei/cluster"
 	"github.com/lovego/xiaomei/release"
+	"github.com/lovego/xiaomei/release/cluster"
 )
 
 var reloadScript = `
@@ -31,7 +31,7 @@ sudo mkdir -p /var/log/nginx/{{ .Domain }}
 
 func HasAccess(svcs []string) bool {
 	for _, svcName := range svcs {
-		if svcName == "app" || svcName == "web" || svcName == "godoc" {
+		if svcName == "app" || svcName == "web" {
 			return true
 		}
 	}
@@ -42,12 +42,8 @@ func ReloadNginx(env, feature string) error {
 	return clusterRun(env, feature, "", reloadScript)
 }
 
-func SetupNginx(env, svcName, feature, downAddr string) error {
-	data, err := getConfig(env, svcName, downAddr)
-	if err != nil {
-		return err
-	}
-	nginxConf, err := getNginxConf(svcName, data)
+func SetupNginx(env, feature, downAddr string) error {
+	nginxConf, data, err := getNginxConf(env, "")
 	if err != nil {
 		return err
 	}
@@ -56,6 +52,38 @@ func SetupNginx(env, svcName, feature, downAddr string) error {
 		return err
 	}
 	return clusterRun(env, feature, nginxConf, script.String())
+}
+
+func printNginxConf(env string) error {
+	nginxConf, _, err := getNginxConf(env, "")
+	if err != nil {
+		return err
+	}
+	fmt.Print(nginxConf)
+	return nil
+}
+
+func getNginxConf(env, downAddr string) (string, Config, error) {
+	data, err := getConfig(env, downAddr)
+	if err != nil {
+		return ``, Config{}, err
+	}
+
+	file := filepath.Join(release.Root(), `access.conf.tmpl`)
+	content, err := ioutil.ReadFile(file)
+	if err != nil {
+		return ``, Config{}, err
+	}
+	tmpl := template.Must(template.New(``).Parse(string(content)))
+	if err != nil {
+		return ``, Config{}, err
+	}
+
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, data); err != nil {
+		return ``, Config{}, err
+	}
+	return buf.String(), data, nil
 }
 
 func clusterRun(env, feature, input, cmdStr string) error {
@@ -72,39 +100,4 @@ func clusterRun(env, feature, input, cmdStr string) error {
 		}
 	}
 	return nil
-}
-
-func printNginxConf(env, svcName string) error {
-	data, err := getConfig(env, svcName, "")
-	if err != nil {
-		return err
-	}
-	nginxConf, err := getNginxConf(svcName, data)
-	if err != nil {
-		return err
-	}
-	fmt.Print(nginxConf)
-	return nil
-}
-
-func getNginxConf(svcName string, data interface{}) (string, error) {
-	name := svcName
-	if name == `` {
-		name = `access`
-	}
-	file := filepath.Join(release.Root(), name+`.conf.tmpl`)
-	content, err := ioutil.ReadFile(file)
-	if err != nil {
-		return ``, err
-	}
-	tmpl := template.Must(template.New(``).Parse(string(content)))
-	if err != nil {
-		return ``, err
-	}
-
-	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, data); err != nil {
-		return ``, err
-	}
-	return buf.String(), nil
 }
