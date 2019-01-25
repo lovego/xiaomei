@@ -10,17 +10,35 @@ func Cmd() *cobra.Command {
 		Use:   `godoc`,
 		Short: `[service] the workspace godoc server.`,
 	}
+	cmd.AddCommand(runCmd())
 	cmd.AddCommand(deployCmd())
+	cmd.AddCommand(rmDeployCmd())
 	cmd.AddCommand(accessCmd())
 	cmd.AddCommand(shellCmd())
 	cmd.AddCommand(psCmd())
 	return cmd
 }
 
+func runCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   `run`,
+		Short: `run the workspace godoc server.`,
+		RunE:  release.NoArgCall(run),
+	}
+}
+
 func deployCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   `deploy`,
 		Short: `deploy the workspace godoc server.`,
+		RunE:  release.NoArgCall(deploy),
+	}
+}
+
+func rmDeployCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   `deploy`,
+		Short: `remove deployment of the workspace godoc server.`,
 		RunE:  release.NoArgCall(deploy),
 	}
 }
