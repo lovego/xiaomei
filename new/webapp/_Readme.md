@@ -1,4 +1,5 @@
-# {{.ProName}}系统
+{{.ProName}}系统
+================
 
 [![pipeline status](https://gitlab.example.com/go/{{.ProNameUrlSafe}}/badges/master/pipeline.svg)](https://gitlab.example.com/go/{{.ProNameUrlSafe}}/commits/master)
 [![coverage report](https://gitlab.example.com/go/{{.ProNameUrlSafe}}/badges/master/coverage.svg)](https://gitlab.example.com/go/{{.ProNameUrlSafe}}/commits/master)
@@ -10,8 +11,9 @@
 | QA2          | https://{{.ProNameUrlSafe}}.api-qa2.example.com              |
 | Production   | https://{{.ProNameUrlSafe}}.api.example.com                  |
 
-## 接口列表
 
-### 样例模块接口列表
+# 模块1接口列表
 - [样例接口](routes/example-api-doc.md)
 
+# 模块2接口列表
+- [样例接口](routes/example-api-doc.md)
