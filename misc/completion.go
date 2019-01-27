@@ -48,7 +48,7 @@ func getBashCompletionInitScript(dir string) string {
 	if fs.IsFile(script) {
 		return script
 	}
-	script = `/etc/profile.d/bash_completion.sh` // Centos
+	script = `/usr/share/bash-completion/bash_completion`
 	if fs.IsFile(script) {
 		return script
 	}
