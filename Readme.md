@@ -21,8 +21,8 @@ go get github.com/lovego/xiaomei
 ## 文档
 - [命令概览](#overview)
 - [生成项目](./new)
-- [运行项目](./run)
-- [基于Docker的部署](./deploy)
+- [运行项目](./services/run)
+- [基于Docker的部署](./services/deploy)
 - [基于Nginx的接入层（负载均衡）](./access)
 
 <a name="overview"></a>

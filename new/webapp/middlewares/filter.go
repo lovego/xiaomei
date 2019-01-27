@@ -45,25 +45,26 @@ func isPublicPaths(path string) bool {
 
 func checkSign(header http.Header) error {
 	timestamp, sign := header.Get(`Timestamp`), header.Get(`Sign`)
-	if err := checkTimestamp(timestamp); err != nil {
+	ts, err := parseTimestamp(timestamp)
+	if err != nil {
 		return err
 	}
-	if conf.TimestampSign(timestamp, config.Secret()) != sign {
+	if conf.TimestampSign(ts, config.Secret()) != sign {
 		return errs.New("sign-err", "header Sign error")
 	}
 	return nil
 }
 
-func checkTimestamp(timestamp string) error {
-	stamp, err := strconv.ParseInt(timestamp, 10, 64)
+func parseTimestamp(timestamp string) (int64, error) {
+	ts, err := strconv.ParseInt(timestamp, 10, 64)
 	if err != nil {
-		return errs.New("args-err", "header Timestamp error")
+		return 0, errs.New("args-err", "header Timestamp error")
 	}
-	diff := time.Now().Unix() - stamp
+	diff := time.Now().Unix() - ts
 	if diff > 60 || diff < -60 {
-		return errs.New("args-err", "header Timestamp has a gap more than one minute")
+		return 0, errs.New("args-err", "header Timestamp has a gap more than one minute")
 	}
-	return nil
+	return ts, nil
 }
 
 func checkSession(c *goa.Context) error {
