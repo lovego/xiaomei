@@ -17,21 +17,42 @@ func bashCompletionCmd(rootCmd *cobra.Command) *cobra.Command {
 		Use:   `bash-completion`,
 		Short: `setup bash completion script.`,
 		RunE: release.NoArgCall(func() error {
-			dir := getBashCompletionDir()
-			if dir == "" {
-				return nil
-			}
-			var buf bytes.Buffer
-			if err := rootCmd.GenBashCompletion(&buf); err != nil {
-				return err
-			}
-			cmd.SudoWriteFile(dir+`/xiaomei`, &buf)
-			fmt.Printf(`Run the following cmd to make completion take effect immediately:
-      source %s
-`, strings.TrimSuffix(dir, ".d"))
-			return nil
+			return setupBashCompletion(rootCmd)
 		}),
 	}
+}
+
+func setupBashCompletion(rootCmd *cobra.Command) error {
+	dir := getBashCompletionDir()
+	if dir == "" {
+		return nil
+	}
+	var buf bytes.Buffer
+	if err := rootCmd.GenBashCompletion(&buf); err != nil {
+		return err
+	}
+	cmd.SudoWriteFile(dir+`/xiaomei`, &buf)
+
+	if initScript := getBashCompletionInitScript(dir); initScript != "" {
+		fmt.Printf(`Run the following cmd to make completion take effect immediately:
+      source %s
+`, initScript)
+	} else {
+		fmt.Println(`Login again to make completion take effect immediately`)
+	}
+	return nil
+}
+
+func getBashCompletionInitScript(dir string) string {
+	script := strings.TrimSuffix(dir, ".d")
+	if fs.IsFile(script) {
+		return script
+	}
+	script = `/etc/profile.d/bash_completion.sh` // Centos
+	if fs.IsFile(script) {
+		return script
+	}
+	return ""
 }
 
 func getBashCompletionDir() string {
