@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strings"
+	"time"
 
 	cmdPkg "github.com/lovego/cmd"
 	"github.com/lovego/config/conf"
@@ -27,14 +28,11 @@ func timestampSignCmd() *cobra.Command {
 		Use:   `timestamp-sign [<env>]`,
 		Short: `generate Timestamp and Sign headers for curl command.`,
 		RunE: release.EnvCall(func(env string) error {
-			var ts int64
-			var sign string
-			if secret != "" {
-				ts, sign = conf.TimestampSign(secret)
-			} else {
-				ts, sign = release.AppConf(env).TimestampSign()
+			ts := time.Now().Unix()
+			if secret == "" {
+				secret = release.AppConf(env).Secret
 			}
-			fmt.Printf("-H Timestamp:%d -H Sign:%s\n", ts, sign)
+			fmt.Printf("-H Timestamp:%d -H Sign:%s\n", ts, conf.TimestampSign(ts, secret))
 			return nil
 		}),
 	}

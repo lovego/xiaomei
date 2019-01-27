@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"github.com/lovego/config"
+	"github.com/lovego/config/conf"
 	"github.com/lovego/errs"
 	"github.com/lovego/goa"
 	"github.com/lovego/tracer"
 	"github.com/lovego/xiaomei/new/webapp/helpers"
-	"hztl3.com/libs/crypto"
 )
 
 func Filter(c *goa.Context) {
@@ -48,7 +48,7 @@ func checkSign(header http.Header) error {
 	if err := checkTimestamp(timestamp); err != nil {
 		return err
 	}
-	if crypto.SHAEncrypt(timestamp, config.Secret()) != sign {
+	if conf.TimestampSign(timestamp, config.Secret()) != sign {
 		return errs.New("sign-err", "header Sign error")
 	}
 	return nil

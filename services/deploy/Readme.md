@@ -15,7 +15,7 @@ docker build --pull --file=Dockerfile --tag=registry.example.com/example/app:dev
 Successfully built 3f8020e2c72a
 Successfully tagged registry.example.com/example/app:dev-180809-142750
 2018/08/09 14:27:57 pushing app image.
-docker push registry.hztl3.com/example/app:dev-180809-142750
+docker push registry.example.com/example/app:dev-180809-142750
 ... # 此处省略若干推送镜像过程中的输出
 dev-180809-142750: digest: sha256:a1fd5e7a60d529883a15c46adefa1a0aa1de4ba901d4f47b85315e4b9ab1e1c7 size: 2819
 2018/08/09 14:27:59 deploying ubuntu@127.0.0.1
