@@ -11,8 +11,11 @@ func Cmds() []*cobra.Command {
 	mysqlCmd := makeCmd(`mysql`, `enter mysql cli.`, Mysql)
 	mysqlCmd.AddCommand(makeCmd(`dump`, `mysqldump to stdout.`, MysqlDump), mysqlSetupCmd())
 
+	postgresCmd := makeCmd(`psql`, `enter psql cli.`, Psql)
+	postgresCmd.AddCommand(postgresSetupCmd())
+
 	return []*cobra.Command{
-		makeCmd(`psql`, `enter psql cli.`, Psql),
+		postgresCmd,
 		mysqlCmd,
 		makeCmd(`mongo`, `enter mongo cli.`, Mongo),
 		makeCmd(`redis`, `enter redis cli.`, Redis),
@@ -49,6 +52,22 @@ func mysqlSetupCmd() *cobra.Command {
 			file, env, key := flags.Arg(0), flags.Arg(1), flags.Arg(2)
 
 			setupMysql(file, env, key)
+			return nil
+		},
+	}
+	return cmd
+}
+
+func postgresSetupCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   `setup <env>`,
+		Short: `create postgres databases and tables.`,
+		RunE: func(c *cobra.Command, args []string) error {
+			env := c.Flags().Arg(0)
+			if env == `` {
+				env = `dev`
+			}
+			setupPostgres(env)
 			return nil
 		},
 	}
