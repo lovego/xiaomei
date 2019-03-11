@@ -3,7 +3,7 @@ upstream {{ .DeployName }}-app {
   {{- range .App.Addrs }}
   server {{ . }};
   {{- end }}
-  keepalive 1;
+  keepalive 32;
 }
 {{ end -}}
 
