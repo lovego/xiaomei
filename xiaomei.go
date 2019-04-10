@@ -12,6 +12,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const version = `19.04.10`
+
 func main() {
 	cobra.EnableCommandSorting = false
 	root := &cobra.Command{
@@ -36,7 +38,7 @@ func versionCmd() *cobra.Command {
 		Use:   `version`,
 		Short: `show xiaomei version.`,
 		RunE: release.NoArgCall(func() error {
-			fmt.Println(`xiaomei version 19.04.10`)
+			fmt.Println(`xiaomei version ` + version)
 			return nil
 		}),
 	}
