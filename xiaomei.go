@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/access"
 	"github.com/lovego/xiaomei/misc"
 	"github.com/lovego/xiaomei/new"
@@ -26,7 +27,7 @@ func main() {
 	root.AddCommand(services.Cmds()...)
 	root.AddCommand(access.Cmd())
 	root.AddCommand(misc.Cmds(root)...)
-	root.AddCommand(versionCmd())
+	root.AddCommand(versionCmd(), updateCmd())
 
 	if err := root.Execute(); err != nil {
 		os.Exit(1)
@@ -40,6 +41,23 @@ func versionCmd() *cobra.Command {
 		RunE: release.NoArgCall(func() error {
 			fmt.Println(`xiaomei version ` + version)
 			return nil
+		}),
+	}
+}
+
+func updateCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   `update`,
+		Short: `update to lastest version.`,
+		RunE: release.NoArgCall(func() error {
+			fmt.Println(`current version ` + version)
+			if _, err := cmd.Run(cmd.O{},
+				`go`, `get`, `-u`, `-v`, `github.com/lovego/xiaomei`,
+			); err != nil {
+				return err
+			}
+			_, err := cmd.Run(cmd.O{}, `xiaomei`, `version`)
+			return err
 		}),
 	}
 }
