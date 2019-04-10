@@ -1,6 +1,8 @@
 package oam
 
 import (
+	"strings"
+
 	cmdPkg "github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/release"
 	"github.com/lovego/xiaomei/release/cluster"
@@ -78,11 +80,19 @@ func psCmdFor(svcName string) *cobra.Command {
 func logsCmdFor(svcName string) *cobra.Command {
 	var filter string
 	cmd := &cobra.Command{
-		Use:   `logs [<env>]`,
+		Use:   `logs [<env> [-- <options for "docker logs" command> ] ]`,
 		Short: `[oam] list logs  of the ` + desc(svcName) + `.`,
-		RunE: release.EnvCall(func(env string) error {
-			return logs(svcName, env, filter)
-		}),
+		RunE: func(c *cobra.Command, args []string) error {
+			var env, options string
+			if len(args) > 0 {
+				env = args[0]
+			}
+			if len(args) > 1 {
+				options = strings.Join(args[1:], " ")
+			}
+
+			return logs(svcName, env, filter, options)
+		},
 	}
 	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
 	return cmd

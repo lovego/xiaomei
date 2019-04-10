@@ -5,9 +5,9 @@ import (
 
 	"github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/access"
-	"github.com/lovego/xiaomei/services/deploy/conf"
 	"github.com/lovego/xiaomei/release"
 	"github.com/lovego/xiaomei/release/cluster"
+	"github.com/lovego/xiaomei/services/deploy/conf"
 )
 
 func shell(svcName, env, feature string) error {
@@ -21,14 +21,14 @@ func shell(svcName, env, feature string) error {
 	return err
 }
 
-func logs(svcName, env, feature string) error {
+func logs(svcName, env, feature, options string) error {
 	script := fmt.Sprintf(`
 for name in $(docker ps -af name=^/%s --format '{{.Names}}'); do
 	echo -e "\033[32m$name\033[0m"
-	docker logs $name
+	docker logs %s $name
 	echo
 done
-`, release.ServiceName(svcName, env))
+`, release.ServiceName(svcName, env), options)
 	return eachNodeRun(env, script, feature)
 }
 
