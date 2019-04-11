@@ -14,7 +14,7 @@ import (
 	"github.com/lovego/xiaomei/release"
 )
 
-func setup(env, typ, key string, dropDatabase bool) error {
+func create(env, typ, key string, dropDatabase bool) error {
 	if env != `dev` && env != `test` && env != `ci` {
 		return errors.New("not allowed env: " + env)
 	}
@@ -34,20 +34,24 @@ func setup(env, typ, key string, dropDatabase bool) error {
 
 	dbUrls := release.AppData(env).Get(typ)
 	for _, key := range keys {
-		if err := setupDatabase(typ, key, dbUrls.GetString(key), dropDatabase); err != nil {
+		if err := createDatabase(typ, key, dbUrls.GetString(key), dropDatabase); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func setupDatabase(typ, key, dbUrl string, dropDatabase bool) error {
+func createDatabase(typ, key, dbUrl string, dropDatabase bool) error {
 	dbURL, err := url.Parse(dbUrl)
 	if err != nil {
 		return err
 	}
 	dbName := strings.TrimPrefix(dbURL.Path, `/`)
-	log.Printf("setup %s ...\n", color.GreenString(dbName))
+	if dropDatabase {
+		log.Printf("recreate %s ...\n", color.GreenString(dbName))
+	} else {
+		log.Printf("create %s ...\n", color.GreenString(dbName))
+	}
 
 	if err := createDB(typ, dbURL, dbName, dropDatabase); err != nil {
 		return err
