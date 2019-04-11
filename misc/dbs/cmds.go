@@ -12,7 +12,10 @@ func Cmds() []*cobra.Command {
 	)
 
 	postgresCmd := makeCmd(`psql`, `enter psql cli.`, Psql)
-	postgresCmd.AddCommand(makeSetupCmd(`postgres`))
+	postgresCmd.AddCommand(
+		makeSetupCmd(`postgres`, `setup`, ``),
+		makeSetupCmd(`postgres`, `recreate`, `drop existing databases and `),
+	)
 
 	return []*cobra.Command{
 		postgresCmd,
@@ -38,15 +41,13 @@ func makeCmd(name, short string, fun func(env, key string, print bool) error) *c
 	return cmd
 }
 
-func makeSetupCmd(typ string) *cobra.Command {
-	var drop bool
+func makeSetupCmd(typ, name, short string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   `setup [<env> [<key>]]`,
-		Short: `setup databases and tables. (execute .sql file in "sqls" dir).`,
+		Use:   name + ` [<env> [<key>]]`,
+		Short: name + ` databases and tables (` + short + `execute ".sql" file in "sqls" dir).`,
 		RunE: release.Env1Call(func(env, key string) error {
-			return setup(env, typ, key, drop)
+			return setup(env, typ, key, name == `recreate`)
 		}),
 	}
-	cmd.Flags().BoolVarP(&drop, `drop`, `d`, false, `drop existing database before setup.`)
 	return cmd
 }
