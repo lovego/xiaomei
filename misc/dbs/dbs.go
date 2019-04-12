@@ -12,7 +12,7 @@ import (
 )
 
 func Psql(env, key string, printCmd bool) error {
-	url := dburl.Parse(release.AppData(env).Get(`postgres`).GetString(key)).URL.String()
+	url := dburl.Parse(getDbUrl(env, `postgres`, key)).URL.String()
 	command := fmt.Sprintf("PAGER=less LESS='-iFMSXx4' psql '%s'", url)
 	if printCmd {
 		fmt.Println(command)
@@ -23,7 +23,7 @@ func Psql(env, key string, printCmd bool) error {
 }
 
 func Mysql(env, key string, printCmd bool) error {
-	flags := dsn.Mysql(release.AppData(env).Get(`mysql`).GetString(key)).Flags()
+	flags := dsn.Mysql(getDbUrl(env, `mysql`, key)).Flags()
 	command := `mysql --pager=less -SX ` + strings.Join(flags, ` `)
 	if printCmd {
 		fmt.Println(command)
@@ -34,7 +34,7 @@ func Mysql(env, key string, printCmd bool) error {
 }
 
 func MysqlDump(env, key string, printCmd bool) error {
-	flags := dsn.Mysql(release.AppData(env).Get(`mysql`).GetString(key)).Flags()
+	flags := dsn.Mysql(getDbUrl(env, `mysql`, key)).Flags()
 	command := `mysqldump -t ` + strings.Join(flags, ` `)
 	if printCmd {
 		fmt.Println(command)
@@ -45,7 +45,7 @@ func MysqlDump(env, key string, printCmd bool) error {
 }
 
 func Mongo(env, key string, printCmd bool) error {
-	command := `mongo ` + release.AppData(env).Get(`mongo`).GetString(key)
+	command := `mongo ` + getDbUrl(env, `mongo`, key)
 	if printCmd {
 		fmt.Println(command)
 		return nil
@@ -55,7 +55,7 @@ func Mongo(env, key string, printCmd bool) error {
 }
 
 func Redis(env, key string, printCmd bool) error {
-	flags := dsn.Redis(release.AppData(env).Get(`redis`).GetString(key)).Flags()
+	flags := dsn.Redis(getDbUrl(env, `redis`, key)).Flags()
 	command := `redis-cli ` + strings.Join(flags, ` `)
 	if printCmd {
 		fmt.Println(command)
@@ -63,4 +63,13 @@ func Redis(env, key string, printCmd bool) error {
 	}
 	_, err := cluster.Get(env).Run(``, cmd.O{}, command)
 	return err
+}
+
+func getDbUrl(env, typ, key string) string {
+	strMap := release.AppData(env).Get(typ)
+	keys := strings.Split(key, ".")
+	for i := 0; i < len(keys)-1; i++ {
+		strMap = strMap.Get(keys[i])
+	}
+	return strMap.GetString(keys[len(keys)-1])
 }
