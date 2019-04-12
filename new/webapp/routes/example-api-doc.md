@@ -12,8 +12,8 @@
 | param1       | 参数1      | bool   | 否   | param1校验规则说明  |
 | param2       | 参数2      | string | 否   | param2校验规则说明  |
 
-## 请求体说明 (application/json编码) 
-```
+## 请求体说明 (JSON编码) 
+```json
 {
   "field1": "value1",    # 字段1的说明
   "field2": [            # 字段2的说明
@@ -26,31 +26,16 @@
 }
 ```
 
-## 返回体说明 (application/json编码)
-```
+## 返回头说明
+| Header       | Value       | 说明                                  |
+| ------------ | ----------- | ------------------------------------- |
+| Set-Cookie   | token=XXXXX | 其中XXXXX代表会话令牌。               |
+
+## 返回体说明 (JSON编码)
+```json
 {
     "code": "ok",           # ok 表示成功，其他表示错误代码
     "message": "success"    # 与code对应的描述信息
 }
 ```
 
-
-## 请求示例
-```
-curl -XPOST 'https://example.com/exmaple/path?param1=v1&param2=v2' -H 'Header1: value' \
-  -d'{
-    "field1": "value1",
-    "field2": [
-      { "field3": "...", "field4": "..." },
-      { "field3": "...", "field4": "..." }
-    ]
-  }'
-```
-
-## 返回示例
-```
-{
-    "code": "ok",
-    "message": "success"
-}
-```
