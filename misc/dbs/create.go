@@ -19,8 +19,11 @@ import (
 )
 
 func create(env, typ, key string, recreate bool) error {
-	if env != `dev` && env != `test` && env != `ci` {
-		return errors.New("not allowed env: " + env)
+	if recreate {
+		switch env {
+		case `production`, `staging`, `preview`:
+			return errors.New("recreate is forbidden under environments: " + env)
+		}
 	}
 
 	var keys []string
