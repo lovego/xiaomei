@@ -52,13 +52,23 @@ func execCmd() *cobra.Command {
 }
 
 func compile(linuxAMD64 bool) error {
-	log.Println(color.GreenString(`compile the app server binary.`))
+	log.Println(color.GreenString(`compile the app binary.`))
 	o := cmd.O{Dir: filepath.Join(release.Root(), `..`)}
 	if linuxAMD64 && (runtime.GOOS != `linux` || runtime.GOARCH != `amd64`) {
-		o.Env = []string{`GOOS=linux`, `GOARCH=amd64`}
+		o.Env = []string{`GOOS=linux`, `GOARCH=amd64`} // cross compile
 	}
-	if cmd.Ok(o, `go`, `build`, `-v`, `-o`, `release/img-app/`+release.Name()) {
+
+	var subCmd []string
+	// go install have no "-o" option, so we use GOBIN environment variable
+	// go install cannot install cross-compiled binaries when GOBIN is set
+	if filepath.Base(o.Dir) == release.Name() && len(o.Env) == 0 {
+		o.Env = []string{`GOBIN=` + filepath.Join(o.Dir, `release/img-app`)}
+		subCmd = []string{`install`, `-i`, `-v`}
+	} else {
+		subCmd = []string{`build`, `-i`, `-v`, `-o`, `release/img-app/` + release.Name()}
+	}
+	if cmd.Ok(o, `go`, subCmd...) {
 		return misc.SpecAll()
 	}
-	return errors.New(`compile the app server binary failed.`)
+	return errors.New(`compile the app binary failed.`)
 }

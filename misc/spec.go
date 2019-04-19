@@ -18,7 +18,7 @@ func specCmd() *cobra.Command {
 	var onlyChanged bool
 	cmd := &cobra.Command{
 		Use:   `spec`,
-		Short: `check code spec.`,
+		Short: `check the app code spec.`,
 		RunE: func(c *cobra.Command, args []string) error {
 			return Spec(args, onlyChanged)
 		},
@@ -32,7 +32,7 @@ func SpecAll() error {
 }
 
 func Spec(targets []string, onlyChanged bool) error {
-	log.Println(color.GreenString(`check app code spec.`))
+	log.Println(color.GreenString(`check the app code spec.`))
 	if err := os.Chdir(filepath.Join(release.Root(), `..`)); err != nil {
 		panic(err)
 	}
