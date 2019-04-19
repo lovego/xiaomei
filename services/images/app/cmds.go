@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"runtime"
 
 	"github.com/fatih/color"
 	"github.com/lovego/cmd"
@@ -53,8 +54,8 @@ func execCmd() *cobra.Command {
 func compile(linuxAMD64 bool) error {
 	log.Println(color.GreenString(`compile the app server binary.`))
 	o := cmd.O{Dir: filepath.Join(release.Root(), `..`)}
-	if linuxAMD64 {
-		o.Env = []string{"GOOS=linux", "GOARCH=amd64"}
+	if linuxAMD64 && (runtime.GOOS != `linux` || runtime.GOARCH != `amd64`) {
+		o.Env = []string{`GOOS=linux`, `GOARCH=amd64`}
 	}
 	if cmd.Ok(o, `go`, `build`, `-v`, `-o`, `release/img-app/`+release.Name()) {
 		return misc.SpecAll()
