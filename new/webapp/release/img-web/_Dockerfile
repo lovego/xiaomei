@@ -1,4 +1,4 @@
-FROM hub.c.163.com/lovego/xiaomei/nginx
+FROM registry.cn-beijing.aliyuncs.com/lovego/nginx
 
 COPY web.conf.tmpl /etc/nginx/sites-available/{{ .ProName }}.conf.tmpl
 COPY public /var/www/{{ .ProName }}/

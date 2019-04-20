@@ -19,7 +19,7 @@ func deploy() error {
 	docker run --name=workspace-godoc -d --restart=always \
     -e=GODOCPORT=1234 --publish=1234:1234 \
 	  -v $(go env GOPATH):/home/ubuntu/go -v $(go env GOROOT):/usr/local/go \
-	  hub.c.163.com/lovego/xiaomei/godoc
+	  registry.cn-beijing.aliyuncs.com/lovego/godoc
 	`
 	_, err := cmd.Run(cmd.O{}, `sh`, `-c`, script)
 	return err
