@@ -1,4 +1,4 @@
-FROM hub.c.163.com/lovego/xiaomei/ubuntu
+FROM registry.cn-beijing.aliyuncs.com/lovego/ubuntu
 
 COPY sources.list /etc/apt/sources.list.d/nginx.list
 

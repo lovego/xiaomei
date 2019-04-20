@@ -1,4 +1,4 @@
-FROM hub.c.163.com/lovego/xiaomei/ubuntu
+FROM registry.cn-beijing.aliyuncs.com/lovego/ubuntu
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends logrotate \

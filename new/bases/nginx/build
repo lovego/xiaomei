@@ -5,7 +5,7 @@ cd $(dirname $0)
 
 test nginx-start.go -nt nginx-start && GOOS=linux GOARCH=amd64 go build nginx-start.go
 
-name=hub.c.163.com/lovego/xiaomei/nginx
+name=registry.cn-beijing.aliyuncs.com/lovego/nginx
 
 docker build --pull -t $name .
 

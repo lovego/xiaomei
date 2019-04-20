@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+
+cd $(dirname $0)
+
+test -x xiaomei || {
+  GOOS=linux GOARCH=amd64 go build -i -v -o xiaomei github.com/lovego/xiaomei
+}
+
+name=registry.cn-beijing.aliyuncs.com/lovego/xiaomei
+
+docker build -t $name .
+
+if test "$1" = '-p'; then
+  docker push $name
+fi

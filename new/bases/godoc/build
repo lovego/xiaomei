@@ -2,7 +2,7 @@
 
 cd $(dirname $0)
 
-name=hub.c.163.com/lovego/xiaomei/godoc
+name=registry.cn-beijing.aliyuncs.com/lovego/godoc
 
 docker build --pull -t $name .
 

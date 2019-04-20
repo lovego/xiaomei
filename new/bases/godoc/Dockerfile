@@ -1,4 +1,4 @@
-FROM hub.c.163.com/lovego/xiaomei/ubuntu
+FROM registry.cn-beijing.aliyuncs.com/lovego/ubuntu
 
 COPY godoc godoc-start /usr/local/bin/
 COPY pkg.png /usr/local/go/doc/gopher/

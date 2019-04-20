@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd $(dirname $0)
-name=hub.c.163.com/lovego/xiaomei/appserver:2
+name=registry.cn-beijing.aliyuncs.com/lovego/appserver
 
 docker build --pull -t $name .
 

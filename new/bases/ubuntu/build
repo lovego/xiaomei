@@ -2,7 +2,7 @@
 
 cd $(dirname $0)
 
-name=hub.c.163.com/lovego/xiaomei/ubuntu
+name=registry.cn-beijing.aliyuncs.com/lovego/ubuntu
 
 docker build -t $name .
 
