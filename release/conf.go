@@ -1,6 +1,8 @@
 package release
 
 import (
+	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/lovego/config/conf"
@@ -54,4 +56,17 @@ func AppData(env string) strmap.StrMap {
 	} else {
 		return data
 	}
+}
+
+func CheckEnv(env string) (string, error) {
+	if env == `` {
+		env = os.Getenv(`GOENV`)
+	}
+	if env == `` {
+		env = `dev`
+	}
+	if _, ok := AppConfig().Envs[env]; ok {
+		return env, nil
+	}
+	return ``, fmt.Errorf("env %s not defined in cluster.yml", env)
 }

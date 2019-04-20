@@ -8,10 +8,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func init() {
-	release.RegisterEnvsGetter(Envs)
-}
-
 var theClusters map[string]*Cluster
 
 func GetClusters() map[string]*Cluster {
@@ -26,19 +22,4 @@ func GetClusters() map[string]*Cluster {
 		}
 	}
 	return theClusters
-}
-
-var theEnvs []string
-
-func Envs() []string {
-	if theEnvs == nil {
-		envs := []string{}
-		// if release.InProject() {
-		for env := range GetClusters() {
-			envs = append(envs, env)
-		}
-		// }
-		theEnvs = envs
-	}
-	return theEnvs
 }
