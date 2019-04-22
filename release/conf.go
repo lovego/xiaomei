@@ -68,5 +68,5 @@ func CheckEnv(env string) (string, error) {
 	if _, ok := AppConfig().Envs[env]; ok {
 		return env, nil
 	}
-	return ``, fmt.Errorf("env %s not defined in cluster.yml", env)
+	return ``, fmt.Errorf("env %s not defined in config.yml", env)
 }
