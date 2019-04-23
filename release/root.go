@@ -27,10 +27,11 @@ func detectRoot() string {
 	if theRoot == nil {
 		if cwd, err := os.Getwd(); err != nil {
 			panic(err)
-		} else if dir := fs.DetectDir(cwd, `release/clusters.yml`); dir != `` {
+		} else if dir := fs.DetectDir(cwd, `release/img-app/config/config.yml`); dir != `` {
 			dir = filepath.Join(dir, `release`)
 			theRoot = &dir
-		} else if dir := fs.DetectDir(cwd, `clusters.yml`); dir != `` {
+		} else if dir := fs.DetectDir(cwd, `release/config.yml`); dir != `` {
+			dir = filepath.Join(dir, `release`)
 			theRoot = &dir
 		} else {
 			return ``
@@ -39,7 +40,7 @@ func detectRoot() string {
 	return *theRoot
 }
 
-// package go path
+// package import path
 func Path() string {
 	proDir := path.Join(Root(), `../`)
 
