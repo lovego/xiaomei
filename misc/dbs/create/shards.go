@@ -9,8 +9,8 @@ import (
 	"github.com/lovego/config/conf"
 )
 
-func setupShard(rawDb *sql.DB, shardNo int, settings conf.ShardsSettings) error {
-	if shardNo == 0 || settings.IdSeqIncrementBy == 0 {
+func (c Creation) setupShard(rawDb *sql.DB, shardNo int, settings conf.ShardsSettings) error {
+	if c.typ != `postgres` || shardNo == 0 || settings.IdSeqIncrementBy == 0 {
 		return nil
 	}
 	db := bsql.New(rawDb, 10*time.Second)

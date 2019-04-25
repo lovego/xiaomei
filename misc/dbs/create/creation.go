@@ -57,7 +57,7 @@ func (c Creation) doOne(dbUrl string, shardNo int, shardSettings conf.ShardsSett
 		return bsql.ErrorWithPosition(err, c.sql)
 	}
 	if shardNo > 0 {
-		return setupShard(db, shardNo, shardSettings)
+		return c.setupShard(db, shardNo, shardSettings)
 	}
 	return nil
 }
