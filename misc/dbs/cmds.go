@@ -1,6 +1,7 @@
 package dbs
 
 import (
+	"github.com/lovego/xiaomei/misc/dbs/create"
 	"github.com/lovego/xiaomei/release"
 	"github.com/spf13/cobra"
 )
@@ -46,7 +47,7 @@ func makeCreateCmd(typ, name, short string) *cobra.Command {
 		Use:   name + ` [<env> [<key>]]`,
 		Short: name + ` databases and tables (` + short + `execute ".sql" file in "sqls" dir).`,
 		RunE: release.Env1Call(func(env, key string) error {
-			return create(env, typ, key, name == `recreate`)
+			return create.Do(env, typ, key, name == `recreate`)
 		}),
 	}
 	return cmd
