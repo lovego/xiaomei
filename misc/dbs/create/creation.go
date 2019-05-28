@@ -11,6 +11,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/lovego/bsql"
 	"github.com/lovego/config/conf"
+	"github.com/lovego/config/db/dburl"
 	"github.com/lovego/xiaomei/release"
 )
 
@@ -41,13 +42,12 @@ func (c Creation) do() error {
 }
 
 func (c Creation) doOne(dbUrl string, shardNo int, shardSettings conf.ShardsSettings) error {
-	if dbURL, dbName, err := c.prepare(dbUrl); err != nil {
-		return err
-	} else if err := c.createDB(dbURL, dbName); err != nil {
+	dbURL, dbName := c.prepare(dbUrl)
+	if err := c.createDB(dbURL, dbName); err != nil {
 		return err
 	}
 
-	db, err := sql.Open(c.typ, dbUrl)
+	db, err := sql.Open(c.typ, dbURL.String())
 	if err != nil {
 		return err
 	}
@@ -62,18 +62,15 @@ func (c Creation) doOne(dbUrl string, shardNo int, shardSettings conf.ShardsSett
 	return nil
 }
 
-func (c Creation) prepare(dbUrl string) (*url.URL, string, error) {
-	dbURL, err := url.Parse(dbUrl)
-	if err != nil {
-		return nil, "", err
-	}
+func (c Creation) prepare(dbUrl string) (*url.URL, string) {
+	dbURL := dburl.Parse(dbUrl).URL
 	dbName := strings.TrimPrefix(dbURL.Path, `/`)
 	if c.recreate {
 		log.Printf("recreate %s ...\n", color.GreenString(dbName))
 	} else {
 		log.Printf("create %s ...\n", color.GreenString(dbName))
 	}
-	return dbURL, dbName, nil
+	return dbURL, dbName
 }
 
 func (c Creation) createDB(dbURL *url.URL, dbName string) error {
