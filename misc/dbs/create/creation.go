@@ -43,7 +43,8 @@ func (c Creation) do() error {
 
 func (c Creation) doOne(dbUrl string, shardNo int, shardSettings conf.ShardsSettings) error {
 	dbURL, dbName := c.prepare(dbUrl)
-	if err := c.createDB(dbURL, dbName); err != nil {
+	// make a dbURL copy
+	if err := c.createDB(*dbURL, dbName); err != nil {
 		return err
 	}
 
@@ -73,7 +74,7 @@ func (c Creation) prepare(dbUrl string) (*url.URL, string) {
 	return dbURL, dbName
 }
 
-func (c Creation) createDB(dbURL *url.URL, dbName string) error {
+func (c Creation) createDB(dbURL url.URL, dbName string) error {
 	dbURL.Path = c.typ
 
 	db, err := sql.Open(c.typ, dbURL.String())
