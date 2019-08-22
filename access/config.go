@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/lovego/config/conf"
+	"github.com/lovego/strmap"
 	"github.com/lovego/xiaomei/release"
 	"github.com/lovego/xiaomei/release/cluster"
 	deployConf "github.com/lovego/xiaomei/services/deploy/conf"
@@ -14,6 +15,7 @@ import (
 type Config struct {
 	*conf.Conf
 	App, Web *service
+	Data     strmap.StrMap
 }
 
 func getConfig(env, downAddr string) (Config, error) {
@@ -21,6 +23,7 @@ func getConfig(env, downAddr string) (Config, error) {
 		Conf: release.AppConf(env),
 		App:  newService(`app`, env, downAddr),
 		Web:  newService(`web`, env, downAddr),
+		Data: release.AppData(env),
 	}
 	if data.App == nil && data.Web == nil {
 		return Config{}, errors.New(`neither app nor web service defined.`)
