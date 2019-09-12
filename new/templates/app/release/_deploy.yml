@@ -1,0 +1,21 @@
+services: &services
+  access:
+    nodes: { }
+  app:
+    image: "{{ .Registry }}{{ .ProNameUrlSafe }}/app"
+    ports: [ 3001, 4001 ]
+    options: [ -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}/log" ]
+
+dev:
+  services:
+    <<: *services
+  volumesToCreate: [ "{{ .ProName }}-logs" ]
+qa:
+  services:
+    <<: *services
+  volumesToCreate: [ "{{ .ProName }}-logs" ]
+production:
+  services:
+    <<: *services
+  volumesToCreate: [ "{{ .ProName }}-logs" ]
+

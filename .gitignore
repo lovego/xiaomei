@@ -2,6 +2,6 @@
 *.test
 .DS_Store
 tmp
-/xiaomei/xiaomei
+/xiaomei
 !.gitkeep
 .idea

@@ -1,0 +1,15 @@
+FROM registry.cn-beijing.aliyuncs.com/lovego/appserver:2
+
+RUN mkdir -p /home/ubuntu/{{ .ProName }}/log
+WORKDIR /home/ubuntu/{{ .ProName }}
+
+CMD [ "./{{ .ProName }}" ]
+
+COPY {{ .ProName }} ./
+COPY config  ./config
+COPY views   ./views
+
+RUN sudo chmod 775 {{ .ProName }} \
+ && sudo find config views -type d -exec chmod 775 {} \+ \
+ && sudo find config views -type f -exec chmod 664 {} \+
+

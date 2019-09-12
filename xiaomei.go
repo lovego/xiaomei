@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const version = `19.08.22`
+const version = `19.09.12`
 
 func main() {
 	cobra.EnableCommandSorting = false
@@ -24,8 +24,8 @@ func main() {
 	}
 
 	root.AddCommand(new.Cmd())
-	root.AddCommand(services.Cmds()...)
 	root.AddCommand(access.Cmd())
+	root.AddCommand(services.Cmds()...)
 	root.AddCommand(misc.Cmds(root)...)
 	root.AddCommand(versionCmd(), updateCmd())
 

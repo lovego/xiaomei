@@ -8,7 +8,7 @@ import (
 func Cmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `godoc`,
-		Short: `[service] the godoc server.`,
+		Short: `the godoc server on local machine.`,
 	}
 	cmd.AddCommand(runCmd())
 	cmd.AddCommand(deployCmd())

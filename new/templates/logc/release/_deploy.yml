@@ -1,0 +1,22 @@
+services: &services
+  logc:
+    image: "{{ .Registry }}{{ .ProNameUrlSafe }}/logc"
+    options: [
+      -e, "LOGCENV=common",
+      -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}-logs",
+      -v, "/var/run/docker.sock:/var/run/docker.sock"
+    ]
+
+dev:
+  services:
+    <<: *services
+  volumesToCreate: [ "{{ .ProName }}-logs" ]
+qa:
+  services:
+    <<: *services
+  volumesToCreate: [ "{{ .ProName }}-logs" ]
+production:
+  services:
+    <<: *services
+  volumesToCreate: [ "{{ .ProName }}-logs" ]
+

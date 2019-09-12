@@ -1,0 +1,19 @@
+# vim: set ft=nginx:
+
+server {
+  listen {{ `{{ .ListenPort }}` }} default_server;
+  root /var/www/{{ .ProName }};
+
+  index index.html;
+
+  location ~ \.html {
+    add_header Cache-Control "must-revalidate";
+  }
+
+  location ~ \.(js|css|png|gif|jpg|svg|ico|woff|woff2|ttf|eot|map|json)$ {
+    expires max;
+  }
+  {{ "{{ if .SendfileOff }}sendfile off;{{ end }}" }}
+  access_log /var/log/nginx/{{ .ProName }}/web.log std;
+  error_log  /var/log/nginx/{{ .ProName }}/web.err;
+}

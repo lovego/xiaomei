@@ -1,7 +1,0 @@
-dev:
-  user: ubuntu
-  nodes:
-    - { addr: 127.0.0.1, labels: { access: true } }
-demo:
-qa:
-production:

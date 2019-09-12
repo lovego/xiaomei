@@ -2,9 +2,8 @@
 *.test
 .DS_Store
 .idea
+*.exe
 tmp
 /{{ .ProName }}
 /release/img-app/{{ .ProName }}
-/release/img-app/tasks
 /release/img-app/log
-*.exe

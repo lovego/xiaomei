@@ -1,0 +1,35 @@
+addrs: &addrs
+  - http://127.0.0.1:9200/logc-${LOGCENV}-
+
+defaults: &defaults
+  "@type": elasticsearch
+  addrs: *addrs
+
+  # add field name suffix accordding to it's data type, "_i" for int, "_s" for string etc.
+  addTypeSuffix: true
+
+  ### the following fields is effective only when "index" field is a time series index. ###
+  # field used to determine which time series index to write to.
+  timeField: at
+  # the number of latest time series indices to keep. old indices will be deleted.
+  indexKeep: 2
+
+name: "{{ .ProName }}" # name used to alarm
+mailer: "mailer://smtp.qq.com:25/?user=小美<xiaomei-go@qq.com>&pass=zjsbosjlhgugechh"
+keepers: [ "小美<xiaomei-go@qq.com>" ]
+rotate:
+  time: "33 33 3 * * *" # cron time pattern to execute rotate.cmd
+  cmd: [ logrotate, ../logrotate.conf ]
+files:
+  # "http.log" is the file path, required, either relative or absolute is ok.
+
+  # "es" is the collector id, it will be used as part of offset file path, so it should be path safe.
+  # make sure different collectors of the same file has unique id.
+
+  # index can be time series index or regular index.
+  # index without "<" and ">" acts as a regular index.
+  # in time series index, string between "<" and ">" acts as time layout.
+  # see https://golang.org/pkg/time/#Parse for time layout format.
+
+  http.log: { es: { <<: *defaults, index: "http-log.<2006.01>" } }
+

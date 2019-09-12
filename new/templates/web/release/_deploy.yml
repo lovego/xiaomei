@@ -1,0 +1,21 @@
+services: &services
+  access:
+    nodes: { }
+  web:
+    image: "{{ .Registry }}{{ .ProNameUrlSafe }}/web"
+    ports: [ 8001 ]
+    options: [ -v, "{{ .ProName }}-logs:/var/log/nginx/{{ .ProName }}" ]
+
+dev:
+  services:
+    <<: *services
+  volumesToCreate: [ "{{ .ProName }}-logs" ]
+qa:
+  services:
+    <<: *services
+  volumesToCreate: [ "{{ .ProName }}-logs" ]
+production:
+  services:
+    <<: *services
+  volumesToCreate: [ "{{ .ProName }}-logs" ]
+

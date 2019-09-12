@@ -13,6 +13,7 @@ import (
 	"github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/release"
 	"github.com/lovego/xiaomei/release/cluster"
+	"github.com/lovego/xiaomei/services/deploy/conf"
 )
 
 var reloadScript = `
@@ -87,8 +88,9 @@ func getNginxConf(env, downAddr string) (string, Config, error) {
 }
 
 func clusterRun(env, feature, input, cmdStr string) error {
+	access := conf.GetService(`access`, env)
 	for _, node := range cluster.Get(env).GetNodes(feature) {
-		if node.Labels[`access`] == `true` {
+		if node.Match(access.Nodes) {
 			log.Println(color.GreenString(node.SshAddr()))
 			cmdOpt := cmd.O{}
 			if input != "" {

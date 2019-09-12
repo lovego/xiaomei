@@ -1,0 +1,7 @@
+FROM registry.cn-beijing.aliyuncs.com/lovego/logc:2
+
+COPY logc.yml logrotate.conf ./
+WORKDIR /home/ubuntu/{{ .ProName }}-logs
+RUN chown ubuntu:ubuntu . && chmod 644 ../logrotate.conf
+
+CMD [ "logc", "../logc.yml" ]

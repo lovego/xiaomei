@@ -1,4 +1,6 @@
 services: &services
+  access:
+    nodes: { }
   app:
     image: "{{ .Registry }}{{ .ProNameUrlSafe }}/app"
     ports: [ 3001, 4001 ]

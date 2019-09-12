@@ -1,20 +1,10 @@
-{{- if .App -}}
+# vim: ft=nginx
 upstream {{ .DeployName }}-app {
   {{- range .App.Addrs }}
   server {{ . }};
   {{- end }}
-  keepalive 32;
+  keepalive 10;
 }
-{{ end -}}
-
-{{- if .Web -}}
-upstream {{ .DeployName }}-web {
-  {{- range .Web.Addrs }}
-  server {{ . }};
-  {{- end }}
-  keepalive 1;
-}
-{{ end -}}
 
 server {
   listen 80;
@@ -29,21 +19,9 @@ server {
   ssl_session_timeout 10m;
   {{- end }}
 
-  {{ if and .App .Web -}}
-  location = / {
-    proxy_pass http://{{ .DeployName }}-web;
-  }
-  location ~ \.(html|js|css|png|gif|jpg|svg|ico|woff|woff2|ttf|eot|map|json)$ {
-    proxy_pass http://{{ .DeployName }}-web;
-  }
   location / {
     proxy_pass http://{{ .DeployName }}-app;
   }
-  {{- else -}}
-  location / {
-    proxy_pass http://{{ .DeployName }}-{{ if .App }}app{{ else }}web{{ end }};
-  }
-  {{- end }}
 
   proxy_http_version 1.1;
   proxy_set_header Connection "";
