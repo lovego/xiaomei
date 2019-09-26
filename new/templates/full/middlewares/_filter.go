@@ -11,7 +11,7 @@ import (
 	"github.com/lovego/errs"
 	"github.com/lovego/goa"
 	"github.com/lovego/tracer"
-	"github.com/lovego/xiaomei/new/webapp/helpers"
+	"{{ .ProPath }}/helpers"
 )
 
 func Filter(c *goa.Context) {

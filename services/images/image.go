@@ -36,7 +36,6 @@ func (i Image) push(env, tag string) error {
 }
 
 func (i Image) list(env string) error {
-	log.Println(color.GreenString(`images of the ` + i.svcName + ` service.`))
 	_, err := cmd.Run(cmd.O{}, `docker`, `images`,
 		`-f`, `reference=`+release.GetService(i.svcName, env).ImageName(``))
 	return err

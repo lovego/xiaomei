@@ -1,6 +1,7 @@
 package images
 
 import (
+	"github.com/fatih/color"
 	"github.com/lovego/xiaomei/release"
 	"github.com/lovego/xiaomei/services/images/app"
 	"github.com/lovego/xiaomei/services/images/logc"
@@ -35,6 +36,9 @@ func Push(svcName, env, tag string) error {
 
 func List(svcName, env string) error {
 	return imagesDo(svcName, env, func(img Image) error {
+		if svcName == `` {
+			color.Green(img.svcName + `:`)
+		}
 		return img.list(env)
 	})
 }

@@ -1,4 +1,4 @@
-FROM registry.cn-beijing.aliyuncs.com/lovego/logc:2
+FROM registry.cn-beijing.aliyuncs.com/lovego/logc
 
 COPY logc.yml logrotate.conf ./
 WORKDIR /home/ubuntu/{{ .ProName }}-logs

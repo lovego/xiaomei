@@ -1,4 +1,4 @@
-FROM registry.cn-beijing.aliyuncs.com/lovego/appserver:2
+FROM registry.cn-beijing.aliyuncs.com/lovego/appserver
 
 RUN mkdir -p /home/ubuntu/{{ .ProName }}/log
 WORKDIR /home/ubuntu/{{ .ProName }}
