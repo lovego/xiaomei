@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Run, Deploy, Ps, Logs commands
 func Cmds(svcName string) (cmds []*cobra.Command) {
 	return []*cobra.Command{
 		deployCmdFor(svcName),
@@ -16,7 +15,7 @@ func Cmds(svcName string) (cmds []*cobra.Command) {
 
 func deployCmdFor(svcName string) *cobra.Command {
 	var filter string
-	var pull, push bool
+	var pull, push, wait bool
 	cmd := &cobra.Command{
 		Use:   `deploy [<env> [<tag>]]`,
 		Short: `deploy the ` + desc(svcName) + `.`,
@@ -32,7 +31,7 @@ func deployCmdFor(svcName string) *cobra.Command {
 					}
 				}
 			}
-			if err := deploy(svcName, env, timeTag, filter); err != nil {
+			if err := deploy(svcName, env, timeTag, filter, wait); err != nil {
 				return err
 			}
 			return nil
@@ -41,6 +40,7 @@ func deployCmdFor(svcName string) *cobra.Command {
 	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
 	cmd.Flags().BoolVarP(&pull, `pull`, `p`, true, `pull base image.`)
 	cmd.Flags().BoolVarP(&push, `push`, `P`, true, `push the built images to registry.`)
+	cmd.Flags().BoolVarP(&wait, `wait`, `w`, true, `wait Ctl+C after deployed a node.`)
 	return cmd
 }
 
