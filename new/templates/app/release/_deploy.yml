@@ -1,21 +1,28 @@
-services: &services
-  access:
-    nodes: { }
-  app:
-    image: "{{ .Registry }}{{ .ProNameUrlSafe }}/app"
-    ports: [ 3001, 4001 ]
-    options: [ -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}/log" ]
-
 dev:
   services:
-    <<: *services
+    access:
+      nodes: { }
+    app:
+      image: "{{ .Registry }}{{ .ProNameUrlSafe }}/app/dev"
+      ports: [ 3001, 4001 ]
+      options: [ -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}/log" ]
   volumesToCreate: [ "{{ .ProName }}-logs" ]
 qa:
   services:
-    <<: *services
+    access:
+      nodes: { }
+    app:
+      image: "{{ .Registry }}{{ .ProNameUrlSafe }}/app/qa"
+      ports: [ 3001, 4001 ]
+      options: [ -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}/log" ]
   volumesToCreate: [ "{{ .ProName }}-logs" ]
 production:
   services:
-    <<: *services
+    access:
+      nodes: { }
+    app:
+      image: "{{ .Registry }}{{ .ProNameUrlSafe }}/app/production"
+      ports: [ 3001, 4001 ]
+      options: [ -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}/log" ]
   volumesToCreate: [ "{{ .ProName }}-logs" ]
 

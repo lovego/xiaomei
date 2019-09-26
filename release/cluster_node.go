@@ -1,4 +1,4 @@
-package cluster
+package release
 
 import (
 	"net"
@@ -9,27 +9,26 @@ import (
 
 	"github.com/lovego/cmd"
 	"github.com/lovego/slice"
-	"github.com/lovego/xiaomei/services/deploy/conf"
 )
 
 type Node struct {
-	user       string
-	jumpAddr   string
-	Addr       string            `yaml:"addr"`
-	Labels     map[string]string `yaml:"labels"`
-	ListenAddr string            `yaml:"listenAddr"` // only for manager
+	user string
+	// addr for ssh and service may be on different network segments.
+	Addr        string            `yaml:"addr"`       // addr for ssh
+	ServiceAddr string            `yaml:"seviceAddr"` // addr for service, use Addr if empty.
+	Labels      map[string]string `yaml:"labels"`
 }
 
 func (n Node) Services(env, svcName string) []string {
 	var svcNames []string
 	if svcName == `` {
-		svcNames = conf.ServiceNames(env)
+		svcNames = ServiceNames(env)
 	} else {
 		svcNames = []string{svcName}
 	}
 	var svcs []string
 	for _, svcName := range svcNames {
-		service := conf.GetService(svcName, env)
+		service := GetService(svcName, env)
 		if n.Match(service.Nodes) {
 			svcs = append(svcs, svcName)
 		}
@@ -51,16 +50,12 @@ func (n Node) SshAddr() string {
 }
 
 func (n Node) SshCmd() string {
-	cmd := `ssh -t ` + n.SshAddr()
-	if n.jumpAddr != `` {
-		cmd = `ssh -t ` + n.jumpAddr + ` ` + cmd
-	}
-	return cmd
+	return `ssh -t ` + n.SshAddr()
 }
 
-func (n Node) GetListenAddr() string {
-	if n.ListenAddr != `` {
-		return n.ListenAddr
+func (n Node) GetServiceAddr() string {
+	if n.ServiceAddr != `` {
+		return n.ServiceAddr
 	}
 	return n.Addr
 }
@@ -78,11 +73,7 @@ func (n Node) Run(o cmd.O, script string) (string, error) {
 		}
 		return cmd.Run(o, `bash`, `-c`, script)
 	} else {
-		if n.jumpAddr == `` {
-			return cmd.SshRun(o, n.SshAddr(), script)
-		} else {
-			return cmd.SshJumpRun(o, n.jumpAddr, n.SshAddr(), script)
-		}
+		return cmd.SshRun(o, n.SshAddr(), script)
 	}
 }
 

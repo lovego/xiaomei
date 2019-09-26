@@ -5,9 +5,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/lovego/xiaomei/services/deploy/conf"
-	"github.com/lovego/xiaomei/services/images"
 	"github.com/lovego/xiaomei/release"
+	"github.com/lovego/xiaomei/services/images"
 )
 
 const deployScriptTmpl = `set -e
@@ -67,7 +66,7 @@ type serviceConfig struct {
 
 func getDeployConfig(svcNames []string, env, timeTag string) deployConfig {
 	data := deployConfig{
-		VolumesToCreate: conf.Get(env).VolumesToCreate,
+		VolumesToCreate: release.GetDeploy(env).VolumesToCreate,
 	}
 	for _, svcName := range svcNames {
 		data.Services = append(data.Services, getServiceConf(svcName, env, timeTag))
@@ -83,7 +82,7 @@ func getServiceConf(svcName, env, timeTag string) serviceConfig {
 		PortEnvVar: images.Get(svcName).PortEnvVar(),
 	}
 	if data.PortEnvVar != `` {
-		data.Ports = conf.GetService(svcName, env).Ports
+		data.Ports = release.GetService(svcName, env).Ports
 	}
 	return data
 }

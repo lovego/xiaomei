@@ -1,10 +1,8 @@
 package deploy
 
 import (
-	"github.com/lovego/xiaomei/services/deploy/conf"
-	"github.com/lovego/xiaomei/services/images"
-	"github.com/lovego/xiaomei/services/images/registry"
 	"github.com/lovego/xiaomei/release"
+	"github.com/lovego/xiaomei/services/images"
 	"github.com/spf13/cobra"
 )
 
@@ -23,9 +21,8 @@ func deployCmdFor(svcName string) *cobra.Command {
 		Use:   `deploy [<env> [<tag>]]`,
 		Short: `deploy the ` + desc(svcName) + `.`,
 		RunE: release.Env1Call(func(env, timeTag string) error {
-			noTag := timeTag == ``
 			if timeTag == `` {
-				timeTag = conf.TimeTag(env)
+				timeTag = release.TimeTag(env)
 				if err := images.Build(svcName, env, timeTag, pull); err != nil {
 					return err
 				}
@@ -37,9 +34,6 @@ func deployCmdFor(svcName string) *cobra.Command {
 			}
 			if err := deploy(svcName, env, timeTag, filter); err != nil {
 				return err
-			}
-			if noTag {
-				registry.PruneTimeTags(svcName, env, 10)
 			}
 			return nil
 		}),

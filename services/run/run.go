@@ -7,7 +7,6 @@ import (
 	"github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/release"
 	"github.com/lovego/xiaomei/services/deploy"
-	"github.com/lovego/xiaomei/services/deploy/conf"
 	"github.com/lovego/xiaomei/services/images"
 )
 
@@ -37,7 +36,7 @@ func run(env, svcName string) error {
 }
 
 func getRunPort(image images.Image, env, svcName string) uint16 {
-	if ports := conf.GetService(svcName, env).Ports; len(ports) > 0 {
+	if ports := release.GetService(svcName, env).Ports; len(ports) > 0 {
 		return ports[0]
 	}
 	return image.DefaultPort()

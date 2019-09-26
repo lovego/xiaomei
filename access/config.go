@@ -8,8 +8,6 @@ import (
 	"github.com/lovego/config/conf"
 	"github.com/lovego/strmap"
 	"github.com/lovego/xiaomei/release"
-	"github.com/lovego/xiaomei/release/cluster"
-	deployConf "github.com/lovego/xiaomei/services/deploy/conf"
 )
 
 type Config struct {
@@ -39,7 +37,7 @@ type service struct {
 }
 
 func newService(svcName, env, downAddr string) *service {
-	if deployConf.HasService(svcName, env) {
+	if release.HasService(svcName, env) {
 		return &service{Conf: release.AppConf(env), svcName: svcName, downAddr: downAddr}
 	} else {
 		return nil
@@ -52,10 +50,10 @@ func (s *service) Addrs() ([]string, error) {
 	}
 	if s.addrs == nil {
 		addrs := []string{}
-		ports := deployConf.GetService(s.svcName, s.Env).Ports
+		ports := release.GetService(s.svcName, s.Env).Ports
 		for _, node := range s.Nodes() {
 			for _, port := range ports {
-				upstreamAddr := node.GetListenAddr() + `:` + strconv.FormatInt(int64(port), 10)
+				upstreamAddr := node.GetServiceAddr() + `:` + strconv.FormatInt(int64(port), 10)
 				if s.downAddr != "" && s.downAddr == node.Addr {
 					upstreamAddr += " down"
 				}
@@ -70,13 +68,13 @@ func (s *service) Addrs() ([]string, error) {
 	return s.addrs, nil
 }
 
-func (s *service) Nodes() (nodes []cluster.Node) {
+func (s *service) Nodes() (nodes []release.Node) {
 	if s == nil {
 		return nil
 	}
-	nodesCondition := deployConf.GetService(s.svcName, s.Env).Nodes
-	for _, node := range cluster.Get(s.Env).GetNodes(``) {
-		if node.Match(nodesCondition) {
+	labels := release.GetService(s.svcName, s.Env).Nodes
+	for _, node := range release.GetCluster(s.Env).GetNodes(``) {
+		if node.Match(labels) {
 			nodes = append(nodes, node)
 		}
 	}

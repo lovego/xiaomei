@@ -1,21 +1,28 @@
-services: &services
-  access:
-    nodes: { }
-  web:
-    image: "{{ .Registry }}{{ .ProNameUrlSafe }}/web"
-    ports: [ 8001 ]
-    options: [ -v, "{{ .ProName }}-logs:/var/log/nginx/{{ .ProName }}" ]
-
 dev:
   services:
-    <<: *services
+    access:
+      nodes: { }
+    web:
+      image: "{{ .Registry }}{{ .ProNameUrlSafe }}/web/dev"
+      ports: [ 8001 ]
+      options: [ -v, "{{ .ProName }}-logs:/var/log/nginx/{{ .ProName }}" ]
   volumesToCreate: [ "{{ .ProName }}-logs" ]
 qa:
   services:
-    <<: *services
+    access:
+      nodes: { }
+    web:
+      image: "{{ .Registry }}{{ .ProNameUrlSafe }}/web/qa"
+      ports: [ 8001 ]
+      options: [ -v, "{{ .ProName }}-logs:/var/log/nginx/{{ .ProName }}" ]
   volumesToCreate: [ "{{ .ProName }}-logs" ]
 production:
   services:
-    <<: *services
+    access:
+      nodes: { }
+    web:
+      image: "{{ .Registry }}{{ .ProNameUrlSafe }}/web/production"
+      ports: [ 8001 ]
+      options: [ -v, "{{ .ProName }}-logs:/var/log/nginx/{{ .ProName }}" ]
   volumesToCreate: [ "{{ .ProName }}-logs" ]
 

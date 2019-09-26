@@ -1,8 +1,8 @@
 package run
 
 import (
-	"github.com/lovego/xiaomei/services/images"
 	"github.com/lovego/xiaomei/release"
+	"github.com/lovego/xiaomei/services/images"
 	"github.com/spf13/cobra"
 )
 

@@ -9,15 +9,14 @@ import (
 	"github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/access"
 	"github.com/lovego/xiaomei/release"
-	"github.com/lovego/xiaomei/release/cluster"
 	"github.com/lovego/xiaomei/services/oam"
 )
 
 func deploy(svcName, env, timeTag, feature string) error {
 	psScript := fmt.Sprintf(oam.WatchCmd()+` docker ps -f name=^/%s`, release.ServiceName(svcName, env))
-	expectHighAvailable := len(cluster.Get(env).GetNodes("")) >= 2
+	expectHighAvailable := len(release.GetCluster(env).GetNodes("")) >= 2
 	var recoverAccess bool
-	for _, node := range cluster.Get(env).GetNodes(feature) {
+	for _, node := range release.GetCluster(env).GetNodes(feature) {
 		if svcs := node.Services(env, svcName); len(svcs) > 0 {
 			if access.HasAccess(svcs) {
 				if expectHighAvailable {
@@ -43,7 +42,7 @@ func deploy(svcName, env, timeTag, feature string) error {
 	return nil
 }
 
-func deployNode(svcs []string, env, timeTag string, node cluster.Node, psScript string) error {
+func deployNode(svcs []string, env, timeTag string, node release.Node, psScript string) error {
 	log.Println(color.GreenString(`deploying ` + node.SshAddr()))
 	deployScript, err := getDeployScript(svcs, env, timeTag)
 	if err != nil {

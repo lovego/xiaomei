@@ -6,16 +6,14 @@ import (
 	"github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/access"
 	"github.com/lovego/xiaomei/release"
-	"github.com/lovego/xiaomei/release/cluster"
-	"github.com/lovego/xiaomei/services/deploy/conf"
 )
 
 func shell(svcName, env, feature string) error {
-	_, err := cluster.Get(env).ServiceRun(svcName, feature, cmd.O{},
+	_, err := release.GetCluster(env).ServiceRun(svcName, feature, cmd.O{},
 		fmt.Sprintf(
 			"docker exec -it -e LINES=$(tput lines) -e COLUMNS=$(tput cols) "+
 				"--detach-keys='ctrl-@' %s bash",
-			conf.GetService(svcName, env).FirstContainerName(),
+			release.GetService(svcName, env).FirstContainerName(),
 		),
 	)
 	return err
@@ -41,7 +39,7 @@ for name in $(docker ps -af name=^/%s --format '{{.Names}}'); do
 	docker %s $name
 done
 `, release.ServiceName(svcName, env), operation)
-	for _, node := range cluster.Get(env).GetNodes(feature) {
+	for _, node := range release.GetCluster(env).GetNodes(feature) {
 		if _, err := node.Run(cmd.O{}, script); err != nil {
 			return err
 		}
@@ -75,7 +73,7 @@ watch`
 }
 
 func eachNodeRun(env, script, feature string) error {
-	for _, node := range cluster.Get(env).GetNodes(feature) {
+	for _, node := range release.GetCluster(env).GetNodes(feature) {
 		if _, err := node.Run(cmd.O{}, script); err != nil {
 			return err
 		}

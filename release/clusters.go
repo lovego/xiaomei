@@ -1,21 +1,38 @@
-package cluster
+package release
 
 import (
+	"io/ioutil"
 	"log"
+	"path/filepath"
 	"strings"
 
 	"github.com/lovego/cmd"
-	"github.com/lovego/xiaomei/services/deploy/conf"
+	yaml "gopkg.in/yaml.v2"
 )
 
+var theClusters map[string]*Cluster
+
 type Cluster struct {
-	env      string
-	User     string `yaml:"user"`
-	JumpAddr string `yaml:"jumpAddr"`
-	Nodes    []Node `yaml:"nodes"`
+	env   string
+	User  string `yaml:"user"`
+	Nodes []Node `yaml:"nodes"`
 }
 
-func Get(env string) *Cluster {
+func GetClusters() map[string]*Cluster {
+	if theClusters == nil {
+		content, err := ioutil.ReadFile(filepath.Join(Root(), `clusters.yml`))
+		if err != nil {
+			panic(err)
+		}
+		theClusters = make(map[string]*Cluster)
+		if err := yaml.Unmarshal(content, theClusters); err != nil {
+			panic(err)
+		}
+	}
+	return theClusters
+}
+
+func GetCluster(env string) *Cluster {
 	cluster := GetClusters()[env]
 	if cluster == nil {
 		log.Fatalf("empty cluster config for env: %v", env)
@@ -28,7 +45,6 @@ func (c *Cluster) init(env string) {
 	c.env = env
 	for i := range c.Nodes {
 		c.Nodes[i].user = c.User
-		c.Nodes[i].jumpAddr = c.JumpAddr
 	}
 }
 
@@ -49,7 +65,7 @@ func (c Cluster) Run(feature string, o cmd.O, script string) (string, error) {
 }
 
 func (c Cluster) ServiceRun(svcName, feature string, o cmd.O, script string) (string, error) {
-	labels := conf.GetService(svcName, c.env).Nodes
+	labels := GetService(svcName, c.env).Nodes
 	for _, node := range c.GetNodes(feature) {
 		if node.Match(labels) {
 			return node.Run(o, script)

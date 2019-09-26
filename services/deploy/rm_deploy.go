@@ -5,7 +5,6 @@ import (
 
 	"github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/release"
-	"github.com/lovego/xiaomei/release/cluster"
 )
 
 func rmDeploy(svcName, env, feature string) error {
@@ -18,7 +17,7 @@ done
 }
 
 func eachNodeRun(env, script, feature string) error {
-	for _, node := range cluster.Get(env).GetNodes(feature) {
+	for _, node := range release.GetCluster(env).GetNodes(feature) {
 		if _, err := node.Run(cmd.O{}, script); err != nil {
 			return err
 		}

@@ -1,7 +1,7 @@
 package images
 
 import (
-	"github.com/lovego/xiaomei/services/deploy/conf"
+	"github.com/lovego/xiaomei/release"
 	"github.com/lovego/xiaomei/services/images/app"
 	"github.com/lovego/xiaomei/services/images/logc"
 	"github.com/lovego/xiaomei/services/images/web"
@@ -21,21 +21,27 @@ func Get(svcName string) Image {
 	}
 }
 
-func Build(svcName, env, timeTag string, pull bool) error {
+func Build(svcName, env, tag string, pull bool) error {
 	return imagesDo(svcName, env, func(img Image) error {
-		return img.build(env, timeTag, pull)
+		return img.build(env, tag, pull)
 	})
 }
 
-func Push(svcName, env, timeTag string) error {
+func Push(svcName, env, tag string) error {
 	return imagesDo(svcName, env, func(img Image) error {
-		return img.push(env, timeTag)
+		return img.push(env, tag)
+	})
+}
+
+func List(svcName, env string) error {
+	return imagesDo(svcName, env, func(img Image) error {
+		return img.list(env)
 	})
 }
 
 func imagesDo(svcName, env string, work func(Image) error) error {
 	if svcName == `` {
-		for _, svcName := range conf.ServiceNames(env) {
+		for _, svcName := range release.ServiceNames(env) {
 			if err := work(Get(svcName)); err != nil {
 				return err
 			}

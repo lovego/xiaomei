@@ -1,24 +1,28 @@
-services: &services
-  access:
-    nodes: { }
-  app:
-    image: "{{ .Registry }}{{ .ProNameUrlSafe }}/app"
-    ports: [ 3001, 4001 ]
-    options: [ -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}/log" ]
-  web:
-    image: "{{ .Registry }}{{ .ProNameUrlSafe }}/web"
-    ports: [ 8001 ]
-    options: [ -v, "{{ .ProName }}-logs:/var/log/nginx/{{ .ProName }}" ]
-
 dev:
   services:
-    <<: *services
+    access:
+      nodes: { }
+    app:
+      image: "{{ .Registry }}{{ .ProNameUrlSafe }}/app/dev"
+      ports: [ 3001, 4001 ]
+      options: [ -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}/log" ]
+    web:
+      image: "{{ .Registry }}{{ .ProNameUrlSafe }}/web/dev"
+      ports: [ 8001 ]
+      options: [ -v, "{{ .ProName }}-logs:/var/log/nginx/{{ .ProName }}" ]
   volumesToCreate: [ "{{ .ProName }}-logs" ]
 qa:
   services:
-    <<: *services
+    app:
+      image: "{{ .Registry }}{{ .ProNameUrlSafe }}/app/qa"
+      ports: [ 3001, 4001 ]
+      options: [ -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}/log" ]
+    web:
+      image: "{{ .Registry }}{{ .ProNameUrlSafe }}/web/qa"
+      ports: [ 8001 ]
+      options: [ -v, "{{ .ProName }}-logs:/var/log/nginx/{{ .ProName }}" ]
 #   logc:
-#     image: "{{ .Registry }}{{ .ProNameUrlSafe }}/logc"
+#     image: "{{ .Registry }}{{ .ProNameUrlSafe }}/logc/qa"
 #     options: [
 #       -e, "LOGCENV=common",
 #       -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}-logs",
@@ -27,9 +31,16 @@ qa:
   volumesToCreate: [ "{{ .ProName }}-logs" ]
 production:
   services:
-    <<: *services
+    app:
+      image: "{{ .Registry }}{{ .ProNameUrlSafe }}/app/production"
+      ports: [ 3001, 4001 ]
+      options: [ -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}/log" ]
+    web:
+      image: "{{ .Registry }}{{ .ProNameUrlSafe }}/web/production"
+      ports: [ 8001 ]
+      options: [ -v, "{{ .ProName }}-logs:/var/log/nginx/{{ .ProName }}" ]
 #   logc:
-#     image: "{{ .Registry }}{{ .ProNameUrlSafe }}/logc"
+#     image: "{{ .Registry }}{{ .ProNameUrlSafe }}/logc/production"
 #     options: [
 #       -e, "LOGCENV=production",
 #       -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}-logs",

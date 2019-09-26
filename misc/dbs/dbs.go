@@ -8,7 +8,6 @@ import (
 	"github.com/lovego/config/db/dburl"
 	"github.com/lovego/dsn"
 	"github.com/lovego/xiaomei/release"
-	"github.com/lovego/xiaomei/release/cluster"
 )
 
 func Psql(env, key string, printCmd bool) error {
@@ -18,7 +17,7 @@ func Psql(env, key string, printCmd bool) error {
 		fmt.Println(command)
 		return nil
 	}
-	_, err := cluster.Get(env).Run(``, cmd.O{}, command)
+	_, err := release.GetCluster(env).Run(``, cmd.O{}, command)
 	return err
 }
 
@@ -29,7 +28,7 @@ func Mysql(env, key string, printCmd bool) error {
 		fmt.Println(command)
 		return nil
 	}
-	_, err := cluster.Get(env).Run(``, cmd.O{}, command)
+	_, err := release.GetCluster(env).Run(``, cmd.O{}, command)
 	return err
 }
 
@@ -40,7 +39,7 @@ func MysqlDump(env, key string, printCmd bool) error {
 		fmt.Println(command)
 		return nil
 	}
-	_, err := cluster.Get(env).Run(``, cmd.O{}, command)
+	_, err := release.GetCluster(env).Run(``, cmd.O{}, command)
 	return err
 }
 
@@ -50,7 +49,7 @@ func Mongo(env, key string, printCmd bool) error {
 		fmt.Println(command)
 		return nil
 	}
-	_, err := cluster.Get(env).Run(``, cmd.O{}, command)
+	_, err := release.GetCluster(env).Run(``, cmd.O{}, command)
 	return err
 }
 
@@ -61,7 +60,7 @@ func Redis(env, key string, printCmd bool) error {
 		fmt.Println(command)
 		return nil
 	}
-	_, err := cluster.Get(env).Run(``, cmd.O{}, command)
+	_, err := release.GetCluster(env).Run(``, cmd.O{}, command)
 	return err
 }
 

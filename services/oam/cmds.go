@@ -5,14 +5,13 @@ import (
 
 	cmdPkg "github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/release"
-	"github.com/lovego/xiaomei/release/cluster"
 	"github.com/spf13/cobra"
 )
 
 // Shell, Ps, Logs, ... commands
 func Cmds(svcName string) (cmds []*cobra.Command) {
 	if svcName == `` {
-		cmds = append(cmds, shellCmd(), lsCmd())
+		cmds = append(cmds, lsCmd(), shellCmd())
 	} else {
 		cmds = append(cmds, shellCmdFor(svcName))
 	}
@@ -30,7 +29,7 @@ func shellCmd() *cobra.Command {
 		Use:   `shell [<env>]`,
 		Short: `[oam] enter a node shell.`,
 		RunE: release.EnvCall(func(env string) error {
-			_, err := cluster.Get(env).Run(filter, cmdPkg.O{}, ``)
+			_, err := release.GetCluster(env).Run(filter, cmdPkg.O{}, ``)
 			return err
 		}),
 	}
@@ -43,7 +42,7 @@ func lsCmd() *cobra.Command {
 		Use:   `ls`,
 		Short: `[oam] list all nodes.`,
 		RunE: release.EnvCall(func(env string) error {
-			cluster.Get(env).List()
+			release.GetCluster(env).List()
 			return nil
 		}),
 	}
