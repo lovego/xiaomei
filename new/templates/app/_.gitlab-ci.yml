@@ -1,6 +1,7 @@
 stages:
   - build
   - test
+  - deploy
 
 build:
   stage: build
@@ -14,8 +15,8 @@ test:
   tags:
     - xiaomei  # match gitlab-runner that use xiaomei docker image.
   services:
-    - name: postgres:10 # url: postgres://postgres:pass@postgres/postgres?sslmode=disable
-    - name: redis:3.2   # url: redis://:@redis/0
+#   - name: postgres:10 # url: postgres://postgres:pass@postgres/postgres?sslmode=disable
+#   - name: redis:3.2   # url: redis://:@redis/0
   variables:
     POSTGRES_PASSWORD: pass
   script:
@@ -23,6 +24,40 @@ test:
     - GOENV=ci go test ./models/... -p 1 -gcflags=-l -coverprofile .test.cover
     - go tool cover -func=.test.cover | tail -n 1
   coverage: '/total:\s+\(statements\)\s+(\d+.\d+\%)/'
+
+deploy-qa:
+  stage: deploy
+  tags:
+    - shell
+  script:
+    - xiaomei app deploy $CI_ENVIRONMENT_NAME
+  environment:
+    name: $CI_COMMIT_REF_NAME
+    url: https://accounts.$CI_ENVIRONMENT_SLUG-api.hztl3.xyz
+  only:
+    refs:
+      - branches
+    variables:
+      - $CI_COMMIT_REF_NAME == 'qa'
+      - $CI_COMMIT_REF_NAME == 'qa2'
+      - $CI_COMMIT_REF_NAME == 'uat'
+
+deploy-master:
+  stage: deploy
+  tags:
+    - shell
+  script:
+    - xiaomei app deploy production
+  environment:
+    name: production
+    url: https://accounts.api.hztl3.com
+  only:
+    refs:
+      - branches
+    variables:
+      - $CI_COMMIT_REF_NAME == 'master'
+  when: manual
+
 
 before_script:
   - buildDir=$(pwd) && echo $buildDir
