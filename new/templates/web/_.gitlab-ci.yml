@@ -10,21 +10,6 @@ build:
   script:
     - go build
 
-test:
-  stage: test
-  tags:
-    - xiaomei  # match gitlab-runner that use xiaomei docker image.
-  services:
-#   - name: postgres:10 # url: postgres://postgres:pass@postgres/postgres?sslmode=disable
-#   - name: redis:3.2   # url: redis://:@redis/0
-  variables:
-    POSTGRES_PASSWORD: pass
-  script:
-    - xiaomei psql create ci
-    - GOENV=ci go test ./models/... -p 1 -gcflags=-l -coverprofile .test.cover
-    - go tool cover -func=.test.cover | tail -n 1
-  coverage: '/total:\s+\(statements\)\s+(\d+.\d+\%)/'
-
 deploy:
   stage: deploy
   tags:
@@ -33,7 +18,7 @@ deploy:
     - xiaomei app deploy $CI_ENVIRONMENT_NAME
   environment:
     name: $CI_COMMIT_REF_NAME
-    url: https://{{ .ProNameUrlSafe }}.api-$CI_COMMIT_REF_NAME.example.com
+    url: https://{{ .ProNameUrlSafe }}.$CI_COMMIT_REF_NAME.example.com
   only:
     refs:
       - branches
@@ -50,7 +35,7 @@ deploy-production:
     - xiaomei app deploy production
   environment:
     name: production
-    url: https://{{ .ProNameUrlSafe }}.api.example.com
+    url: https://{{ .ProNameUrlSafe }}.example.com
   only:
     refs:
       - branches
