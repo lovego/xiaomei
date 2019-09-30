@@ -1,7 +1,11 @@
+# vim: ft=dockerfile:
+
 FROM registry.cn-beijing.aliyuncs.com/lovego/appserver
 
 RUN mkdir -p /home/ubuntu/{{ .ProName }}/log
 WORKDIR /home/ubuntu/{{ .ProName }}
+
+LABEL builder=xiaomei
 
 CMD [ "./{{ .ProName }}" ]
 

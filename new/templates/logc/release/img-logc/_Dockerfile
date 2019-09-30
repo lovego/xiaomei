@@ -1,7 +1,12 @@
+# vim: ft=dockerfile:
+
 FROM registry.cn-beijing.aliyuncs.com/lovego/logc
 
-COPY logc.yml logrotate.conf ./
+LABEL builder=xiaomei
+
 WORKDIR /home/ubuntu/{{ .ProName }}-logs
+CMD [ "logc", "../logc.yml" ]
+
+COPY logc.yml logrotate.conf ../
 RUN chown ubuntu:ubuntu . && chmod 644 ../logrotate.conf
 
-CMD [ "logc", "../logc.yml" ]
