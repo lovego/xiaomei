@@ -12,9 +12,9 @@ import (
 	"github.com/lovego/xiaomei/services/oam"
 )
 
-func deploy(svcName, env, timeTag, feature string, wait bool) error {
+func deploy(svcName, env, timeTag, feature string, noWatch bool) error {
 	psScript := fmt.Sprintf(` docker ps -f name=^/%s`, release.ServiceName(svcName, env))
-	if wait {
+	if !noWatch {
 		psScript = oam.WatchCmd() + psScript
 	}
 	expectHighAvailable := len(release.GetCluster(env).GetNodes("")) >= 2

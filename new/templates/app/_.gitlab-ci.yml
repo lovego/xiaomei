@@ -30,7 +30,7 @@ deploy:
   tags:
     - shell
   script:
-    - xiaomei app deploy $CI_ENVIRONMENT_NAME --wait=false
+    - xiaomei app deploy $CI_ENVIRONMENT_NAME --no-wait
   environment:
     name: $CI_COMMIT_REF_NAME
     url: https://{{ .ProNameUrlSafe }}.api-$CI_COMMIT_REF_NAME.{{ .Domain }}
@@ -47,7 +47,7 @@ deploy-production:
   tags:
     - shell
   script:
-    - xiaomei app deploy production --wait=false
+    - xiaomei app deploy production --no-wait
   environment:
     name: production
     url: https://{{ .ProNameUrlSafe }}.api.{{ .Domain }}
