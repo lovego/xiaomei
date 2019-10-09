@@ -1,6 +1,6 @@
 defaults: &defaults
   timeZone: { name: China, offset: 28800 }
-  # mailer://smtp.exmail.qq.com:587/?user=报警<alarm@exmaple.com>&pass=123456
+  # mailer://smtp.exmail.qq.com:587/?user=报警<alarm@{{.Domain }}>&pass=123456
   mailer: "mailer://smtp.qq.com:25/?user=小美<xiaomei-go@qq.com>&pass=zjsbosjlhgugechh"
   keepers: [ "小美<xiaomei-go@qq.com>" ]
 
@@ -8,7 +8,7 @@ name: {{ .ProName }}
 envs:
   dev:
     <<: *defaults
-    domain: {{ .ProNameUrlSafe }}.api-dev.example.com
+    domain: {{ .ProNameUrlSafe }}.api-dev.{{ .Domain }}
     secret: {{ genSecret }}
     keepers: [ ]
   test:
@@ -23,16 +23,16 @@ envs:
   qa:
     <<: *defaults
     https: true
-    domain: {{ .ProNameUrlSafe }}.api-qa.example.com
+    domain: {{ .ProNameUrlSafe }}.api-qa.{{ .Domain }}
     secret: {{ genSecret }}
   preview:
     <<: *defaults
     https: true
-    domain: {{ .ProNameUrlSafe }}.api-preview.example.com
+    domain: {{ .ProNameUrlSafe }}.api-preview.{{ .Domain }}
     secret: {{ genSecret }}
   production:
     <<: *defaults
     https: true
-    domain: {{ .ProNameUrlSafe }}.api.example.com
+    domain: {{ .ProNameUrlSafe }}.api.{{ .Domain }}
     secret: {{ genSecret }}
 

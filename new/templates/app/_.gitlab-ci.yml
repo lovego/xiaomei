@@ -20,7 +20,7 @@ test:
   variables:
     POSTGRES_PASSWORD: pass
   script:
-    - xiaomei psql create ci
+#   - xiaomei psql create ci
     - GOENV=ci go test ./models/... -p 1 -gcflags=-l -coverprofile .test.cover
     - go tool cover -func=.test.cover | tail -n 1
   coverage: '/total:\s+\(statements\)\s+(\d+.\d+\%)/'
@@ -30,10 +30,10 @@ deploy:
   tags:
     - shell
   script:
-    - xiaomei app deploy $CI_ENVIRONMENT_NAME
+    - xiaomei app deploy $CI_ENVIRONMENT_NAME --wait=false
   environment:
     name: $CI_COMMIT_REF_NAME
-    url: https://{{ .ProNameUrlSafe }}.api-$CI_COMMIT_REF_NAME.example.com
+    url: https://{{ .ProNameUrlSafe }}.api-$CI_COMMIT_REF_NAME.{{ .Domain }}
   only:
     refs:
       - branches
@@ -47,10 +47,10 @@ deploy-production:
   tags:
     - shell
   script:
-    - xiaomei app deploy production
+    - xiaomei app deploy production --wait=false
   environment:
     name: production
-    url: https://{{ .ProNameUrlSafe }}.api.example.com
+    url: https://{{ .ProNameUrlSafe }}.api.{{ .Domain }}
   only:
     refs:
       - branches
@@ -61,6 +61,6 @@ deploy-production:
 
 before_script:
   - buildDir=$(pwd) && echo $buildDir
-  - projectDir=$(go env GOPATH)/src/example.com/{{ .ProName }} && echo $projectDir
+  - projectDir=$(go env GOPATH)/src/{{ .Domain }}/{{ .ProName }} && echo $projectDir
   - mkdir -p $(dirname $projectDir) && ln -sf $buildDir $projectDir && cd $projectDir
 

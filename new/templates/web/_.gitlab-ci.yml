@@ -1,24 +1,15 @@
 stages:
-  - build
-  - test
   - deploy
-
-build:
-  stage: build
-  tags:
-    - xiaomei  # match gitlab-runner that use xiaomei docker image.
-  script:
-    - go build
 
 deploy:
   stage: deploy
   tags:
     - shell
   script:
-    - xiaomei app deploy $CI_ENVIRONMENT_NAME
+    - xiaomei web deploy $CI_ENVIRONMENT_NAME --wait=false
   environment:
     name: $CI_COMMIT_REF_NAME
-    url: https://{{ .ProNameUrlSafe }}.$CI_COMMIT_REF_NAME.example.com
+    url: https://{{ .ProNameUrlSafe }}.$CI_COMMIT_REF_NAME.{{ .Domain }}
   only:
     refs:
       - branches
@@ -32,20 +23,14 @@ deploy-production:
   tags:
     - shell
   script:
-    - xiaomei app deploy production
+    - xiaomei web deploy production --wait=false
   environment:
     name: production
-    url: https://{{ .ProNameUrlSafe }}.example.com
+    url: https://{{ .ProNameUrlSafe }}.{{ .Domain }}
   only:
     refs:
       - branches
     variables:
       - $CI_COMMIT_REF_NAME == 'master'
   when: manual
-
-
-before_script:
-  - buildDir=$(pwd) && echo $buildDir
-  - projectDir=$(go env GOPATH)/src/example.com/{{ .ProName }} && echo $projectDir
-  - mkdir -p $(dirname $projectDir) && ln -sf $buildDir $projectDir && cd $projectDir
 

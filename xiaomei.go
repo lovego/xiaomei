@@ -13,14 +13,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const version = `19.09.26`
+const version = `19.10.09`
 
 func main() {
 	cobra.EnableCommandSorting = false
 	root := &cobra.Command{
-		Use:          `xiaomei`,
-		Short:        `be small and beautiful.`,
-		SilenceUsage: true,
+		Use:   `xiaomei`,
+		Short: `be small and beautiful.`,
 	}
 
 	root.AddCommand(new.Cmd())

@@ -3,5 +3,11 @@ dev:
   nodes:
     - { addr: 127.0.0.1, labels: { } }
 demo:
+  user: ubuntu
+  nodes:
+    - { addr: 127.0.0.1, labels: { } }
 qa:
+  user: ubuntu
+  nodes:
+    - { addr: 127.0.0.1, labels: { } }
 production:

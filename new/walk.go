@@ -18,7 +18,7 @@ func walk(tmplsDir, proDir string, config *Config) error {
 		}
 		dst := strings.Replace(src, tmplsDir, proDir, 1)
 		if info.IsDir() {
-			return os.Mkdir(dst, 0755)
+			return os.MkdirAll(dst, 0755)
 		} else {
 			return copyFile(src, dst, info, config)
 		}

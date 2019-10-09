@@ -19,13 +19,13 @@ test:
   variables:
     POSTGRES_PASSWORD: pass
   script:
-    - xiaomei psql create ci
+#   - xiaomei psql create ci
     - GOENV=ci go test ./models/... -p 1 -gcflags=-l -coverprofile .test.cover
     - go tool cover -func=.test.cover | tail -n 1
   coverage: '/total:\s+\(statements\)\s+(\d+.\d+\%)/'
 
 before_script:
   - buildDir=$(pwd) && echo $buildDir
-  - projectDir=$(go env GOPATH)/src/example.com/{{ .ProName }} && echo $projectDir
+  - projectDir=$(go env GOPATH)/src/{{ .Domain }}/{{ .ProName }} && echo $projectDir
   - mkdir -p $(dirname $projectDir) && ln -sf $buildDir $projectDir && cd $projectDir
 

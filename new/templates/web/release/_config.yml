@@ -1,18 +1,18 @@
 name: {{ .ProName }}
 envs:
   dev:
-    domain: {{ .ProNameUrlSafe }}.dev.example.com
+    domain: {{ .ProNameUrlSafe }}.dev.{{ .Domain }}
     timeZone: { name: China, offset: 28800 }
   qa:
     https: true
-    domain: {{ .ProNameUrlSafe }}.qa.example.com
+    domain: {{ .ProNameUrlSafe }}.qa.{{ .Domain }}
     timeZone: { name: China, offset: 28800 }
   preview:
     https: true
-    domain: {{ .ProNameUrlSafe }}.preview.example.com
+    domain: {{ .ProNameUrlSafe }}.preview.{{ .Domain }}
     timeZone: { name: China, offset: 28800 }
   production:
     https: true
-    domain: {{ .ProNameUrlSafe }}.example.com
+    domain: {{ .ProNameUrlSafe }}.{{ .Domain }}
     timeZone: { name: China, offset: 28800 }
 
