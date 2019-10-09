@@ -6,14 +6,14 @@ stages:
 build:
   stage: build
   tags:
-    - xiaomei  # match gitlab-runner that use xiaomei docker image.
+    - docker-xiaomei  # match docker runner that use xiaomei image.
   script:
     - go build
 
 test:
   stage: test
   tags:
-    - xiaomei  # match gitlab-runner that use xiaomei docker image.
+    - docker-xiaomei  # match docker runner that use xiaomei image.
   services:
 #   - name: postgres:10 # url: postgres://postgres:pass@postgres/postgres?sslmode=disable
 #   - name: redis:3.2   # url: redis://:@redis/0
@@ -25,10 +25,10 @@ test:
     - go tool cover -func=.test.cover | tail -n 1
   coverage: '/total:\s+\(statements\)\s+(\d+.\d+\%)/'
 
-deploy:
+deploy-qa:
   stage: deploy
   tags:
-    - shell
+    - shell-xiaomei-qa  # match shell runner for qa that has xiaomei command.
   script:
     - xiaomei app deploy $CI_ENVIRONMENT_NAME --no-wait
   environment:
@@ -45,7 +45,7 @@ deploy:
 deploy-production:
   stage: deploy
   tags:
-    - shell
+    - shell-xiaomei-production # match shell runner for production that has xiaomei command.
   script:
     - xiaomei app deploy production --no-wait
   environment:

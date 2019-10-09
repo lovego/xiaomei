@@ -4,7 +4,7 @@ stages:
 deploy:
   stage: deploy
   tags:
-    - shell
+    - shell-xiaomei-qa  # match shell runner for qa that has xiaomei command.
   script:
     - xiaomei web deploy $CI_ENVIRONMENT_NAME --no-wait
   environment:
@@ -21,7 +21,7 @@ deploy:
 deploy-production:
   stage: deploy
   tags:
-    - shell
+    - shell-xiaomei-production # match shell runner for production that has xiaomei command.
   script:
     - xiaomei web deploy production --no-wait
   environment:
