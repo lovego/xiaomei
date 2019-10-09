@@ -27,7 +27,7 @@ func timestampSignCmd() *cobra.Command {
 	var secret string
 	cmd := &cobra.Command{
 		Use:   `timestamp-sign [<env>]`,
-		Short: `generate Timestamp and Sign headers for curl command.`,
+		Short: `Generate Timestamp and Sign headers for curl command.`,
 		RunE: release.EnvCall(func(env string) error {
 			ts := time.Now().Unix()
 			if secret == "" {
@@ -44,7 +44,7 @@ func timestampSignCmd() *cobra.Command {
 func coverCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `cover [package] ...`,
-		Short: `show coverage details for packages.`,
+		Short: `Show coverage details for packages.`,
 		RunE: func(_ *cobra.Command, args []string) error {
 			_, err := cmdPkg.Run(cmdPkg.O{}, "sh", "-c", fmt.Sprintf(`
 rm -f /tmp/go-cover.out && {
@@ -64,7 +64,7 @@ func yamlCmd() *cobra.Command {
 	var goSyntax bool
 	cmd := &cobra.Command{
 		Use:   `yaml`,
-		Short: `parse yaml file.`,
+		Short: `Parse yaml file.`,
 		RunE: release.Arg1Call(``, func(p string) error {
 			content, err := ioutil.ReadFile(p)
 			if err != nil {

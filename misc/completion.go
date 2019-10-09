@@ -15,7 +15,7 @@ import (
 func bashCompletionCmd(rootCmd *cobra.Command) *cobra.Command {
 	return &cobra.Command{
 		Use:   `bash-completion`,
-		Short: `setup bash completion script.`,
+		Short: `Setup bash completion script.`,
 		RunE: release.NoArgCall(func() error {
 			return setupBashCompletion(rootCmd)
 		}),

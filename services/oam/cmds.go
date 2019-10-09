@@ -27,7 +27,7 @@ func shellCmd() *cobra.Command {
 	var filter string
 	theCmd := &cobra.Command{
 		Use:   `shell [<env>]`,
-		Short: `[oam] enter a node shell.`,
+		Short: `[oam] Enter a node shell.`,
 		RunE: release.EnvCall(func(env string) error {
 			_, err := release.GetCluster(env).Run(filter, cmdPkg.O{}, ``)
 			return err
@@ -40,7 +40,7 @@ func shellCmd() *cobra.Command {
 func lsCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   `ls`,
-		Short: `[oam] list all nodes.`,
+		Short: `[oam] List all nodes.`,
 		RunE: release.EnvCall(func(env string) error {
 			release.GetCluster(env).List()
 			return nil
@@ -52,7 +52,7 @@ func shellCmdFor(svcName string) *cobra.Command {
 	var filter string
 	theCmd := &cobra.Command{
 		Use:   `shell [<env>]`,
-		Short: `[oam] enter a container for ` + desc(svcName) + `.`,
+		Short: `[oam] Enter a container for ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			return shell(svcName, env, filter)
 		}),
@@ -66,7 +66,7 @@ func psCmdFor(svcName string) *cobra.Command {
 	var watch bool
 	cmd := &cobra.Command{
 		Use:   `ps [<env>]`,
-		Short: `[oam] list containers of the ` + desc(svcName) + `.`,
+		Short: `[oam] List containers of the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			return ps(svcName, env, filter, watch)
 		}),
@@ -80,7 +80,7 @@ func logsCmdFor(svcName string) *cobra.Command {
 	var filter string
 	cmd := &cobra.Command{
 		Use:   `logs [<env> [-- <options for "docker logs" command> ] ]`,
-		Short: `[oam] list logs  of the ` + desc(svcName) + `.`,
+		Short: `[oam] List logs  of the ` + desc(svcName) + `.`,
 		RunE: func(c *cobra.Command, args []string) error {
 			var env, options string
 			if len(args) > 0 {
@@ -110,7 +110,7 @@ func makeOperationCmd(operation, svcName string) *cobra.Command {
 	var filter string
 	cmd := &cobra.Command{
 		Use:   operation + ` [<env>]`,
-		Short: `[oam] ` + operation + ` the ` + desc(svcName) + `.`,
+		Short: `[oam] ` + strings.Title(operation) + ` the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			return operate(operation, svcName, env, filter)
 		}),

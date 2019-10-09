@@ -18,7 +18,7 @@ func specCmd() *cobra.Command {
 	var onlyChanged bool
 	cmd := &cobra.Command{
 		Use:   `spec`,
-		Short: `check the app code spec.`,
+		Short: `Check the app code spec.`,
 		RunE: func(c *cobra.Command, args []string) error {
 			return Spec(args, onlyChanged)
 		},

@@ -36,7 +36,7 @@ func main() {
 func versionCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   `version`,
-		Short: `show xiaomei version.`,
+		Short: `Show xiaomei version.`,
 		RunE: release.NoArgCall(func() error {
 			fmt.Println(`xiaomei version ` + version)
 			return nil
@@ -47,7 +47,7 @@ func versionCmd() *cobra.Command {
 func updateCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   `update`,
-		Short: `update to lastest version.`,
+		Short: `Update to lastest version.`,
 		RunE: release.NoArgCall(func() error {
 			fmt.Println(`current version ` + version)
 			if _, err := cmd.Run(cmd.O{},

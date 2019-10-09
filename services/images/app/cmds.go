@@ -20,7 +20,7 @@ func Cmds() []*cobra.Command {
 		execCmd(),
 		{
 			Use:   `compile`,
-			Short: `compile the app server binary.`,
+			Short: `Compile the app server binary.`,
 			RunE: release.NoArgCall(func() error {
 				return compile(false)
 			}),
@@ -33,7 +33,7 @@ func Cmds() []*cobra.Command {
 func execCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `exec [<env>]`,
-		Short: `compile and execute the app server binary.`,
+		Short: `Compile and execute the app server binary.`,
 		RunE: release.EnvCall(func(env string) error {
 			if err := compile(false); err != nil {
 				return err

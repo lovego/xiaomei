@@ -17,7 +17,7 @@ func buildCmdFor(svcName string) *cobra.Command {
 	var pull bool
 	cmd := &cobra.Command{
 		Use:   `build [<env>]`,
-		Short: `[image] build ` + imageDesc(svcName, `for`) + `.`,
+		Short: `[image] Build ` + imageDesc(svcName, `for`) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			return Build(svcName, env, release.TimeTag(env), pull)
 		}),
@@ -29,7 +29,7 @@ func buildCmdFor(svcName string) *cobra.Command {
 func pushCmdFor(svcName string) *cobra.Command {
 	return &cobra.Command{
 		Use:   `push [<env> [<tag>]]`,
-		Short: `[image] push  ` + imageDesc(svcName, `of `) + `.`,
+		Short: `[image] Push  ` + imageDesc(svcName, `of `) + `.`,
 		RunE: release.Env1Call(func(env, timeTag string) error {
 			return Push(svcName, env, timeTag)
 		}),
@@ -39,7 +39,7 @@ func pushCmdFor(svcName string) *cobra.Command {
 func imagesCmdFor(svcName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `images [<env>]`,
-		Short: `[image] list  images of  the ` + desc(svcName) + ` on this machine.`,
+		Short: `[image] List  images of  the ` + desc(svcName) + ` on this machine.`,
 		RunE: release.EnvCall(func(env string) error {
 			return List(svcName, env)
 		}),

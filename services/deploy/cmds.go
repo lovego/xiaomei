@@ -18,7 +18,7 @@ func deployCmdFor(svcName string) *cobra.Command {
 	var pull, push, noWatch bool
 	cmd := &cobra.Command{
 		Use:   `deploy [<env> [<tag>]]`,
-		Short: `deploy the ` + desc(svcName) + `.`,
+		Short: `Deploy the ` + desc(svcName) + `.`,
 		RunE: release.Env1Call(func(env, timeTag string) error {
 			if timeTag == `` {
 				timeTag = release.TimeTag(env)
@@ -48,7 +48,7 @@ func rmDeployCmdFor(svcName string) *cobra.Command {
 	var filter string
 	cmd := &cobra.Command{
 		Use:   `rm-deploy [<env>]`,
-		Short: `remove deployment of the ` + desc(svcName) + `.`,
+		Short: `Remove deployment of the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			return rmDeploy(svcName, env, filter)
 		}),

@@ -16,7 +16,7 @@ func depsCmd() *cobra.Command {
 	var excludeTest bool
 	cmd := &cobra.Command{
 		Use:   `deps`,
-		Short: "list dependence packages.",
+		Short: "List dependence packages.",
 		Run: func(c *cobra.Command, args []string) {
 			deps := getDeps(inVendor, excludeTest)
 			fmt.Println(strings.Join(deps, "\n"))

@@ -12,11 +12,11 @@ import (
 func Cmd() *cobra.Command {
 	var typ string
 	cmd := &cobra.Command{
-		Use: `new [flags] <dir> <registry> [<domain>]
+		Use: `new <dir> <registry> [<domain>] [flags]
      dir: the dir where to create the project, may be a relative or absolute path, required.
 registry: docker registry prefix for images built by the project, required.
   domain: the parent domain for the project. used for config.yml, access.conf.tmpl, readme.md, .gitlab-ci.yml. required for non logc project.`,
-		Short:                 `create a new project.`,
+		Short:                 `Create a new project.`,
 		Example:               `  xiaomei new accounts registry.abc.com/go abc.com`,
 		DisableFlagsInUseLine: true,
 		RunE: func(c *cobra.Command, args []string) error {

@@ -13,9 +13,9 @@ import (
 
 func Cmds() []*cobra.Command {
 	cmds := []*cobra.Command{
-		serviceCmd(`app`, `[service] the app server.`, app.Cmds()),
-		serviceCmd(`web`, `[service] the web server.`, web.Cmds()),
-		serviceCmd(`logc`, `[service] the log collector.`, logc.Cmds()),
+		serviceCmd(`app`, `[service] The app server.`, app.Cmds()),
+		serviceCmd(`web`, `[service] The web server.`, web.Cmds()),
+		serviceCmd(`logc`, `[service] The log collector.`, logc.Cmds()),
 	}
 	cmds = append(cmds, deploy.Cmds(``)...)
 	cmds = append(cmds, oam.Cmds(``)...)

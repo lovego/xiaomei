@@ -8,7 +8,7 @@ import (
 func Cmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `godoc`,
-		Short: `the godoc server on local machine.`,
+		Short: `The godoc server on local machine.`,
 	}
 	cmd.AddCommand(runCmd())
 	cmd.AddCommand(deployCmd())
@@ -22,7 +22,7 @@ func Cmd() *cobra.Command {
 func runCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   `run`,
-		Short: `run the godoc server using nohup.`,
+		Short: `Run the godoc server using nohup.`,
 		RunE:  release.NoArgCall(run),
 	}
 }
@@ -30,7 +30,7 @@ func runCmd() *cobra.Command {
 func deployCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   `deploy`,
-		Short: `deploy the godoc server using docker image.`,
+		Short: `Deploy the godoc server using docker image.`,
 		RunE:  release.NoArgCall(deploy),
 	}
 }
@@ -38,7 +38,7 @@ func deployCmd() *cobra.Command {
 func rmDeployCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   `rm-deploy`,
-		Short: `stop and remove docker container of the godoc server.`,
+		Short: `Stop and remove docker container of the godoc server.`,
 		RunE:  release.NoArgCall(deploy),
 	}
 }
@@ -46,14 +46,14 @@ func rmDeployCmd() *cobra.Command {
 func accessCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `access`,
-		Short: `access config for the godoc server.`,
+		Short: `Access config for the godoc server.`,
 		RunE: release.NoArgCall(func() error {
 			return accessPrint()
 		}),
 	}
 	cmd.AddCommand(&cobra.Command{
 		Use:   `setup`,
-		Short: `setup access config for the godoc server.`,
+		Short: `Setup access config for the godoc server.`,
 		RunE: release.NoArgCall(func() error {
 			return accessSetup()
 		}),
@@ -64,7 +64,7 @@ func accessCmd() *cobra.Command {
 func shellCmd() *cobra.Command {
 	theCmd := &cobra.Command{
 		Use:   `shell`,
-		Short: `enter the docker container of the godoc server.`,
+		Short: `Enter the docker container of the godoc server.`,
 		RunE:  release.NoArgCall(shell),
 	}
 	return theCmd
@@ -73,7 +73,7 @@ func shellCmd() *cobra.Command {
 func psCmd() *cobra.Command {
 	theCmd := &cobra.Command{
 		Use:   `ps`,
-		Short: `list the docker container of the godoc server.`,
+		Short: `List the docker container of the godoc server.`,
 		RunE:  release.NoArgCall(ps),
 	}
 	return theCmd
