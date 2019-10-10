@@ -9,6 +9,9 @@ build:
     - docker-xiaomei  # match docker runner that use xiaomei image.
   script:
     - go build
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /\bno-ci\b/i
 
 test:
   stage: test
@@ -18,12 +21,15 @@ test:
 #   - name: postgres:10 # url: postgres://postgres:pass@postgres/postgres?sslmode=disable
 #   - name: redis:3.2   # url: redis://:@redis/0
   variables:
-    POSTGRES_PASSWORD: pass
+#   POSTGRES_PASSWORD: pass
   script:
 #   - xiaomei psql create ci
     - GOENV=ci go test ./models/... -p 1 -gcflags=-l -coverprofile .test.cover
     - go tool cover -func=.test.cover | tail -n 1
   coverage: '/total:\s+\(statements\)\s+(\d+.\d+\%)/'
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /\bno-ci\b/i
 
 deploy-qa:
   stage: deploy
@@ -41,6 +47,9 @@ deploy-qa:
       - $CI_COMMIT_REF_NAME == 'qa'
       - $CI_COMMIT_REF_NAME == 'qa2'
       - $CI_COMMIT_REF_NAME == 'uat'
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /\bno-c[id]\b/i
 
 deploy-production:
   stage: deploy
@@ -56,6 +65,9 @@ deploy-production:
       - branches
     variables:
       - $CI_COMMIT_REF_NAME == 'master'
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /\bno-c[id]\b/i
   when: manual
 
 

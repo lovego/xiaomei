@@ -17,6 +17,9 @@ deploy:
       - $CI_COMMIT_REF_NAME == 'qa'
       - $CI_COMMIT_REF_NAME == 'qa2'
       - $CI_COMMIT_REF_NAME == 'uat'
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /\bno-c[id]\b/i
 
 deploy-production:
   stage: deploy
@@ -32,5 +35,8 @@ deploy-production:
       - branches
     variables:
       - $CI_COMMIT_REF_NAME == 'master'
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /\bno-c[id]\b/i
   when: manual
 
