@@ -11,14 +11,15 @@ import (
 )
 
 type Config struct {
-	ProPath        string
 	ProName        string
+	ProPath        string
 	ProNameUrlSafe string
 	Domain         string
 	Registry       string
 }
 
 func getConfig(typ, dir, registry, domain string) (*Config, error) {
+	var proName = filepath.Base(dir)
 	var proPath string
 	if typ == `app` || typ == `full` {
 		var err error
@@ -26,11 +27,10 @@ func getConfig(typ, dir, registry, domain string) (*Config, error) {
 			return nil, err
 		}
 	}
-	proName := filepath.Base(dir)
 	return &Config{
-		ProPath:        proPath,
 		ProName:        proName,
 		ProNameUrlSafe: strings.Replace(proName, `_`, `-`, -1),
+		ProPath:        proPath,
 		Domain:         domain,
 		Registry:       registry,
 	}, nil

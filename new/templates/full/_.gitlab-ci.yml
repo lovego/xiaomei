@@ -8,6 +8,9 @@ build:
     - docker-xiaomei  # match docker runner that use xiaomei image.
   script:
     - go build
+  only:
+    changes:
+      - "**/*.go"
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /\bno-ci\b/i
@@ -23,15 +26,18 @@ test:
 #   POSTGRES_PASSWORD: pass
   script:
 #   - xiaomei psql create ci
-    - GOENV=ci go test ./models/... -p 1 -gcflags=-l -coverprofile .test.cover
+    - GOENV=ci go test ./... -p 1 -gcflags=-l -coverprofile .test.cover
     - go tool cover -func=.test.cover | tail -n 1
   coverage: '/total:\s+\(statements\)\s+(\d+.\d+\%)/'
+  only:
+    changes:
+      - "**/*.go"
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /\bno-ci\b/i
 
 before_script:
   - buildDir=$(pwd) && echo $buildDir
-  - projectDir=$(go env GOPATH)/src/{{ .Domain }}/{{ .ProName }} && echo $projectDir
-  - mkdir -p $(dirname $projectDir) && ln -sf $buildDir $projectDir && cd $projectDir
+  - projectDir=$(go env GOPATH)/src/{{ .ProPath }} && echo $projectDir
+  - mkdir -p $(dirname $projectDir) && ln -sfT $buildDir $projectDir && cd $projectDir
 

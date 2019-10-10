@@ -9,6 +9,9 @@ build:
     - docker-xiaomei  # match docker runner that use xiaomei image.
   script:
     - go build
+  only:
+    changes:
+      - "**/*.go"
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /\bno-ci\b/i
@@ -24,9 +27,12 @@ test:
 #   POSTGRES_PASSWORD: pass
   script:
 #   - xiaomei psql create ci
-    - GOENV=ci go test ./models/... -p 1 -gcflags=-l -coverprofile .test.cover
+    - GOENV=ci go test ./... -p 1 -gcflags=-l -coverprofile .test.cover
     - go tool cover -func=.test.cover | tail -n 1
   coverage: '/total:\s+\(statements\)\s+(\d+.\d+\%)/'
+  only:
+    changes:
+      - "**/*.go"
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /\bno-ci\b/i
@@ -36,7 +42,7 @@ deploy-qa:
   tags:
     - shell-xiaomei-qa  # match shell runner for qa that has xiaomei command.
   script:
-    - xiaomei app deploy $CI_ENVIRONMENT_NAME --no-wait
+    - xiaomei app deploy $CI_ENVIRONMENT_NAME --no-watch
   environment:
     name: $CI_COMMIT_REF_NAME
     url: https://{{ .ProNameUrlSafe }}.api-$CI_COMMIT_REF_NAME.{{ .Domain }}
@@ -56,7 +62,7 @@ deploy-production:
   tags:
     - shell-xiaomei-production # match shell runner for production that has xiaomei command.
   script:
-    - xiaomei app deploy production --no-wait
+    - xiaomei app deploy production --no-watch
   environment:
     name: production
     url: https://{{ .ProNameUrlSafe }}.api.{{ .Domain }}
@@ -73,6 +79,6 @@ deploy-production:
 
 before_script:
   - buildDir=$(pwd) && echo $buildDir
-  - projectDir=$(go env GOPATH)/src/{{ .Domain }}/{{ .ProName }} && echo $projectDir
-  - mkdir -p $(dirname $projectDir) && ln -sf $buildDir $projectDir && cd $projectDir
+  - projectDir=$(go env GOPATH)/src/{{ .ProPath }} && echo $projectDir
+  - mkdir -p $(dirname $projectDir) && ln -sfT $buildDir $projectDir && cd $projectDir
 
