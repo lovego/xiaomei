@@ -11,6 +11,7 @@ import (
 
 func Cmd() *cobra.Command {
 	var typ string
+	var force bool
 	cmd := &cobra.Command{
 		Use: `new <dir> <registry> [<domain>] [flags]
      dir: the dir where to create the project, may be a relative or absolute path, required.
@@ -31,7 +32,7 @@ registry: docker registry prefix for images built by the project, required.
 			if len(args) == 3 {
 				domain = args[2]
 			}
-			return New(typ, args[0], args[1], domain)
+			return New(typ, args[0], args[1], domain, force)
 		},
 	}
 	cmd.Flags().StringVarP(&typ, `type`, `t`, `full`, `project type.
@@ -40,10 +41,11 @@ registry: docker registry prefix for images built by the project, required.
 logc: only service that collect logs to ElasticSearch.
 full: all services including app, web and logc.
 `)
+	cmd.Flags().BoolVarP(&force, `force`, `f`, false, `force overwrite existing files.`)
 	return cmd
 }
 
-func New(typ, dir, registry, domain string) error {
+func New(typ, dir, registry, domain string, force bool) error {
 	if dir == `` {
 		return errors.New(`dir can't be empty.`)
 	}
@@ -62,5 +64,5 @@ func New(typ, dir, registry, domain string) error {
 		return err
 	}
 	tmplsDir := filepath.Join(fs.GetGoSrcPath(), `github.com/lovego/xiaomei/new/templates/`+typ)
-	return walk(tmplsDir, dir, config)
+	return walk(tmplsDir, dir, config, force)
 }

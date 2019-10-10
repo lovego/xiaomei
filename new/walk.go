@@ -2,6 +2,7 @@ package new
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -11,31 +12,43 @@ import (
 	"github.com/lovego/fs"
 )
 
-func walk(tmplsDir, proDir string, config *Config) error {
+func walk(tmplsDir, proDir string, config *Config, force bool) error {
 	return filepath.Walk(tmplsDir, func(src string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		dst := strings.Replace(src, tmplsDir, proDir, 1)
 		if info.IsDir() {
-			return os.MkdirAll(dst, 0755)
+			if err := os.MkdirAll(dst, 0755); err == os.ErrExist {
+				return nil
+			} else {
+				return err
+			}
 		} else {
-			return copyFile(src, dst, info, config)
+			return copyFile(src, dst, info, config, force)
 		}
 	})
 }
 
-func copyFile(src, dst string, info os.FileInfo, config *Config) error {
+func copyFile(src, dst string, info os.FileInfo, config *Config, force bool) error {
 	dir, file := filepath.Split(dst)
-	if !strings.HasPrefix(file, `_`) {
-		return fs.Copy(src, dst)
+	isTmpl := strings.HasPrefix(file, `_`)
+	if isTmpl {
+		dst = filepath.Join(dir, strings.TrimPrefix(file, `_`))
 	}
-	dst = filepath.Join(dir, strings.TrimPrefix(file, `_`))
-	if content, err := renderTmpl(src, config); err == nil {
-		return ioutil.WriteFile(dst, content, info.Mode())
-	} else {
-		return err
+
+	if !force && fs.Exist(dst) {
+		return fmt.Errorf(`%s: aready exists, use "-f" flag to override.`, dst)
 	}
+
+	if isTmpl {
+		if content, err := renderTmpl(src, config); err == nil {
+			return ioutil.WriteFile(dst, content, info.Mode())
+		} else {
+			return err
+		}
+	}
+	return fs.Copy(src, dst)
 }
 
 func renderTmpl(tmplPath string, config *Config) ([]byte, error) {
