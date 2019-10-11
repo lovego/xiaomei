@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const version = `19.10.10`
+const version = `19.10.11`
 
 func main() {
 	cobra.EnableCommandSorting = false

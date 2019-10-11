@@ -9,12 +9,13 @@ build:
     - docker-xiaomei  # match docker runner that use xiaomei image.
   script:
     - go build
-  only:
-    changes:
-      - "**/*.go"
-  except:
-    variables:
-      - $CI_COMMIT_MESSAGE =~ /\bno-ci\b/i
+  rules:
+    - if: '$CI_COMMIT_REF_NAME =~ /^(qa|qa2|uat|master)$/'
+      when: on_success
+    - changes:
+        - "**/*.go"
+      when: on_success
+    - when: never
 
 test:
   stage: test
@@ -30,12 +31,15 @@ test:
     - GOENV=ci go test ./... -p 1 -gcflags=-l -coverprofile .test.cover
     - go tool cover -func=.test.cover | tail -n 1
   coverage: '/total:\s+\(statements\)\s+(\d+.\d+\%)/'
-  only:
-    changes:
-      - "**/*.go"
-  except:
-    variables:
-      - $CI_COMMIT_MESSAGE =~ /\bno-ci\b/i
+  rules:
+    - if: '$CI_COMMIT_REF_NAME =~ /^(qa|qa2|uat|master)$/'
+      when: on_success
+    - changes:
+        - "**/*.go"
+        - release/img-app/config/config.yml
+        - release/img-app/config/env/ci.yml
+      when: on_success
+    - when: never
 
 deploy-qa:
   stage: deploy
@@ -48,15 +52,8 @@ deploy-qa:
     name: $CI_COMMIT_REF_NAME
     url: https://{{ .ProNameUrlSafe }}.api-$CI_COMMIT_REF_NAME.{{ .Domain }}
   only:
-    refs:
-      - branches
-    variables:
-      - $CI_COMMIT_REF_NAME == 'qa'
-      - $CI_COMMIT_REF_NAME == 'qa2'
-      - $CI_COMMIT_REF_NAME == 'uat'
-  except:
-    variables:
-      - $CI_COMMIT_MESSAGE =~ /\bno-c[id]\b/i
+    refs: [ branches ]
+    variables: [ '$CI_COMMIT_REF_NAME =~ /^(qa|qa2|uat)$/' ]
 
 deploy-production:
   stage: deploy
@@ -69,15 +66,9 @@ deploy-production:
     name: production
     url: https://{{ .ProNameUrlSafe }}.api.{{ .Domain }}
   only:
-    refs:
-      - branches
-    variables:
-      - $CI_COMMIT_REF_NAME == 'master'
-  except:
-    variables:
-      - $CI_COMMIT_MESSAGE =~ /\bno-c[id]\b/i
+    refs: [ branches ]
+    variables: [ '$CI_COMMIT_REF_NAME == "master"' ]
   when: manual
-
 
 before_script:
   - buildDir=$(pwd) && echo $buildDir

@@ -1,7 +1,6 @@
 dev:
+  accessNodes: { }
   services:
-    access:
-      nodes: { }
     app:
       image: "{{ .Registry }}{{ .ProNameUrlSafe }}/app/dev"
       ports: [ 3001, 4001 ]
@@ -12,6 +11,7 @@ dev:
       options: [ -v, "{{ .ProName }}-logs:/var/log/nginx/{{ .ProName }}" ]
   volumesToCreate: [ "{{ .ProName }}-logs" ]
 qa:
+  accessNodes: { }
   services:
     app:
       image: "{{ .Registry }}{{ .ProNameUrlSafe }}/app/qa"
@@ -30,6 +30,7 @@ qa:
 #     ]
   volumesToCreate: [ "{{ .ProName }}-logs" ]
 production:
+  accessNodes: { }
   services:
     app:
       image: "{{ .Registry }}{{ .ProNameUrlSafe }}/app/production"

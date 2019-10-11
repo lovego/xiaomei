@@ -84,9 +84,9 @@ func getNginxConf(env, downAddr string) (string, Config, error) {
 }
 
 func clusterRun(env, feature, input, cmdStr string) error {
-	access := release.GetService(`access`, env)
+	accessNodes := release.GetDeploy(env).AccessNodes
 	for _, node := range release.GetCluster(env).GetNodes(feature) {
-		if node.Match(access.Nodes) {
+		if node.Match(accessNodes) {
 			log.Println(color.GreenString(node.SshAddr()))
 			cmdOpt := cmd.O{}
 			if input != "" {

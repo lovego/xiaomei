@@ -12,6 +12,7 @@ import (
 )
 
 type Deploy struct {
+	AccessNodes     map[string]string
 	Services        map[string]*Service
 	VolumesToCreate []string `yaml:"volumesToCreate"`
 }
