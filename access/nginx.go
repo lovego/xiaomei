@@ -39,7 +39,7 @@ func ReloadNginx(env, feature string) error {
 }
 
 func SetupNginx(env, feature, downAddr string) error {
-	nginxConf, data, err := getNginxConf(env, "")
+	nginxConf, data, err := getNginxConf(env, downAddr)
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,8 @@ func getNginxConf(env, downAddr string) (string, Config, error) {
 	if err != nil {
 		return ``, Config{}, err
 	}
-	tmpl := template.Must(template.New(``).Parse(string(content)))
+	tmpl := template.New(``).Funcs(funcsMap)
+	tmpl = template.Must(tmpl.Parse(string(content)))
 	if err != nil {
 		return ``, Config{}, err
 	}

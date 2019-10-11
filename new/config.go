@@ -16,6 +16,7 @@ type Config struct {
 	ProNameUrlSafe string
 	Domain         string
 	Registry       string
+	RepoPrefix     string
 }
 
 func getConfig(typ, dir, registry, domain string) (*Config, error) {
@@ -27,13 +28,19 @@ func getConfig(typ, dir, registry, domain string) (*Config, error) {
 			return nil, err
 		}
 	}
-	return &Config{
+
+	config := &Config{
 		ProName:        proName,
 		ProNameUrlSafe: strings.Replace(proName, `_`, `-`, -1),
 		ProPath:        proPath,
 		Domain:         domain,
 		Registry:       registry,
-	}, nil
+	}
+	if i := strings.IndexByte(registry, '/'); i > 0 {
+		config.RepoPrefix = strings.TrimSuffix(registry[i:], "/")
+	}
+
+	return config, nil
 }
 
 func getProjectPath(dir string) (string, error) {

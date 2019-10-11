@@ -32,9 +32,9 @@ func walk(tmplsDir, proDir string, config *Config, force bool) error {
 
 func copyFile(src, dst string, info os.FileInfo, config *Config, force bool) error {
 	dir, file := filepath.Split(dst)
-	isTmpl := strings.HasPrefix(file, `_`)
+	isTmpl := strings.HasPrefix(file, `__`)
 	if isTmpl {
-		dst = filepath.Join(dir, strings.TrimPrefix(file, `_`))
+		dst = filepath.Join(dir, strings.TrimPrefix(file, `__`))
 	}
 
 	if !force && fs.Exist(dst) {
