@@ -1,10 +1,12 @@
 package release
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/fatih/color"
@@ -70,6 +72,27 @@ func ServiceNames(env string) (names []string) {
 		}
 	}
 	return
+}
+
+func ServiceNameRegexp(svcName, env string) string {
+	var names []string
+	if svcName != `` {
+		names = []string{svcName}
+	} else {
+		names = ServiceNames(env)
+	}
+	var regex string
+
+	switch len(names) {
+	case 0:
+		log.Fatalf(`deploy.yml: %s: no services defined.`, env)
+	case 1:
+		regex = names[0]
+	default:
+		regex = fmt.Sprintf(`(%s)`, strings.Join(names, `|`))
+	}
+
+	return `^/` + AppConf(env).DeployName() + `-` + regex + `(\.\d+)?`
 }
 
 func (svc Service) ImageName(tag string) string {
