@@ -1,11 +1,16 @@
 stages:
   - deploy
 
+variables:
+  GIT_CLEAN_FLAGS: none
+
 deploy:
   stage: deploy
   tags:
     - shell-xiaomei-qa  # match shell runner for qa that has xiaomei command.
   script:
+    - npm install
+    - npm run build -- --mode $CI_ENVIRONMENT_NAME
     - xiaomei web deploy $CI_ENVIRONMENT_NAME --no-watch
   environment:
     name: $CI_COMMIT_REF_NAME
@@ -19,6 +24,8 @@ deploy-production:
   tags:
     - shell-xiaomei-production # match shell runner for production that has xiaomei command.
   script:
+    - npm install
+    - npm run build -- --mode production
     - xiaomei web deploy production --no-watch
   environment:
     name: production
