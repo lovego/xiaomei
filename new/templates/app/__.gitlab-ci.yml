@@ -71,6 +71,7 @@ deploy-production:
     refs: [ branches ]
     variables: [ '$CI_COMMIT_REF_NAME == "master"' ]
   when: manual
+  allow_failure: false
 
 before_script:
   - buildDir=$(pwd) && echo $buildDir
