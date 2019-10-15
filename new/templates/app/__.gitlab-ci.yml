@@ -47,6 +47,7 @@ deploy-qa:
     - shell-xiaomei-qa  # match shell runner for qa that has xiaomei command.
   script:
 #   - xiaomei psql create $CI_ENVIRONMENT_NAME
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - xiaomei app deploy $CI_ENVIRONMENT_NAME --no-watch
   environment:
     name: $CI_COMMIT_REF_NAME
@@ -61,6 +62,7 @@ deploy-production:
     - shell-xiaomei-production # match shell runner for production that has xiaomei command.
   script:
 #   - xiaomei psql create production
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - xiaomei app deploy production --no-watch
   environment:
     name: production

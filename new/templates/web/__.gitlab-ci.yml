@@ -11,6 +11,7 @@ deploy:
   script:
     - npm install
     - npm run build -- --mode $CI_ENVIRONMENT_NAME
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - xiaomei web deploy $CI_ENVIRONMENT_NAME --no-watch
   environment:
     name: $CI_COMMIT_REF_NAME
@@ -26,6 +27,7 @@ deploy-production:
   script:
     - npm install
     - npm run build -- --mode production
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - xiaomei web deploy production --no-watch
   environment:
     name: production
@@ -39,3 +41,4 @@ before_script:
   - buildDir=$(pwd) && echo $buildDir
   - projectDir=~/front/{{ .ProPath }} && echo $projectDir
   - mkdir -p $(dirname $projectDir) && ln -sfT $buildDir $projectDir && cd $projectDir
+
