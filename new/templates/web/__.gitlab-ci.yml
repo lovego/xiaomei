@@ -4,7 +4,7 @@ stages:
 variables:
   GIT_CLEAN_FLAGS: none
 
-deploy:
+deploy-qa:
   stage: deploy
   tags:
     - shell-xiaomei-qa  # match shell runner for qa that has xiaomei command.
