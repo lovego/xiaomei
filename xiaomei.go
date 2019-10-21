@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/access"
 	"github.com/lovego/xiaomei/misc"
@@ -16,6 +17,7 @@ import (
 const version = `19.10.21`
 
 func main() {
+	color.NoColor = false
 	cobra.EnableCommandSorting = false
 	root := &cobra.Command{
 		Use:   `xiaomei`,
