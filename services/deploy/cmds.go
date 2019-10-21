@@ -14,8 +14,8 @@ func Cmds(svcName string) (cmds []*cobra.Command) {
 }
 
 func deployCmdFor(svcName string) *cobra.Command {
-	var filter string
 	var pull, push, noWatch bool
+	var filter, beforeScript string
 	cmd := &cobra.Command{
 		Use:   `deploy [<env> [<tag>]]`,
 		Short: `Deploy the ` + desc(svcName) + `.`,
@@ -31,15 +31,16 @@ func deployCmdFor(svcName string) *cobra.Command {
 					}
 				}
 			}
-			if err := deploy(svcName, env, timeTag, filter, noWatch); err != nil {
+			if err := deploy(svcName, env, timeTag, filter, beforeScript, noWatch); err != nil {
 				return err
 			}
 			return nil
 		}),
 	}
-	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
 	cmd.Flags().BoolVarP(&pull, `pull`, `p`, true, `pull base image.`)
 	cmd.Flags().BoolVarP(&push, `push`, `P`, true, `push the built images to registry.`)
+	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
+	cmd.Flags().StringVarP(&beforeScript, `before-script`, `b`, ``, `script to execute before deploy on every node.`)
 	cmd.Flags().BoolVarP(&noWatch, `no-watch`, `W`, false, `after deployed a node, don't watch container status until "Ctl+C".`)
 	return cmd
 }

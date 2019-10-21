@@ -9,7 +9,9 @@ import (
 	"github.com/lovego/xiaomei/services/images"
 )
 
-const deployScriptTmpl = `set -e
+// newline at beginning and ending is required for beforeScript and psScript.
+const deployScriptTmpl = `
+set -e
 {{ range .VolumesToCreate }}
 docker volume create {{ . }} >/dev/null
 {{- end }}

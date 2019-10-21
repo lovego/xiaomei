@@ -12,7 +12,7 @@ import (
 	"github.com/lovego/xiaomei/services/oam"
 )
 
-func deploy(svcName, env, timeTag, feature string, noWatch bool) error {
+func deploy(svcName, env, timeTag, feature, beforeScript string, noWatch bool) error {
 	psScript := fmt.Sprintf(` docker ps -f name=^/%s`, release.ServiceName(svcName, env))
 	if !noWatch {
 		psScript = oam.WatchCmd() + psScript
@@ -30,7 +30,7 @@ func deploy(svcName, env, timeTag, feature string, noWatch bool) error {
 				}
 				recoverAccess = true
 			}
-			if err := deployNode(svcs, env, timeTag, node, psScript); err != nil {
+			if err := deployNode(svcs, env, timeTag, node, beforeScript, psScript); err != nil {
 				return err
 			}
 		}
@@ -45,12 +45,14 @@ func deploy(svcName, env, timeTag, feature string, noWatch bool) error {
 	return nil
 }
 
-func deployNode(svcs []string, env, timeTag string, node release.Node, psScript string) error {
+func deployNode(
+	svcs []string, env, timeTag string, node release.Node, beforeScript, psScript string,
+) error {
 	log.Println(color.GreenString(`deploying ` + node.SshAddr()))
 	deployScript, err := getDeployScript(svcs, env, timeTag)
 	if err != nil {
 		return err
 	}
-	_, err = node.Run(cmd.O{}, deployScript+psScript)
+	_, err = node.Run(cmd.O{}, beforeScript+deployScript+psScript)
 	return err
 }
