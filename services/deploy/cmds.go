@@ -2,7 +2,6 @@ package deploy
 
 import (
 	"github.com/lovego/xiaomei/release"
-	"github.com/lovego/xiaomei/services/images"
 	"github.com/spf13/cobra"
 )
 
@@ -14,34 +13,27 @@ func Cmds(svcName string) (cmds []*cobra.Command) {
 }
 
 func deployCmdFor(svcName string) *cobra.Command {
-	var pull, push, noWatch bool
-	var filter, beforeScript string
+	var d Deploy
 	cmd := &cobra.Command{
 		Use:   `deploy [<env> [<tag>]]`,
 		Short: `Deploy the ` + desc(svcName) + `.`,
 		RunE: release.Env1Call(func(env, timeTag string) error {
-			if timeTag == `` {
-				timeTag = release.TimeTag(env)
-				if err := images.Build(svcName, env, timeTag, pull); err != nil {
-					return err
-				}
-				if push {
-					if err := images.Push(svcName, env, timeTag); err != nil {
-						return err
-					}
-				}
-			}
-			if err := deploy(svcName, env, timeTag, filter, beforeScript, noWatch); err != nil {
-				return err
-			}
-			return nil
+			d.svcName, d.env, d.timeTag = svcName, env, timeTag
+			return d.start()
 		}),
 	}
-	cmd.Flags().BoolVarP(&pull, `pull`, `p`, true, `pull base image.`)
-	cmd.Flags().BoolVarP(&push, `push`, `P`, true, `push the built images to registry.`)
-	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
-	cmd.Flags().StringVarP(&beforeScript, `before-script`, `b`, ``, `script to execute before deploy on every node.`)
-	cmd.Flags().BoolVarP(&noWatch, `no-watch`, `W`, false, `after deployed a node, don't watch container status until "Ctl+C".`)
+	cmd.Flags().BoolVar(&d.noPullBaseImage, `no-pull`, false,
+		`Don't pull base image when building image.`)
+	cmd.Flags().BoolVar(&d.noPushImageIfLocal, `no-push`, false,
+		`Don't push the built images to registry if deploying cluster is local machine.`)
+	cmd.Flags().StringVarP(&d.filter, `filter`, `f`, ``, `Filter the node to deploy to by node addr.`)
+
+	cmd.Flags().StringVarP(&d.beforeScript, `before-script`, `b`, ``,
+		`Script to execute before deploy on every node.`)
+	cmd.Flags().BoolVarP(&d.noBeforeScriptOnLocal, `no-before-script-on-local`, `B`, false,
+		`Don't run before-script on this local machine at the very beginning of the deployment.`)
+	cmd.Flags().BoolVarP(&d.noWatch, `no-watch`, `W`, false,
+		`After deployed a node, don't watch container status until "Ctl+C".`)
 	return cmd
 }
 

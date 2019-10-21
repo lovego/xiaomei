@@ -48,6 +48,17 @@ func (c *Cluster) init(env string) {
 	}
 }
 
+func (c Cluster) IsLocalHost() (bool, error) {
+	for _, node := range c.Nodes {
+		if ok, err := node.IsLocalHost(); err != nil {
+			return false, err
+		} else if !ok {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
 func (c Cluster) GetNodes(feature string) (nodes []Node) {
 	for _, node := range c.Nodes {
 		if feature == `` || strings.Contains(node.Addr, feature) {

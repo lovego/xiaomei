@@ -21,6 +21,7 @@ func main() {
 		Use:   `xiaomei`,
 		Short: `be small and beautiful.`,
 	}
+	root.PersistentFlags().SortFlags = false
 
 	root.AddCommand(new.Cmd())
 	root.AddCommand(access.Cmd())

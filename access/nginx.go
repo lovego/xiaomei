@@ -16,11 +16,11 @@ import (
 
 var reloadScript = `
 sudo nginx -t
-sudo systemctl reload nginx
+sudo nginx -s reload
 `
 
 var setupScriptTmpl = template.Must(template.New(``).Parse(`
-set -e
+set -eu
 sudo tee /etc/nginx/sites-enabled/{{ .Domain }} > /dev/null
 sudo mkdir -p /var/log/nginx/{{ .Domain }}
 ` + reloadScript))
@@ -35,7 +35,7 @@ func HasAccess(svcs []string) bool {
 }
 
 func ReloadNginx(env, feature string) error {
-	return clusterRun(env, feature, "", reloadScript)
+	return clusterRun(env, feature, "", "set -eu\n"+reloadScript)
 }
 
 func SetupNginx(env, feature, downAddr string) error {
