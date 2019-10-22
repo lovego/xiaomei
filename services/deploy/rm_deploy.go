@@ -9,10 +9,10 @@ import (
 
 func rmDeploy(svcName, env, feature string) error {
 	script := fmt.Sprintf(`
-for name in $(docker ps -af name=^/%s --format '{{.Names}}'); do
+for name in $(docker ps -af name='%s' --format '{{.Names}}'); do
 	docker stop $name >/dev/null 2>&1 && docker rm $name
 done
-`, release.ServiceName(svcName, env))
+`, release.ServiceNameRegexp(svcName, env))
 	return eachNodeRun(env, script, feature)
 }
 

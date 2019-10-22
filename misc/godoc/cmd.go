@@ -39,7 +39,7 @@ func rmDeployCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   `rm-deploy`,
 		Short: `Stop and remove docker container of the godoc server.`,
-		RunE:  release.NoArgCall(deploy),
+		RunE:  release.NoArgCall(rmDeploy),
 	}
 }
 
