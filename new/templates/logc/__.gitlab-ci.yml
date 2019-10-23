@@ -1,35 +1,26 @@
 stages:
   - deploy
 
-variables:
-  GIT_CLEAN_FLAGS: none
-
 deploy-qa:
   stage: deploy
   tags:
     - shell-xiaomei-qa  # match shell runner for qa that has xiaomei command.
   script:
-    - npm install
-    - npm run build
-    - xiaomei app deploy $CI_ENVIRONMENT_NAME -Wb "docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY"
+    - xiaomei logc deploy $CI_ENVIRONMENT_NAME -Wb "docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY"
   environment:
     name: $CI_COMMIT_REF_NAME
-    url: https://{{ .ProNameUrlSafe }}.$CI_COMMIT_REF_NAME.{{ .Domain }}
   only:
     refs: [ branches ]
-    variables: [ '$CI_COMMIT_REF_NAME =~ /^(qa|qa2|uat)$/' ]
+    variables: [ '$CI_COMMIT_REF_NAME == "qa"' ]
 
 deploy-production:
   stage: deploy
   tags:
     - shell-xiaomei-production # match shell runner for production that has xiaomei command.
   script:
-    - npm install
-    - npm run build -- --mode production
-    - xiaomei app deploy production -Wb "docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY"
+    - xiaomei logc deploy production -Wb "docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY"
   environment:
     name: production
-    url: https://{{ .ProNameUrlSafe }}.{{ .Domain }}
   only:
     refs: [ branches ]
     variables: [ '$CI_COMMIT_REF_NAME == "master"' ]
@@ -38,6 +29,6 @@ deploy-production:
 
 before_script:
   - buildDir=$(pwd) && echo $buildDir
-  - projectDir=~/front/{{ .ProPath }} && echo $projectDir
+  - projectDir=~/logc/{{ .ProPath }} && echo $projectDir
   - mkdir -p $(dirname $projectDir) && ln -sfT $buildDir $projectDir && cd $projectDir
 

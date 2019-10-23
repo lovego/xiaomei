@@ -47,8 +47,7 @@ deploy-qa:
     - shell-xiaomei-qa  # match shell runner for qa that has xiaomei command.
   script:
 #   - xiaomei psql create $CI_ENVIRONMENT_NAME
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - xiaomei app deploy $CI_ENVIRONMENT_NAME --no-watch
+    - xiaomei app deploy $CI_ENVIRONMENT_NAME -Wb "docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY"
   environment:
     name: $CI_COMMIT_REF_NAME
     url: https://{{ .ProNameUrlSafe }}.api-$CI_COMMIT_REF_NAME.{{ .Domain }}
@@ -62,8 +61,7 @@ deploy-production:
     - shell-xiaomei-production # match shell runner for production that has xiaomei command.
   script:
 #   - xiaomei psql create production
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - xiaomei app deploy production --no-watch
+    - xiaomei app deploy production -Wb "docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY"
   environment:
     name: production
     url: https://{{ .ProNameUrlSafe }}.api.{{ .Domain }}
