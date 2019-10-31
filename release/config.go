@@ -45,17 +45,16 @@ func ServiceName(svcName, env string) string {
 }
 
 func AppData(env string) strmap.StrMap {
-	if data := appData[env]; data == nil {
+	data := appData[env]
+	if data == nil {
 		if fs.Exist(filepath.Join(Root(), `img-app`)) {
 			data = conf.Data(filepath.Join(Root(), `img-app/config/envs/`+env+`.yml`))
-		} else {
-			data = conf.Data(filepath.Join(Root(), `envs/`+env+`.yml`))
+		} else if fpath := filepath.Join(Root(), `envs/`+env+`.yml`); fs.Exist(fpath) {
+			data = conf.Data(fpath)
 		}
 		appData[env] = data
-		return data
-	} else {
-		return data
 	}
+	return data
 }
 
 func CheckEnv(env string) (string, error) {
@@ -68,5 +67,9 @@ func CheckEnv(env string) (string, error) {
 	if _, ok := AppConfig().Envs[env]; ok {
 		return env, nil
 	}
-	return ``, fmt.Errorf("env %s not defined in config.yml", env)
+	if GetClusters()[env] != nil {
+		return env, nil
+	}
+
+	return ``, fmt.Errorf("env %s is not defined neither in config.yml nor clusters.yml", env)
 }
