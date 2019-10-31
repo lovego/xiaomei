@@ -28,7 +28,7 @@ deploy-production:
   allow_failure: false
 
 before_script:
-  - buildDir=$(pwd) && echo $buildDir
-  - projectDir=~/logc/{{ .ProPath }} && echo $projectDir
-  - mkdir -p $(dirname $projectDir) && ln -sfT $buildDir $projectDir && cd $projectDir
+  - buildDir=$(pwd); echo $buildDir
+  - projectDir=~/oam/{{ .ProName }}; echo $projectDir
+  - mkdir -p $(dirname $projectDir); ln -sfT $buildDir $projectDir; cd $projectDir
 

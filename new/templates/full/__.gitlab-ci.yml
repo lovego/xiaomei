@@ -41,7 +41,7 @@ test:
     - when: never
 
 before_script:
-  - buildDir=$(pwd) && echo $buildDir
-  - projectDir=$(go env GOPATH)/src/{{ .ProPath }} && echo $projectDir
-  - mkdir -p $(dirname $projectDir) && ln -sfT $buildDir $projectDir && cd $projectDir
+  - buildDir=$(pwd); echo $buildDir
+  - projectDir=$(go env GOPATH)/src/{{ .ProPath }}; echo $projectDir
+  - mkdir -p $(dirname $projectDir); ln -sfT $buildDir $projectDir; cd $projectDir
 

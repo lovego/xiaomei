@@ -1,2 +1,9 @@
 name: {{ .ProName }}
+envs:
+  dev:
+    timeZone: { name: China, offset: 28800 }
+  qa:
+    timeZone: { name: China, offset: 28800 }
+  production:
+    timeZone: { name: China, offset: 28800 }
 

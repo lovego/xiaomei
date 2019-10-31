@@ -37,7 +37,7 @@ deploy-production:
   allow_failure: false
 
 before_script:
-  - buildDir=$(pwd) && echo $buildDir
-  - projectDir=~/front/{{ .ProPath }} && echo $projectDir
-  - mkdir -p $(dirname $projectDir) && ln -sfT $buildDir $projectDir && cd $projectDir
+  - buildDir=$(pwd); echo $buildDir
+  - projectDir=~/front/{{ .ProName }}; echo $projectDir
+  - mkdir -p $(dirname $projectDir); ln -sfT $buildDir $projectDir; cd $projectDir
 
