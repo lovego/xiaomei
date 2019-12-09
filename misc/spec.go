@@ -65,7 +65,7 @@ func specTargets() []string {
 
 	targets := []string{}
 	for _, v := range matches {
-		if v != `release` && v != `vendor` {
+		if v != `release` && v != `vendor` && v != `apidocs` {
 			if fs.IsDir(v) {
 				v = v + `/...`
 			}
