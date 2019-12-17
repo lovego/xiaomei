@@ -20,9 +20,9 @@ func parseCmd() *cobra.Command {
 			if token == `` {
 				return errors.New(`token cann't be empty.`)
 			}
-			ck := newCookie(release.AppConf(env).Cookie)
+			ck := release.AppConf(env).HttpCookie()
 			ck.Value = token
-			return parse(ck, release.AppConf(env).Secret)
+			return parse(&ck, release.AppConf(env).Secret)
 		}),
 	}
 	return cmd
