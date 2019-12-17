@@ -10,10 +10,10 @@ import (
 func Cmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `token`,
-		Short: `Generate/parse token command.`,
+		Short: `Generate or parse a token.`,
 	}
-	cmd.AddCommand(tokenGenCmd())
-	cmd.AddCommand(tokenParseCmd())
+	cmd.AddCommand(genCmd())
+	cmd.AddCommand(parseCmd())
 	return cmd
 }
 

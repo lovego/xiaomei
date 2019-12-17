@@ -1,7 +1,6 @@
 package token
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -11,31 +10,31 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func tokenParseCmd() *cobra.Command {
+func parseCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   `parse <env> <value>`,
-		Short: `parse token command.`,
-		RunE: release.Env1Call(func(env, value string) error {
-			if value == `` {
-				return errors.New(`cookie value is required`)
+		Use: `parse <env> <token>
+<token> is a pure cookie value, without cookie name or other attributes.`,
+		DisableFlagsInUseLine: true,
+		Short: `parse a token. (decode a token and remove the signature)`,
+		RunE: release.Env1Call(func(env, token string) error {
+			if token == `` {
+				return errors.New(`token cann't be empty.`)
 			}
 			ck := newCookie(release.AppConf(env).Cookie)
-			return tokenParse(ck, release.AppConf(env).Secret, value)
+			ck.Value = token
+			return parse(ck, release.AppConf(env).Secret)
 		}),
 	}
 	return cmd
 }
 
-func tokenParse(ck *http.Cookie, secret, value string) error {
-	data := make(map[string]interface{})
-	ck.Value = value
-	if err := cookiestore.New(secret).Get(ck, &data); err != nil {
+func parse(ck *http.Cookie, secret string) error {
+	if data, err := cookiestore.New(secret).Decode(
+		ck.Name, []byte(ck.Value), int64(ck.MaxAge),
+	); err != nil {
 		return err
+	} else {
+		fmt.Println(string(data))
 	}
-	b, err := json.Marshal(data)
-	if err != nil {
-		return err
-	}
-	fmt.Println(string(b))
 	return nil
 }

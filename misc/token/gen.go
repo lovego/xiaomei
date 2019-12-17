@@ -3,47 +3,38 @@ package token
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/lovego/sessions/cookiestore"
 	"github.com/lovego/xiaomei/release"
 	"github.com/spf13/cobra"
 )
 
-func tokenGenCmd() *cobra.Command {
+func genCmd() *cobra.Command {
 	var domain string
-	var values = make(map[string]string)
 	cmd := &cobra.Command{
-		Use:   `gen <env>`,
-		Short: `generate token command.`,
-		RunE: release.EnvCall(func(env string) error {
+		Use: `gen <env> <content> [flags]
+<content> can be any string, but generally it may be a json encoded string`,
+		DisableFlagsInUseLine: true,
+		Short: `generate a token. (add a signature to a content and encode it)`,
+		RunE: release.Env1Call(func(env, content string) error {
 			ck := newCookie(release.AppConf(env).Cookie)
-			return tokenGen(ck, release.AppConf(env).Secret, domain, values)
+			if domain != `` {
+				ck.Domain = domain
+			}
+			return generate(ck, release.AppConf(env).Secret, content)
 		}),
 	}
-	cmd.Flags().StringVarP(&domain, `domain`, ``, ``, `specified the cookie domain.`)
-	cmd.Flags().StringToStringVar(&values, `value`, nil, `specified the value of domain.`)
+	cmd.Flags().StringVarP(&domain, `domain`, ``, ``, `specify the cookie domain.`)
 	return cmd
 }
 
-func tokenGen(ck *http.Cookie, secret, domain string, values map[string]string) error {
-	data := make(map[string]interface{})
-	for key, value := range values {
-		if v, err := strconv.ParseInt(value, 10, 64); err == nil {
-			data[key] = v
-		} else {
-			data[key] = value
-		}
-	}
-	if domain != `` {
-		ck.Domain = domain
-	}
-	sess, err := cookiestore.New(secret).EncodeData(ck.Name, data)
+func generate(ck *http.Cookie, secret, content string) error {
+	encoded, err := cookiestore.New(secret).Encode(ck.Name, []byte(content))
 	if err != nil {
 		return err
 	}
 
-	ck.Value = string(sess)
+	ck.Value = string(encoded)
 
 	fmt.Println(fmt.Sprintf(`document.cookie = "%s";`, ck.String()))
 	return nil
