@@ -11,7 +11,7 @@ deploy-qa:
   script:
     - npm install
     - npm run build
-    - xiaomei app deploy $CI_ENVIRONMENT_NAME -Wb "docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY"
+    - xiaomei web deploy $CI_ENVIRONMENT_NAME -Wb "docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY"
   environment:
     name: $CI_COMMIT_REF_NAME
     url: https://{{ .ProNameUrlSafe }}.$CI_COMMIT_REF_NAME.{{ .Domain }}
@@ -26,7 +26,7 @@ deploy-production:
   script:
     - npm install
     - npm run build -- --mode production
-    - xiaomei app deploy production -Wb "docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY"
+    - xiaomei web deploy production -Wb "docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY"
   environment:
     name: production
     url: https://{{ .ProNameUrlSafe }}.{{ .Domain }}
