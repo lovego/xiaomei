@@ -70,6 +70,11 @@ func (c Cluster) GetNodes(feature string) (nodes []Node) {
 
 func (c Cluster) Run(feature string, o cmd.O, script string) (string, error) {
 	for _, node := range c.GetNodes(feature) {
+		if node.IsLocalHostP() {
+			return node.Run(o, script)
+		}
+	}
+	for _, node := range c.GetNodes(feature) {
 		return node.Run(o, script)
 	}
 	return ``, nil
@@ -77,6 +82,11 @@ func (c Cluster) Run(feature string, o cmd.O, script string) (string, error) {
 
 func (c Cluster) ServiceRun(svcName, feature string, o cmd.O, script string) (string, error) {
 	labels := GetService(svcName, c.env).Nodes
+	for _, node := range c.GetNodes(feature) {
+		if node.IsLocalHostP() && node.Match(labels) {
+			return node.Run(o, script)
+		}
+	}
 	for _, node := range c.GetNodes(feature) {
 		if node.Match(labels) {
 			return node.Run(o, script)

@@ -77,6 +77,14 @@ func (n Node) Run(o cmd.O, script string) (string, error) {
 	}
 }
 
+func (n Node) IsLocalHostP() bool {
+	ok, err := n.IsLocalHost()
+	if err != nil {
+		panic(err)
+	}
+	return ok
+}
+
 func (n Node) IsLocalHost() (bool, error) {
 	ips, err := net.LookupIP(n.Addr)
 	if err != nil {
