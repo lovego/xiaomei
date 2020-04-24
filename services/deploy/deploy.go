@@ -76,11 +76,7 @@ func (d Deploy) run() error {
 		}
 	}
 	if recoverAccess {
-		if expectHighAvailable {
-			return access.SetupNginx(d.env, "", "")
-		} else {
-			return access.ReloadNginx(d.env, "")
-		}
+		return access.SetupNginx(d.env, "", "")
 	}
 	return nil
 }
