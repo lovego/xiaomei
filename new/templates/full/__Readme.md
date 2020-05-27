@@ -15,8 +15,8 @@
 ### 后端地址说明
 | 环境         | 地址                                                         |
 | ------------ | ------------------------------------------------------------ |
-| QA           | https://{{.ProNameUrlSafe}}.api-qa.{{ .Domain }}             |
-| QA2          | https://{{.ProNameUrlSafe}}.api-qa2.{{ .Domain }}            |
+| QA           | https://{{.ProNameUrlSafe}}.api.qa.{{ .Domain }}             |
+| QA2          | https://{{.ProNameUrlSafe}}.api.qa2.{{ .Domain }}            |
 | Production   | https://{{.ProNameUrlSafe}}.api.{{ .Domain }}                |
 
 
