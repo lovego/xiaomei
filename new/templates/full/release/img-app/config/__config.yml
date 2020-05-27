@@ -8,7 +8,12 @@ name: {{ .ProName }}
 envs:
   dev:
     <<: *defaults
-    domain: {{ .ProNameUrlSafe }}.dev.{{ .Domain }}
+    domain: {{ .ProNameUrlSafe }}.api.dev.{{ .Domain }}
+    cookie:
+      name: token-dev
+      domain: api.dev.{{ .Domain }}
+      path: /
+      maxAge: 1M # y:年; M:月; d:天; h:时; m:分; s:秒
     secret: {{ genSecret }}
     keepers: [ ]
   test:
@@ -23,16 +28,31 @@ envs:
   qa:
     <<: *defaults
     https: true
-    domain: {{ .ProNameUrlSafe }}.qa.{{ .Domain }}
+    domain: {{ .ProNameUrlSafe }}.api.qa.{{ .Domain }}
+    cookie:
+      name: token-dev
+      domain: api.qa.{{ .Domain }}
+      path: /
+      maxAge: 1M # y:年; M:月; d:天; h:时; m:分; s:秒
     secret: {{ genSecret }}
   preview:
     <<: *defaults
     https: true
-    domain: {{ .ProNameUrlSafe }}.preview.{{ .Domain }}
+    domain: {{ .ProNameUrlSafe }}.api.preview.{{ .Domain }}
+    cookie:
+      name: token-dev
+      domain: api.preview.{{ .Domain }}
+      path: /
+      maxAge: 1M # y:年; M:月; d:天; h:时; m:分; s:秒
     secret: {{ genSecret }}
   production:
     <<: *defaults
     https: true
-    domain: {{ .ProNameUrlSafe }}.{{ .Domain }}
+    domain: {{ .ProNameUrlSafe }}.api.{{ .Domain }}
+    cookie:
+      name: token-dev
+      domain: api.{{ .Domain }}
+      path: /
+      maxAge: 1M # y:年; M:月; d:天; h:时; m:分; s:秒
     secret: {{ genSecret }}
 

@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"net/http"
 	"time"
 
 	"github.com/lovego/config"
@@ -10,10 +9,7 @@ import (
 	"github.com/lovego/tracer"
 )
 
-var Cookie = &http.Cookie{
-	Name:   "session",
-	MaxAge: 86400 * 30,
-}
+var Cookie = config.Cookie()
 var CookieStore = cookiestore.New(config.Secret())
 
 type Session struct {
@@ -31,12 +27,12 @@ func GetSession(c *goa.Context) Session {
 }
 
 func SaveSession(c *goa.Context, data Session) {
-	err := CookieStore.Save(c.ResponseWriter, Cookie, data)
+	err := CookieStore.Save(c.ResponseWriter, &Cookie, data)
 	if err != nil {
 		tracer.Log(c.Context(), "save session: ", err)
 	}
 }
 
 func DeleteSession(c *goa.Context) {
-	CookieStore.Delete(c.ResponseWriter, Cookie)
+	CookieStore.Delete(c.ResponseWriter, &Cookie)
 }
