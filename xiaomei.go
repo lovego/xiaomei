@@ -14,7 +14,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const version = `20.03.20`
+const version = `20.07.08`
 
 func main() {
 	color.NoColor = false
