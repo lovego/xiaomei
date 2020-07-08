@@ -107,7 +107,7 @@ func (svc Service) ImageName(tag string) string {
 }
 
 func TimeTag(env string) string {
-	tag := time.Now().In(AppConf(env).TimeLocation).Format(`060102-150405`)
+	tag := time.Now().In(AppConf(env).TimeLocation).Format(`20060102-150405`)
 	log.Println(`time tag: `, color.MagentaString(tag))
 	return tag
 }
