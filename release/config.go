@@ -51,6 +51,8 @@ func AppData(env string) strmap.StrMap {
 			data = conf.Data(filepath.Join(Root(), `img-app/config/envs/`+env+`.yml`))
 		} else if fpath := filepath.Join(Root(), `envs/`+env+`.yml`); fs.Exist(fpath) {
 			data = conf.Data(fpath)
+		} else {
+			data = strmap.StrMap{}
 		}
 		appData[env] = data
 	}

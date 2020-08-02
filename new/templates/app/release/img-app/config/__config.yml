@@ -13,7 +13,7 @@ envs:
       name: token-dev
       domain: api.dev.{{ .Domain }}
       path: /
-      maxAge: 1M # y:年; M:月; d:天; h:时; m:分; s:秒
+      maxAge: 1M # Y:年; M:月; D:天; h:时; m:分; s:秒
     secret: {{ genSecret }}
     keepers: [ ]
   test:
@@ -33,7 +33,7 @@ envs:
       name: token-dev
       domain: api.qa.{{ .Domain }}
       path: /
-      maxAge: 1M # y:年; M:月; d:天; h:时; m:分; s:秒
+      maxAge: 1M # Y:年; M:月; D:天; h:时; m:分; s:秒
     secret: {{ genSecret }}
   preview:
     <<: *defaults
@@ -43,7 +43,7 @@ envs:
       name: token-dev
       domain: api.preview.{{ .Domain }}
       path: /
-      maxAge: 1M # y:年; M:月; d:天; h:时; m:分; s:秒
+      maxAge: 1M # Y:年; M:月; D:天; h:时; m:分; s:秒
     secret: {{ genSecret }}
   production:
     <<: *defaults
@@ -53,6 +53,6 @@ envs:
       name: token-dev
       domain: api.{{ .Domain }}
       path: /
-      maxAge: 1M # y:年; M:月; d:天; h:时; m:分; s:秒
+      maxAge: 1M # Y:年; M:月; D:天; h:时; m:分; s:秒
     secret: {{ genSecret }}
 

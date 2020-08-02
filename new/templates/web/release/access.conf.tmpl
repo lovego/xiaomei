@@ -7,7 +7,6 @@ upstream {{ .DeployName }}-web {
 }
 
 server {
-  listen 80;
   server_name {{ .Domain }};
   {{ if .Https -}}
   listen              443 ssl http2;
@@ -17,7 +16,10 @@ server {
   ssl_certificate_key /etc/nginx/certs/{{ domainAncestor .Domain 1 }}.key;
   ssl_session_cache   shared:SSL:10m;
   ssl_session_timeout 10m;
+  {{ else -}}
+  listen 80;
   {{- end }}
+
 
   location / {
     proxy_pass http://{{ .DeployName }}-web;
@@ -35,3 +37,12 @@ server {
   access_log /var/log/nginx/{{ .Domain }}/access.log;
   error_log  /var/log/nginx/{{ .Domain }}/access.err;
 }
+
+{{ if .Https -}}
+server {
+  listen 80;
+  server_name {{ .Domain }};
+
+  return 301 https://$host$request_uri;
+}
+{{- end }}

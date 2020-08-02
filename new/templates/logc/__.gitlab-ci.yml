@@ -1,29 +1,30 @@
 stages:
   - deploy
 
-deploy-qa:
+.deploy:
   stage: deploy
-  tags:
-    - shell-xiaomei-qa  # match shell runner for qa that has xiaomei command.
-  script:
-    - xiaomei logc deploy $CI_ENVIRONMENT_NAME -Wb "docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY"
   environment:
     name: $CI_COMMIT_REF_NAME
+  script:
+    - xiaomei logc deploy $CI_ENVIRONMENT_NAME -Wb "docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY"
   only:
     refs: [ branches ]
+
+deploy-qa:
+  extends: .deploy
+  only:
     variables: [ '$CI_COMMIT_REF_NAME == "qa"' ]
+  tags:
+    - shell-xiaomei-qa  # match shell runner for qa that has xiaomei command.
 
 deploy-production:
-  stage: deploy
-  tags:
-    - shell-xiaomei-production # match shell runner for production that has xiaomei command.
-  script:
-    - xiaomei logc deploy production -Wb "docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY"
+  extends: .deploy
   environment:
     name: production
   only:
-    refs: [ branches ]
     variables: [ '$CI_COMMIT_REF_NAME == "master"' ]
+  tags:
+    - shell-xiaomei-production  # match shell runner for production that has xiaomei command.
   when: manual
   allow_failure: false
 
