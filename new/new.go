@@ -35,11 +35,10 @@ registry: docker registry prefix for images built by the project, required.
 			return New(typ, args[0], args[1], domain, force)
 		},
 	}
-	cmd.Flags().StringVarP(&typ, `type`, `t`, `full`, `project type.
+	cmd.Flags().StringVarP(&typ, `type`, `t`, `app`, `project type.
  app: only service that provides Golang API.
  web: only service that provides fontend UI.
 logc: only service that collect logs to ElasticSearch.
-full: all services including app, web and logc.
 `)
 	cmd.Flags().BoolVarP(&force, `force`, `f`, false, `force overwrite existing files.`)
 	return cmd

@@ -22,7 +22,7 @@ type Config struct {
 func getConfig(typ, dir, registry, domain string) (*Config, error) {
 	var proName = filepath.Base(dir)
 	var proPath string
-	if typ == `app` || typ == `full` {
+	if typ == `app` {
 		var err error
 		if proPath, err = getProjectPath(dir); err != nil {
 			return nil, err

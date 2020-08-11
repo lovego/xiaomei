@@ -1,8 +1,6 @@
 dev:
   accessNodes: { }
   services:
-    access:
-      nodes: { }
     web:
       image: "{{ .Registry }}{{ .ProNameUrlSafe }}/web/dev"
       ports: [ 8001 ]
@@ -11,18 +9,22 @@ dev:
 qa:
   accessNodes: { }
   services:
-    access:
-      nodes: { }
     web:
       image: "{{ .Registry }}{{ .ProNameUrlSafe }}/web/qa"
       ports: [ 8001 ]
       options: [ -v, "{{ .ProName }}-logs:/var/log/nginx/{{ .ProName }}" ]
   volumesToCreate: [ "{{ .ProName }}-logs" ]
+preview:
+  accessNodes: { }
+  services:
+    web:
+      image: "{{ .Registry }}{{ .ProNameUrlSafe }}/web/preview"
+      ports: [ 9001 ]
+      options: [ -v, "{{ .ProName }}-logs:/var/log/nginx/{{ .ProName }}" ]
+  volumesToCreate: [ "{{ .ProName }}-logs" ]
 production:
   accessNodes: { }
   services:
-    access:
-      nodes: { }
     web:
       image: "{{ .Registry }}{{ .ProNameUrlSafe }}/web/production"
       ports: [ 8001 ]

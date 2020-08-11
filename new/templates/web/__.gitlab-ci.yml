@@ -31,7 +31,7 @@ deploy-preview:
     - shell-xiaomei-production # match shell runner for production that has xiaomei command.
 
 deploy-production:
-  stage: deploy
+  extends: .deploy
   only:
     variables: [ '$CI_COMMIT_REF_NAME == "master"' ]
   environment:
