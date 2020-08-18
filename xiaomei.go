@@ -14,14 +14,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const version = `20.08.11`
+const version = `20.08.18`
 
 func main() {
 	color.NoColor = false
 	cobra.EnableCommandSorting = false
 	root := &cobra.Command{
 		Use:   `xiaomei`,
-		Short: `be small and beautiful.`,
+		Short: `Be small and beautiful.`,
 	}
 	root.PersistentFlags().SortFlags = false
 

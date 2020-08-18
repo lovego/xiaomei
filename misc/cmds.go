@@ -3,11 +3,11 @@ package misc
 import (
 	"fmt"
 	"io/ioutil"
+	"math"
+	"strconv"
 	"strings"
-	"time"
 
 	cmdPkg "github.com/lovego/cmd"
-	"github.com/lovego/config/conf"
 	"github.com/lovego/xiaomei/misc/dbs"
 	"github.com/lovego/xiaomei/misc/godoc"
 	"github.com/lovego/xiaomei/misc/token"
@@ -18,27 +18,10 @@ import (
 
 func Cmds(rootCmd *cobra.Command) []*cobra.Command {
 	return append(
-		dbs.Cmds(), godoc.Cmd(), timestampSignCmd(), token.Cmd(),
-		specCmd(), coverCmd(), yamlCmd(), bashCompletionCmd(rootCmd),
+		dbs.Cmds(), godoc.Cmd(), token.Cmd(), token.TimestampSignCmd(),
+		specCmd(), coverCmd(), yamlCmd(), float32Cmd(), float64Cmd(),
+		bashCompletionCmd(rootCmd),
 	)
-}
-
-func timestampSignCmd() *cobra.Command {
-	var secret string
-	cmd := &cobra.Command{
-		Use:   `timestamp-sign [<env>]`,
-		Short: `Generate Timestamp and Sign headers for curl command.`,
-		RunE: release.EnvCall(func(env string) error {
-			ts := time.Now().Unix()
-			if secret == "" {
-				secret = release.AppConf(env).Secret
-			}
-			fmt.Printf("-H Timestamp:%d -H Sign:%s\n", ts, conf.TimestampSign(ts, secret))
-			return nil
-		}),
-	}
-	cmd.Flags().StringVarP(&secret, `secret`, `s`, ``, `secret used to generate sign`)
-	return cmd
 }
 
 func coverCmd() *cobra.Command {
@@ -88,4 +71,36 @@ func yamlCmd() *cobra.Command {
 	}
 	cmd.Flags().BoolVarP(&goSyntax, `go-syntax`, `g`, false, `print in go syntax`)
 	return cmd
+}
+
+func float32Cmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   `float32`,
+		Short: `Print IEEE 754 binary bits of float32.`,
+		RunE: release.Arg1Call(``, func(p string) error {
+			f, err := strconv.ParseFloat(p, 32)
+			if err != nil {
+				return err
+			}
+			s := fmt.Sprintf("%032b", math.Float32bits(float32(f)))
+			fmt.Printf("%s,%s,%s\n", s[:1], s[1:9], s[9:])
+			return nil
+		}),
+	}
+}
+
+func float64Cmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   `float64`,
+		Short: `Print IEEE 754 binary bits of float64.`,
+		RunE: release.Arg1Call(``, func(p string) error {
+			f, err := strconv.ParseFloat(p, 64)
+			if err != nil {
+				return err
+			}
+			s := fmt.Sprintf("%064b", math.Float64bits(f))
+			fmt.Printf("%s,%s,%s\n", s[:1], s[1:12], s[11:])
+			return nil
+		}),
+	}
 }
