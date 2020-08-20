@@ -19,9 +19,9 @@ func main() {
 	}
 
 	router := goa.New()
+	router.Use(middlewares.CORS.Check)
 	router.Use(middlewares.Logger.Record)
 	router.Use(middlewares.SessionParse)
-	router.Use(middlewares.CORS.Check)
 	utilroutes.Setup(router)
 	router.Use(middlewares.Filter)
 
