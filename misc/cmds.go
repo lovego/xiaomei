@@ -18,10 +18,22 @@ import (
 
 func Cmds(rootCmd *cobra.Command) []*cobra.Command {
 	return append(
-		dbs.Cmds(), godoc.Cmd(), token.Cmd(), token.TimestampSignCmd(),
+		dbs.Cmds(), godoc.Cmd(), docCmd(), token.Cmd(), token.TimestampSignCmd(),
 		specCmd(), coverCmd(), yamlCmd(), float32Cmd(), float64Cmd(),
 		bashCompletionCmd(rootCmd),
 	)
+}
+
+func docCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   `doc`,
+		Short: `Generate api documentation from goa router.`,
+		RunE: func(_ *cobra.Command, args []string) error {
+			_, err := cmdPkg.Run(cmdPkg.O{Env: []string{"GOA_DOC=1"}}, "go", "run", "main.go")
+			return err
+		},
+	}
+	return cmd
 }
 
 func coverCmd() *cobra.Command {
