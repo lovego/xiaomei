@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -29,7 +30,10 @@ func docCmd() *cobra.Command {
 		Use:   `doc`,
 		Short: `Generate api documentation from goa router.`,
 		RunE: func(_ *cobra.Command, args []string) error {
-			_, err := cmdPkg.Run(cmdPkg.O{Env: []string{"GOA_DOC=1"}}, "go", "run", "main.go")
+			_, err := cmdPkg.Run(cmdPkg.O{
+				Dir: filepath.Dir(release.Root()),
+				Env: []string{"GOA_DOC=1"},
+			}, "go", "run", "main.go")
 			return err
 		},
 	}
