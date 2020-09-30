@@ -48,18 +48,28 @@ func versionCmd() *cobra.Command {
 }
 
 func updateCmd() *cobra.Command {
-	return &cobra.Command{
+	var deep bool
+	cmd := &cobra.Command{
 		Use:   `update`,
 		Short: `Update to lastest version.`,
 		RunE: release.NoArgCall(func() error {
 			fmt.Println(`current version ` + version)
-			if _, err := cmd.Run(cmd.O{},
-				`go`, `get`, `-u`, `-v`, `github.com/lovego/xiaomei`,
-			); err != nil {
+			if deep {
+				if _, err := cmd.Run(cmd.O{},
+					`go`, `get`, `-u`, `-v`, `github.com/lovego/xiaomei`,
+				); err != nil {
+					return err
+				}
+			} else if _, err := cmd.Run(cmd.O{}, `sh`, `-c`, `
+				cd $(go env GOPATH)/src/github.com/lovego/xiaomei && git pull && go install -v
+			`); err != nil {
 				return err
 			}
 			_, err := cmd.Run(cmd.O{}, `xiaomei`, `version`)
 			return err
 		}),
 	}
+	cmd.Flags().BoolVar(&deep, `deep`, false, `Update all dependency packages.`)
+
+	return cmd
 }

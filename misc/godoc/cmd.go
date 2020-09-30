@@ -9,22 +9,14 @@ func Cmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `godoc`,
 		Short: `The godoc server on local machine.`,
+		RunE:  release.NoArgCall(run),
 	}
-	cmd.AddCommand(runCmd())
 	cmd.AddCommand(deployCmd())
 	cmd.AddCommand(rmDeployCmd())
 	cmd.AddCommand(accessCmd())
 	cmd.AddCommand(shellCmd())
 	cmd.AddCommand(psCmd())
 	return cmd
-}
-
-func runCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   `run`,
-		Short: `Run the godoc server using nohup.`,
-		RunE:  release.NoArgCall(run),
-	}
 }
 
 func deployCmd() *cobra.Command {
