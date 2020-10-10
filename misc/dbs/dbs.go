@@ -12,7 +12,7 @@ import (
 
 func Psql(env, key string, printCmd bool) error {
 	url := dburl.Parse(getDbUrl(env, `postgres`, key)).URL.String()
-	command := fmt.Sprintf("PAGER=less LESS='-iFMSXx4' psql '%s'", url)
+	command := fmt.Sprintf("PAGER='less -iFMSXx4' psql '%s'", url)
 	if printCmd {
 		fmt.Println(command)
 		return nil
