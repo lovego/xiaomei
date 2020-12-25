@@ -8,7 +8,7 @@ import (
 	"github.com/lovego/errs"
 	"github.com/lovego/goa"
 	"github.com/lovego/tracer"
-	"{{ .ProPath }}/helpers"
+	"{{ .ProPath }}/middlewares/helpers"
 )
 
 func Setup(router *goa.Router)  {
