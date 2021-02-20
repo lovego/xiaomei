@@ -11,7 +11,7 @@ import (
 	"github.com/lovego/errs"
 	"github.com/lovego/goa"
 	"github.com/lovego/tracer"
-	"{{ .ProPath }}/middlewares/helpers"
+	"{{ .ModulePath }}/middlewares/helpers"
 )
 
 func Filter(c *goa.Context) {

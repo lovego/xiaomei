@@ -8,9 +8,9 @@ import (
 	"github.com/lovego/goa"
 	"github.com/lovego/goa/server"
 	"github.com/lovego/goa/utilroutes"
-	"{{ .ProPath }}/middlewares"
-	"{{ .ProPath }}/routes"
-	// "{{ .ProPath }}/tasks"
+	"{{ .ModulePath }}/middlewares"
+	"{{ .ModulePath }}/routes"
+	// "{{ .ModulePath }}/tasks"
 )
 
 func main() {

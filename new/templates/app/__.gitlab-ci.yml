@@ -45,7 +45,7 @@ test:
   stage: deploy
   environment:
     name: $CI_COMMIT_REF_NAME
-    url: https://{{ .ProNameUrlSafe }}.api.$CI_ENVIRONMENT_NAME.{{ .Domain }}
+    url: https://$CI_ENVIRONMENT_NAME-{{ .Domain }}
   script:
 #   - xiaomei psql create $CI_ENVIRONMENT_NAME
     - xiaomei app deploy $CI_ENVIRONMENT_NAME -Wb "docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY"
@@ -72,7 +72,7 @@ deploy-production:
     variables: [ '$CI_COMMIT_REF_NAME == "master"' ]
   environment:
     name: production
-    url: https://{{ .ProNameUrlSafe }}.api.{{ .Domain }}
+    url: https://{{ .Domain }}
   tags:
     - shell-xiaomei-production  # match shell runner for production that has xiaomei command.
   when: manual
@@ -80,6 +80,6 @@ deploy-production:
 
 before_script:
   - buildDir=$(pwd); echo $buildDir
-  - projectDir=$(go env GOPATH)/src/{{ .ProPath }}; echo $projectDir
+  - projectDir=$(go env GOPATH)/src/{{ .ModulePath }}; echo $projectDir
   - mkdir -p $(dirname $projectDir); ln -sfT $buildDir $projectDir; cd $projectDir
 

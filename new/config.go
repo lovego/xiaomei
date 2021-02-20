@@ -6,53 +6,42 @@ import (
 	"errors"
 	"path/filepath"
 	"strings"
-
-	"github.com/lovego/fs"
 )
 
 type Config struct {
 	ProName        string
-	ProPath        string
 	ProNameUrlSafe string
-	Domain         string
 	Registry       string
 	RepoPrefix     string
+	ModulePath     string
+	Domain         string
 }
 
-func getConfig(typ, dir, registry, domain string) (*Config, error) {
-	var proName = filepath.Base(dir)
-	var proPath string
-	if typ == `app` {
-		var err error
-		if proPath, err = getProjectPath(dir); err != nil {
-			return nil, err
-		}
+func getConfig(typ, projectPath, registry, domain string) (*Config, error) {
+	var proName = filepath.Base(projectPath)
+	if proName == `` {
+		return nil, errors.New(`project name can't be empty.`)
+	}
+	if registry != "" && registry[len(registry)-1] != '/' {
+		registry += "/"
 	}
 
 	config := &Config{
 		ProName:        proName,
 		ProNameUrlSafe: strings.Replace(proName, `_`, `-`, -1),
-		ProPath:        proPath,
-		Domain:         domain,
 		Registry:       registry,
 	}
 	if i := strings.IndexByte(registry, '/'); i > 0 {
 		config.RepoPrefix = strings.TrimSuffix(registry[i:], "/")
 	}
+	switch typ {
+	case `app`:
+		config.ModulePath = projectPath
+	case `logc`:
+		config.Domain = domain
+	}
 
 	return config, nil
-}
-
-func getProjectPath(dir string) (string, error) {
-	srcPath := fs.GetGoSrcPath()
-	proPath, err := filepath.Rel(srcPath, dir)
-	if err != nil {
-		return ``, err
-	}
-	if proPath[0] == '.' {
-		return ``, errors.New(`project dir must be under ` + srcPath + "\n")
-	}
-	return proPath, nil
 }
 
 // 32 byte hex string

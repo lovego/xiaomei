@@ -3,7 +3,7 @@ package middlewares
 import (
 	"github.com/lovego/goa"
 	"github.com/lovego/tracer"
-	"{{ .ProPath }}/middlewares/helpers"
+	"{{ .ModulePath }}/middlewares/helpers"
 )
 
 func SessionParse(c *goa.Context) {

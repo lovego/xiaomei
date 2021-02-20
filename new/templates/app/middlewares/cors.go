@@ -2,9 +2,7 @@ package middlewares
 
 import (
 	"net/url"
-	"strings"
 
-	"github.com/lovego/config"
 	"github.com/lovego/goa/middlewares"
 )
 
@@ -16,5 +14,5 @@ func allowOrigin(origin string) bool {
 		return false
 	}
 	hostname := u.Hostname()
-	return strings.HasSuffix(hostname, config.Domain()) || hostname == `localhost`
+	return hostname == `localhost`
 }

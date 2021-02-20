@@ -8,7 +8,7 @@ variables:
   stage: deploy
   environment:
     name: $CI_COMMIT_REF_NAME
-    url: https://{{ .ProNameUrlSafe }}.$CI_ENVIRONMENT_NAME.{{ .Domain }}
+    url: https://$CI_ENVIRONMENT_NAME-{{ .Domain }}
   script:
     - npm install
     - npm run build
@@ -36,7 +36,7 @@ deploy-production:
     variables: [ '$CI_COMMIT_REF_NAME == "master"' ]
   environment:
     name: production
-    url: https://{{ .ProNameUrlSafe }}.{{ .Domain }}
+    url: https://{{ .Domain }}
   tags:
     - shell-xiaomei-production # match shell runner for production that has xiaomei command.
   when: manual

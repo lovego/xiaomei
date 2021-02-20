@@ -5,15 +5,9 @@
 [![coverage report]({{ .RepoPrefix }}/{{.ProNameUrlSafe}}/badges/master/coverage.svg)]({{ .RepoPrefix }}/{{.ProNameUrlSafe}}/commits/master)
 
 ### 地址说明
-| 环境         | 地址                                                         |
-| ------------ | ------------------------------------------------------------ |
-| QA           | https://{{.ProNameUrlSafe}}.api.qa.{{ .Domain }}             |
-| QA2          | https://{{.ProNameUrlSafe}}.api.qa2.{{ .Domain }}            |
-| Production   | https://{{.ProNameUrlSafe}}.api.{{ .Domain }}                |
+| 环境         | 地址                                 |
+| ------------ | ------------------------------------ |
+| QA           | https://qa-{{ .Domain }}             |
+| Preview      | https://preview-{{ .Domain }}        |
+| Production   | https://{{ .Domain }}                |
 
-
-# 模块1接口列表
-- [样例接口](routes/example-api-doc.md)
-
-# 模块2接口列表
-- [样例接口](routes/example-api-doc.md)

@@ -3,9 +3,10 @@ package release
 import (
 	"log"
 	"os"
-	"path"
 	"path/filepath"
+	"strings"
 
+	"github.com/lovego/cmd"
 	"github.com/lovego/fs"
 )
 
@@ -40,25 +41,13 @@ func detectRoot() string {
 	return *theRoot
 }
 
-// package import path
-func Path() string {
-	proDir := path.Join(Root(), `../`)
-
-	if !filepath.IsAbs(proDir) {
-		var err error
-		if proDir, err = filepath.Abs(proDir); err != nil {
-			panic(err)
-		}
-	}
-
-	srcPath := fs.GetGoSrcPath()
-
-	proPath, err := filepath.Rel(srcPath, proDir)
+func ModulePath() (string, error) {
+	output, err := cmd.Run(cmd.O{
+		Output: true,
+		Dir:    Root(),
+	}, `go`, `list`, `.`)
 	if err != nil {
-		panic(err)
+		return ``, err
 	}
-	if proPath[0] == '.' {
-		panic(`project dir must be under ` + srcPath + "\n")
-	}
-	return proPath
+	return strings.TrimSpace(output), nil
 }

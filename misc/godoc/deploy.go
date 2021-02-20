@@ -2,14 +2,22 @@ package godoc
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/fatih/color"
 	"github.com/lovego/cmd"
+	"github.com/lovego/xiaomei/misc/utils"
 )
 
 func run() error {
+	if nullDevice, err := os.OpenFile(`/dev/null`, os.O_WRONLY, 0); err != nil {
+		return err
+	} else if !cmd.Ok(cmd.O{Stdout: nullDevice}, `which`, `godoc`) {
+		if err := utils.GoGetMod("golang.org/x/tools/..."); err != nil {
+			return err
+		}
+	}
 	script := `
-which godoc > /dev/null || GOPROXY="https://goproxy.cn,direct" GO111MODULE="on" go get -v golang.org/x/tools/...
 killall godoc >/dev/null 2>&1
 nohup godoc -http=:1234 -index_interval=1s >/dev/null 2>&1 &
 `

@@ -17,9 +17,12 @@ func depsCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   `deps`,
 		Short: "List dependence packages.",
-		Run: func(c *cobra.Command, args []string) {
-			deps := getDeps(inVendor, excludeTest)
-			fmt.Println(strings.Join(deps, "\n"))
+		RunE: func(c *cobra.Command, args []string) error {
+			deps, err := getDeps(inVendor, excludeTest)
+			if err == nil {
+				fmt.Println(strings.Join(deps, "\n"))
+			}
+			return err
 		},
 	}
 	cmd.Flags().BoolVarP(&inVendor, `in-vendor`, `v`, false, `list dependences in vendor dir.`)
@@ -27,11 +30,15 @@ func depsCmd() *cobra.Command {
 	return cmd
 }
 
-func getDeps(inVendor, excludeTest bool) (deps []string) {
+func getDeps(inVendor, excludeTest bool) (deps []string, err error) {
+	modulePath, err := release.ModulePath()
+	if err != nil {
+		return nil, err
+	}
+
 	pkgs := getDepPkgs(excludeTest)
 
-	projectPath := release.Path()
-	vendorPath := path.Join(projectPath, `vendor`)
+	vendorPath := path.Join(modulePath, `vendor`)
 
 	if inVendor {
 		for _, pkg := range pkgs {
@@ -41,7 +48,7 @@ func getDeps(inVendor, excludeTest bool) (deps []string) {
 		}
 	} else {
 		for _, pkg := range pkgs {
-			if strings.Contains(pkg, `.`) && !strings.HasPrefix(pkg, projectPath) {
+			if strings.Contains(pkg, `.`) && !strings.HasPrefix(pkg, modulePath) {
 				deps = append(deps, pkg)
 			}
 		}
