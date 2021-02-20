@@ -3,7 +3,6 @@ package new
 import (
 	"fmt"
 	"path/filepath"
-	"sort"
 
 	"github.com/lovego/cmd"
 	"github.com/lovego/fs"
@@ -11,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func Cmd() *cobra.Command {
+func Cmd(moduleVersion string) *cobra.Command {
 	var typ, domain string
 	var force bool
 	cmd := &cobra.Command{
@@ -26,7 +25,7 @@ registry: Docker registry url for images of the project, required.  `,
 			if len(args) != 2 {
 				return fmt.Errorf(`exactly 2 arguments required.`)
 			}
-			return New(typ, args[0], args[1], domain, force)
+			return New(moduleVersion, typ, args[0], args[1], domain, force)
 		},
 	}
 	cmd.Flags().StringVarP(&typ, `type`, `t`, `app`, `project type.
@@ -40,12 +39,12 @@ logc: only service that collect logs to ElasticSearch.
 	return cmd
 }
 
-func New(typ, projectDir, registry, domain string, force bool) error {
+func New(moduleVersion, typ, projectDir, registry, domain string, force bool) error {
 	config, err := getConfig(typ, projectDir, registry, domain)
 	if err != nil {
 		return err
 	}
-	templateDir, err := getTemplateDir(typ)
+	templateDir, err := getTemplateDir(moduleVersion, typ)
 	if err != nil {
 		return err
 	}
@@ -61,27 +60,19 @@ func New(typ, projectDir, registry, domain string, force bool) error {
 	return nil
 }
 
-func getTemplateDir(typ string) (string, error) {
-	modulePath := filepath.Join(fs.GoModPath(), `github.com`, `lovego`, `xiaomei`)
-	dirs, err := filepath.Glob(modulePath + `@*`)
-	if err != nil {
-		return ``, err
-	}
-	if len(dirs) == 0 {
-		if err := utils.GoGetMod(`github.com/lovego/xiaomei`); err != nil {
+func getTemplateDir(moduleVersion, typ string) (string, error) {
+	moduleDir := filepath.Join(fs.GoModPath(), `github.com`, `lovego`, `xiaomei`+`@`+moduleVersion)
+	if !fs.IsDir(moduleDir) {
+		module := `github.com/lovego/xiaomei` + `@` + moduleVersion
+		fmt.Println(module, `download...`)
+		if err := utils.GoGetMod(module); err != nil {
 			return ``, err
 		}
-		if dirs, err = filepath.Glob(modulePath + `@*`); err != nil {
-			return ``, err
-		}
-		if len(dirs) == 0 {
-			return ``, fmt.Errorf("no xiaomei module found at %s.", modulePath)
+		if fs.IsDir(moduleDir) {
+			return ``, fmt.Errorf("no xiaomei module found at %s.", moduleDir)
 		}
 	}
-	sort.Strings(dirs)
-	latest := dirs[len(dirs)-1]
-
-	return filepath.Join(latest, `new`, `_templates`, typ), nil
+	return filepath.Join(moduleDir, `new`, `_templates`, typ), nil
 }
 
 func initProject(projectDir string) error {

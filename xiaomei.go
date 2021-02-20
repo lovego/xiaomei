@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -15,7 +16,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const version = `21.2.20`
+const moduleVersion = `v0.0.3`
 
 func main() {
 	color.NoColor = false
@@ -26,7 +27,7 @@ func main() {
 	}
 	root.PersistentFlags().SortFlags = false
 
-	root.AddCommand(new.Cmd())
+	root.AddCommand(new.Cmd(moduleVersion))
 	root.AddCommand(access.Cmd())
 	root.AddCommand(services.Cmds()...)
 	root.AddCommand(misc.Cmds(root)...)
@@ -42,7 +43,7 @@ func versionCmd() *cobra.Command {
 		Use:   `version`,
 		Short: `Show xiaomei version.`,
 		RunE: release.NoArgCall(func() error {
-			fmt.Println(`xiaomei version ` + version)
+			fmt.Println(`xiaomei ` + moduleVersion)
 			return nil
 		}),
 	}
@@ -50,16 +51,26 @@ func versionCmd() *cobra.Command {
 
 func updateCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   `update`,
-		Short: `Update to lastest version.`,
-		RunE: release.NoArgCall(func() error {
-			fmt.Println(`current version ` + version)
-			if err := utils.GoGetMod(`-u`, `github.com/lovego/xiaomei`); err != nil {
+		Use:     `update [version]`,
+		Short:   `Update to lastest version.`,
+		Example: `xiaomei update v0.0.3`,
+		RunE: func(c *cobra.Command, args []string) error {
+			target := `github.com/lovego/xiaomei`
+			switch len(args) {
+			case 0:
+			case 1:
+				target += `@` + args[0]
+			default:
+				return errors.New(`more than one arguments given.`)
+			}
+
+			fmt.Println(`current version ` + moduleVersion)
+			if err := utils.GoGetMod(`-u`, target); err != nil {
 				return err
 			}
 			_, err := cmd.Run(cmd.O{}, `xiaomei`, `version`)
 			return err
-		}),
+		},
 	}
 
 	return cmd
