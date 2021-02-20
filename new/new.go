@@ -76,5 +76,5 @@ func getTemplateDir(typ string) (string, error) {
 	sort.Strings(dirs)
 	latest := dirs[len(dirs)-1]
 
-	return filepath.Join(latest, `new`, `templates`, typ), nil
+	return filepath.Join(latest, `new`, `_templates`, typ), nil
 }
