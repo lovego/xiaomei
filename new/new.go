@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"sort"
 
+	"github.com/lovego/cmd"
 	"github.com/lovego/fs"
 	"github.com/lovego/xiaomei/misc/utils"
 	"github.com/spf13/cobra"
@@ -14,9 +15,9 @@ func Cmd() *cobra.Command {
 	var typ, domain string
 	var force bool
 	cmd := &cobra.Command{
-		Use: `new <project path> <registry> [flags]
+		Use: `new <project dir> <registry> [flags]
 
-project path: Go module path or directory path for the project, required. The last element of project path is used as project name.
+project dir: Go module path or directory for the project, required. The last element of project path is used as project name.
 registry: Docker registry url for images of the project, required.  `,
 		Short:   `Create a new project.`,
 		Example: `  xiaomei new accounts registry.abc.com/go -d accounts.abc.com`,
@@ -39,8 +40,8 @@ logc: only service that collect logs to ElasticSearch.
 	return cmd
 }
 
-func New(typ, projectPath, registry, domain string, force bool) error {
-	config, err := getConfig(typ, projectPath, registry, domain)
+func New(typ, projectDir, registry, domain string, force bool) error {
+	config, err := getConfig(typ, projectDir, registry, domain)
 	if err != nil {
 		return err
 	}
@@ -48,12 +49,16 @@ func New(typ, projectPath, registry, domain string, force bool) error {
 	if err != nil {
 		return err
 	}
-	projectDir := projectPath
-	if typ == "app" {
-		projectDir = filepath.Base(projectPath)
-	}
 
-	return walk(templateDir, projectDir, config, force)
+	if err := walk(templateDir, projectDir, config, force); err != nil {
+		return err
+	}
+	if typ == `app` {
+		if err := initProject(projectDir); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func getTemplateDir(typ string) (string, error) {
@@ -77,4 +82,15 @@ func getTemplateDir(typ string) (string, error) {
 	latest := dirs[len(dirs)-1]
 
 	return filepath.Join(latest, `new`, `_templates`, typ), nil
+}
+
+func initProject(projectDir string) error {
+	o := cmd.O{Dir: projectDir}
+	if _, err := cmd.Run(o, `go`, `mod`, `init`, projectDir); err != nil {
+		return err
+	}
+	if _, err := cmd.Run(o, `go`, `mod`, `vendor`); err != nil {
+		return err
+	}
+	return nil
 }

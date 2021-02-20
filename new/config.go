@@ -17,8 +17,8 @@ type Config struct {
 	Domain         string
 }
 
-func getConfig(typ, projectPath, registry, domain string) (*Config, error) {
-	var proName = filepath.Base(projectPath)
+func getConfig(typ, projectDir, registry, domain string) (*Config, error) {
+	var proName = filepath.Base(projectDir)
 	if proName == `` {
 		return nil, errors.New(`project name can't be empty.`)
 	}
@@ -36,7 +36,7 @@ func getConfig(typ, projectPath, registry, domain string) (*Config, error) {
 	}
 	switch typ {
 	case `app`:
-		config.ModulePath = projectPath
+		config.ModulePath = projectDir
 	case `logc`:
 		config.Domain = domain
 	}

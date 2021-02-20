@@ -25,7 +25,10 @@ require (
 	github.com/lovego/structs v0.0.0-20210207031546-7db08510750d // indirect
 	github.com/lovego/tracer v0.0.0-20200207073659-f9fecb73b19f
 	github.com/mattn/go-runewidth v0.0.10 // indirect
+	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
+	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/cobra v1.1.3
+	golang.org/x/sys v0.0.0-20210219172841-57ea560cfca1 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 )
