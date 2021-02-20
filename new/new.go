@@ -19,7 +19,7 @@ func Cmd() *cobra.Command {
 project path: Go module path or directory path for the project, required. The last element of project path is used as project name.
 registry: Docker registry url for images of the project, required.  `,
 		Short:   `Create a new project.`,
-		Example: `  xiaomei new accounts registry.abc.com/go abc.com`,
+		Example: `  xiaomei new accounts registry.abc.com/go -d accounts.abc.com`,
 		// DisableFlagsInUseLine: true,
 		RunE: func(c *cobra.Command, args []string) error {
 			if len(args) != 2 {
