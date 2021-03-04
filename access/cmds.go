@@ -7,7 +7,7 @@ import (
 
 const sudoTip = `
 The user must be permitted to run some commands with sudo. A line like this in /etc/sudoers may work:
-  USERNAME ALL=NOPASSWD: /bin/tee, /bin/mkdir, /usr/sbin/nginx -t, /bin/systemctl reload nginx`
+  USERNAME ALL=NOPASSWD: /bin/tee, /bin/mkdir, /usr/sbin/nginx -t, /usr/sbin/nginx -s reload`
 
 // access commands
 func Cmd() *cobra.Command {
@@ -26,8 +26,8 @@ func Cmd() *cobra.Command {
 func accessSetupCmd() *cobra.Command {
 	var filter string
 	cmd := &cobra.Command{
-		Use:   `setup [<env>] [flags]` + sudoTip,
-		Short: `Setup access config for the project.`,
+		Use:                   `setup [<env>] [flags]` + sudoTip,
+		Short:                 `Setup access config for the project.`,
 		DisableFlagsInUseLine: true,
 		RunE: release.EnvCall(func(env string) error {
 			return SetupNginx(env, filter, "")
@@ -40,8 +40,8 @@ func accessSetupCmd() *cobra.Command {
 func accessReloadCmd() *cobra.Command {
 	var filter string
 	cmd := &cobra.Command{
-		Use:   `reload [<env>] [flags]` + sudoTip,
-		Short: `Reload access config for the project.`,
+		Use:                   `reload [<env>] [flags]` + sudoTip,
+		Short:                 `Reload access config for the project.`,
 		DisableFlagsInUseLine: true,
 		RunE: release.EnvCall(func(env string) error {
 			return ReloadNginx(env, filter)

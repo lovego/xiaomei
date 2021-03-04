@@ -40,7 +40,7 @@ server {
 ```
 使用`xiaomei access setup`命令则可以将Nginx配置写到接入层机器的`/etc/nginx/sites-enabled/<domain>`这个文件内，并且重新加载Nginx配置。
 1. release/clusters.yml文件中`labels.access`为`true`的机器就是需要配置接入层的机器。
-2. 重新加载Nginx配置通过执行 `sudo systemctl reload nginx` 或 `sudo service nginx reload` 命令来完成，因此`xiaomei access setup`是只支持Linux系统的。
+2. 重新加载Nginx配置通过执行 `sudo nginx -s reload` 命令来完成。
 3. Ubuntu的Nginx的主配置文件默认包含`include /etc/nginx/sites-enabled/*;`这条配置，所以/etc/nginx/sites-enabled目录下的所有配置文件都会生效。其他Linux发行版，如果没有这条配置，需要自行添加。
 4. 其中`<domain>`代表项目的域名，在release/img-app/config/config.yml配置文件中配置。
 
