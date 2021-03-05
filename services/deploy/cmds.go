@@ -24,14 +24,20 @@ func deployCmdFor(svcName string) *cobra.Command {
 	}
 	cmd.Flags().BoolVar(&d.noPullBaseImage, `no-pull`, false,
 		`Don't pull base image when building image.`)
-	cmd.Flags().BoolVar(&d.noPushImageIfLocal, `no-push`, false,
+	cmd.Flags().BoolVar(&d.noPushImageIfLocal, `no-push-if-local`, false,
 		`Don't push the built images to registry if deploying cluster is local machine.`)
 	cmd.Flags().StringVarP(&d.filter, `filter`, `f`, ``, `Filter the node to deploy to by node addr.`)
 
 	cmd.Flags().StringVarP(&d.beforeScript, `before-script`, `b`, ``,
-		`Script to execute before deploy on every node.`)
+		`Script to be executed on:
+  1. This local machine at the very beginning of the deployment.
+  2. Every node in the cluster before deployment on the node.
+If this local machine is also a node in the cluster, and the
+before-script is aready executed by the "1" step, it won't be
+executed by the "2" step again.`)
 	cmd.Flags().BoolVarP(&d.noBeforeScriptOnLocal, `no-before-script-on-local`, `B`, false,
-		`Don't run before-script on this local machine at the very beginning of the deployment.`)
+		`Don't run before-script on this local machine at the very beginning of the deployment(the "1" step).`)
+
 	cmd.Flags().BoolVarP(&d.noWatch, `no-watch`, `W`, false,
 		`After deployed a node, don't watch container status until "Ctl+C".`)
 	return cmd
