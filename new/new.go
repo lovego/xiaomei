@@ -68,7 +68,7 @@ func getTemplateDir(moduleVersion, typ string) (string, error) {
 		if err := utils.GoGetMod(module); err != nil {
 			return ``, err
 		}
-		if fs.IsDir(moduleDir) {
+		if !fs.IsDir(moduleDir) {
 			return ``, fmt.Errorf("no xiaomei module found at %s.", moduleDir)
 		}
 	}
