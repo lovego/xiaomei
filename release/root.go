@@ -44,7 +44,7 @@ func detectRoot() string {
 func ModulePath() (string, error) {
 	output, err := cmd.Run(cmd.O{
 		Output: true,
-		Dir:    Root(),
+		Dir:    filepath.Dir(Root()),
 	}, `go`, `list`, `.`)
 	if err != nil {
 		return ``, err
