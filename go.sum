@@ -129,8 +129,8 @@ github.com/lovego/duration v0.0.0-20200802140436-42c773e4fb38 h1:CMDJi86iyRiMnxt
 github.com/lovego/duration v0.0.0-20200802140436-42c773e4fb38/go.mod h1:zWeN/5zaL2SMyp1FLYjJ4zf8el6OXmcvbj0ydMEnIb8=
 github.com/lovego/errs v0.0.0-20200914124519-002655aaf593 h1:r7226H6FsObjjedOSIVC8iF0ueJBObYsF8oukgAQ6m0=
 github.com/lovego/errs v0.0.0-20200914124519-002655aaf593/go.mod h1:FfIOS6S5g1NZl4X4jGnY5DifiOaKOpv4N9wZXUKej8k=
-github.com/lovego/fs v0.0.0-20210219095352-ea9961438fb2 h1:qLt55uhpFrT/MP0ZY2NbCKTZGC7X7MVza1ggRz3XqYw=
-github.com/lovego/fs v0.0.0-20210219095352-ea9961438fb2/go.mod h1:eC1n8ssR/jjoWsdF3tuoWpf6zN4i9pErNdkpz7qysOQ=
+github.com/lovego/fs v0.0.1 h1:YaOX/k1nE/Iqw7aUbWyvz9Zwu1xBTLCvZSjnhvt4W/8=
+github.com/lovego/fs v0.0.1/go.mod h1:rn6mRqNaC3noNNdckmOH0h9uvcka9JNvk1KbgZyh47Q=
 github.com/lovego/httputil v0.0.0-20200817134008-d1c7bdde2274 h1:hm/Aew/yhyZFO7C3hZszvyNbBGIXwvsIvJsCCfi+NiA=
 github.com/lovego/httputil v0.0.0-20200817134008-d1c7bdde2274/go.mod h1:Jk8nGiyQDOUBCgojjxBjGvlh3FQtBilgK2fXWc7TfWQ=
 github.com/lovego/maps v0.0.0-20190404131308-5c14106deb1f h1:ddyIZqaD9In5hDtB5eDgUr04JjBp0cpN3XPzS22kREc=

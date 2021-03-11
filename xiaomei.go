@@ -16,7 +16,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const moduleVersion = `v0.0.4`
+const moduleVersion = `v0.0.6`
+const fullVersion = moduleVersion + ` 20210311`
 
 func main() {
 	color.NoColor = false
@@ -43,7 +44,7 @@ func versionCmd() *cobra.Command {
 		Use:   `version`,
 		Short: `Show xiaomei version.`,
 		RunE: release.NoArgCall(func() error {
-			fmt.Println(`xiaomei ` + moduleVersion)
+			fmt.Println(`xiaomei ` + fullVersion)
 			return nil
 		}),
 	}
@@ -64,7 +65,7 @@ func updateCmd() *cobra.Command {
 				return errors.New(`more than one arguments given.`)
 			}
 
-			fmt.Println(`current version ` + moduleVersion)
+			fmt.Println(`current version ` + fullVersion)
 			if err := utils.GoGetMod(`-u`, target); err != nil {
 				return err
 			}

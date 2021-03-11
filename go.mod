@@ -15,7 +15,7 @@ require (
 	github.com/lovego/dsn v0.0.0-20171124113204-c554b7604c74
 	github.com/lovego/duration v0.0.0-20200802140436-42c773e4fb38 // indirect
 	github.com/lovego/errs v0.0.0-20200914124519-002655aaf593 // indirect
-	github.com/lovego/fs v0.0.0-20210219095352-ea9961438fb2
+	github.com/lovego/fs v0.0.1
 	github.com/lovego/httputil v0.0.0-20200817134008-d1c7bdde2274
 	github.com/lovego/maps v0.0.0-20190404131308-5c14106deb1f // indirect
 	github.com/lovego/sessions v0.0.0-20200506092438-73b3ac90c80a

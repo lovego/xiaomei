@@ -43,12 +43,12 @@ func copyFile(src, dst string, info os.FileInfo, config *Config, force bool) err
 
 	if isTmpl {
 		if content, err := renderTmpl(src, config); err == nil {
-			return ioutil.WriteFile(dst, content, info.Mode())
+			return ioutil.WriteFile(dst, content, 0644)
 		} else {
 			return err
 		}
 	}
-	return fs.Copy(src, dst)
+	return fs.CopyWithMode(src, dst, 0644)
 }
 
 func renderTmpl(tmplPath string, config *Config) ([]byte, error) {
