@@ -32,11 +32,11 @@ deploy-preview:
 
 deploy-production:
   extends: .deploy
-  only:
-    variables: [ '$CI_COMMIT_REF_NAME == "master"' ]
   environment:
     name: production
     url: https://{{ .Domain }}
+  only:
+    variables: [ '$CI_COMMIT_REF_NAME == "master"' ]
   tags:
     - shell-xiaomei-production # match shell runner for production that has xiaomei command.
   when: manual
