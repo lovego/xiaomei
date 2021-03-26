@@ -3,8 +3,11 @@ package main
 import (
 	_ "github.com/lovego/config/init" // this package must be the first.
 
+	"os"
+	"path/filepath"
 	"runtime"
 
+	"github.com/lovego/fs"
 	"github.com/lovego/goa"
 	"github.com/lovego/goa/server"
 	"github.com/lovego/goa/utilroutes"
@@ -25,6 +28,11 @@ func main() {
 	utilroutes.Setup(router)
 	router.Use(middlewares.Filter)
 
+	if os.Getenv("GOA_DOC") != `` {
+		router.DocDir(filepath.Join(fs.SourceDir(), "docs", "apis"))
+		routes.Setup(router)
+		return
+	}
 	routes.Setup(router)
 
 	// tasks.Start()
