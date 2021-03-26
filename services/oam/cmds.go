@@ -86,6 +86,10 @@ func logsCmdFor(svcName string) *cobra.Command {
 			if len(args) > 0 {
 				env = args[0]
 			}
+			env, err := release.CheckEnv(env)
+			if err != nil {
+				return err
+			}
 			if len(args) > 1 {
 				options = strings.Join(args[1:], " ")
 			}
