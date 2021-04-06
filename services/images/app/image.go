@@ -4,7 +4,7 @@ type Image struct {
 }
 
 func (i Image) EnvironmentEnvVar() string {
-	return `GOENV`
+	return `GoEnv`
 }
 
 func (i Image) PortEnvVar() string {

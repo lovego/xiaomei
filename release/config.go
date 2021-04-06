@@ -61,7 +61,7 @@ func AppData(env string) strmap.StrMap {
 
 func CheckEnv(env string) (string, error) {
 	if env == `` {
-		env = os.Getenv(`GOENV`)
+		env = os.Getenv(`GoEnv`)
 	}
 	if env == `` {
 		env = `dev`

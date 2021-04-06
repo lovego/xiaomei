@@ -22,14 +22,14 @@ func ExampleDeployScript() {
 		Services: []serviceConfig{
 			{
 				Name: "app",
-				CommonArgs: "-e GOENV=production -v example-logs:/home/ubuntu/logs " +
+				CommonArgs: "-e GoEnv=production -v example-logs:/home/ubuntu/logs " +
 					"registry.example.com/example/app:production-180803-141210",
-				PortEnvVar: "GOENV",
+				PortEnvVar: "GoEnv",
 				Ports:      []uint16{3001, 4001},
 			},
 			{
 				Name: "logc",
-				CommonArgs: "-e GOENV=production -v example-logs:/home/ubuntu/example-logs " +
+				CommonArgs: "-e GoEnv=production -v example-logs:/home/ubuntu/example-logs " +
 					"registry.example.com/example/logc:production-180803-141210",
 			},
 		},
@@ -58,9 +58,9 @@ func ExampleDeployScript() {
 	//   docker logs -f $id 2>&1 | { sed '/started./q'; pkill -P $$ docker; }
 	// }
 	//
-	// args='-e GOENV=production -v example-logs:/home/ubuntu/logs registry.example.com/example/app:production-180803-141210'
-	// deploy app.3001 "$args" "GOENV" 3001
-	// deploy app.4001 "$args" "GOENV" 4001
-	// args='-e GOENV=production -v example-logs:/home/ubuntu/example-logs registry.example.com/example/logc:production-180803-141210'
+	// args='-e GoEnv=production -v example-logs:/home/ubuntu/logs registry.example.com/example/app:production-180803-141210'
+	// deploy app.3001 "$args" "GoEnv" 3001
+	// deploy app.4001 "$args" "GoEnv" 4001
+	// args='-e GoEnv=production -v example-logs:/home/ubuntu/example-logs registry.example.com/example/logc:production-180803-141210'
 	// deploy logc "$args"
 }
