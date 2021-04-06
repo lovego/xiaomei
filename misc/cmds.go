@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -33,7 +34,7 @@ func docCmd() *cobra.Command {
 			_, err := cmdPkg.Run(cmdPkg.O{
 				Dir: filepath.Dir(release.Root()),
 				Env: []string{"GOA_DOC=1"},
-			}, "go", "run", "main.go")
+			}, release.GoCmd(), "run", "main.go")
 			return err
 		},
 	}
@@ -45,14 +46,24 @@ func coverCmd() *cobra.Command {
 		Use:   `cover [package] ...`,
 		Short: `Show coverage details for packages.`,
 		RunE: func(_ *cobra.Command, args []string) error {
-			_, err := cmdPkg.Run(cmdPkg.O{}, "sh", "-c", fmt.Sprintf(`
-rm -f /tmp/go-cover.out && {
-  go test -p 1 --gcflags=-l -coverprofile /tmp/go-cover.out %s
-  test -f /tmp/go-cover.out && (($(wc -c </tmp/go-cover.out) > 10)) && {
-    go tool cover -func /tmp/go-cover.out | tail -n 1
-    go tool cover -html /tmp/go-cover.out
+			script := os.Expand(`
+rm -f /tmp/cover.out && {
+  $GoCmd test -p 1 --gcflags=-l -coverprofile /tmp/cover.out $packages
+  test -f /tmp/cover.out && (($(wc -c </tmp/cover.out) > 10)) && {
+    $GoCmd tool cover -func /tmp/cover.out | tail -n 1
+    $GoCmd tool cover -html /tmp/cover.out
   }
-}`, strings.Join(args, " ")))
+}`, func(name string) string {
+				switch name {
+				case `GoCmd`:
+					return release.GoCmd()
+				case `packages`:
+					return strings.Join(args, " ")
+				default:
+					return ``
+				}
+			})
+			_, err := cmdPkg.Run(cmdPkg.O{}, "sh", "-c", script)
 			return err
 		},
 	}
@@ -85,7 +96,7 @@ func yamlCmd() *cobra.Command {
 			return nil
 		}),
 	}
-	cmd.Flags().BoolVarP(&goSyntax, `go-syntax`, `g`, false, `print in go syntax`)
+	cmd.Flags().BoolVarP(&goSyntax, `go-syntax`, `g`, false, `print in golang syntax`)
 	return cmd
 }
 

@@ -9,7 +9,6 @@ import (
 	"github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/access"
 	"github.com/lovego/xiaomei/misc"
-	"github.com/lovego/xiaomei/misc/utils"
 	"github.com/lovego/xiaomei/new"
 	"github.com/lovego/xiaomei/release"
 	"github.com/lovego/xiaomei/services"
@@ -66,7 +65,7 @@ func updateCmd() *cobra.Command {
 			}
 
 			fmt.Println(`current version ` + fullVersion)
-			if err := utils.GoGetMod(`-u`, target); err != nil {
+			if err := release.GoGetByProxy(`-u`, target); err != nil {
 				return err
 			}
 			_, err := cmd.Run(cmd.O{}, `xiaomei`, `version`)

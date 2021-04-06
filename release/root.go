@@ -45,7 +45,7 @@ func ModulePath() (string, error) {
 	output, err := cmd.Run(cmd.O{
 		Output: true,
 		Dir:    filepath.Dir(Root()),
-	}, `go`, `list`, `.`)
+	}, GoCmd(), `list`, `.`)
 	if err != nil {
 		return ``, err
 	}

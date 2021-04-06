@@ -6,7 +6,7 @@ import (
 
 	"github.com/lovego/cmd"
 	"github.com/lovego/fs"
-	"github.com/lovego/xiaomei/misc/utils"
+	"github.com/lovego/xiaomei/release"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +19,7 @@ func Cmd(moduleVersion string) *cobra.Command {
 project dir: Go module path or directory for the project, required. The last element of project path is used as project name.
 registry: Docker registry url for images of the project, required.  `,
 		Short:   `Create a new project.`,
-		Example: `  xiaomei new accounts registry.abc.com/go -d accounts.abc.com`,
+		Example: `  xiaomei new accounts registry.abc.com/backend -d accounts.abc.com`,
 		// DisableFlagsInUseLine: true,
 		RunE: func(c *cobra.Command, args []string) error {
 			if len(args) != 2 {
@@ -65,7 +65,7 @@ func getTemplateDir(moduleVersion, typ string) (string, error) {
 	if !fs.IsDir(moduleDir) {
 		module := `github.com/lovego/xiaomei` + `@` + moduleVersion
 		fmt.Println(module, `download...`)
-		if err := utils.GoGetMod(module); err != nil {
+		if err := release.GoGetByProxy(module); err != nil {
 			return ``, err
 		}
 		if !fs.IsDir(moduleDir) {
@@ -77,10 +77,10 @@ func getTemplateDir(moduleVersion, typ string) (string, error) {
 
 func initProject(projectDir string) error {
 	o := cmd.O{Dir: projectDir}
-	if _, err := cmd.Run(o, `go`, `mod`, `init`, projectDir); err != nil {
+	if _, err := cmd.Run(o, release.GoCmd(), `mod`, `init`, projectDir); err != nil {
 		return err
 	}
-	if _, err := cmd.Run(o, `go`, `mod`, `vendor`); err != nil {
+	if _, err := cmd.Run(o, release.GoCmd(), `mod`, `vendor`); err != nil {
 		return err
 	}
 	return nil

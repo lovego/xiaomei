@@ -57,19 +57,7 @@ func compile(linuxAMD64 bool) error {
 	if linuxAMD64 && (runtime.GOOS != `linux` || runtime.GOARCH != `amd64`) {
 		o.Env = []string{`GOOS=linux`, `GOARCH=amd64`} // cross compile
 	}
-
-	var subCmd []string
-	if filepath.Base(o.Dir) == release.Name() && len(o.Env) == 0 {
-		// go install have no "-o" option, so we use GOBIN environment variable
-		// go install cannot install cross-compiled binaries when GOBIN is set
-		o.Env = []string{`GOBIN=` + filepath.Join(o.Dir, `release/img-app`)}
-		subCmd = []string{`install`, `-v`}
-	} else {
-		// after go 1.10, go build is as fast as go install.
-		// so maybe we should always use go build in the future.
-		subCmd = []string{`build`, `-i`, `-v`, `-o`, `release/img-app/` + release.Name()}
-	}
-	if cmd.Ok(o, `go`, subCmd...) {
+	if cmd.Ok(o, release.GoCmd(), `build`, `-i`, `-v`, `-o`, `release/img-app/`+release.Name()) {
 		return misc.SpecAll()
 	}
 	return errors.New(`compile the app binary failed.`)

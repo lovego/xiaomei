@@ -60,7 +60,7 @@ func getDeps(inVendor, excludeTest bool) (deps []string, err error) {
 func getDepPkgs(excludeTest bool) []string {
 	o := cmd.O{Output: true, Dir: path.Join(release.Root(), `../`)}
 	result, err := cmd.Run(
-		o, `go`, `list`, `-f`, `{{join .Deps "\n"}}`,
+		o, release.GoCmd(), `list`, `-f`, `{{join .Deps "\n"}}`,
 	)
 	if err != nil {
 		log.Panic(err)
@@ -69,7 +69,7 @@ func getDepPkgs(excludeTest bool) []string {
 
 	if !excludeTest {
 		result, err := cmd.Run(
-			o, `go`, `list`, `-f`, `{{join .TestImports "\n"}}`, `./models/...`,
+			o, release.GoCmd(), `list`, `-f`, `{{join .TestImports "\n"}}`, `./models/...`,
 		)
 		if err != nil {
 			log.Panic(err)

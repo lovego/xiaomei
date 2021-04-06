@@ -48,7 +48,7 @@ func Spec(targets []string, onlyChanged bool) error {
 	}
 
 	if !cmd.Ok(cmd.O{NoStdout: true}, `which`, `gospec`) {
-		cmd.Run(cmd.O{Panic: true}, `go`, `get`, `-v`, `github.com/lovego/gospec`)
+		release.GoGetByProxy(`github.com/lovego/gospec`)
 	}
 
 	if cmd.Ok(cmd.O{}, `gospec`, targets...) {

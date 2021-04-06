@@ -23,7 +23,7 @@ server {
     location / {
         proxy_pass http://{{ .DeployName }}-app;
     }
-    location ^~ /_debug/ {
+    location ^~ /_debug {
         auth_basic 'auth';
         auth_basic_user_file /etc/nginx/.htpasswd;
         proxy_pass http://{{ .DeployName }}-app;
