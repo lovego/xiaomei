@@ -19,7 +19,7 @@ require (
 	github.com/lovego/httputil v0.0.0-20200817134008-d1c7bdde2274
 	github.com/lovego/maps v0.0.0-20190404131308-5c14106deb1f // indirect
 	github.com/lovego/sessions v0.0.0-20200506092438-73b3ac90c80a
-	github.com/lovego/slice v0.0.0-20201119035147-20974b063233
+	github.com/lovego/slice v0.0.5
 	github.com/lovego/strmap v0.0.0-20190329135032-007683ae22da
 	github.com/lovego/struct_tag v0.0.0-20200821111615-1a11055a2d31 // indirect
 	github.com/lovego/structs v0.0.0-20210207031546-7db08510750d // indirect

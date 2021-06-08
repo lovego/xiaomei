@@ -38,8 +38,8 @@ func (i Image) DefaultPort() uint16 {
 	return 0
 }
 
-// 4. options for run
-func (i Image) OptionsForRun() []string {
+// 4. flags for run
+func (i Image) FlagsForRun() []string {
 	if img, ok := i.image.(interface {
 		OptionsForRun() []string
 	}); ok {
@@ -49,11 +49,11 @@ func (i Image) OptionsForRun() []string {
 }
 
 // 5. prepare files for build
-func (i Image) prepare() error {
+func (i Image) prepare(flags []string) error {
 	if img, ok := i.image.(interface {
-		Prepare() error
+		Prepare(flags []string) error
 	}); ok {
-		return img.Prepare()
+		return img.Prepare(flags)
 	}
 	return nil
 }

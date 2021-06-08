@@ -15,7 +15,7 @@ func genCmd() *cobra.Command {
 		Use: `gen <env> <content> [flags]
 <content> can be any string, but generally it may be a json encoded string`,
 		DisableFlagsInUseLine: true,
-		Short: `generate a token. (add a signature to a content and encode it)`,
+		Short:                 `generate a token. (add a signature to a content and encode it)`,
 		RunE: release.Env1Call(func(env, content string) error {
 			ck := release.AppConf(env).HttpCookie()
 			if domain != `` {

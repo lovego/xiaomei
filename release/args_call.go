@@ -3,6 +3,7 @@ package release
 import (
 	"errors"
 
+	"github.com/lovego/slice"
 	"github.com/spf13/cobra"
 )
 
@@ -71,15 +72,46 @@ func Env1Call(work func(string, string) error) cmdFunc {
 	}
 }
 
+// optional env, and optional signle argument slice seperated by "--"
 func EnvSliceCall(work func(string, []string) error) cmdFunc {
 	return func(c *cobra.Command, args []string) error {
-		if len(args) < 2 {
-			return errors.New(`at leaset two arguments required.`)
-		}
-		if env, err := CheckEnv(args[0]); err == nil {
-			return work(env, args[1:])
-		} else {
+		env, args, lenBeforeDash, err := stripEnv(c, args)
+		if err != nil {
 			return err
 		}
+		if lenBeforeDash != 0 {
+			return errors.New("invalid arguments usage.")
+		}
+		return work(env, args)
 	}
+}
+
+// optional env, and optional multiple argument slices seperated by "--"
+func EnvSlicesCall(work func(string, [][]string) error) cmdFunc {
+	return func(c *cobra.Command, args []string) error {
+		env, args, lenBeforeDash, err := stripEnv(c, args)
+		if err != nil {
+			return err
+		}
+		return work(env, append(
+			[][]string{args[:lenBeforeDash]},
+			slice.SplitString(args[lenBeforeDash:], "--")...,
+		))
+	}
+}
+
+func stripEnv(c *cobra.Command, args []string) (string, []string, int, error) {
+	lenBeforeDash := c.Flags().ArgsLenAtDash() // pflag removed the first "--"
+	if lenBeforeDash < 0 {
+		lenBeforeDash = len(args)
+	}
+
+	var env string
+	if lenBeforeDash > 0 {
+		env = args[0]
+		args = args[1:]
+		lenBeforeDash--
+	}
+	env, err := CheckEnv(env)
+	return env, args, lenBeforeDash, err
 }

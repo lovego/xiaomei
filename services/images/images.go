@@ -1,7 +1,10 @@
 package images
 
 import (
+	"log"
+
 	"github.com/fatih/color"
+	"github.com/lovego/cmd"
 	"github.com/lovego/xiaomei/release"
 	"github.com/lovego/xiaomei/services/images/app"
 	"github.com/lovego/xiaomei/services/images/logc"
@@ -14,6 +17,11 @@ var imagesMap = map[string]Image{
 	`logc`: {svcName: `logc`, image: logc.Image{}},
 }
 
+type Image struct {
+	svcName string
+	image   interface{}
+}
+
 func Get(svcName string) Image {
 	if img, ok := imagesMap[svcName]; !ok {
 		panic(`no image for: ` + svcName)
@@ -22,15 +30,44 @@ func Get(svcName string) Image {
 	}
 }
 
-func Build(svcName, env, tag string, pull bool) error {
-	return imagesDo(svcName, env, func(img Image) error {
-		return img.build(env, tag, pull)
+type Build struct {
+	Env, Tag         string
+	GoBuildFlags     []string
+	DockerBuildFlags []string
+}
+
+func (b Build) Run(svcName string) error {
+	return imagesDo(svcName, b.Env, func(img Image) error {
+		if err := img.prepare(b.GoBuildFlags); err != nil {
+			return err
+		}
+
+		log.Println(color.GreenString(`building ` + img.svcName + ` image.`))
+
+		_, err := cmd.Run(cmd.O{Dir: img.buildDir(), Print: true}, `docker`, b.args(img)...)
+		return err
 	})
+}
+
+func (b Build) args(img Image) []string {
+	var result = []string{
+		`build`,
+		`--tag=` + release.GetService(img.svcName, b.Env).ImageName(b.Tag),
+	}
+	if len(b.DockerBuildFlags) > 0 {
+		b.DockerBuildFlags = []string{`--pull`, `--file=` + img.dockerfile()}
+	}
+	result = append(result, b.DockerBuildFlags...)
+
+	return append(result, `.`)
 }
 
 func Push(svcName, env, tag string) error {
 	return imagesDo(svcName, env, func(img Image) error {
-		return img.push(env, tag)
+		log.Println(color.GreenString(`pushing ` + img.svcName + ` image.`))
+		imgName := release.GetService(img.svcName, env).ImageName(tag)
+		_, err := cmd.Run(cmd.O{Print: true}, `docker`, `push`, imgName)
+		return err
 	})
 }
 
@@ -39,7 +76,9 @@ func List(svcName, env string) error {
 		if svcName == `` {
 			color.Green(img.svcName + `:`)
 		}
-		return img.list(env)
+		_, err := cmd.Run(cmd.O{}, `docker`, `images`,
+			`-f`, `reference=`+release.GetService(img.svcName, env).ImageName(``))
+		return err
 	})
 }
 

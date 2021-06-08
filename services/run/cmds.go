@@ -14,17 +14,15 @@ func Cmds(svcName string) (cmds []*cobra.Command) {
 }
 
 func runCmdFor(svcName string) *cobra.Command {
-	var pull bool
 	cmd := &cobra.Command{
-		Use:   `run [<env>]`,
+		Use:   `run [env]`,
 		Short: `Run    the ` + svcName + ` service.`,
 		RunE: release.EnvCall(func(env string) error {
-			if err := images.Build(svcName, env, ``, pull); err != nil {
+			if err := (images.Build{Env: env}).Run(svcName); err != nil {
 				return err
 			}
 			return run(env, svcName)
 		}),
 	}
-	cmd.Flags().BoolVarP(&pull, `pull`, `p`, true, `pull base image.`)
 	return cmd
 }

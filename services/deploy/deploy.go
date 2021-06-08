@@ -14,10 +14,14 @@ import (
 )
 
 type Deploy struct {
-	svcName, env, timeTag, filter       string
-	noPullBaseImage, noPushImageIfLocal bool
-	beforeScript                        string
-	noBeforeScriptOnLocal, noWatch      bool
+	svcName string
+	images.Build
+	noPushImageIfLocal bool
+
+	filter                string
+	beforeScript          string
+	noBeforeScriptOnLocal bool
+	noWatch               bool
 }
 
 func (d Deploy) start() error {
@@ -26,8 +30,8 @@ func (d Deploy) start() error {
 			return err
 		}
 	}
-	if d.timeTag == `` {
-		d.timeTag = release.TimeTag(d.env)
+	if d.Tag == `` {
+		d.Tag = release.TimeTag(d.Env)
 		if err := d.createImages(); err != nil {
 			return err
 		}
@@ -39,31 +43,31 @@ func (d Deploy) start() error {
 }
 
 func (d Deploy) createImages() error {
-	if err := images.Build(d.svcName, d.env, d.timeTag, !d.noPullBaseImage); err != nil {
+	if err := d.Build.Run(d.svcName); err != nil {
 		return err
 	}
 	if d.noPushImageIfLocal {
-		if ok, err := release.GetCluster(d.env).IsLocalHost(); err != nil {
+		if ok, err := release.GetCluster(d.Env).IsLocalHost(); err != nil {
 			return err
 		} else if ok {
 			return nil
 		}
 	}
-	return images.Push(d.svcName, d.env, d.timeTag)
+	return images.Push(d.svcName, d.Env, d.Tag)
 }
 
 func (d Deploy) run() error {
-	psScript := fmt.Sprintf(` docker ps -f name=^/%s`, release.ServiceName(d.svcName, d.env))
+	psScript := fmt.Sprintf(` docker ps -f name=^/%s`, release.ServiceName(d.svcName, d.Env))
 	if !d.noWatch {
 		psScript = oam.WatchCmd() + psScript
 	}
-	expectHighAvailable := len(release.GetCluster(d.env).GetNodes("")) >= 2
+	expectHighAvailable := len(release.GetCluster(d.Env).GetNodes("")) >= 2
 	var recoverAccess bool
-	for _, node := range release.GetCluster(d.env).GetNodes(d.filter) {
-		if svcs := node.Services(d.env, d.svcName); len(svcs) > 0 {
+	for _, node := range release.GetCluster(d.Env).GetNodes(d.filter) {
+		if svcs := node.Services(d.Env, d.svcName); len(svcs) > 0 {
 			if access.HasAccess(svcs) {
 				if expectHighAvailable {
-					if err := access.SetupNginx(d.env, "", node.Addr); err != nil {
+					if err := access.SetupNginx(d.Env, "", node.Addr); err != nil {
 						return err
 					}
 					time.Sleep(time.Second) // wait for nginx reloading finished.
@@ -76,14 +80,14 @@ func (d Deploy) run() error {
 		}
 	}
 	if recoverAccess {
-		return access.SetupNginx(d.env, "", "")
+		return access.SetupNginx(d.Env, "", "")
 	}
 	return nil
 }
 
 func (d Deploy) runNode(svcs []string, node release.Node, psScript string) error {
 	log.Println(color.GreenString(`deploying ` + node.SshAddr()))
-	deployScript, err := getDeployScript(svcs, d.env, d.timeTag)
+	deployScript, err := getDeployScript(svcs, d.Env, d.Tag)
 	if err != nil {
 		return err
 	}

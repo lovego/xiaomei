@@ -15,7 +15,7 @@ func copy2vendorCmd() *cobra.Command {
 	var all bool
 	var excludeTest bool
 	cmd := &cobra.Command{
-		Use:   `copy2vendor [<package-path>] ...`,
+		Use:   `copy2vendor [package-path] ...`,
 		Short: `Copy the specified packages to vendor dir.`,
 		RunE: func(c *cobra.Command, args []string) error {
 			if len(args) == 0 && !all {

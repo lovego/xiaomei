@@ -12,7 +12,7 @@ import (
 func TimestampSignCmd() *cobra.Command {
 	var secret string
 	cmd := &cobra.Command{
-		Use:   `timestamp-sign [<env>]`,
+		Use:   `timestamp-sign [env]`,
 		Short: `Generate Timestamp and Sign headers for curl command.`,
 		RunE: release.EnvCall(func(env string) error {
 			ts := time.Now().Unix()

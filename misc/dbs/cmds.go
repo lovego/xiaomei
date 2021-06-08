@@ -31,7 +31,7 @@ func Cmds() []*cobra.Command {
 func makeCmd(name, short string, fun func(env, key string, print bool) error) *cobra.Command {
 	var print bool
 	cmd := &cobra.Command{
-		Use:   name + ` [<env> [<key>]]`,
+		Use:   name + ` [env [key]]`,
 		Short: `[db] ` + short,
 		RunE: release.Env1Call(func(env, key string) error {
 			if key == `` {
@@ -46,7 +46,7 @@ func makeCmd(name, short string, fun func(env, key string, print bool) error) *c
 
 func makeCreateCmd(typ, name, short string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   name + ` [<env> [<key>]]`,
+		Use:   name + ` [env [key]]`,
 		Short: strings.Title(name) + ` databases and tables (` + short + `execute ".sql" file in "sqls" dir).`,
 		RunE: release.Env1Call(func(env, key string) error {
 			return create.Do(env, typ, key, name == `recreate`)

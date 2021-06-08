@@ -26,7 +26,7 @@ func run(env, svcName string) error {
 			args = append(args, fmt.Sprintf(`--publish=%d:%d`, runPort, runPort))
 		}
 	}
-	if options := image.OptionsForRun(); len(options) > 0 {
+	if options := image.FlagsForRun(); len(options) > 0 {
 		args = append(args, options...)
 	}
 

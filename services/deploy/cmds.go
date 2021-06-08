@@ -1,6 +1,8 @@
 package deploy
 
 import (
+	"errors"
+
 	"github.com/lovego/xiaomei/release"
 	"github.com/spf13/cobra"
 )
@@ -13,19 +15,31 @@ func Cmds(svcName string) (cmds []*cobra.Command) {
 }
 
 func deployCmdFor(svcName string) *cobra.Command {
-	var d Deploy
+	var d = Deploy{svcName: svcName}
 	cmd := &cobra.Command{
-		Use:   `deploy [<env> [<tag>]]`,
+		Use:   `deploy [flags] [env [tag]] [ -- [go build flags] [-- docker build flags] ]`,
 		Short: `Deploy the ` + desc(svcName) + `.`,
-		RunE: release.Env1Call(func(env, timeTag string) error {
-			d.svcName, d.env, d.timeTag = svcName, env, timeTag
+		RunE: release.EnvSlicesCall(func(env string, args [][]string) error {
+			if len(args) > 3 || len(args) > 0 && len(args[0]) > 1 {
+				return errors.New("invalid arguments usage.")
+			}
+			d.Env = env
+			if len(args) > 0 && len(args[0]) == 1 {
+				d.Tag = args[0][0]
+			}
+			if len(args) > 1 {
+				d.GoBuildFlags = args[1]
+			}
+			if len(args) > 2 {
+				d.GoBuildFlags = args[2]
+			}
 			return d.start()
 		}),
+		DisableFlagsInUseLine: true,
 	}
-	cmd.Flags().BoolVar(&d.noPullBaseImage, `no-pull`, false,
-		`Don't pull base image when building image.`)
-	cmd.Flags().BoolVar(&d.noPushImageIfLocal, `no-push-if-local`, false,
+	cmd.Flags().BoolVarP(&d.noPushImageIfLocal, `no-push-if-local`, `P`, false,
 		`Don't push the built images to registry if deploying cluster is local machine.`)
+
 	cmd.Flags().StringVarP(&d.filter, `filter`, `f`, ``, `Filter the node to deploy to by node addr.`)
 
 	cmd.Flags().StringVarP(&d.beforeScript, `before-script`, `b`, ``,
@@ -35,18 +49,20 @@ func deployCmdFor(svcName string) *cobra.Command {
 If this local machine is also a node in the cluster, and the
 before-script is aready executed by the "1" step, it won't be
 executed by the "2" step again.`)
+
 	cmd.Flags().BoolVarP(&d.noBeforeScriptOnLocal, `no-before-script-on-local`, `B`, false,
 		`Don't run before-script on this local machine at the very beginning of the deployment(the "1" step).`)
 
 	cmd.Flags().BoolVarP(&d.noWatch, `no-watch`, `W`, false,
 		`After deployed a node, don't watch container status until "Ctl+C".`)
+
 	return cmd
 }
 
 func rmDeployCmdFor(svcName string) *cobra.Command {
 	var filter string
 	cmd := &cobra.Command{
-		Use:   `rm-deploy [<env>]`,
+		Use:   `rm-deploy [env]`,
 		Short: `Remove deployment of the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			return rmDeploy(svcName, env, filter)

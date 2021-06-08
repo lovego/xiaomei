@@ -1,17 +1,18 @@
 # xiaomei（小美）
 一个简单、实用的go语言web框架，注重部署、日志、报警、尽可能的自动化。
 
-[![Build Status](https://travis-ci.org/lovego/xiaomei.svg?branch=master)](https://travis-ci.org/lovego/xiaomei)
-[![Coverage Status](https://img.shields.io/coveralls/github/lovego/xiaomei/master.svg)](https://coveralls.io/github/lovego/xiaomei?branch=master)
+[![Build Status](https://github.com/lovego/xiaomei/actions/workflows/go.yml/badge.svg)](https://github.com/lovego/xiaomei/actions/workflows/go.yml)
+[![Coverage Status](https://coveralls.io/repos/github/lovego/xiaomei/badge.svg?branch=master)](https://coveralls.io/github/lovego/xiaomei)
 [![Go Report Card](https://goreportcard.com/badge/github.com/lovego/xiaomei)](https://goreportcard.com/report/github.com/lovego/xiaomei)
-[![GoDoc](https://godoc.org/github.com/lovego/xiaomei?status.svg)](https://godoc.org/github.com/lovego/xiaomei)
+[![Documentation](https://pkg.go.dev/badge/github.com/lovego/xiaomei)](https://pkg.go.dev/github.com/lovego/xiaomei@v0.0.9)
 
 ## 安装
 ```shell
 go get github.com/lovego/xiaomei
 ```
 执行如上`go get`命令即可将xiaomei安装到`$GOPATH/bin`目录中。
-如果`$GOPATH/bin`已经在`$PATH`搜索路径中，你可以输入`xiaomei version`命令来检查xiaomei是否已经安装成功。如果输出类似"xiaomei version 18.7.13"的版本信息，就说明已经安装成功了。
+如果`$GOPATH/bin`已经在`$PATH`搜索路径中，你可以输入`xiaomei version`命令来检查xiaomei是否已经安装成功。
+如果输出类似"xiaomei version 18.7.13"的版本信息，就说明已经安装成功了。
 
 现在xiaomei包含了三个服务：
 1. app服务：运行项目编译出的二进制文件，用来服务HTTP请求、执行定时任务等。

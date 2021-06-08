@@ -26,7 +26,7 @@ func Cmds(svcName string) (cmds []*cobra.Command) {
 func shellCmd() *cobra.Command {
 	var filter string
 	theCmd := &cobra.Command{
-		Use:   `shell [<env>]`,
+		Use:   `shell [env]`,
 		Short: `[oam] Enter a node shell.`,
 		RunE: release.EnvCall(func(env string) error {
 			_, err := release.GetCluster(env).Run(filter, cmdPkg.O{}, ``)
@@ -51,7 +51,7 @@ func lsCmd() *cobra.Command {
 func shellCmdFor(svcName string) *cobra.Command {
 	var filter string
 	theCmd := &cobra.Command{
-		Use:   `shell [<env>]`,
+		Use:   `shell [env]`,
 		Short: `[oam] Enter a container for ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			return shell(svcName, env, filter)
@@ -65,7 +65,7 @@ func psCmdFor(svcName string) *cobra.Command {
 	var filter string
 	var watch bool
 	cmd := &cobra.Command{
-		Use:   `ps [<env>]`,
+		Use:   `ps [env]`,
 		Short: `[oam] List containers of the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			return ps(svcName, env, filter, watch)
@@ -79,8 +79,9 @@ func psCmdFor(svcName string) *cobra.Command {
 func logsCmdFor(svcName string) *cobra.Command {
 	var filter string
 	cmd := &cobra.Command{
-		Use:   `logs [<env> [-- <options for "docker logs" command> ] ]`,
-		Short: `[oam] List logs  of the ` + desc(svcName) + `.`,
+		Use:                   `logs [env] [-- "docker logs" flags]`,
+		DisableFlagsInUseLine: true,
+		Short:                 `[oam] List logs  of the ` + desc(svcName) + `.`,
 		RunE: func(c *cobra.Command, args []string) error {
 			var env, options string
 			if len(args) > 0 {
@@ -113,7 +114,7 @@ func operationCmdFor(svcName string) []*cobra.Command {
 func makeOperationCmd(operation, svcName string) *cobra.Command {
 	var filter string
 	cmd := &cobra.Command{
-		Use:   operation + ` [<env>]`,
+		Use:   operation + ` [env]`,
 		Short: `[oam] ` + strings.Title(operation) + ` the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
 			return operate(operation, svcName, env, filter)

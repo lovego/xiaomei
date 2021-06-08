@@ -137,8 +137,9 @@ github.com/lovego/maps v0.0.0-20190404131308-5c14106deb1f h1:ddyIZqaD9In5hDtB5eD
 github.com/lovego/maps v0.0.0-20190404131308-5c14106deb1f/go.mod h1:7hsF4cgdpLGo+c6/0bQAKi14FnRIqmFu2bfAHKdQuG8=
 github.com/lovego/sessions v0.0.0-20200506092438-73b3ac90c80a h1:Roh19TEbKxstkmHwYApa0iWFbaNu0crTSW55hNaYCkY=
 github.com/lovego/sessions v0.0.0-20200506092438-73b3ac90c80a/go.mod h1:DuOhPTr75m5kud9orvxObpOspsfcEqBqGTK/IcPcQqs=
-github.com/lovego/slice v0.0.0-20201119035147-20974b063233 h1:Eec/2XHW3PBB+mOeWAnb9M5fkJ1StVYtuW3aO3yDG3Y=
 github.com/lovego/slice v0.0.0-20201119035147-20974b063233/go.mod h1:pmPgY47eN42xyDbWruiiReH77fFLV/eYikFJ3+NdOxw=
+github.com/lovego/slice v0.0.5 h1:Y3ERO3UJMSwUKvIkY6RgIHCzO0HXk7/NtjUezMDdO0U=
+github.com/lovego/slice v0.0.5/go.mod h1:C4ahk1h65jGU4T1V6Tg4VBQUx0ORnHuc2owWwr62cNg=
 github.com/lovego/strmap v0.0.0-20190329135032-007683ae22da h1:zV482aLxLxg03sPTrhySYXN/HO43os4uznnyrhXr7ok=
 github.com/lovego/strmap v0.0.0-20190329135032-007683ae22da/go.mod h1:oVx+EwWDDNWwGXrfEuzvPbHi3DO8tYU5EfT5nXzfU/o=
 github.com/lovego/struct_tag v0.0.0-20200821111615-1a11055a2d31 h1:ivs6MCONAgAxVwtFzw076W2Y71Ey3JvXoq84QlDyyDs=

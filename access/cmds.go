@@ -12,7 +12,7 @@ The user must be permitted to run some commands with sudo. A line like this in /
 // access commands
 func Cmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   `access [<env>]`,
+		Use:   `access [env]`,
 		Short: `Access config for the project.`,
 		RunE: release.EnvCall(func(env string) error {
 			return printNginxConf(env)
@@ -26,7 +26,7 @@ func Cmd() *cobra.Command {
 func accessSetupCmd() *cobra.Command {
 	var filter string
 	cmd := &cobra.Command{
-		Use:                   `setup [<env>] [flags]` + sudoTip,
+		Use:                   `setup [env] [flags]` + sudoTip,
 		Short:                 `Setup access config for the project.`,
 		DisableFlagsInUseLine: true,
 		RunE: release.EnvCall(func(env string) error {
@@ -40,7 +40,7 @@ func accessSetupCmd() *cobra.Command {
 func accessReloadCmd() *cobra.Command {
 	var filter string
 	cmd := &cobra.Command{
-		Use:                   `reload [<env>] [flags]` + sudoTip,
+		Use:                   `reload [env] [flags]` + sudoTip,
 		Short:                 `Reload access config for the project.`,
 		DisableFlagsInUseLine: true,
 		RunE: release.EnvCall(func(env string) error {

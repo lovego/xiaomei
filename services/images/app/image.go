@@ -4,11 +4,11 @@ type Image struct {
 }
 
 func (i Image) EnvironmentEnvVar() string {
-	return `GoEnv`
+	return `ProENV`
 }
 
 func (i Image) PortEnvVar() string {
-	return `GOPORT`
+	return `ProPORT`
 }
 
 func (i Image) DefaultPort() uint16 {
@@ -16,17 +16,15 @@ func (i Image) DefaultPort() uint16 {
 }
 
 func (i Image) OptionsForRun() []string {
-	return []string{`-e=GODEV=true`}
+	return []string{`-e=ProDEV=true`}
 }
 
-func (i Image) Prepare() error {
-	if err := compile(true); err != nil {
+func (i Image) Prepare(goBuildFlags []string) error {
+	if err := compile(true, goBuildFlags); err != nil {
 		return err
 	}
-	/*
-		if err :=	Assets(nil); err != nil {
-			return err
-		}
-	*/
+	// if err := Assets(nil); err != nil {
+	// 	   return err
+	// }
 	return nil
 }
