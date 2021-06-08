@@ -1,0 +1,47 @@
+name: Go
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+    inputs:
+      debug:
+        required: false
+        default: false
+        description: 'Run the build with tmate debug'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: ['1.11', '1.16']
+      fail-fast: false
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup golang
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go }}
+
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug }}
+
+    - name: Build
+      run: go build -v ./...
+
+    - name: Test
+      run: go test -v -coverprofile=profile.cov ./...
+
+    - name: Send coverage
+      uses: shogo82148/actions-goveralls@v1
+      with:
+        path-to-profile: profile.cov
+      if: ${{ matrix.go == '1.16' }}
+
