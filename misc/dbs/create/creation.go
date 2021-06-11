@@ -10,7 +10,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/lib/pq"
 	"github.com/lovego/bsql"
-	"github.com/lovego/config/conf"
+	"github.com/lovego/config/config"
 	"github.com/lovego/config/db/dburl"
 	"github.com/lovego/xiaomei/release"
 )
@@ -22,14 +22,14 @@ type Creation struct {
 }
 
 func (c Creation) do() error {
-	v, err := conf.GetDb(release.AppData(c.env), c.typ, c.key)
+	v, err := config.GetDB(release.EnvData(c.env), c.typ, c.key)
 	if err != nil {
 		return err
 	}
 	switch dbConf := v.(type) {
 	case string:
-		return c.doOne(dbConf, 0, conf.ShardsSettings{})
-	case *conf.Shards:
+		return c.doOne(dbConf, 0, config.ShardsSettings{})
+	case *config.Shards:
 		for _, shard := range dbConf.Shards {
 			if err := c.doOne(shard.Url, shard.No, dbConf.Settings); err != nil {
 				return err
@@ -41,7 +41,7 @@ func (c Creation) do() error {
 	}
 }
 
-func (c Creation) doOne(dbUrl string, shardNo int, shardSettings conf.ShardsSettings) error {
+func (c Creation) doOne(dbUrl string, shardNo int, shardSettings config.ShardsSettings) error {
 	dbURL, dbName := c.prepare(dbUrl)
 	// make a dbURL copy
 	if err := c.createDB(*dbURL, dbName); err != nil {

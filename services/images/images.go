@@ -2,33 +2,13 @@ package images
 
 import (
 	"log"
+	"path/filepath"
 
 	"github.com/fatih/color"
 	"github.com/lovego/cmd"
+	"github.com/lovego/config/config"
 	"github.com/lovego/xiaomei/release"
-	"github.com/lovego/xiaomei/services/images/app"
-	"github.com/lovego/xiaomei/services/images/logc"
-	"github.com/lovego/xiaomei/services/images/web"
 )
-
-var imagesMap = map[string]Image{
-	`app`:  {svcName: `app`, image: app.Image{}},
-	`web`:  {svcName: `web`, image: web.Image{}},
-	`logc`: {svcName: `logc`, image: logc.Image{}},
-}
-
-type Image struct {
-	svcName string
-	image   interface{}
-}
-
-func Get(svcName string) Image {
-	if img, ok := imagesMap[svcName]; !ok {
-		panic(`no image for: ` + svcName)
-	} else {
-		return img
-	}
-}
 
 type Build struct {
 	Env, Tag         string
@@ -38,13 +18,16 @@ type Build struct {
 
 func (b Build) Run(svcName string) error {
 	return imagesDo(svcName, b.Env, func(img Image) error {
-		if err := img.prepare(b.GoBuildFlags); err != nil {
+		if err := img.prepare(b.Env, b.GoBuildFlags); err != nil {
 			return err
 		}
 
 		log.Println(color.GreenString(`building ` + img.svcName + ` image.`))
 
-		_, err := cmd.Run(cmd.O{Dir: img.buildDir(), Print: true}, `docker`, b.args(img)...)
+		_, err := cmd.Run(cmd.O{
+			Dir:   filepath.Join(release.Root(), `img-`+img.svcName),
+			Print: true,
+		}, `docker`, b.args(img)...)
 		return err
 	})
 }
@@ -54,10 +37,15 @@ func (b Build) args(img Image) []string {
 		`build`,
 		`--tag=` + release.GetService(img.svcName, b.Env).ImageName(b.Tag),
 	}
-	if len(b.DockerBuildFlags) > 0 {
-		b.DockerBuildFlags = []string{`--pull`, `--file=` + img.dockerfile()}
+	if len(b.DockerBuildFlags) == 0 {
+		result = append(result, `--pull`)
+		env := config.NewEnv(b.Env)
+		if img.svcName == `app` && env.Major() != "" {
+			result = append(result, `--build-arg`, `ConfigDir=`+env.ConfigDir())
+		}
+	} else {
+		result = append(result, b.DockerBuildFlags...)
 	}
-	result = append(result, b.DockerBuildFlags...)
 
 	return append(result, `.`)
 }

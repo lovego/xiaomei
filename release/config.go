@@ -5,58 +5,43 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/lovego/config/conf"
+	"github.com/lovego/config/config"
 	"github.com/lovego/fs"
 	"github.com/lovego/strmap"
 )
 
+const EnvironmentEnvVar = "ProENV"
+
 var theName string
-var appConfig *conf.Config
-var appData = map[string]strmap.StrMap{}
+var configMap = make(map[string]*config.Config)
+var dataMap = make(map[string]strmap.StrMap)
 
-func Name() string {
-	if theName == `` {
-		if AppConfig() != nil {
-			theName = AppConfig().Name
-		} else {
-			theName = filepath.Base(Root())
-		}
-	}
-	return theName
-}
-
-func AppConfig() *conf.Config {
-	if appConfig == nil {
+func Config(envStr string) *config.Config {
+	env := config.NewEnv(envStr)
+	if configMap[env.Major()] == nil {
 		if fs.Exist(filepath.Join(Root(), `img-app`)) {
-			appConfig = conf.Get(filepath.Join(Root(), `img-app/config/config.yml`))
+			configMap[env.Major()] = config.Get(filepath.Join(
+				Root(), `img-app`, env.ConfigDir(), `config.yml`,
+			), env.Major())
 		} else {
-			appConfig = conf.Get(filepath.Join(Root(), `config.yml`))
+			configMap[env.Major()] = config.Get(filepath.Join(
+				Root(), env.ConfigDir()+`.yml`,
+			), env.Major())
 		}
 	}
-	return appConfig
+	return configMap[env.Major()]
 }
 
-func AppConf(env string) *conf.Conf {
-	return AppConfig().Get(env)
+func Name(env string) string {
+	return Config(env).Name
+}
+
+func EnvConfig(env string) *config.EnvConfig {
+	return Config(env).Get(env)
 }
 
 func ServiceName(svcName, env string) string {
-	return AppConf(env).DeployName() + `-` + svcName
-}
-
-func AppData(env string) strmap.StrMap {
-	data := appData[env]
-	if data == nil {
-		if fs.Exist(filepath.Join(Root(), `img-app`)) {
-			data = conf.Data(filepath.Join(Root(), `img-app/config/envs/`+env+`.yml`))
-		} else if fpath := filepath.Join(Root(), `envs/`+env+`.yml`); fs.Exist(fpath) {
-			data = conf.Data(fpath)
-		} else {
-			data = strmap.StrMap{}
-		}
-		appData[env] = data
-	}
-	return data
+	return EnvConfig(env).DeployName() + `.` + svcName
 }
 
 func CheckEnv(env string) (string, error) {
@@ -66,9 +51,25 @@ func CheckEnv(env string) (string, error) {
 	if env == `` {
 		env = `dev`
 	}
-	if _, ok := AppConfig().Envs[env]; ok {
+	if _, ok := Config(env).Envs[env]; ok {
 		return env, nil
 	}
 
 	return ``, fmt.Errorf("env %s is not defined in config.yml", env)
+}
+
+func EnvData(envStr string) strmap.StrMap {
+	data := dataMap[envStr]
+	if data == nil {
+		env := config.NewEnv(envStr)
+		if fs.Exist(filepath.Join(Root(), `img-app`)) {
+			data = config.Data(filepath.Join(
+				Root(), `img-app`, env.ConfigDir(), `envs`, env.Minor()+`.yml`,
+			))
+		} else {
+			data = strmap.StrMap{}
+		}
+		dataMap[envStr] = data
+	}
+	return data
 }

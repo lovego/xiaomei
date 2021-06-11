@@ -8,7 +8,7 @@ name: {{ .ProName }}
 envs:
   dev:
     <<: *defaults
-    domain: dev-{{ .Domain }}
+    externalURL: http://dev-{{ .Domain }}
     cookie:
       name: token
       domain: dev-{{ .Domain }}
@@ -18,17 +18,16 @@ envs:
     keepers: [ ]
   test:
     <<: *defaults
-    domain: localhost:3000
+    externalURL: http://localhost:3000
     secret: {{ genSecret }}
     keepers: [ ]
   ci:
     <<: *defaults
-    domain: localhost:3000
+    externalURL: http://localhost:3000
     secret: {{ genSecret }}
   qa:
     <<: *defaults
-    https: true
-    domain: qa-{{ .Domain }}
+    externalURL: https://qa-{{ .Domain }}
     cookie:
       name: token
       domain: qa-{{ .Domain }}
@@ -37,8 +36,7 @@ envs:
     secret: {{ genSecret }}
   preview:
     <<: *defaults
-    https: true
-    domain: preview-{{ .Domain }}
+    externalURL: https://preview-{{ .Domain }}
     cookie:
       name: token
       domain: preview-{{ .Domain }}
@@ -47,8 +45,7 @@ envs:
     secret: {{ genSecret }}
   production:
     <<: *defaults
-    https: true
-    domain: {{ .Domain }}
+    externalURL: https://{{ .Domain }}
     cookie:
       name: token
       domain: {{ .Domain }}

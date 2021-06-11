@@ -7,7 +7,7 @@ import (
 )
 
 func GoCmd() string {
-	if cmd := os.Getenv("GoCmd"); cmd != "" {
+	if cmd := os.Getenv("GoCMD"); cmd != "" {
 		return cmd
 	}
 	return `go`

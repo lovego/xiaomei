@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/lovego/bsql"
-	"github.com/lovego/config/conf"
+	"github.com/lovego/config/config"
 )
 
-func (c Creation) setupShard(rawDb *sql.DB, shardNo int, settings conf.ShardsSettings) error {
+func (c Creation) setupShard(rawDb *sql.DB, shardNo int, settings config.ShardsSettings) error {
 	if c.typ != `postgres` || shardNo == 0 || settings.IdSeqIncrementBy == 0 {
 		return nil
 	}

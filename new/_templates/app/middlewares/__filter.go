@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/lovego/config"
-	"github.com/lovego/config/conf"
+	config2 "github.com/lovego/config/config"
 	"github.com/lovego/errs"
 	"github.com/lovego/goa"
 	"github.com/lovego/tracer"
@@ -49,7 +49,7 @@ func checkSign(header http.Header) error {
 	if err != nil {
 		return err
 	}
-	if conf.TimestampSign(ts, config.Secret()) != sign {
+	if config2.TimestampSign(ts, config.Secret()) != sign {
 		return errs.New("sign-err", "header Sign error")
 	}
 	return nil

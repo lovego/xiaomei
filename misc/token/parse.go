@@ -15,14 +15,14 @@ func parseCmd() *cobra.Command {
 		Use: `parse <env> <token>
 <token> is a pure cookie value, without cookie name or other attributes.`,
 		DisableFlagsInUseLine: true,
-		Short: `parse a token. (decode a token and remove the signature)`,
+		Short:                 `parse a token. (decode a token and remove the signature)`,
 		RunE: release.Env1Call(func(env, token string) error {
 			if token == `` {
 				return errors.New(`token cann't be empty.`)
 			}
-			ck := release.AppConf(env).HttpCookie()
+			ck := release.EnvConfig(env).HttpCookie()
 			ck.Value = token
-			return parse(&ck, release.AppConf(env).Secret)
+			return parse(&ck, release.EnvConfig(env).Secret)
 		}),
 	}
 	return cmd

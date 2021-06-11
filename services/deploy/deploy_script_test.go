@@ -24,7 +24,7 @@ func ExampleDeployScript() {
 				Name: "app",
 				CommonArgs: "-e ProENV=production -v example-logs:/home/ubuntu/logs " +
 					"registry.example.com/example/app:production-180803-141210",
-				PortEnvVar: "ProENV",
+				PortEnvVar: "ProPORT",
 				Ports:      []uint16{3001, 4001},
 			},
 			{
@@ -59,8 +59,8 @@ func ExampleDeployScript() {
 	// }
 	//
 	// args='-e ProENV=production -v example-logs:/home/ubuntu/logs registry.example.com/example/app:production-180803-141210'
-	// deploy app.3001 "$args" "ProENV" 3001
-	// deploy app.4001 "$args" "ProENV" 4001
+	// deploy app.3001 "$args" "ProPORT" 3001
+	// deploy app.4001 "$args" "ProPORT" 4001
 	// args='-e ProENV=production -v example-logs:/home/ubuntu/example-logs registry.example.com/example/logc:production-180803-141210'
 	// deploy logc "$args"
 }

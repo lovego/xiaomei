@@ -24,8 +24,8 @@ test:
       when: on_success
     - changes:
         - "**/*.go"
-        - release/img-app/config/config.yml
-        - release/img-app/config/env/ci.yml
+        - "release/img-app/config*/config.yml"
+        - "release/img-app/config*/envs/ci.yml"
       when: on_success
     - when: never
   tags:

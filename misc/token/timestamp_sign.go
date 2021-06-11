@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lovego/config/conf"
+	"github.com/lovego/config/config"
 	"github.com/lovego/xiaomei/release"
 	"github.com/spf13/cobra"
 )
@@ -17,9 +17,9 @@ func TimestampSignCmd() *cobra.Command {
 		RunE: release.EnvCall(func(env string) error {
 			ts := time.Now().Unix()
 			if secret == "" {
-				secret = release.AppConf(env).Secret
+				secret = release.EnvConfig(env).Secret
 			}
-			fmt.Printf("-H Timestamp:%d -H Sign:%s\n", ts, conf.TimestampSign(ts, secret))
+			fmt.Printf("-H Timestamp:%d -H Sign:%s\n", ts, config.TimestampSign(ts, secret))
 			return nil
 		}),
 	}
