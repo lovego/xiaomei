@@ -11,6 +11,7 @@ require (
 	github.com/lovego/cmd v0.0.1
 	github.com/lovego/config v0.1.1
 	github.com/lovego/fs v0.0.2
+	github.com/lovego/gospec v1.0.0 // indirect
 	github.com/lovego/httputil v0.0.0-20200817134008-d1c7bdde2274
 	github.com/lovego/sessions v0.0.0-20200506092438-73b3ac90c80a
 	github.com/lovego/slice v0.0.5

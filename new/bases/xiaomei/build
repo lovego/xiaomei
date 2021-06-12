@@ -3,8 +3,8 @@ set -e
 
 cd $(dirname $0)
 
-sudo GOOS=linux GOARCH=amd64 go build -i -v -o xiaomei github.com/lovego/xiaomei
-sudo GOOS=linux GOARCH=amd64 go build -i -v -o gospec github.com/lovego/gospec
+sudo GOOS=linux GOARCH=amd64 go build -v -o xiaomei github.com/lovego/xiaomei
+sudo GOOS=linux GOARCH=amd64 go build -v -o gospec github.com/lovego/gospec
 
 name=registry.cn-beijing.aliyuncs.com/lovego/xiaomei
 
