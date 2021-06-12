@@ -21,8 +21,8 @@ sudo nginx -s reload
 
 var setupScriptTmpl = template.Must(template.New(``).Parse(`
 set -eu
-sudo tee /etc/nginx/sites-enabled/{{ .Domain }} > /dev/null
-sudo mkdir -p /var/log/nginx/{{ .Domain }}
+sudo tee /etc/nginx/sites-enabled/{{ .DeployName }} > /dev/null
+sudo mkdir -p /var/log/nginx/{{ .DeployName }}
 ` + reloadScript))
 
 func HasAccess(svcs []string) bool {

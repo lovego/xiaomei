@@ -11,7 +11,7 @@ type Image struct {
 }
 
 func (i Image) PortEnvVar() string {
-	return `NGINXPORT`
+	return `ProPORT`
 }
 
 func (i Image) DefaultPort() uint16 {

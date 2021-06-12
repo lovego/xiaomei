@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	port := os.Getenv(`NGINXPORT`)
+	port := os.Getenv(`ProPORT`)
 	if port == `` {
 		port = `8000`
 	}

@@ -5,7 +5,7 @@ cd $(dirname $0)
 
 test docker-kill.go -nt docker-kill && GOOS=linux GOARCH=amd64 go build -v docker-kill.go
 
-name=registry.cn-beijing.aliyuncs.com/lovego/logc
+name=registry.cn-beijing.aliyuncs.com/lovego/logc:2
 
 docker build --pull -t $name .
 
