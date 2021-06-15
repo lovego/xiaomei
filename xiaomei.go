@@ -16,7 +16,7 @@ import (
 )
 
 const moduleVersion = `v1.0.1`
-const fullVersion = moduleVersion + ` 20210612`
+const fullVersion = moduleVersion + ` 20210614`
 
 func main() {
 	color.NoColor = false
@@ -53,7 +53,7 @@ func updateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     `update [version]`,
 		Short:   `Update to lastest version.`,
-		Example: `xiaomei update v0.0.3`,
+		Example: `xiaomei update v1.0.1`,
 		RunE: func(c *cobra.Command, args []string) error {
 			target := `github.com/lovego/xiaomei`
 			switch len(args) {

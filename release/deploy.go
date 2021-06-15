@@ -92,7 +92,7 @@ func ServiceNameRegexp(svcName, env string) string {
 		regex = fmt.Sprintf(`(%s)`, strings.Join(names, `|`))
 	}
 
-	return `^/` + EnvConfig(env).DeployName() + `-` + regex + `(\.\d+)?`
+	return `^/` + EnvConfig(env).DeployName() + `.` + regex + `(\.\d+)?`
 }
 
 func (svc Service) ImageName(tag string) string {
@@ -113,7 +113,7 @@ func TimeTag(env string) string {
 }
 
 func (svc Service) FirstContainerName() string {
-	name := EnvConfig(svc.env).DeployName() + `-` + svc.name
+	name := ServiceName(svc.name, svc.env)
 	if ports := svc.Ports; len(ports) > 0 {
 		name += `.` + strconv.FormatInt(int64(ports[0]), 10)
 	}

@@ -1,15 +1,18 @@
+defaults: &defaults
+  timeZone: { name: China, offset: 28800 }
+
 name: {{ .ProName }}
 envs:
   dev:
+    <<: *defaults
     externalURL: http://dev-{{ .Domain }}
-    timeZone: { name: China, offset: 28800 }
   qa:
+    <<: *defaults
     externalURL: https://qa-{{ .Domain }}
-    timeZone: { name: China, offset: 28800 }
   preview:
+    <<: *defaults
     externalURL: https://preview-{{ .Domain }}
-    timeZone: { name: China, offset: 28800 }
   production:
+    <<: *defaults
     externalURL: https://{{ .Domain }}
-    timeZone: { name: China, offset: 28800 }
 

@@ -10,6 +10,7 @@ import (
 )
 
 type Config struct {
+	AccessName string
 	*config.EnvConfig
 	App, Web *service
 	Data     strmap.StrMap
@@ -24,6 +25,13 @@ func getConfig(env, downAddr string) (Config, error) {
 	}
 	if data.App == nil && data.Web == nil {
 		return Config{}, errors.New(`neither app nor web service defined.`)
+	}
+	if data.App != nil && data.Web != nil {
+		data.AccessName = data.EnvConfig.DeployName()
+	} else if data.App != nil {
+		data.AccessName = release.ServiceName(data.App.svcName, env)
+	} else if data.Web != nil {
+		data.AccessName = release.ServiceName(data.Web.svcName, env)
 	}
 	return data, nil
 }
