@@ -18,7 +18,7 @@ func Cmds(svcName string) []*cobra.Command {
 func buildCmdFor(svcName string) *cobra.Command {
 	var push bool
 	cmd := &cobra.Command{
-		Use:   `build [flags] [env] [ -- [go build flags] [-- docker build flags] ]`,
+		Use:   `build [flags] [env] [ -- [prepare flags] [-- docker build flags] ]`,
 		Short: `[image] Build ` + imageDesc(svcName, `for`) + `.`,
 		RunE: release.EnvSlicesCall(func(env string, args [][]string) error {
 			if len(args) > 3 || len(args) > 0 && len(args[0]) > 0 {
@@ -26,7 +26,7 @@ func buildCmdFor(svcName string) *cobra.Command {
 			}
 			b := Build{Env: env, Tag: release.TimeTag(env)}
 			if len(args) > 1 {
-				b.GoBuildFlags = args[1]
+				b.PrepareFlags = args[1]
 			}
 			if len(args) > 2 {
 				b.DockerBuildFlags = args[2]

@@ -17,7 +17,7 @@ import (
 
 type Creation struct {
 	env, typ, key string
-	recreate      bool
+	dropDB        bool
 	sql           string
 }
 
@@ -42,7 +42,8 @@ func (c Creation) do() error {
 }
 
 func (c Creation) doOne(dbUrl string, shardNo int, shardSettings config.ShardsSettings) error {
-	dbURL, dbName := c.prepare(dbUrl)
+	dbURL := dburl.Parse(dbUrl).URL
+	dbName := strings.TrimPrefix(dbURL.Path, `/`)
 	// make a dbURL copy
 	if err := c.createDB(*dbURL, dbName); err != nil {
 		return err
@@ -63,17 +64,6 @@ func (c Creation) doOne(dbUrl string, shardNo int, shardSettings config.ShardsSe
 	return nil
 }
 
-func (c Creation) prepare(dbUrl string) (*url.URL, string) {
-	dbURL := dburl.Parse(dbUrl).URL
-	dbName := strings.TrimPrefix(dbURL.Path, `/`)
-	if c.recreate {
-		log.Printf("recreate %s ...\n", color.GreenString(dbName))
-	} else {
-		log.Printf("create %s ...\n", color.GreenString(dbName))
-	}
-	return dbURL, dbName
-}
-
 func (c Creation) createDB(dbURL url.URL, dbName string) error {
 	dbURL.Path = c.typ
 
@@ -83,11 +73,14 @@ func (c Creation) createDB(dbURL url.URL, dbName string) error {
 	}
 	defer db.Close()
 
-	if c.recreate {
+	if c.dropDB {
+		log.Printf("drop database %s\n", color.GreenString(dbName))
 		if _, err := db.Exec(`DROP DATABASE IF EXISTS ` + dbName); err != nil {
 			return err
 		}
 	}
+
+	log.Printf("create %s ...\n", color.GreenString(dbName))
 
 	sql := `CREATE DATABASE `
 	if c.typ == "mysql" {

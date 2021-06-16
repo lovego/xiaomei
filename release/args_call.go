@@ -72,6 +72,28 @@ func Env1Call(work func(string, string) error) cmdFunc {
 	}
 }
 
+func Env2Call(work func(string, string, string) error) cmdFunc {
+	return func(c *cobra.Command, args []string) error {
+		var arg0, arg1, arg2 string
+		switch len(args) {
+		case 0:
+		case 1:
+			arg0 = args[0]
+		case 2:
+			arg0, arg1 = args[0], args[1]
+		case 3:
+			arg0, arg1, arg2 = args[0], args[1], args[2]
+		default:
+			return errors.New(`more than three arguments given.`)
+		}
+		if env, err := CheckEnv(arg0); err == nil {
+			return work(env, arg1, arg2)
+		} else {
+			return err
+		}
+	}
+}
+
 // optional env, and optional signle argument slice seperated by "--"
 func EnvSliceCall(work func(string, []string) error) cmdFunc {
 	return func(c *cobra.Command, args []string) error {

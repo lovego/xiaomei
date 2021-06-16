@@ -17,7 +17,7 @@ func Cmds(svcName string) (cmds []*cobra.Command) {
 func deployCmdFor(svcName string) *cobra.Command {
 	var d = Deploy{svcName: svcName}
 	cmd := &cobra.Command{
-		Use:   `deploy [flags] [env [tag]] [ -- [go build flags] [-- docker build flags] ]`,
+		Use:   `deploy [flags] [env [tag]] [ -- [prepare flags] [-- docker build flags] ]`,
 		Short: `Deploy the ` + desc(svcName) + `.`,
 		RunE: release.EnvSlicesCall(func(env string, args [][]string) error {
 			if len(args) > 3 || len(args) > 0 && len(args[0]) > 1 {
@@ -28,10 +28,10 @@ func deployCmdFor(svcName string) *cobra.Command {
 				d.Tag = args[0][0]
 			}
 			if len(args) > 1 {
-				d.GoBuildFlags = args[1]
+				d.PrepareFlags = args[1]
 			}
 			if len(args) > 2 {
-				d.GoBuildFlags = args[2]
+				d.DockerBuildFlags = args[2]
 			}
 			return d.start()
 		}),

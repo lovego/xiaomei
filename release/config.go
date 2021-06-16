@@ -10,8 +10,6 @@ import (
 	"github.com/lovego/strmap"
 )
 
-const EnvironmentEnvVar = "ProENV"
-
 var theName string
 var configMap = make(map[string]*config.Config)
 var dataMap = make(map[string]strmap.StrMap)
@@ -19,9 +17,9 @@ var dataMap = make(map[string]strmap.StrMap)
 func Config(envStr string) *config.Config {
 	env := config.NewEnv(envStr)
 	if configMap[env.Major()] == nil {
-		if fs.Exist(filepath.Join(Root(), `img-app`)) {
+		if imgApp := ServiceDir(`app`); fs.Exist(imgApp) {
 			configMap[env.Major()] = config.Get(filepath.Join(
-				Root(), `img-app`, env.ConfigDir(), `config.yml`,
+				imgApp, env.ConfigDir(), `config.yml`,
 			), env.Major())
 		} else {
 			configMap[env.Major()] = config.Get(filepath.Join(
@@ -44,6 +42,10 @@ func ServiceName(svcName, env string) string {
 	return EnvConfig(env).DeployName() + `.` + svcName
 }
 
+func ServiceDir(svcName string) string {
+	return filepath.Join(Root(), "img-"+svcName)
+}
+
 func CheckEnv(env string) (string, error) {
 	if env == `` {
 		env = os.Getenv(`ProENV`)
@@ -62,9 +64,9 @@ func EnvData(envStr string) strmap.StrMap {
 	data := dataMap[envStr]
 	if data == nil {
 		env := config.NewEnv(envStr)
-		if fs.Exist(filepath.Join(Root(), `img-app`)) {
+		if imgApp := ServiceDir(`app`); fs.Exist(imgApp) {
 			data = config.Data(filepath.Join(
-				Root(), `img-app`, env.ConfigDir(), `envs`, env.Minor()+`.yml`,
+				imgApp, env.ConfigDir(), `envs`, env.Minor()+`.yml`,
 			))
 		} else {
 			data = strmap.StrMap{}

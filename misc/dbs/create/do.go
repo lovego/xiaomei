@@ -9,11 +9,11 @@ import (
 	"github.com/lovego/xiaomei/release"
 )
 
-func Do(env, typ, key string, recreate bool) error {
-	if recreate {
+func Do(env, typ, key string, dropDB bool) error {
+	if dropDB {
 		switch env {
 		case `production`, `staging`, `preview`:
-			return errors.New("recreate is forbidden under environment: " + env)
+			return errors.New("dropDB is forbidden under environment: " + env)
 		}
 	}
 	keys, err := getKeys(key)
@@ -21,19 +21,19 @@ func Do(env, typ, key string, recreate bool) error {
 		return err
 	}
 	for _, key := range keys {
-		if err := create(env, typ, key, recreate); err != nil {
+		if err := create(env, typ, key, dropDB); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func create(env, typ, key string, recreate bool) error {
+func create(env, typ, key string, dropDB bool) error {
 	content, err := ioutil.ReadFile(filepath.Join(release.Root(), `../sqls`, key+`.sql`))
 	if err != nil {
 		return err
 	}
-	return Creation{env: env, typ: typ, key: key, recreate: recreate, sql: string(content)}.do()
+	return Creation{env: env, typ: typ, key: key, dropDB: dropDB, sql: string(content)}.do()
 }
 
 func getKeys(key string) ([]string, error) {

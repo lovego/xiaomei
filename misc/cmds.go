@@ -20,9 +20,9 @@ import (
 
 func Cmds(rootCmd *cobra.Command) []*cobra.Command {
 	return append(
-		dbs.Cmds(), godoc.Cmd(), docCmd(), token.Cmd(), token.TimestampSignCmd(),
-		specCmd(), coverCmd(), yamlCmd(), float32Cmd(), float64Cmd(),
-		bashCompletionCmd(rootCmd),
+		dbs.Cmds(), renderCmd(), token.Cmd(), token.TimestampSignCmd(),
+		godoc.Cmd(), docCmd(), specCmd(), coverCmd(),
+		yamlCmd(), float32Cmd(), float64Cmd(), bashCompletionCmd(rootCmd),
 	)
 }
 

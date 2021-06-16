@@ -1,12 +1,12 @@
 package deploy
 
 import (
+	"github.com/lovego/config/config"
 	"github.com/lovego/xiaomei/release"
-	//	"github.com/lovego/xiaomei/registry"
 )
 
 func GetCommonArgs(svcName, env, tag string) []string {
-	args := []string{`-e`, release.EnvironmentEnvVar + `=` + env}
+	args := []string{`-e`, config.EnvVar + `=` + env}
 
 	service := release.GetService(svcName, env)
 	args = append(args, service.Options...)

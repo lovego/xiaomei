@@ -1,8 +1,6 @@
 package dbs
 
 import (
-	"strings"
-
 	"github.com/lovego/xiaomei/misc/dbs/create"
 	"github.com/lovego/xiaomei/release"
 	"github.com/spf13/cobra"
@@ -15,10 +13,7 @@ func Cmds() []*cobra.Command {
 	)
 
 	postgresCmd := makeCmd(`psql`, `Enter psql cli.`, Psql)
-	postgresCmd.AddCommand(
-		makeCreateCmd(`postgres`, `create`, ``),
-		makeCreateCmd(`postgres`, `recreate`, `drop existing databases and `),
-	)
+	postgresCmd.AddCommand(makeCreateCmd(`postgres`))
 
 	return []*cobra.Command{
 		postgresCmd,
@@ -44,13 +39,15 @@ func makeCmd(name, short string, fun func(env, key string, print bool) error) *c
 	return cmd
 }
 
-func makeCreateCmd(typ, name, short string) *cobra.Command {
+func makeCreateCmd(typ string) *cobra.Command {
+	var dropDB bool
 	cmd := &cobra.Command{
-		Use:   name + ` [env [key]]`,
-		Short: strings.Title(name) + ` databases and tables (` + short + `execute ".sql" file in "sqls" dir).`,
+		Use:   `create [env [key]]`,
+		Short: `create databases and tables (execute "*.sql" file in "sqls" dir).`,
 		RunE: release.Env1Call(func(env, key string) error {
-			return create.Do(env, typ, key, name == `recreate`)
+			return create.Do(env, typ, key, dropDB)
 		}),
 	}
+	cmd.Flags().BoolVarP(&dropDB, "drop-db", "d", false, "drop existing databases before creating")
 	return cmd
 }

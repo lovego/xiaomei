@@ -10,6 +10,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/lovego/cmd"
+	"github.com/lovego/config/config"
 	"github.com/lovego/xiaomei/misc"
 	"github.com/lovego/xiaomei/release"
 	"github.com/spf13/cobra"
@@ -30,16 +31,14 @@ func runCmd() *cobra.Command {
 		DisableFlagsInUseLine: true,
 		Short:                 `Compile the app server binary and run it.`,
 		RunE: release.EnvSliceCall(func(env string, args []string) error {
-			if err := compile(false, env, args); err != nil {
+			if err := Compile(false, env, args); err != nil {
 				return err
 			}
 			signal.Ignore(os.Interrupt)
 			_, err := cmd.Run(cmd.O{
 				Dir: filepath.Join(release.Root(), `..`),
-				Env: []string{
-					`ProDEV=true`, release.EnvironmentEnvVar + `=` + env,
-				},
-			}, filepath.Join(release.Root(), `img-app`, release.Name(env)))
+				Env: []string{`ProDEV=true`, config.EnvVar + `=` + env},
+			}, filepath.Join(release.ServiceDir(`app`), release.Name(env)))
 			return err
 		}),
 	}
@@ -52,12 +51,12 @@ func compileCmd() *cobra.Command {
 		DisableFlagsInUseLine: true,
 		Short:                 `Compile the app server binary.`,
 		RunE: release.EnvSliceCall(func(env string, args []string) error {
-			return compile(false, env, args)
+			return Compile(false, env, args)
 		}),
 	}
 }
 
-func compile(linuxAMD64 bool, env string, goBuildFlags []string) error {
+func Compile(linuxAMD64 bool, env string, goBuildFlags []string) error {
 	log.Println(color.GreenString(`compile the app binary.`))
 	o := cmd.O{Dir: filepath.Join(release.Root(), `..`)}
 	if linuxAMD64 && (runtime.GOOS != `linux` || runtime.GOARCH != `amd64`) {

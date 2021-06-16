@@ -9,7 +9,7 @@ require (
 	github.com/lib/pq v1.10.2
 	github.com/lovego/bsql v0.0.3
 	github.com/lovego/cmd v0.0.1
-	github.com/lovego/config v0.1.2
+	github.com/lovego/config v0.1.3
 	github.com/lovego/fs v0.0.2
 	github.com/lovego/httputil v0.0.0-20200817134008-d1c7bdde2274
 	github.com/lovego/sessions v0.0.0-20200506092438-73b3ac90c80a

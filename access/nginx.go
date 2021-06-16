@@ -3,7 +3,6 @@ package access
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"path/filepath"
 	"strings"
@@ -11,6 +10,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/lovego/cmd"
+	"github.com/lovego/xiaomei/misc"
 	"github.com/lovego/xiaomei/release"
 )
 
@@ -65,22 +65,12 @@ func getNginxConf(env, downAddr string) (string, Config, error) {
 		return ``, Config{}, err
 	}
 
-	file := filepath.Join(release.Root(), `access.conf.tmpl`)
-	content, err := ioutil.ReadFile(file)
-	if err != nil {
-		return ``, Config{}, err
-	}
-	tmpl := template.New(``).Funcs(funcsMap)
-	tmpl = template.Must(tmpl.Parse(string(content)))
+	output, err := misc.RenderFile(filepath.Join(release.Root(), `access.conf.tmpl`), funcsMap, data)
 	if err != nil {
 		return ``, Config{}, err
 	}
 
-	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, data); err != nil {
-		return ``, Config{}, err
-	}
-	return buf.String(), data, nil
+	return output.String(), data, nil
 }
 
 func clusterRun(env, feature, input, cmdStr string) error {

@@ -2,7 +2,6 @@ package images
 
 import (
 	"log"
-	"path/filepath"
 
 	"github.com/fatih/color"
 	"github.com/lovego/cmd"
@@ -12,22 +11,20 @@ import (
 
 type Build struct {
 	Env, Tag         string
-	GoBuildFlags     []string
+	PrepareFlags     []string
 	DockerBuildFlags []string
 }
 
 func (b Build) Run(svcName string) error {
 	return imagesDo(svcName, b.Env, func(img Image) error {
-		if err := img.prepare(b.Env, b.GoBuildFlags); err != nil {
+		svcDir := release.ServiceDir(img.svcName)
+		if err := img.prepare(b.Env, svcDir, b.PrepareFlags); err != nil {
 			return err
 		}
 
 		log.Println(color.GreenString(`building ` + img.svcName + ` image.`))
 
-		_, err := cmd.Run(cmd.O{
-			Dir:   filepath.Join(release.Root(), `img-`+img.svcName),
-			Print: true,
-		}, `docker`, b.args(img)...)
+		_, err := cmd.Run(cmd.O{Dir: svcDir, Print: true}, `docker`, b.args(img)...)
 		return err
 	})
 }
@@ -39,9 +36,9 @@ func (b Build) args(img Image) []string {
 	}
 	if len(b.DockerBuildFlags) == 0 {
 		result = append(result, `--pull`)
-		env := config.NewEnv(b.Env)
-		if img.svcName == `app` && env.Major() != "" {
-			result = append(result, `--build-arg`, `ConfigDir=`+env.ConfigDir())
+		environment := config.NewEnv(b.Env)
+		for _, envVar := range environment.Vars() {
+			result = append(result, `--build-arg`, envVar)
 		}
 	} else {
 		result = append(result, b.DockerBuildFlags...)
