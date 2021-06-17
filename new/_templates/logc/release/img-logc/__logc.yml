@@ -19,7 +19,7 @@ mailer: "mailer://smtp.qq.com:25/?user=小美<xiaomei-go@qq.com>&pass=zjsbosjlhg
 keepers: [ "小美<xiaomei-go@qq.com>" ]
 rotate:
   time: "33 33 3 * * *" # cron time pattern to execute rotate.cmd
-  cmd: [ logrotate, ../logrotate.conf ]
+  cmd: [ logrotate, logrotate.conf ]
 files:
   # "http.log" is the file path, required, either relative or absolute is ok.
 
@@ -31,5 +31,5 @@ files:
   # in time series index, string between "<" and ">" acts as time layout.
   # see https://golang.org/pkg/time/#Parse for time layout format.
 
-  http.log: { es: { <<: *defaults, index: "http-log.<2006.01>" } }
+  app-logs/http.log: { es: { <<: *defaults, index: "http-log.<2006.01>" } }
 

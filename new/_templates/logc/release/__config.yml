@@ -1,9 +1,12 @@
+defaults: &defaults
+  timeZone: { name: China, offset: 28800 }
+
 name: {{ .ProName }}
 envs:
   dev:
-    timeZone: { name: China, offset: 28800 }
+    <<: *defaults
   qa:
-    timeZone: { name: China, offset: 28800 }
+    <<: *defaults
   production:
-    timeZone: { name: China, offset: 28800 }
+    <<: *defaults
 

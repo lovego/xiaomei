@@ -7,6 +7,6 @@ LABEL builder=xiaomei
 WORKDIR /var/log/nginx/{{ .ProName }}
 RUN  chown ubuntu:ubuntu .
 
-COPY web.conf.tmpl /etc/nginx/sites-available/{{ .ProName }}.conf.tmpl
+COPY web.conf /etc/nginx/sites-available/{{ .ProName }}.conf.tmpl
 COPY public /var/www/{{ .ProName }}/
 

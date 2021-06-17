@@ -4,7 +4,8 @@ dev:
       image: "{{ .Registry }}{{ .ProNameUrlSafe }}/logc/dev"
       options: [
         -e, "LOGCENV=common",
-        -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}-logs",
+        -v, "{{ .ProName }}-app-logs:/home/ubuntu/app-logs",
+        -v, "{{ .ProName }}-web-logs:/home/ubuntu/web-logs",
         -v, "/var/run/docker.sock:/var/run/docker.sock"
       ]
   volumesToCreate: [ "{{ .ProName }}-logs" ]
@@ -14,7 +15,8 @@ qa:
       image: "{{ .Registry }}{{ .ProNameUrlSafe }}/logc/qa"
       options: [
         -e, "LOGCENV=common",
-        -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}-logs",
+        -v, "{{ .ProName }}-app-logs:/home/ubuntu/app-logs",
+        -v, "{{ .ProName }}-web-logs:/home/ubuntu/web-logs",
         -v, "/var/run/docker.sock:/var/run/docker.sock"
       ]
   volumesToCreate: [ "{{ .ProName }}-logs" ]
@@ -24,7 +26,8 @@ production:
       image: "{{ .Registry }}{{ .ProNameUrlSafe }}/logc/production"
       options: [
         -e, "LOGCENV=production",
-        -v, "{{ .ProName }}-logs:/home/ubuntu/{{ .ProName }}-logs",
+        -v, "{{ .ProName }}-app-logs:/home/ubuntu/app-logs",
+        -v, "{{ .ProName }}-web-logs:/home/ubuntu/web-logs",
         -v, "/var/run/docker.sock:/var/run/docker.sock"
       ]
   volumesToCreate: [ "{{ .ProName }}-logs" ]

@@ -1,5 +1,0 @@
-#!/bin/sh
-
-file="../logc_${ProENV:-dev}.yml"
-test -f "$file" || file=../logc.yml
-exec logc "$file"
