@@ -1,6 +1,6 @@
 # vim: ft=dockerfile:
 
-FROM registry.cn-beijing.aliyuncs.com/lovego/nginx
+FROM registry.cn-beijing.aliyuncs.com/lovego/nginx:2
 
 LABEL builder=xiaomei
 

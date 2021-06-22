@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"regexp"
 	"text/template"
 
 	"github.com/lovego/xiaomei/release"
@@ -23,9 +24,9 @@ func renderCmd() *cobra.Command {
 
 func RenderFileWithEnvConfig(env, tmplFile, outputFile string) error {
 	if outputFile != "" {
-		return RenderFileTo(tmplFile, nil, release.EnvConfig(env), outputFile)
+		return RenderFileTo(tmplFile, release.EnvConfig(env), outputFile)
 	}
-	if output, err := RenderFile(tmplFile, nil, release.EnvConfig(env)); err != nil {
+	if output, err := RenderFile(tmplFile, release.EnvConfig(env)); err != nil {
 		return err
 	} else {
 		fmt.Println(output.String())
@@ -33,24 +34,21 @@ func RenderFileWithEnvConfig(env, tmplFile, outputFile string) error {
 	}
 }
 
-func RenderFileTo(tmplFile string, funcs template.FuncMap, data interface{}, outputFile string) error {
-	output, err := RenderFile(tmplFile, funcs, data)
+func RenderFileTo(tmplFile string, data interface{}, outputFile string) error {
+	output, err := RenderFile(tmplFile, data)
 	if err != nil {
 		return err
 	}
 	return ioutil.WriteFile(outputFile, output.Bytes(), 0644)
 }
 
-func RenderFile(tmplFile string, funcs template.FuncMap, data interface{}) (bytes.Buffer, error) {
+func RenderFile(tmplFile string, data interface{}) (bytes.Buffer, error) {
 	var buf bytes.Buffer
 	content, err := ioutil.ReadFile(tmplFile)
 	if err != nil {
 		return buf, err
 	}
-	tmpl := template.New(``)
-	if funcs != nil {
-		tmpl.Funcs(funcs)
-	}
+	tmpl := template.New(``).Funcs(funcsMap)
 	if _, err := tmpl.Parse(string(content)); err != nil {
 		return buf, err
 	}
@@ -58,4 +56,27 @@ func RenderFile(tmplFile string, funcs template.FuncMap, data interface{}) (byte
 		return buf, err
 	}
 	return buf, nil
+}
+
+var funcsMap = template.FuncMap{
+	`domainAncestor`:  DomainAncestor,
+	`regexpQuoteMeta`: regexp.QuoteMeta,
+}
+
+// DomainAncestor return the N'th ancestor of domain
+func DomainAncestor(domain string, n int) string {
+	if n <= 0 {
+		return domain
+	}
+	var index int
+	for i, b := range domain {
+		if b == '.' {
+			index = i
+			n--
+			if n == 0 {
+				break
+			}
+		}
+	}
+	return domain[index+1:]
 }
