@@ -2,6 +2,7 @@ package release
 
 import (
 	"os"
+	"strings"
 
 	"github.com/lovego/cmd"
 )
@@ -21,4 +22,12 @@ func GoGetByProxy(args ...string) error {
 		GoCmd(), append([]string{`get`, `-v`}, args...)...,
 	)
 	return err
+}
+
+func BashQuote(original string) string {
+	replaced := strings.ReplaceAll(original, `'`, `\'`)
+	if replaced == original {
+		return `'` + original + `'`
+	}
+	return `$'` + replaced + `'`
 }

@@ -16,7 +16,8 @@ func Cmds(svcName string) []*cobra.Command {
 }
 
 func buildCmdFor(svcName string) *cobra.Command {
-	var push bool
+	var doPush bool
+	var push Push
 	cmd := &cobra.Command{
 		Use:   `build [flags] [env] [ -- [prepare flags] [-- docker build flags] ]`,
 		Short: `[image] Build ` + imageDesc(svcName, `for`) + `.`,
@@ -34,25 +35,37 @@ func buildCmdFor(svcName string) *cobra.Command {
 			if err := b.Run(svcName); err != nil {
 				return err
 			}
-			if push {
-				return Push(svcName, env, b.Tag)
+			if doPush {
+				push.Env, push.Tag = b.Env, b.Tag
+				return push.Run(svcName)
 			}
 			return nil
 		}),
 		DisableFlagsInUseLine: true,
 	}
-	cmd.Flags().BoolVarP(&push, "push", "p", false, "push "+imageDesc(svcName, `for`))
+	cmd.Flags().BoolVarP(&doPush, "push", "P", false, "push "+imageDesc(svcName, `for`))
+	cmd.Flags().StringVarP(&push.DockerLogin.User, "docker-user", "u", "",
+		"The docker login user, used before pushing image")
+	cmd.Flags().StringVarP(&push.DockerLogin.Password, "docker-password", "p", "",
+		"The docker login password, used before pushing image")
 	return cmd
 }
 
 func pushCmdFor(svcName string) *cobra.Command {
-	return &cobra.Command{
+	var push Push
+	cmd := &cobra.Command{
 		Use:   `push [env [tag]]`,
 		Short: `[image] Push  ` + imageDesc(svcName, `of `) + `.`,
 		RunE: release.Env1Call(func(env, timeTag string) error {
-			return Push(svcName, env, timeTag)
+			push.Env, push.Tag = env, timeTag
+			return push.Run(svcName)
 		}),
 	}
+	cmd.Flags().StringVarP(&push.DockerLogin.User, "docker-user", "u", "",
+		"The docker login user, used before pushing image")
+	cmd.Flags().StringVarP(&push.DockerLogin.Password, "docker-password", "p", "",
+		"The docker login password, used before pushing image")
+	return cmd
 }
 
 func imagesCmdFor(svcName string) *cobra.Command {

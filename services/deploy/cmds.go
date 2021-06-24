@@ -23,9 +23,9 @@ func deployCmdFor(svcName string) *cobra.Command {
 			if len(args) > 3 || len(args) > 0 && len(args[0]) > 1 {
 				return errors.New("invalid arguments usage.")
 			}
-			d.Env = env
+			d.Build.Env, d.Push.Env = env, env
 			if len(args) > 0 && len(args[0]) == 1 {
-				d.Tag = args[0][0]
+				d.Build.Tag, d.Push.Tag = args[0][0], args[0][0]
 			}
 			if len(args) > 1 {
 				d.PrepareFlags = args[1]
@@ -37,21 +37,14 @@ func deployCmdFor(svcName string) *cobra.Command {
 		}),
 		DisableFlagsInUseLine: true,
 	}
-	cmd.Flags().BoolVarP(&d.noPushImageIfLocal, `no-push-if-local`, `P`, false,
-		`Don't push the built images to registry if deploying cluster is local machine.`)
+	cmd.Flags().BoolVarP(&d.alwaysPush, `always-push`, `P`, false,
+		`Always push the built images to registry, even the deploying cluster is local machine.`)
+	cmd.Flags().StringVarP(&d.DockerLogin.User, "docker-user", "u", "",
+		"The docker login user, used before pushing or pulling image")
+	cmd.Flags().StringVarP(&d.DockerLogin.Password, "docker-password", "p", "",
+		"The docker login password, used before pushing or pulling image")
 
 	cmd.Flags().StringVarP(&d.filter, `filter`, `f`, ``, `Filter the node to deploy to by node addr.`)
-
-	cmd.Flags().StringVarP(&d.beforeScript, `before-script`, `b`, ``,
-		`Script to be executed on:
-  1. This local machine at the very beginning of the deployment.
-  2. Every node in the cluster before deployment on the node.
-If this local machine is also a node in the cluster, and the
-before-script is aready executed by the "1" step, it won't be
-executed by the "2" step again.`)
-
-	cmd.Flags().BoolVarP(&d.noBeforeScriptOnLocal, `no-before-script-on-local`, `B`, false,
-		`Don't run before-script on this local machine at the very beginning of the deployment(the "1" step).`)
 
 	cmd.Flags().BoolVarP(&d.noWatch, `no-watch`, `W`, false,
 		`After deployed a node, don't watch container status until "Ctl+C".`)
