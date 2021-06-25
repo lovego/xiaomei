@@ -13,7 +13,7 @@ import (
 	"github.com/lovego/goa/utilroutes"
 	"{{ .ModulePath }}/middlewares"
 	"{{ .ModulePath }}/routes"
-	// "{{ .ModulePath }}/tasks"
+	//"{{ .ModulePath }}/tasks"
 )
 
 func main() {
@@ -22,19 +22,21 @@ func main() {
 	}
 
 	router := goa.New()
-	router.Use(middlewares.CORS.Check)
-	router.Use(middlewares.Logger.Record)
-	router.Use(middlewares.SessionParse)
-	utilroutes.Setup(router)
-	router.Use(middlewares.Filter)
-
-	if os.Getenv("GOA_DOC") != `` {
-		router.DocDir(filepath.Join(fs.SourceDir(), "docs", "apis"))
-		routes.Setup(router)
-		return
-	}
-	routes.Setup(router)
+	router.Use(middlewares.CORS.Check, middlewares.Logger.Record, middlewares.SessionParse)
+	setupRouter(&router.RouterGroup)
 
 	// tasks.Start()
 	server.ListenAndServe(router)
+}
+
+func setupRouter(routerGroup *goa.RouterGroup) {
+	if os.Getenv("GOA_DOC") != `` {
+		routerGroup.DocDir(filepath.Join(fs.SourceDir(), "docs", "apis"))
+		routes.Setup(routerGroup)
+		os.Exit(1)
+	}
+
+	utilroutes.Setup(routerGroup)
+	routerGroup.Use(middlewares.Filter)
+	routes.Setup(routerGroup)
 }

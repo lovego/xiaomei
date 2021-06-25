@@ -11,7 +11,7 @@ import (
 	"{{ .ModulePath }}/middlewares/helpers"
 )
 
-func Setup(router *goa.Router)  {
+func Setup(router *goa.RouterGroup)  {
 	router.Get(`/`, func(c *goa.Context) {
 		tracer.Tag(c.Context(), `hello`, `world`)
 		c.Json(map[string]string{`hello`: config.DeployName()})
