@@ -29,7 +29,7 @@ func main() {
 		return
 	}
 
-	process := startNginx(port)
+	cmd := startNginx(port)
 	waitPortReady(addr)
 
 	log.Println(color.GreenString(`started. (%s)`, addr))
@@ -37,13 +37,13 @@ func main() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGUSR1) // for log reopen
 	for {
-		if err := process.Signal(<-c); err != nil {
+		if err := cmd.Process.Signal(<-c); err != nil {
 			log.Println(err)
 		}
 	}
 }
 
-func startNginx(port string) *os.Process {
+func startNginx(port string) *exec.Cmd {
 	generateConf(port)
 
 	cmd := exec.Command(`/usr/sbin/nginx`)
@@ -57,7 +57,7 @@ func startNginx(port string) *os.Process {
 		}
 	}()
 
-	return cmd.Process
+	return cmd
 }
 
 type configData struct {
@@ -91,11 +91,13 @@ func makeConf(file string, confData configData) []byte {
 }
 
 func waitPortReady(addr string) {
-	for {
+	for i := 0; i < 30; i++ {
 		time.Sleep(100 * time.Millisecond)
 		if conn, _ := net.DialTimeout("tcp", addr, time.Second); conn != nil {
 			conn.Close()
 			return
 		}
 	}
+	log.Printf("waitPortReady timeout(%s)\n", addr)
+	os.Exit(1)
 }
