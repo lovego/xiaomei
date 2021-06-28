@@ -7,8 +7,10 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"text/template"
 	"time"
 
@@ -20,20 +22,28 @@ func main() {
 	if port == `` {
 		port = `8000`
 	}
-	if conn, _ := net.DialTimeout("tcp", port, time.Second); conn != nil {
+	addr := ":" + port
+	if conn, _ := net.DialTimeout("tcp", addr, time.Second); conn != nil {
 		conn.Close()
-		log.Printf("port %s is adready bound by other process.", port)
+		log.Printf("addr %s is already bound by other process.", addr)
 		return
 	}
 
-	startNginx(port)
-	waitPortReady(":" + port)
+	process := startNginx(port)
+	waitPortReady(addr)
 
-	log.Println(color.GreenString(`started. (:%s)`, port))
-	select {}
+	log.Println(color.GreenString(`started. (%s)`, addr))
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, syscall.SIGUSR1) // for log reopen
+	for {
+		if err := process.Signal(<-c); err != nil {
+			log.Println(err)
+		}
+	}
 }
 
-func startNginx(port string) *exec.Cmd {
+func startNginx(port string) *os.Process {
 	generateConf(port)
 
 	cmd := exec.Command(`/usr/sbin/nginx`)
@@ -47,7 +57,7 @@ func startNginx(port string) *exec.Cmd {
 		}
 	}()
 
-	return cmd
+	return cmd.Process
 }
 
 type configData struct {
@@ -80,10 +90,10 @@ func makeConf(file string, confData configData) []byte {
 	return buf.Bytes()
 }
 
-func waitPortReady(port string) {
+func waitPortReady(addr string) {
 	for {
 		time.Sleep(100 * time.Millisecond)
-		if conn, _ := net.DialTimeout("tcp", port, time.Second); conn != nil {
+		if conn, _ := net.DialTimeout("tcp", addr, time.Second); conn != nil {
 			conn.Close()
 			return
 		}
