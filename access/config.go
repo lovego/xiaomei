@@ -44,7 +44,7 @@ type service struct {
 }
 
 func newService(svcName, env, downAddr string) *service {
-	if release.HasService(svcName, env) {
+	if release.HasService(env, svcName) {
 		return &service{EnvConfig: release.EnvConfig(env), svcName: svcName, downAddr: downAddr}
 	} else {
 		return nil
