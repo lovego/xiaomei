@@ -28,7 +28,7 @@ func (n Node) Services(env, svcName string) []string {
 	}
 	var svcs []string
 	for _, svcName := range svcNames {
-		service := GetService(svcName, env)
+		service := GetService(env, svcName)
 		if n.Match(service.Nodes) {
 			svcs = append(svcs, svcName)
 		}

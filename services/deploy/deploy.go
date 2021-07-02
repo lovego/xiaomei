@@ -57,13 +57,13 @@ func (d Deploy) run() error {
 	if !d.noWatch {
 		psScript = oam.WatchCmd() + psScript
 	}
-	expectHighAvailable := len(release.GetCluster(d.Build.Env).GetNodes("")) >= 2
 	var hasAccess bool
+	multiNodes := release.GetCluster(d.Build.Env).NodesCount() >= 2
 	for _, node := range release.GetCluster(d.Build.Env).GetNodes(d.filter) {
 		if svcs := node.Services(d.Build.Env, d.svcName); len(svcs) > 0 {
 			if access.HasAccess(svcs) {
 				hasAccess = true
-				if expectHighAvailable {
+				if multiNodes || release.MultiPorts(d.Build.Env, svcs) { // expect high available
 					if err := access.SetupNginx(d.Build.Env, "", node.Addr); err != nil {
 						return err
 					}

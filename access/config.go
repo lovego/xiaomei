@@ -57,7 +57,7 @@ func (s *service) Addrs() ([]string, error) {
 	}
 	if s.addrs == nil {
 		addrs := []string{}
-		ports := release.GetService(s.svcName, s.Env.String()).Ports
+		ports := release.GetService(s.Env.String(), s.svcName).Ports
 		for _, node := range s.Nodes() {
 			for _, port := range ports {
 				upstreamAddr := node.GetServiceAddr() + `:` + strconv.FormatInt(int64(port), 10)
@@ -79,7 +79,7 @@ func (s *service) Nodes() (nodes []release.Node) {
 	if s == nil {
 		return nil
 	}
-	labels := release.GetService(s.svcName, s.Env.String()).Nodes
+	labels := release.GetService(s.Env.String(), s.svcName).Nodes
 	for _, node := range release.GetCluster(s.Env.String()).GetNodes(``) {
 		if node.Match(labels) {
 			nodes = append(nodes, node)

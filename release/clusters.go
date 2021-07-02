@@ -28,6 +28,9 @@ func GetClusters() map[string]*Cluster {
 		if err := yaml.Unmarshal(content, theClusters); err != nil {
 			panic(err)
 		}
+		for env, cluster := range theClusters {
+			cluster.init(env)
+		}
 	}
 	return theClusters
 }
@@ -37,7 +40,6 @@ func GetCluster(env string) *Cluster {
 	if cluster == nil {
 		log.Fatalf("empty cluster config for env: %v", env)
 	}
-	cluster.init(env)
 	return cluster
 }
 
@@ -68,6 +70,10 @@ func (c Cluster) GetNodes(feature string) (nodes []Node) {
 	return
 }
 
+func (c Cluster) NodesCount() int {
+	return len(c.Nodes)
+}
+
 func (c Cluster) Run(feature string, o cmd.O, script string) (string, error) {
 	for _, node := range c.GetNodes(feature) {
 		if node.IsLocalHostP() {
@@ -81,7 +87,7 @@ func (c Cluster) Run(feature string, o cmd.O, script string) (string, error) {
 }
 
 func (c Cluster) ServiceRun(svcName, feature string, o cmd.O, script string) (string, error) {
-	labels := GetService(svcName, c.env).Nodes
+	labels := GetService(c.env, svcName).Nodes
 	for _, node := range c.GetNodes(feature) {
 		if node.IsLocalHostP() && node.Match(labels) {
 			return node.Run(o, script)

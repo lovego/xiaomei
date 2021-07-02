@@ -13,7 +13,7 @@ func shell(svcName, env, feature string) error {
 		fmt.Sprintf(
 			"docker exec -it -e LINES=$(tput lines) -e COLUMNS=$(tput cols) "+
 				"--detach-keys='ctrl-@' %s bash",
-			release.GetService(svcName, env).FirstContainerName(),
+			release.GetService(env, svcName).FirstContainerName(),
 		),
 	)
 	return err

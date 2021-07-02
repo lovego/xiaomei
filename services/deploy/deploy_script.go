@@ -82,7 +82,7 @@ func getServiceConf(svcName, env, timeTag string) serviceConfig {
 		PortEnvVar: images.Get(svcName).PortEnvVar(),
 	}
 	if data.PortEnvVar != `` {
-		data.Ports = release.GetService(svcName, env).Ports
+		data.Ports = release.GetService(env, svcName).Ports
 	}
 	return data
 }

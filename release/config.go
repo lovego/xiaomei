@@ -17,15 +17,13 @@ var dataMap = make(map[string]strmap.StrMap)
 func Config(envStr string) *config.Config {
 	env := config.NewEnv(envStr)
 	if configMap[env.Major()] == nil {
+		var file string
 		if imgApp := ServiceDir(`app`); fs.Exist(imgApp) {
-			configMap[env.Major()] = config.Get(filepath.Join(
-				imgApp, env.ConfigDir(), `config.yml`,
-			), env.Major())
+			file = filepath.Join(imgApp, env.ConfigDir(), `config.yml`)
 		} else {
-			configMap[env.Major()] = config.Get(filepath.Join(
-				Root(), env.ConfigDir()+`.yml`,
-			), env.Major())
+			file = filepath.Join(Root(), env.ConfigDir()+`.yml`)
 		}
+		configMap[env.Major()] = config.Get(file, env.Major())
 	}
 	return configMap[env.Major()]
 }
@@ -64,14 +62,17 @@ func EnvData(envStr string) strmap.StrMap {
 	data := dataMap[envStr]
 	if data == nil {
 		env := config.NewEnv(envStr)
+		var dir string
 		if imgApp := ServiceDir(`app`); fs.Exist(imgApp) {
-			data = config.Data(filepath.Join(
-				imgApp, env.ConfigDir(), `envs`, env.Minor()+`.yml`,
-			))
+			dir = filepath.Join(imgApp, env.ConfigDir(), `envs`)
 		} else {
-			data = strmap.StrMap{}
+			dir = filepath.Join(Root(), env.TailMajor(`envs`))
 		}
-		dataMap[envStr] = data
+		file := filepath.Join(dir, env.Minor()+`.yml`)
+		if fs.Exist(file) {
+			data = config.Data(file)
+			dataMap[envStr] = data
+		}
 	}
 	return data
 }

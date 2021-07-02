@@ -51,17 +51,26 @@ func GetDeploy(env string) *Deploy {
 	return theDeploy
 }
 
-func HasService(svcName, env string) bool {
+func HasService(env, svcName string) bool {
 	_, ok := GetDeploy(env).Services[svcName]
 	return ok
 }
 
-func GetService(svcName, env string) *Service {
+func GetService(env, svcName string) *Service {
 	svc, ok := GetDeploy(env).Services[svcName]
 	if !ok {
 		log.Fatalf(`deploy.yml: %s.services.%s: undefined.`, env, svcName)
 	}
 	return svc
+}
+
+func MultiPorts(env string, svcNames []string) bool {
+	for _, svcName := range svcNames {
+		if len(GetService(env, svcName).Ports) >= 2 {
+			return true
+		}
+	}
+	return false
 }
 
 func ServiceNames(env string) (names []string) {

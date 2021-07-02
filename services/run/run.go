@@ -36,7 +36,7 @@ func run(env, svcName string) error {
 }
 
 func getRunPort(image images.Image, env, svcName string) uint16 {
-	if ports := release.GetService(svcName, env).Ports; len(ports) > 0 {
+	if ports := release.GetService(env, svcName).Ports; len(ports) > 0 {
 		return ports[0]
 	}
 	return image.DefaultPort()

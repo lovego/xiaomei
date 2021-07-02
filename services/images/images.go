@@ -33,7 +33,7 @@ func (b Build) Run(svcName string) error {
 func (b Build) args(img Image) []string {
 	var result = []string{
 		`build`,
-		`--tag=` + release.GetService(img.svcName, b.Env).ImageName(b.Tag),
+		`--tag=` + release.GetService(b.Env, img.svcName).ImageName(b.Tag),
 	}
 	if len(b.DockerBuildFlags) == 0 {
 		result = append(result, `--pull`)
@@ -56,7 +56,7 @@ type Push struct {
 func (p Push) Run(svcName string) error {
 	return imagesDo(svcName, p.Env, func(img Image) error {
 		log.Println(color.GreenString(`pushing ` + img.svcName + ` image.`))
-		imgName := release.GetService(img.svcName, p.Env).ImageName(p.Tag)
+		imgName := release.GetService(p.Env, img.svcName).ImageName(p.Tag)
 		if err := p.DockerLogin.Run(imgName); err != nil {
 			return err
 		}
@@ -101,7 +101,7 @@ func (dl *DockerLogin) BashCommand(env string, svcs []string) string {
 	var commands []string
 	var registries = map[string]bool{}
 	for _, svc := range svcs {
-		registry := DockerRegistry(release.GetService(svc, env).Image)
+		registry := DockerRegistry(release.GetService(env, svc).Image)
 		if !registries[registry] {
 			commands = append(commands, strings.Join(dl.Command(registry, true), " "))
 		}
@@ -135,7 +135,7 @@ func List(svcName, env string) error {
 			color.Green(img.svcName + `:`)
 		}
 		_, err := cmd.Run(cmd.O{}, `docker`, `images`,
-			`-f`, `reference=`+release.GetService(img.svcName, env).ImageName(``))
+			`-f`, `reference=`+release.GetService(env, img.svcName).ImageName(``))
 		return err
 	})
 }
