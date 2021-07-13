@@ -29,7 +29,7 @@ deploy() {
   if test -n "$portEnvVar"; then
     args="-e $portEnvVar=$port $args"
     $isLinux || args="-p $port:$port $args"
-    if [[ $(docker inspect -f '{{ "{{ .State.Status }}" }}' $name) == running ]]; then
+    if [[ $(docker inspect -f '{{ "{{ .State.Status }}" }}' $name 2>/dev/null) == running ]]; then
       dockerRemove $name.old
       docker rename $name $name.old
     fi
@@ -42,12 +42,21 @@ deploy() {
   set +x
   docker logs -f $name |& { sed '/ started\./q'; pkill -P $$ docker; }
 
-  test -n "$portEnvVar" && dockerRemove $name.old
+  test -n "$portEnvVar" && dockerStop $name.old
+}
+
+dockerStop() {
+  if [[ $(docker inspect -f '{{ "{{ .State.Status }}" }}' $1 2>/dev/null) != running ]]; then
+    return
+  fi
+  set -x
+  time docker stop -t 180 $1 >/dev/null
+  set +x
 }
 
 dockerRemove() {
-  docker stop $1 &>/dev/null || true
-  docker rm   $1 &>/dev/null || true
+  dockerStop $1
+  docker rm  $1 &>/dev/null || true
 }
 
 checkPort() {
