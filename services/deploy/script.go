@@ -2,7 +2,6 @@ package deploy
 
 import (
 	"bytes"
-	"fmt"
 	"strings"
 	"text/template"
 
@@ -10,7 +9,7 @@ import (
 	"github.com/lovego/xiaomei/services/images"
 )
 
-const deployScriptTmpl = `set -ex
+const deployScriptTmpl = `set -e
 {{ range .VolumesToCreate }}
 docker volume create {{ . }} >/dev/null
 {{- end }}
@@ -38,7 +37,9 @@ deploy() {
   else
     dockerRemove $name
   fi
+  set -x
   docker run --name=$name -dt --restart=always $args
+  set +x
   docker logs -f $name |& { sed '/ started\./q'; pkill -P $$ docker; }
 
   test -n "$portEnvVar" && dockerRemove $name.old
@@ -50,7 +51,21 @@ dockerRemove() {
 }
 
 checkPort() {
-  true
+  local port=$1
+
+  local pid=$(lsof -itcp:$port -stcp:listen -Fp | grep -oP '^p\K\d+$')
+  test -z "$pid" && return
+  local dockerId=$(cat /proc/$pid/cgroup | grep -oP -m1 ':/docker/\K\w+$')
+  if test -n "$dockerId"; then
+    local container=$(docker inspect -f '{{ "{{ .Name }}" }}' $dockerId)
+    container=${container#/}
+    [[ $container == $2 ]] && return
+    echo "$port is already bound by container $container: "
+  else
+    echo "$port is already bound by: "
+  fi
+  lsof -itcp:$port -stcp:listen -P
+  exit 1
 }
 
 {{ range .Services -}}
@@ -72,8 +87,9 @@ func getDeployScript(svcNames []string, env, timeTag string) (string, error) {
 	if err := tmpl.Execute(&buf, getDeployConfig(svcNames, env, timeTag)); err != nil {
 		return ``, err
 	}
-	fmt.Println(buf.String())
-	return buf.String(), nil
+	script := buf.String()
+	// fmt.Println(script)
+	return script, nil
 }
 
 type deployConfig struct {

@@ -6,11 +6,10 @@ import (
 	"text/template"
 )
 
-var testTmpl = template.Must(template.New(``).Parse(deployScriptTmpl))
-
 func testScriptTmpl(conf deployConfig) {
+	tmpl := template.Must(template.New(``).Parse(deployScriptTmpl))
 	var buf bytes.Buffer
-	if err := testTmpl.Execute(&buf, conf); err != nil {
+	if err := tmpl.Execute(&buf, conf); err != nil {
 		fmt.Println("error: ", err)
 	}
 	fmt.Println(buf.String())
@@ -35,7 +34,7 @@ func ExampleDeployScript() {
 		},
 	})
 	// Output:
-	// set -ex
+	// set -e
 	//
 	// docker volume create example-logs >/dev/null
 	// if [[ $(uname) == Linux ]]; then
@@ -62,7 +61,9 @@ func ExampleDeployScript() {
 	//   else
 	//     dockerRemove $name
 	//   fi
+	//   set -x
 	//   docker run --name=$name -dt --restart=always $args
+	//   set +x
 	//   docker logs -f $name |& { sed '/ started\./q'; pkill -P $$ docker; }
 	//
 	//   test -n "$portEnvVar" && dockerRemove $name.old
@@ -74,7 +75,21 @@ func ExampleDeployScript() {
 	// }
 	//
 	// checkPort() {
-	//   true
+	//   local port=$1
+	//
+	//   local pid=$(lsof -itcp:$port -stcp:listen -Fp | grep -oP '^p\K\d+$')
+	//   test -z "$pid" && return
+	//   local dockerId=$(cat /proc/$pid/cgroup | grep -oP -m1 ':/docker/\K\w+$')
+	//   if test -n "$dockerId"; then
+	//     local container=$(docker inspect -f '{{ .Name }}' $dockerId)
+	//     container=${container#/}
+	//     [[ $container == $2 ]] && return
+	//     echo "$port is already bound by container $container: "
+	//   else
+	//     echo "$port is already bound by: "
+	//   fi
+	//   lsof -itcp:$port -stcp:listen -P
+	//   exit 1
 	// }
 	//
 	// args="$networkArgs "'-e ProENV=production -v example-logs:/home/ubuntu/logs registry.example.com/example/app:production-180803-141210'
