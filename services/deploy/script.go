@@ -2,6 +2,7 @@ package deploy
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"text/template"
 
@@ -9,11 +10,16 @@ import (
 	"github.com/lovego/xiaomei/services/images"
 )
 
-const deployScriptTmpl = `set -e
+const deployScriptTmpl = `set -ex
 {{ range .VolumesToCreate }}
 docker volume create {{ . }} >/dev/null
 {{- end }}
-test $(uname) = Linux && isLinux=true || isLinux=false
+if [[ $(uname) == Linux ]]; then
+  isLinux=true
+  networkArgs="--network=host"
+else
+  isLinux=false
+fi
 
 deploy() {
   local name=$1
@@ -21,20 +27,34 @@ deploy() {
   local portEnvVar=$3
   local port=$4
 
-  $isLinux && args=" --network=host $args"
   if test -n "$portEnvVar"; then
     args="-e $portEnvVar=$port $args"
     $isLinux || args="-p $port:$port $args"
+    if [[ $(docker inspect -f '{{ "{{ .State.Status }}" }}' $name) == running ]]; then
+      dockerRemove $name.old
+      docker rename $name $name.old
+    fi
+    checkPort $port $name.old
+  else
+    dockerRemove $name
   fi
+  docker run --name=$name -dt --restart=always $args
+  docker logs -f $name |& { sed '/ started\./q'; pkill -P $$ docker; }
 
-  docker stop $name >/dev/null 2>&1 && docker rm $name >/dev/null
-  id=$(docker run --name=$name -dt --restart=always $args)
-  echo $name
-  docker logs -f $id 2>&1 | { sed '/started./q'; pkill -P $$ docker; }
+  test -n "$portEnvVar" && dockerRemove $name.old
+}
+
+dockerRemove() {
+  docker stop $1 &>/dev/null || true
+  docker rm   $1 &>/dev/null || true
+}
+
+checkPort() {
+  true
 }
 
 {{ range .Services -}}
-  args='{{ .CommonArgs }}'{{"\n"}}
+  args="$networkArgs "'{{ .CommonArgs }}'{{"\n"}}
   {{- $svc := . -}}
   {{ if .PortEnvVar -}}
     {{ range .Ports -}}
@@ -52,6 +72,7 @@ func getDeployScript(svcNames []string, env, timeTag string) (string, error) {
 	if err := tmpl.Execute(&buf, getDeployConfig(svcNames, env, timeTag)); err != nil {
 		return ``, err
 	}
+	fmt.Println(buf.String())
 	return buf.String(), nil
 }
 

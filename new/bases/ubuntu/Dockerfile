@@ -4,7 +4,7 @@ COPY sources.list /etc/apt/sources.list
 
 RUN apt-get update \
       && apt-get install -y --no-install-recommends \
-      locales tzdata less wget sudo ca-certificates net-tools iputils-ping dnsutils \
+      locales tzdata less wget sudo ca-certificates lsof net-tools iputils-ping dnsutils \
       && rm -rf /var/lib/apt/lists/* \
       && locale-gen en_US.UTF-8 \
       && ln -fs /usr/share/zoneinfo/Asia/Chongqing /etc/localtime \

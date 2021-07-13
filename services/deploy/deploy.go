@@ -3,11 +3,9 @@ package deploy
 import (
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/fatih/color"
 	"github.com/lovego/cmd"
-	"github.com/lovego/xiaomei/access"
 	"github.com/lovego/xiaomei/release"
 	"github.com/lovego/xiaomei/services/images"
 	"github.com/lovego/xiaomei/services/oam"
@@ -57,26 +55,12 @@ func (d Deploy) run() error {
 	if !d.noWatch {
 		psScript = oam.WatchCmd() + psScript
 	}
-	var hasAccess bool
-	multiNodes := release.GetCluster(d.Build.Env).NodesCount() >= 2
 	for _, node := range release.GetCluster(d.Build.Env).GetNodes(d.filter) {
 		if svcs := node.Services(d.Build.Env, d.svcName); len(svcs) > 0 {
-			if access.HasAccess(svcs) {
-				hasAccess = true
-				if multiNodes || release.MultiPorts(d.Build.Env, svcs) { // expect high available
-					if err := access.SetupNginx(d.Build.Env, "", node.Addr); err != nil {
-						return err
-					}
-					time.Sleep(time.Second) // wait for nginx reloading finished.
-				}
-			}
 			if err := d.runNode(svcs, node, psScript); err != nil {
 				return err
 			}
 		}
-	}
-	if hasAccess {
-		return access.SetupNginx(d.Build.Env, "", "")
 	}
 	return nil
 }
