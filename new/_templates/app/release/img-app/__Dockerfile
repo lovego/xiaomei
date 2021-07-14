@@ -1,13 +1,12 @@
 # vim: ft=dockerfile:
 
-FROM registry.cn-beijing.aliyuncs.com/lovego/appserver
-
-RUN mkdir -p /home/ubuntu/{{ .ProName }}/log
-WORKDIR /home/ubuntu/{{ .ProName }}
+FROM registry.cn-beijing.aliyuncs.com/lovego/service
 
 LABEL builder=xiaomei
 
-CMD [ "./{{ .ProName }}" ]
+USER ubuntu
+WORKDIR /home/ubuntu/{{ .ProName }}
+RUN mkdir log
 
 COPY {{ .ProName }} ./
 COPY config  ./config
@@ -17,3 +16,4 @@ RUN sudo chmod 775 {{ .ProName }} \
  && sudo find config views -type d -exec chmod 775 {} \+ \
  && sudo find config views -type f -exec chmod 664 {} \+
 
+CMD [ "./{{ .ProName }}" ]

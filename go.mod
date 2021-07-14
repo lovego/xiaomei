@@ -17,6 +17,6 @@ require (
 	github.com/lovego/strmap v0.0.0-20190329135032-007683ae22da
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/spf13/cobra v1.1.3
-	golang.org/x/sys v0.0.0-20210219172841-57ea560cfca1 // indirect
+	golang.org/x/sys v0.0.0-20210403161142-5e06dd20ab57 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 )

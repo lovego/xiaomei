@@ -32,7 +32,7 @@ func main() {
 	cmd := startNginx(port)
 	waitPortReady(addr)
 
-	log.Println(color.GreenString(`started. (%s)`, addr))
+	log.Println(color.GreenString(`frontend started. (%s)`, addr))
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGUSR1) // for log reopen

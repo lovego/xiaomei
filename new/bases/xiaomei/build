@@ -3,8 +3,14 @@ set -e
 
 cd $(dirname $0)
 
-sudo GOOS=linux GOARCH=amd64 go build -v -o xiaomei github.com/lovego/xiaomei
-sudo GOOS=linux GOARCH=amd64 go build -v -o gospec github.com/lovego/gospec
+if [[ $(file -b xiaomei) != 'ELF '* ]]; then
+  GOOS=linux GOARCH=amd64 go build -v -o xiaomei ../../..
+fi
+
+if [[ $(file -b gospec) != 'ELF '* ]]; then
+                          go get   -v -d        github.com/lovego/gospec
+  GOOS=linux GOARCH=amd64 go build -v -o gospec github.com/lovego/gospec
+fi
 
 name=registry.cn-beijing.aliyuncs.com/lovego/xiaomei
 
