@@ -33,7 +33,7 @@ func deploy() error {
 docker stop workspace-godoc >/dev/null 2>&1 && docker rm workspace-godoc
 docker run --name=workspace-godoc -d --restart=always -e=GODOCPORT=1234 --publish=1234:1234 \
 	-v $($GoCmd env GOPATH):/home/ubuntu/go -v $($GoCmd env GOROOT):/usr/local/go \
-	registry.cn-beijing.aliyuncs.com/lovego/godoc
+	registry.cn-beijing.aliyuncs.com/lovego/xiaomei godoc-start
 `, func(name string) string {
 		return release.GoCmd()
 	})
