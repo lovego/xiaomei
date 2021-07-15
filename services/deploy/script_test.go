@@ -53,10 +53,17 @@ func ExampleDeployScript() {
 	//   if test -n "$portEnvVar"; then
 	//     args="-e $portEnvVar=$port $args"
 	//     $isLinux || args="-p $port:$port $args"
-	//     if [[ $(docker inspect -f '{{ .State.Status }}' $name 2>/dev/null) == running ]]; then
-	//       dockerRemove $name.old
-	//       docker rename $name $name.old
-	//     fi
+	//     case $(dockerStatus $name) in
+	//       '' )
+	//         ;;
+	//       running )
+	//         dockerRemove $name.old
+	//         docker rename $name $name.old
+	//         ;;
+	//       * )
+	//         dockerRemove $name
+	//         ;;
+	//     esac
 	//     checkPort $port $name.old
 	//   else
 	//     dockerRemove $name
@@ -69,18 +76,20 @@ func ExampleDeployScript() {
 	//   test -n "$portEnvVar" && dockerStop $name.old
 	// }
 	//
+	// dockerRemove() {
+	//   dockerStop $1
+	//   docker rm  $1 &>/dev/null || true
+	// }
+	//
 	// dockerStop() {
-	//   if [[ $(docker inspect -f '{{ .State.Status }}' $1 2>/dev/null) != running ]]; then
-	//     return
-	//   fi
+	//   [[ $(dockerStatus $1) != running ]] && return
 	//   set -x
 	//   time docker stop -t 180 $1 >/dev/null
 	//   set +x
 	// }
 	//
-	// dockerRemove() {
-	//   dockerStop $1
-	//   docker rm  $1 &>/dev/null || true
+	// dockerStatus() {
+	//   docker inspect -f '{{ .State.Status }}' $1 2>/dev/null
 	// }
 	//
 	// checkPort() {
