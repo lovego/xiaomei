@@ -23,7 +23,7 @@ nohup godoc -http=:1234 -index_interval=1s >/dev/null 2>&1 &
 `
 	_, err := cmd.Run(cmd.O{}, `sh`, `-c`, script)
 	if err == nil {
-		printAddr()
+		fmt.Println("started at " + color.GreenString(`http://localhost:1234/`))
 	}
 	return err
 }
@@ -31,8 +31,8 @@ nohup godoc -http=:1234 -index_interval=1s >/dev/null 2>&1 &
 func deploy() error {
 	script := os.Expand(`
 docker stop workspace-godoc >/dev/null 2>&1 && docker rm workspace-godoc
-docker run --name=workspace-godoc -d --restart=always -e=GODOCPORT=1234 --publish=1234:1234 \
-	-v $($GoCmd env GOPATH):/home/ubuntu/go -v $($GoCmd env GOROOT):/usr/local/go \
+docker run --name=workspace-godoc -d --restart=always --publish=7000:7000 \
+	-v $($GoCmd env GOPATH):/home/ubuntu/go \
 	registry.cn-beijing.aliyuncs.com/lovego/xiaomei godoc-start
 `, func(name string) string {
 		return release.GoCmd()
@@ -40,7 +40,7 @@ docker run --name=workspace-godoc -d --restart=always -e=GODOCPORT=1234 --publis
 
 	_, err := cmd.Run(cmd.O{}, `sh`, `-c`, script)
 	if err == nil {
-		printAddr()
+		fmt.Println("started at " + color.GreenString(`http://localhost:7000/`))
 	}
 	return err
 }
@@ -49,8 +49,4 @@ func rmDeploy() error {
 	script := `docker stop workspace-godoc && docker rm workspace-godoc`
 	_, err := cmd.Run(cmd.O{}, `sh`, `-c`, script)
 	return err
-}
-
-func printAddr() {
-	fmt.Println("started at " + color.GreenString(`http://localhost:1234/`))
 }
