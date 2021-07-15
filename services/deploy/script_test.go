@@ -34,7 +34,7 @@ func ExampleDeployScript() {
 		},
 	})
 	// Output:
-	// set -e
+	// set -ex
 	//
 	// docker volume create example-logs >/dev/null
 	// if [[ $(uname) == Linux ]]; then
@@ -68,24 +68,20 @@ func ExampleDeployScript() {
 	//   else
 	//     dockerRemove $name
 	//   fi
-	//   set -x
 	//   docker run --name=$name -dt --restart=always $args
-	//   set +x
 	//   docker logs -f $name |& { sed '/ started\./q'; pkill -P $$ docker; }
 	//
-	//   test -n "$portEnvVar" && dockerStop $name.old
+	//   test -n "$portEnvVar" && [[ $(dockerStatus $name.old) != '' ]] && dockerStop $name.old
 	// }
 	//
 	// dockerRemove() {
+	//   [[ $(dockerStatus $1) == '' ]] && return
 	//   dockerStop $1
-	//   docker rm  $1 &>/dev/null || true
+	//   docker rm  $1
 	// }
 	//
 	// dockerStop() {
-	//   [[ $(dockerStatus $1) != running ]] && return
-	//   set -x
 	//   time docker stop -t 180 $1 >/dev/null
-	//   set +x
 	// }
 	//
 	// dockerStatus() {
@@ -95,7 +91,7 @@ func ExampleDeployScript() {
 	// checkPort() {
 	//   local port=$1
 	//
-	//   local pid=$(lsof -itcp:$port -stcp:listen -Fp | grep -oP '^p\K\d+$')
+	//   local pid=$(sudo lsof -itcp:$port -stcp:listen -Fp | grep -oP '^p\K\d+$')
 	//   test -z "$pid" && return
 	//   local dockerId=$(cat /proc/$pid/cgroup | grep -oP -m1 ':/docker/\K\w+$')
 	//   if test -n "$dockerId"; then
@@ -106,7 +102,7 @@ func ExampleDeployScript() {
 	//   else
 	//     echo "$port is already bound by: "
 	//   fi
-	//   lsof -itcp:$port -stcp:listen -P
+	//   sudo lsof -itcp:$port -stcp:listen -P
 	//   exit 1
 	// }
 	//

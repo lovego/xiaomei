@@ -4,12 +4,11 @@ FROM registry.cn-beijing.aliyuncs.com/lovego/service
 
 LABEL builder=xiaomei
 
-USER ubuntu
 RUN mkdir {{ .ProName }}
 WORKDIR {{ .ProName }}
 
 COPY {{ .ProName }} ./
-COPY config  ./config
+COPY config ./config
 RUN mkdir ./log
 
 RUN sudo chmod 775 {{ .ProName }} \

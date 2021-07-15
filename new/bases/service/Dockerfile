@@ -19,7 +19,7 @@ RUN locale-gen en_US.UTF-8 \
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en
 
 RUN  mkdir /etc/nginx/sites-enabled /etc/nginx/sites-available \
-        && rm /var/log/nginx/*.log
+        && rm -rf /etc/nginx/conf.d /var/log/nginx/*.log
 COPY nginx/nginx.conf nginx/proxy_params /etc/nginx/
 COPY nginx/nginx-start /usr/local/bin/
 COPY logc/logc logc/docker-kill /usr/local/bin/
