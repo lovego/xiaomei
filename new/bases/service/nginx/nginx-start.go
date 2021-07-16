@@ -2,9 +2,9 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"log"
-	"net"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -18,85 +18,86 @@ import (
 )
 
 func main() {
-	port := os.Getenv(`ProPORT`)
-	if port == `` {
-		port = `8000`
+	port := os.Getenv("ProPORT")
+	if port == "" {
+		port = "8000"
 	}
 	addr := ":" + port
-	if conn, _ := net.DialTimeout("tcp", addr, time.Second); conn != nil {
-		conn.Close()
-		log.Printf("addr %s is already bound by other process.", addr)
-		return
-	}
 
-	cmd := startNginx(port)
-	waitPortReady(addr)
+	process := startNginx(port)
+	log.Printf("starting.(%s)", addr)
+	waitPortReady(process.Pid, addr)
+	log.Println(color.GreenString("frontend started. (%s)", addr))
 
-	log.Println(color.GreenString(`frontend started. (%s)`, addr))
-
+	// SIGUSR1 for log reopen
 	c := make(chan os.Signal, 1)
-	signal.Notify(c, syscall.SIGUSR1) // for log reopen
+	signal.Notify(c, syscall.SIGUSR1, syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT)
 	for {
-		if err := cmd.Process.Signal(<-c); err != nil {
+		if err := process.Signal(<-c); err != nil {
 			log.Println(err)
 		}
 	}
 }
 
-func startNginx(port string) *exec.Cmd {
+func startNginx(port string) *os.Process {
 	generateConf(port)
 
-	cmd := exec.Command(`/usr/sbin/nginx`)
+	cmd := exec.Command("nginx")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+	if err := cmd.Start(); err != nil {
+		log.Fatal(err)
+	}
 
 	go func() {
-		if err := cmd.Run(); err != nil {
-			log.Println(err)
-			os.Exit(1)
+		if err := cmd.Wait(); err != nil {
+			log.Fatal(err)
+		} else {
+			log.Println("shutdown")
+			os.Exit(0)
 		}
 	}()
 
-	return cmd
-}
-
-type configData struct {
-	ListenPort  string
-	SendfileOff bool
+	return cmd.Process
 }
 
 func generateConf(port string) {
-	tmplFiles, err := filepath.Glob(`/etc/nginx/sites-available/*.conf.tmpl`)
-	if err != nil {
-		panic(err)
-	}
-	confData := configData{
+	config := struct {
+		ListenPort  string
+		SendfileOff bool
+	}{
 		ListenPort:  port,
-		SendfileOff: os.Getenv(`SendfileOff`) == `true`,
+		SendfileOff: os.Getenv("SendfileOff") == "true",
+	}
+	tmplFiles, err := filepath.Glob("/etc/nginx/sites-available/*.conf.tmpl")
+	if err != nil {
+		log.Panic(err)
 	}
 	for _, tmplFile := range tmplFiles {
+		var buf bytes.Buffer
+		if err := template.Must(template.ParseFiles(tmplFile)).Execute(&buf, config); err != nil {
+			log.Panic(err)
+		}
 		confFile := `/etc/nginx/sites-enabled/` + strings.TrimSuffix(filepath.Base(tmplFile), `.tmpl`)
-		if err := ioutil.WriteFile(confFile, makeConf(tmplFile, confData), 0644); err != nil {
-			panic(err)
+		if err := ioutil.WriteFile(confFile, buf.Bytes(), 0644); err != nil {
+			log.Panic(err)
 		}
 	}
 }
 
-func makeConf(file string, confData configData) []byte {
-	var buf bytes.Buffer
-	if err := template.Must(template.ParseFiles(file)).Execute(&buf, confData); err != nil {
-		panic(err)
-	}
-	return buf.Bytes()
-}
-
-func waitPortReady(addr string) {
-	for i := 0; i < 30; i++ {
-		time.Sleep(100 * time.Millisecond)
-		if conn, _ := net.DialTimeout("tcp", addr, time.Second); conn != nil {
-			conn.Close()
+func waitPortReady(pid int, addr string) {
+	for i := 0; i < 7; i++ {
+		cmd := exec.Command("lsof", "-aP", "-i"+addr, "-stcp:listen")
+		cmd.Stderr = os.Stderr
+		out, err := cmd.Output()
+		if err != nil {
+			log.Fatal(err)
+		}
+		if len(out) > 0 {
+			fmt.Print(string(out))
 			return
 		}
+		time.Sleep(time.Second)
 	}
 	log.Printf("waitPortReady timeout(%s)\n", addr)
 	os.Exit(1)

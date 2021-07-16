@@ -35,12 +35,12 @@ func (b Build) args(img Image) []string {
 		`build`,
 		`--tag=` + release.GetService(b.Env, img.svcName).ImageName(b.Tag),
 	}
+	environment := config.NewEnv(b.Env)
+	for _, envVar := range environment.Vars() {
+		result = append(result, `--build-arg`, envVar)
+	}
 	if len(b.DockerBuildFlags) == 0 {
 		result = append(result, `--pull`)
-		environment := config.NewEnv(b.Env)
-		for _, envVar := range environment.Vars() {
-			result = append(result, `--build-arg`, envVar)
-		}
 	} else {
 		result = append(result, b.DockerBuildFlags...)
 	}

@@ -47,7 +47,7 @@ deploy() {
   docker run --name=$name -dt --restart=always $args
   docker logs -f $name |& { sed '/ started\./q'; pkill -P $$ docker; }
 
-  test -n "$portEnvVar" && [[ $(dockerStatus $name.old) != '' ]] && dockerStop $name.old
+  test -n "$portEnvVar" && [[ $(dockerStatus $name.old) != '' ]] && dockerStop $name.old || true
 }
 
 dockerRemove() {
@@ -61,7 +61,7 @@ dockerStop() {
 }
 
 dockerStatus() {
-  docker inspect -f '{{ "{{ .State.Status }}" }}' $1 2>/dev/null
+  docker inspect -f '{{ "{{ .State.Status }}" }}' $1 2>/dev/null || true
 }
 
 checkPort() {
