@@ -29,7 +29,9 @@ func GetClusters() map[string]*Cluster {
 			panic(err)
 		}
 		for env, cluster := range theClusters {
-			cluster.init(env)
+			if cluster != nil {
+				cluster.init(env)
+			}
 		}
 	}
 	return theClusters
