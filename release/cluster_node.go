@@ -1,14 +1,13 @@
 package release
 
 import (
-	"net"
 	"os"
 	"os/signal"
 	"os/user"
 	"strings"
 
+	"github.com/lovego/addrs"
 	"github.com/lovego/cmd"
-	"github.com/lovego/slice"
 )
 
 type Node struct {
@@ -86,22 +85,7 @@ func (n Node) IsLocalHostP() bool {
 }
 
 func (n Node) IsLocalHost() (bool, error) {
-	ips, err := net.LookupIP(n.Addr)
-	if err != nil {
-		return false, err
-	}
-	for _, ip := range ips {
-		if ip.IsLoopback() {
-			return true, nil
-		}
-	}
-	machineAddrs := MachineAddrs()
-	for _, ip := range ips {
-		if slice.ContainsString(machineAddrs, ip.String()) {
-			return true, nil
-		}
-	}
-	return false, nil
+	return addrs.IsLocalhost(n.Addr)
 }
 
 func IsCurrentUser(users string) (bool, error) {
@@ -115,27 +99,4 @@ func IsCurrentUser(users string) (bool, error) {
 		}
 	}
 	return false, nil
-}
-
-var theMachineAddrs []string
-
-func MachineAddrs() []string {
-	if theMachineAddrs != nil {
-		return theMachineAddrs
-	}
-
-	ifcAddrs, err := net.InterfaceAddrs()
-	if err != nil {
-		panic(err)
-	}
-	addrs := make([]string, len(ifcAddrs))
-	for i, ifcAddr := range ifcAddrs {
-		addr := ifcAddr.String()
-		if i := strings.IndexByte(addr, '/'); i >= 0 {
-			addr = addr[:i]
-		}
-		addrs[i] = addr
-	}
-	theMachineAddrs = addrs
-	return theMachineAddrs
 }
