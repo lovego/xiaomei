@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"math"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -21,24 +20,9 @@ import (
 func Cmds(rootCmd *cobra.Command) []*cobra.Command {
 	return append(
 		dbs.Cmds(), renderCmd(), token.Cmd(), token.TimestampSignCmd(),
-		godoc.Cmd(), docCmd(), specCmd(), coverCmd(),
+		godoc.Cmd(), specCmd(), coverCmd(),
 		yamlCmd(), float32Cmd(), float64Cmd(), bashCompletionCmd(rootCmd),
 	)
-}
-
-func docCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   `doc`,
-		Short: `Generate api documentation from goa router.`,
-		RunE: func(_ *cobra.Command, args []string) error {
-			_, err := cmdPkg.Run(cmdPkg.O{
-				Dir: filepath.Dir(release.Root()),
-				Env: []string{"GOA_DOC=1"},
-			}, release.GoCmd(), "run", "main.go")
-			return err
-		},
-	}
-	return cmd
 }
 
 func coverCmd() *cobra.Command {

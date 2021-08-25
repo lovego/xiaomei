@@ -18,29 +18,38 @@ import (
 
 func Cmds() []*cobra.Command {
 	return []*cobra.Command{
-		runCmd(),
+		runCmd(`run`),
 		compileCmd(),
 		depsCmd(),
 		copy2vendorCmd(),
+		runCmd(`doc`),
 	}
 }
 
-func runCmd() *cobra.Command {
+func runCmd(name string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:                   `run [flags] [env] [-- go build flags]`,
+		Use:                   name + ` [flags] [env] [-- go build flags]`,
 		DisableFlagsInUseLine: true,
-		Short:                 `Compile the app server binary and run it.`,
 		RunE: release.EnvSliceCall(func(env string, args []string) error {
 			if err := Compile(false, env, args); err != nil {
 				return err
 			}
 			signal.Ignore(os.Interrupt)
-			_, err := cmd.Run(cmd.O{
+			o := cmd.O{
 				Dir: filepath.Join(release.Root(), `..`),
 				Env: []string{`ProDEV=true`, config.EnvVar + `=` + env},
-			}, filepath.Join(release.ServiceDir(`app`), release.Name(env)))
+			}
+			if name == `doc` {
+				o.Env = append(o.Env, `GOA_DOC=1`)
+			}
+			_, err := cmd.Run(o, filepath.Join(release.ServiceDir(`app`), release.Name(env)))
 			return err
 		}),
+	}
+	if name == `doc` {
+		cmd.Short = `Compile the app server binary and run it to generate routes documents.`
+	} else {
+		cmd.Short = `Compile the app server binary and run it.`
 	}
 	return cmd
 }
@@ -58,12 +67,12 @@ func compileCmd() *cobra.Command {
 
 func Compile(linuxAMD64 bool, env string, goBuildFlags []string) error {
 	log.Println(color.GreenString(`compile the app binary.`))
-	o := cmd.O{Dir: filepath.Join(release.Root(), `..`)}
+	o := cmd.O{Dir: release.SrcDir()}
 	if linuxAMD64 && (runtime.GOOS != `linux` || runtime.GOARCH != `amd64`) {
 		o.Env = []string{`GOOS=linux`, `GOARCH=amd64`} // cross compile
 	}
 	var options = []string{
-		`build`, `-v`, `-o`, `release/img-app/` + release.Name(env),
+		`build`, `-v`, `-o`, filepath.Join(release.ServiceDir(`app`), release.Name(env)),
 	}
 	options = append(options, goBuildFlags...)
 	if cmd.Ok(o, release.GoCmd(), options...) {

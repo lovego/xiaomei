@@ -33,7 +33,7 @@ func SpecAll() error {
 
 func Spec(targets []string, onlyChanged bool) error {
 	log.Println(color.GreenString(`check the app code spec.`))
-	if err := os.Chdir(filepath.Join(release.Root(), `..`)); err != nil {
+	if err := os.Chdir(release.SrcDir()); err != nil {
 		panic(err)
 	}
 

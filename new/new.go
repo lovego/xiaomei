@@ -76,7 +76,7 @@ func getTemplateDir(moduleVersion, typ string) (string, error) {
 }
 
 func initProject(projectDir string) error {
-	o := cmd.O{Dir: projectDir}
+	o := cmd.O{Dir: filepath.Join(projectDir, "src")}
 	if _, err := cmd.Run(o, release.GoCmd(), `mod`, `init`, projectDir); err != nil {
 		return err
 	}

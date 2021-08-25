@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/lovego/cmd"
+	"github.com/lovego/fs"
 )
 
 var theRoot *string
@@ -71,4 +72,12 @@ func hasAnyFeatures(dir string, features []string) bool {
 		}
 	}
 	return false
+}
+
+func SrcDir() string {
+	dir := filepath.Join(Root(), `..`)
+	if fs.Exist(filepath.Join(dir, "src", "go.mod")) {
+		return filepath.Join(dir, "src")
+	}
+	return dir
 }
