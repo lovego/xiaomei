@@ -3,7 +3,7 @@ FROM ubuntu:20.04
 COPY sources.list /etc/apt/sources.list
 RUN apt-get update \
         && apt-get install -y --no-install-recommends locales tzdata sudo ca-certificates gnupg \
-        less wget lsof net-tools iputils-ping dnsutils logrotate \
+        openssh-client less wget lsof net-tools iputils-ping dnsutils logrotate \
         && rm -rf /var/lib/apt/lists/*
 
 COPY nginx/sources.list /etc/apt/sources.list.d/nginx.list
