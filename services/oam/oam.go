@@ -26,7 +26,7 @@ for name in $(docker ps -af name='%s' --format '{{.Names}}'); do
 	docker logs %s $name
 	echo
 done
-`, release.ServiceNameRegexp(svcName, env), options)
+`, release.ContainerNameRegexp(svcName, env), options)
 	return eachNodeRun(env, script, feature)
 }
 
@@ -38,7 +38,7 @@ func operate(operation, svcName, env, feature string) error {
 for name in $(docker ps -af name='%s' --format '{{.Names}}'); do
 	docker %s $name
 done
-`, release.ServiceNameRegexp(svcName, env), operation)
+`, release.ContainerNameRegexp(svcName, env), operation)
 	for _, node := range release.GetCluster(env).GetNodes(feature) {
 		if _, err := node.Run(cmd.O{}, script); err != nil {
 			return err
@@ -53,7 +53,7 @@ done
 }
 
 func ps(svcName, env, feature string, watch bool) error {
-	script := fmt.Sprintf(` docker ps -af name='%s'`, release.ServiceNameRegexp(svcName, env))
+	script := fmt.Sprintf(` docker ps -af name='%s'`, release.ContainerNameRegexp(svcName, env))
 	if watch {
 		script = WatchCmd() + script
 	}

@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -83,25 +84,24 @@ func ServiceNames(env string) (names []string) {
 	return
 }
 
-func ServiceNameRegexp(svcName, env string) string {
+func ContainerNameRegexp(svcName, env string) string {
 	var names []string
 	if svcName != `` {
 		names = []string{svcName}
 	} else {
 		names = ServiceNames(env)
 	}
-	var regex string
-
+	var svcNamesRegexp string
 	switch len(names) {
 	case 0:
 		log.Fatalf(`deploy.yml: %s: no services defined.`, env)
 	case 1:
-		regex = names[0]
+		svcNamesRegexp = names[0]
 	default:
-		regex = fmt.Sprintf(`(%s)`, strings.Join(names, `|`))
+		svcNamesRegexp = fmt.Sprintf(`(%s)`, strings.Join(names, `|`))
 	}
 
-	return `^/` + EnvConfig(env).DeployName() + `.` + regex + `(\.\d+)?`
+	return `^/` + regexp.QuoteMeta(EnvConfig(env).DeployName()) + `\.` + svcNamesRegexp + `(\.\d+)?$`
 }
 
 func (svc Service) ImageName(tag string) string {

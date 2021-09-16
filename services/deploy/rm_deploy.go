@@ -12,7 +12,7 @@ func rmDeploy(svcName, env, feature string) error {
 for name in $(docker ps -af name='%s' --format '{{.Names}}'); do
 	docker stop $name >/dev/null 2>&1 && docker rm $name
 done
-`, release.ServiceNameRegexp(svcName, env))
+`, release.ContainerNameRegexp(svcName, env))
 	return eachNodeRun(env, script, feature)
 }
 
