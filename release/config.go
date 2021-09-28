@@ -1,7 +1,6 @@
 package release
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -51,11 +50,8 @@ func CheckEnv(env string) (string, error) {
 	if env == `` {
 		env = `dev`
 	}
-	if _, ok := Config(env).Envs[env]; ok {
-		return env, nil
-	}
-
-	return ``, fmt.Errorf("env %s is not defined in config.yml", env)
+	Config(env).Get(env) // ensure env exist
+	return env, nil
 }
 
 func EnvData(envStr string) strmap.StrMap {
