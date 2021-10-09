@@ -56,7 +56,7 @@ func (c Creation) doOne(dbUrl string, shardNo int, shardSettings config.ShardsSe
 	defer db.Close()
 
 	if _, err = db.Exec(c.sql); err != nil {
-		return bsql.ErrorWithPosition(err, c.sql, false)
+		return bsql.ErrorWithPosition(err, c.sql)
 	}
 	if shardNo > 0 {
 		return c.setupShard(db, shardNo, shardSettings)

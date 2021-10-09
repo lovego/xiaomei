@@ -16,7 +16,7 @@ import (
 )
 
 const moduleVersion = `v1.0.7`
-const fullVersion = moduleVersion + ` 20210928`
+const fullVersion = moduleVersion + ` 20211009`
 
 func main() {
 	color.NoColor = false
