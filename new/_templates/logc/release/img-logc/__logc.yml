@@ -19,7 +19,7 @@ mailer: "mailer://smtp.qq.com:25/?user=小美<xiaomei-go@qq.com>&pass=zjsbosjlhg
 keepers: [ "小美<xiaomei-go@qq.com>" ]
 rotate:
   time: "33 33 3 * * *" # cron time pattern to execute rotate.cmd
-  cmd: [ logrotate, logrotate.conf ]
+  cmd: [ logrotate, -s, .logrotate-status, logrotate.conf ]
 files:
   # "http.log" is the file path, required, either relative or absolute is ok.
 
