@@ -10,7 +10,7 @@ require (
 	github.com/lovego/addrs v0.0.1
 	github.com/lovego/bsql v0.0.8
 	github.com/lovego/cmd v0.0.1
-	github.com/lovego/config v0.1.5
+	github.com/lovego/config v0.2.1
 	github.com/lovego/fs v0.0.2
 	github.com/lovego/sessions v0.0.0-20200506092438-73b3ac90c80a
 	github.com/lovego/slice v0.0.8
