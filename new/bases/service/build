@@ -10,7 +10,7 @@ test logc/docker-kill.go  -nt logc/docker-kill &&
     GOOS=linux GOARCH=amd64 go build -v -o logc/docker-kill docker-kill.go
 
 if [[ $(file -b logc/logc) != 'ELF '* ]]; then
-                            go get   -v -d           github.com/lovego/logc
+                            go get   -v -d           github.com/lovego/logc@latest
     GOOS=linux GOARCH=amd64 go build -v -o logc/logc github.com/lovego/logc
 fi
 
