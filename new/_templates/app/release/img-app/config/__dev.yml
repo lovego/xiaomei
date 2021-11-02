@@ -1,0 +1,23 @@
+name: {{ .ProName }}
+timeZone: { name: China, offset: 28800 }
+# mailer://smtp.exmail.qq.com:465/?user=报警<alarm@{{ .Domain }}>&pass=123456
+mailer: "mailer://smtp.qq.com:25/?user=小美<xiaomei-go@qq.com>&pass=zjsbosjlhgugechh"
+keepers: [ "小美<xiaomei-go@qq.com>" ]
+externalURL: http://dev-{{ .Domain }}
+cookie:
+  name: token
+  domain: dev-{{ .Domain }}
+  path: /
+  maxAge: 1M # Y:年; M:月; D:天; h:时; m:分; s:秒
+secret: {{ genSecret }}
+keepers: [ ]
+data:
+  postgres:
+    default: postgres://postgres:@localhost/{{.ProName}}_dev
+  mysql:
+    default: root:root@tcp(127.0.0.1:3306)/{{.ProName}}_dev
+  mongo:
+    default: mongodb://127.0.0.1/{{.ProName}}_dev
+  redis:
+    default: redis://:@localhost:6379/0
+
