@@ -11,27 +11,29 @@ import (
 )
 
 func run(env, svcName string) error {
-	image := images.Get(svcName)
+	containerName := release.ServiceName(env, svcName) + ".run"
 
-	args := []string{
-		`run`, `-it`, `--rm`, `--name=` + release.ServiceName(svcName, env) + `.run`,
+	args := []string{"run", "-it", "--rm", "--name=" + containerName}
+	if runtime.GOOS == "linux" { // only linux support host network
+		args = append(args, "--network=host")
 	}
-	if runtime.GOOS == `linux` { // only linux support host network
-		args = append(args, `--network=host`)
-	}
-	if portEnvVar := image.PortEnvVar(); portEnvVar != `` {
+	image := images.Get(svcName)
+	if portEnvVar := image.PortEnvVar(); portEnvVar != "" {
 		runPort := getRunPort(image, env, svcName)
-		args = append(args, `-e`, fmt.Sprintf(`%s=%d`, portEnvVar, runPort))
+		args = append(args, "-e", fmt.Sprintf("%s=%d", portEnvVar, runPort))
 		if runtime.GOOS != "linux" {
-			args = append(args, fmt.Sprintf(`--publish=%d:%d`, runPort, runPort))
+			args = append(args, fmt.Sprintf("--publish=%d:%d", runPort, runPort))
 		}
 	}
 	if options := image.FlagsForRun(env); len(options) > 0 {
 		args = append(args, options...)
 	}
 
-	args = append(args, deploy.GetCommonArgs(svcName, env, ``)...)
-	_, err := cmd.Run(cmd.O{}, `docker`, args...)
+	args = append(args, deploy.GetCommonArgs(svcName, env, "")...)
+	if err := removeContainer(containerName); err != nil {
+		return err
+	}
+	_, err := cmd.Run(cmd.O{}, "docker", args...)
 	return err
 }
 
@@ -40,4 +42,12 @@ func getRunPort(image images.Image, env, svcName string) uint16 {
 		return ports[0]
 	}
 	return image.DefaultPort()
+}
+
+func removeContainer(name string) error {
+	if !cmd.Ok(cmd.O{}, "docker", "inspect", "-f", "{{ .State.Status }}", name) {
+		return nil
+	}
+	_, err := cmd.Run(cmd.O{}, "docker", "rm", name)
+	return err
 }

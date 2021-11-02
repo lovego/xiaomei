@@ -17,11 +17,11 @@ func genCmd() *cobra.Command {
 		DisableFlagsInUseLine: true,
 		Short:                 `generate a token. (add a signature to a content and encode it)`,
 		RunE: release.Env1Call(func(env, content string) error {
-			ck := release.EnvConfig(env).HttpCookie()
+			ck := release.Config(env).HttpCookie()
 			if domain != `` {
 				ck.Domain = domain
 			}
-			return generate(&ck, release.EnvConfig(env).Secret, content)
+			return generate(&ck, release.Config(env).Secret, content)
 		}),
 	}
 	cmd.Flags().StringVarP(&domain, `domain`, ``, ``, `specify the cookie domain.`)

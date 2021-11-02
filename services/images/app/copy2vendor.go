@@ -37,7 +37,7 @@ func copy2Vendor(pkgs []string, excludeTest bool) error {
 		}
 	}
 	goSrcDir := fs.GoSrcPath()
-	vendorDir := filepath.Join(release.Root(), `../vendor`)
+	vendorDir := filepath.Join(release.ProjectRoot(), `vendor`)
 	for _, pkg := range pkgs {
 		if err := syncGoFiles(filepath.Join(goSrcDir, pkg), filepath.Join(vendorDir, pkg)); err != nil {
 			return err

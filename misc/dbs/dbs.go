@@ -63,7 +63,7 @@ func Redis(env, key string, printCmd bool) error {
 }
 
 func getDBUrl(env, typ, key string) string {
-	strMap := release.EnvData(env).Get(typ)
+	strMap := release.Config(env).Data.Get(typ)
 	keys := strings.Split(key, ".")
 	for i := 0; i < len(keys)-1; i++ {
 		strMap = strMap.Get(keys[i])

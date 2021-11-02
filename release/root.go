@@ -2,51 +2,61 @@ package release
 
 import (
 	"log"
-	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/lovego/cmd"
+	"github.com/lovego/config/config"
 	"github.com/lovego/fs"
 )
 
-var theRoot *string
-
-func Root() string {
-	root := detectRoot()
+// Root returns an environment's root directory of release config.
+func Root(env string) string {
+	root := getRoot(env)
 	if root == `` {
-		log.Fatal(`release root not found.`)
+		log.Fatalf(`release root of %s not found.`, env)
 	}
 	return root
 }
 
-func InProject() bool {
-	return detectRoot() != ``
+func InProject(env string) bool {
+	return getRoot(env) != ""
 }
 
-func detectRoot() string {
-	if theRoot == nil {
-		if cwd, err := os.Getwd(); err != nil {
-			log.Panic(err)
-		} else if dir := detectDir(cwd,
-			`release/img-app/config/config.yml`,
-			`release/img-app/config_*/config.yml`,
-			`release/config.yml`,
-			`release/config_*.yml`,
-		); dir != `` {
-			dir = filepath.Join(dir, `release`)
-			theRoot = &dir
+func configFile(env, file string) string {
+	return filepath.Join(Root(env), file)
+}
+
+var roots = make(map[string]string)
+
+func getRoot(env string) string {
+	environ := config.NewEnv(env)
+	root, ok := roots[environ.Major()]
+	if !ok {
+		root = config.DetectReleaseConfigDirOf(environ.Major())
+		roots[environ.Major()] = root
+	}
+	return root
+}
+
+var projectRoot *string
+
+func ProjectRoot() string {
+	if projectRoot == nil {
+		if releaseDir, _ := config.DetectReleaseDir(); releaseDir == `` {
+			log.Fatal(`release root not found.`)
 		} else {
-			return ``
+			projectDir := filepath.Dir(releaseDir)
+			projectRoot = &projectDir
 		}
 	}
-	return *theRoot
+	return *projectRoot
 }
 
 func ModulePath() (string, error) {
 	output, err := cmd.Run(cmd.O{
 		Output: true,
-		Dir:    filepath.Dir(Root()),
+		Dir:    ProjectRoot(),
 	}, GoCmd(), `list`, `.`)
 	if err != nil {
 		return ``, err
@@ -54,28 +64,8 @@ func ModulePath() (string, error) {
 	return strings.TrimSpace(output), nil
 }
 
-func detectDir(dir string, features ...string) string {
-	for ; dir != `/`; dir = filepath.Dir(dir) {
-		if hasAnyFeatures(dir, features) {
-			return dir
-		}
-	}
-	return ``
-}
-
-func hasAnyFeatures(dir string, features []string) bool {
-	for _, feature := range features {
-		if out, err := filepath.Glob(filepath.Join(dir, feature)); err != nil {
-			log.Panic(err)
-		} else if len(out) > 0 {
-			return true
-		}
-	}
-	return false
-}
-
 func SrcDir() string {
-	dir := filepath.Join(Root(), `..`)
+	dir := ProjectRoot()
 	if fs.Exist(filepath.Join(dir, "src", "go.mod")) {
 		return filepath.Join(dir, "src")
 	}

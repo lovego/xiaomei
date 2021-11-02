@@ -4,20 +4,20 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/fatih/color"
+	"github.com/lovego/config/config"
 	"gopkg.in/yaml.v2"
 )
 
 type Deploy struct {
-	AccessNodes     map[string]string
-	Services        map[string]*Service
-	VolumesToCreate []string `yaml:"volumesToCreate"`
+	AccessNodes     map[string]string   `yaml:"accessNodes"`
+	Services        map[string]*Service `yaml:"services"`
+	VolumesToCreate []string            `yaml:"volumesToCreate"`
 }
 
 type Service struct {
@@ -32,7 +32,7 @@ var deploys map[string]*Deploy
 
 func GetDeploy(env string) *Deploy {
 	if deploys == nil {
-		if content, err := ioutil.ReadFile(filepath.Join(Root(), `deploy.yml`)); err != nil {
+		if content, err := ioutil.ReadFile(configFile(env, `deploy.yml`)); err != nil {
 			log.Panic(err)
 		} else {
 			deploys = map[string]*Deploy{}
@@ -41,9 +41,10 @@ func GetDeploy(env string) *Deploy {
 			}
 		}
 	}
-	theDeploy := deploys[env]
+	environ := config.NewEnv(env)
+	theDeploy := deploys[environ.Minor()]
 	if theDeploy == nil {
-		log.Fatalf(`deploy.yml: %s: undefined.`, env)
+		log.Fatalf(`%s: %s: undefined.`, configFile(env, `deploy.yml`), environ.Minor())
 	}
 	for name, svc := range theDeploy.Services {
 		svc.env = env
@@ -60,7 +61,7 @@ func HasService(env, svcName string) bool {
 func GetService(env, svcName string) *Service {
 	svc, ok := GetDeploy(env).Services[svcName]
 	if !ok {
-		log.Fatalf(`deploy.yml: %s.services.%s: undefined.`, env, svcName)
+		log.Fatalf(`%s: %s.services.%s: undefined.`, configFile(env, `deploy.yml`), env, svcName)
 	}
 	return svc
 }
@@ -101,7 +102,7 @@ func ContainerNameRegexp(svcName, env string) string {
 		svcNamesRegexp = fmt.Sprintf(`(%s)`, strings.Join(names, `|`))
 	}
 
-	return `^/` + regexp.QuoteMeta(EnvConfig(env).DeployName()) + `\.` + svcNamesRegexp + `(\.\d+)?$`
+	return `^/` + regexp.QuoteMeta(Config(env).DeployName()) + `\.` + svcNamesRegexp + `(\.\d+)?$`
 }
 
 func (svc Service) ImageName(tag string) string {
@@ -116,7 +117,7 @@ func (svc Service) ImageName(tag string) string {
 }
 
 func TimeTag(env string) string {
-	tag := time.Now().In(EnvConfig(env).TimeLocation).Format(`20060102-150405`)
+	tag := time.Now().In(Config(env).TimeLocation).Format(`20060102-150405`)
 	log.Println(`time tag: `, color.MagentaString(tag))
 	return tag
 }

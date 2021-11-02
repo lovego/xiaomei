@@ -22,7 +22,7 @@ type Creation struct {
 }
 
 func (c Creation) do() error {
-	v, err := config.GetDB(release.EnvData(c.env), c.typ, c.key)
+	v, err := config.GetDB(release.Config(c.env).Data, c.typ, c.key)
 	if err != nil {
 		return err
 	}

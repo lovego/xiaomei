@@ -29,7 +29,7 @@ func Do(env, typ, key string, dropDB bool) error {
 }
 
 func create(env, typ, key string, dropDB bool) error {
-	content, err := ioutil.ReadFile(filepath.Join(release.Root(), `../sqls`, key+`.sql`))
+	content, err := ioutil.ReadFile(filepath.Join(release.ProjectRoot(), `sqls`, key+`.sql`))
 	if err != nil {
 		return err
 	}
@@ -41,7 +41,7 @@ func getKeys(key string) ([]string, error) {
 	if key != "" {
 		keys = []string{key}
 	} else {
-		files, err := filepath.Glob(filepath.Join(release.Root(), `..`, `sqls`, `*.sql`))
+		files, err := filepath.Glob(filepath.Join(release.ProjectRoot(), `sqls`, `*.sql`))
 		if err != nil {
 			return nil, err
 		}

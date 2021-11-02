@@ -132,7 +132,7 @@ func getDeployConfig(svcNames []string, env, timeTag string) deployConfig {
 func getServiceConf(svcName, env, timeTag string) serviceConfig {
 	commonArgs := GetCommonArgs(svcName, env, timeTag)
 	data := serviceConfig{
-		Name:       release.ServiceName(svcName, env),
+		Name:       release.ServiceName(env, svcName),
 		CommonArgs: strings.Join(commonArgs, ` `),
 		PortEnvVar: images.Get(svcName).PortEnvVar(),
 	}

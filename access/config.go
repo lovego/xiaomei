@@ -5,39 +5,36 @@ import (
 	"strconv"
 
 	"github.com/lovego/config/config"
-	"github.com/lovego/strmap"
 	"github.com/lovego/xiaomei/release"
 )
 
 type Config struct {
 	AccessName string
-	*config.EnvConfig
+	*config.Config
 	App, Web *service
-	Data     strmap.StrMap
 }
 
 func getConfig(env, downAddr string) (Config, error) {
 	data := Config{
-		EnvConfig: release.EnvConfig(env),
-		App:       newService(`app`, env, downAddr),
-		Web:       newService(`web`, env, downAddr),
-		Data:      release.EnvData(env),
+		Config: release.Config(env),
+		App:    newService(`app`, env, downAddr),
+		Web:    newService(`web`, env, downAddr),
 	}
 	if data.App == nil && data.Web == nil {
 		return Config{}, errors.New(`neither app nor web service defined.`)
 	}
 	if data.App != nil && data.Web != nil {
-		data.AccessName = data.EnvConfig.DeployName()
+		data.AccessName = data.Config.DeployName()
 	} else if data.App != nil {
-		data.AccessName = release.ServiceName(data.App.svcName, env)
+		data.AccessName = release.ServiceName(env, data.App.svcName)
 	} else if data.Web != nil {
-		data.AccessName = release.ServiceName(data.Web.svcName, env)
+		data.AccessName = release.ServiceName(env, data.Web.svcName)
 	}
 	return data, nil
 }
 
 type service struct {
-	*config.EnvConfig
+	*config.Config
 	svcName  string
 	downAddr string
 	addrs    []string
@@ -45,7 +42,7 @@ type service struct {
 
 func newService(svcName, env, downAddr string) *service {
 	if release.HasService(env, svcName) {
-		return &service{EnvConfig: release.EnvConfig(env), svcName: svcName, downAddr: downAddr}
+		return &service{Config: release.Config(env), svcName: svcName, downAddr: downAddr}
 	} else {
 		return nil
 	}

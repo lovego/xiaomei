@@ -16,17 +16,17 @@ func renderCmd() *cobra.Command {
 		Use:   `render <env> <template file> [output file]`,
 		Short: `render template with envionment config.`,
 		RunE: release.Env2Call(func(env string, tmplFile, outputFile string) error {
-			return RenderFileWithEnvConfig(env, tmplFile, outputFile)
+			return RenderFileWithConfig(env, tmplFile, outputFile)
 		}),
 	}
 	return cmd
 }
 
-func RenderFileWithEnvConfig(env, tmplFile, outputFile string) error {
+func RenderFileWithConfig(env, tmplFile, outputFile string) error {
 	if outputFile != "" {
-		return RenderFileTo(tmplFile, release.EnvConfig(env), outputFile)
+		return RenderFileTo(tmplFile, release.Config(env), outputFile)
 	}
-	if output, err := RenderFile(tmplFile, release.EnvConfig(env)); err != nil {
+	if output, err := RenderFile(tmplFile, release.Config(env)); err != nil {
 		return err
 	} else {
 		fmt.Println(output.String())

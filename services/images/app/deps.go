@@ -58,7 +58,7 @@ func getDeps(inVendor, excludeTest bool) (deps []string, err error) {
 }
 
 func getDepPkgs(excludeTest bool) []string {
-	o := cmd.O{Output: true, Dir: path.Join(release.Root(), `../`)}
+	o := cmd.O{Output: true, Dir: release.ProjectRoot()}
 	result, err := cmd.Run(
 		o, release.GoCmd(), `list`, `-f`, `{{join .Deps "\n"}}`,
 	)

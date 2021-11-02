@@ -62,7 +62,7 @@ func (i Image) FlagsForRun(env string) []string {
 	case "web":
 		return []string{
 			`-e=SendfileOff=true`,
-			fmt.Sprintf("-v=%s/public:/var/www/%s", release.ServiceDir(`web`), release.Name(env)),
+			fmt.Sprintf("-v=%s/public:/var/www/%s", release.ImageDir(env, `web`), release.Name(env)),
 		}
 	default:
 		return nil
@@ -72,9 +72,11 @@ func (i Image) FlagsForRun(env string) []string {
 // 4. prepare files for build
 func (i Image) prepare(env, svcDir string, flags []string) error {
 	if prepare := svcDir + "/prepare"; fs.Exist(prepare) {
-		environment := config.NewEnv(env)
+		environ := config.NewEnv(env)
 		if _, err := cmd.Run(cmd.O{
-			Dir: svcDir, Env: environment.Vars(), Print: true,
+			Dir:   svcDir,
+			Env:   append(environ.Vars(), "ReleaseRoot="+release.Root(env)),
+			Print: true,
 		}, prepare, flags...); err != nil {
 			return err
 		}
@@ -95,7 +97,7 @@ func (i Image) prepare(env, svcDir string, flags []string) error {
 				color.GreenString(`render`), tmpl,
 				color.GreenString(`to`), output,
 			)
-			if err := misc.RenderFileWithEnvConfig(env, tmpl, output); err != nil {
+			if err := misc.RenderFileWithConfig(env, tmpl, output); err != nil {
 				return err
 			}
 		}

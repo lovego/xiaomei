@@ -36,13 +36,13 @@ func runCmd(name string) *cobra.Command {
 			}
 			signal.Ignore(os.Interrupt)
 			o := cmd.O{
-				Dir: filepath.Join(release.Root(), `..`),
+				Dir: filepath.Join(release.Root(env), `..`),
 				Env: []string{`ProDEV=true`, config.EnvVar + `=` + env},
 			}
 			if name == `doc` {
 				o.Env = append(o.Env, `GOA_DOC=1`)
 			}
-			_, err := cmd.Run(o, filepath.Join(release.ServiceDir(`app`), release.Name(env)))
+			_, err := cmd.Run(o, filepath.Join(release.ImageDir(env, `app`), release.Name(env)))
 			return err
 		}),
 	}
@@ -72,7 +72,7 @@ func Compile(linuxAMD64 bool, env string, goBuildFlags []string) error {
 		o.Env = []string{`GOOS=linux`, `GOARCH=amd64`} // cross compile
 	}
 	var options = []string{
-		`build`, `-v`, `-o`, filepath.Join(release.ServiceDir(`app`), release.Name(env)),
+		`build`, `-v`, `-o`, filepath.Join(release.ImageDir(env, `app`), release.Name(env)),
 	}
 	options = append(options, goBuildFlags...)
 	if cmd.Ok(o, release.GoCmd(), options...) {

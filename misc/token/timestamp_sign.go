@@ -17,7 +17,7 @@ func TimestampSignCmd() *cobra.Command {
 		RunE: release.EnvCall(func(env string) error {
 			ts := time.Now().Unix()
 			if secret == "" {
-				secret = release.EnvConfig(env).Secret
+				secret = release.Config(env).Secret
 			}
 			fmt.Printf("-H Timestamp:%d -H Sign:%s\n", ts, config.TimestampSign(ts, secret))
 			return nil

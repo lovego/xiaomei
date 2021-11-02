@@ -51,7 +51,7 @@ func (d Deploy) createImages() error {
 }
 
 func (d Deploy) run() error {
-	psScript := fmt.Sprintf(` docker ps -f name=^/%s`, release.ServiceName(d.svcName, d.Build.Env))
+	psScript := fmt.Sprintf(` docker ps -f name=^/%s`, release.ServiceName(d.Build.Env, d.svcName))
 	if !d.noWatch {
 		psScript = oam.WatchCmd() + psScript
 	}

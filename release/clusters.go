@@ -3,10 +3,10 @@ package release
 import (
 	"io/ioutil"
 	"log"
-	"path/filepath"
 	"strings"
 
 	"github.com/lovego/cmd"
+	"github.com/lovego/config/config"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -18,9 +18,9 @@ type Cluster struct {
 	Nodes []Node `yaml:"nodes"`
 }
 
-func GetClusters() map[string]*Cluster {
+func GetClusters(env string) map[string]*Cluster {
 	if theClusters == nil {
-		content, err := ioutil.ReadFile(filepath.Join(Root(), `clusters.yml`))
+		content, err := ioutil.ReadFile(configFile(env, `clusters.yml`))
 		if err != nil {
 			panic(err)
 		}
@@ -38,9 +38,10 @@ func GetClusters() map[string]*Cluster {
 }
 
 func GetCluster(env string) *Cluster {
-	cluster := GetClusters()[env]
+	environ := config.NewEnv(env)
+	cluster := GetClusters(env)[environ.Minor()]
 	if cluster == nil {
-		log.Fatalf("empty cluster config for env: %v", env)
+		log.Fatalf(`%s: %s: undefined.`, configFile(env, `clusters.yml`), environ.Minor())
 	}
 	return cluster
 }

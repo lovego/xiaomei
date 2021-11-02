@@ -18,7 +18,7 @@ type Build struct {
 
 func (b Build) Run(svcName string) error {
 	return imagesDo(svcName, b.Env, func(img Image) error {
-		svcDir := release.ServiceDir(img.svcName)
+		svcDir := release.ImageDir(b.Env, img.svcName)
 		if err := img.prepare(b.Env, svcDir, b.PrepareFlags); err != nil {
 			return err
 		}

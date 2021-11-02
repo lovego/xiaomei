@@ -65,7 +65,7 @@ func getNginxConf(env, downAddr string) (string, Config, error) {
 		return ``, Config{}, err
 	}
 
-	output, err := misc.RenderFile(filepath.Join(release.Root(), `access.conf.tmpl`), data)
+	output, err := misc.RenderFile(filepath.Join(release.Root(env), `access.conf.tmpl`), data)
 	if err != nil {
 		return ``, Config{}, err
 	}
