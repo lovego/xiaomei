@@ -74,13 +74,13 @@ func (c Creation) createDB(dbURL url.URL, dbName string) error {
 	defer db.Close()
 
 	if c.dropDB {
-		log.Printf("drop database %s\n", color.GreenString(dbName))
+		log.Printf("drop   database %s ...\n", color.GreenString(dbName))
 		if _, err := db.Exec(`DROP DATABASE IF EXISTS ` + dbName); err != nil {
 			return err
 		}
 	}
 
-	log.Printf("create %s ...\n", color.GreenString(dbName))
+	log.Printf("create database %s ...\n", color.GreenString(dbName))
 
 	sql := `CREATE DATABASE `
 	if c.typ == "mysql" {

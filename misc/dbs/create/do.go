@@ -6,14 +6,16 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/lovego/config/config"
 	"github.com/lovego/xiaomei/release"
 )
 
 func Do(env, typ, key string, dropDB bool) error {
 	if dropDB {
-		switch env {
+		environ := config.NewEnv(env)
+		switch environ.Minor() {
 		case `production`, `staging`, `preview`:
-			return errors.New("dropDB is forbidden under environment: " + env)
+			return errors.New("drop db is forbidden under environment: " + environ.Minor())
 		}
 	}
 	keys, err := getKeys(key)
