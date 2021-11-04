@@ -19,7 +19,7 @@ func Cmds(svcName string) (cmds []*cobra.Command) {
 		psCmdFor(svcName),
 		logsCmdFor(svcName),
 	)
-	cmds = append(cmds, operationCmdFor(svcName)...)
+	cmds = append(cmds, operationCmdsFor(svcName)...)
 	return
 }
 
@@ -102,7 +102,7 @@ func logsCmdFor(svcName string) *cobra.Command {
 	return cmd
 }
 
-func operationCmdFor(svcName string) []*cobra.Command {
+func operationCmdsFor(svcName string) []*cobra.Command {
 	var operations = []string{`start`, `stop`, `restart`}
 	cmds := make([]*cobra.Command, len(operations), len(operations))
 	for i, operation := range operations {
