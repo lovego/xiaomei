@@ -123,7 +123,7 @@ func TimeTag(env string) string {
 }
 
 func (svc Service) FirstContainerName() string {
-	name := ServiceName(svc.name, svc.env)
+	name := ServiceName(svc.env, svc.name)
 	if ports := svc.Ports; len(ports) > 0 {
 		name += `.` + strconv.FormatInt(int64(ports[0]), 10)
 	}
