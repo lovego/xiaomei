@@ -18,7 +18,7 @@ func deployCmdFor(svcName string) *cobra.Command {
 	var d = Deploy{svcName: svcName}
 	cmd := &cobra.Command{
 		Use:   `deploy [flags] [env [tag]] [ -- [prepare flags] [-- docker build flags] ]`,
-		Short: `Deploy the ` + desc(svcName) + `.`,
+		Short: `Deploy the ` + desc(svcName) + `. Specify a tag to use an existing image with that tag.`,
 		RunE: release.EnvSlicesCall(func(env string, args [][]string) error {
 			if len(args) > 3 || len(args) > 0 && len(args[0]) > 1 {
 				return errors.New("invalid arguments usage.")

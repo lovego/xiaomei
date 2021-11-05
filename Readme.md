@@ -4,7 +4,7 @@
 [![Build Status](https://github.com/lovego/xiaomei/actions/workflows/go.yml/badge.svg)](https://github.com/lovego/xiaomei/actions/workflows/go.yml)
 [![Coverage Status](https://coveralls.io/repos/github/lovego/xiaomei/badge.svg?branch=master)](https://coveralls.io/github/lovego/xiaomei)
 [![Go Report Card](https://goreportcard.com/badge/github.com/lovego/xiaomei)](https://goreportcard.com/report/github.com/lovego/xiaomei)
-[![Documentation](https://pkg.go.dev/badge/github.com/lovego/xiaomei)](https://pkg.go.dev/github.com/lovego/xiaomei@v1.0.8)
+[![Documentation](https://pkg.go.dev/badge/github.com/lovego/xiaomei)](https://pkg.go.dev/github.com/lovego/xiaomei@v1.1.0)
 
 ## 安装
 ```shell
