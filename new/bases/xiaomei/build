@@ -4,12 +4,15 @@ set -e
 cd $(dirname $0)
 
 if [[ $(file -b xiaomei) != 'ELF '* ]]; then
-  GOOS=linux GOARCH=amd64 go build -v -o xiaomei ../../..
+    dir=$(pwd)
+    cd ../../..
+    GOOS=linux GOARCH=amd64 go build -v -o "$dir"/xiaomei
+    cd "$dir"
 fi
 
 if [[ $(file -b gospec) != 'ELF '* ]]; then
-                          go get   -v -d        github.com/lovego/gospec
-  GOOS=linux GOARCH=amd64 go build -v -o gospec github.com/lovego/gospec
+                            go get   -v -d        github.com/lovego/gospec
+    GOOS=linux GOARCH=amd64 go build -v -o gospec github.com/lovego/gospec
 fi
 
 name=registry.cn-beijing.aliyuncs.com/lovego/xiaomei
@@ -17,5 +20,5 @@ name=registry.cn-beijing.aliyuncs.com/lovego/xiaomei
 docker build -t $name .
 
 if test "$1" = '-p'; then
-  docker push $name
+    docker push $name
 fi
