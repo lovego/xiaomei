@@ -19,7 +19,7 @@ func run() error {
 	}
 	script := `
 killall godoc >/dev/null 2>&1
-nohup godoc -http=:1234 -index_interval=1s >/dev/null 2>&1 &
+nohup godoc -http=:1234 -index_interval=1s >/tmp/godoc.log 2>&1 &
 `
 	_, err := cmd.Run(cmd.O{}, `sh`, `-c`, script)
 	if err == nil {

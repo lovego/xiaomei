@@ -33,7 +33,7 @@ func setupRouter(routerGroup *goa.RouterGroup) {
 	if os.Getenv("GOA_DOC") != `` {
 		routerGroup.DocDir(filepath.Join(fs.SourceDir(), "docs", "apis"))
 		routes.Setup(routerGroup)
-		os.Exit(1)
+		os.Exit(0)
 	}
 
 	utilroutes.Setup(routerGroup)

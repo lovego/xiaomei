@@ -1,3 +1,8 @@
+before_script:
+  - buildDir=$(pwd); echo $buildDir
+  - projectDir=~/oam/{{ .ProName }}; echo $projectDir
+  - mkdir -p $(dirname $projectDir); ln -sfT $buildDir $projectDir; cd $projectDir
+
 stages:
   - deploy
 
@@ -7,29 +12,30 @@ stages:
     name: $CI_COMMIT_REF_NAME
   script:
     - xiaomei logc deploy $CI_ENVIRONMENT_NAME -Wb "docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY"
-  only:
-    refs: [ branches ]
+  tags:
+    - shell-xiaomei-qa  # match shell runner for qa that has xiaomei command.
+  tags:
+    - shell-xiaomei-qa  # match shell runner for qa that has xiaomei command.
+  variables:
+    branch: ""
+  rules:
+    - if: [ '$CI_COMMIT_REF_NAME == $branch' ]
 
 deploy-qa:
   extends: .deploy
-  only:
-    variables: [ '$CI_COMMIT_REF_NAME == "qa"' ]
-  tags:
-    - shell-xiaomei-qa  # match shell runner for qa that has xiaomei command.
+  variables:
+    branch: qa
 
 deploy-production:
   extends: .deploy
   environment:
     name: production
-  only:
-    variables: [ '$CI_COMMIT_REF_NAME == "master"' ]
   tags:
     - shell-xiaomei-production  # match shell runner for production that has xiaomei command.
-  when: manual
+  variables:
+    branch: production
+  rules:
+    - if: [ '$CI_COMMIT_REF_NAME == $branch' ]
+      when: manual
   allow_failure: false
-
-before_script:
-  - buildDir=$(pwd); echo $buildDir
-  - projectDir=~/oam/{{ .ProName }}; echo $projectDir
-  - mkdir -p $(dirname $projectDir); ln -sfT $buildDir $projectDir; cd $projectDir
 

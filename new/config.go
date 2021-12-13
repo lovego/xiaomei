@@ -37,7 +37,8 @@ func getConfig(typ, projectDir, registry, domain string) (*Config, error) {
 	switch typ {
 	case `app`:
 		config.ModulePath = projectDir
-	case `logc`:
+		config.Domain = domain
+	case `web`:
 		config.Domain = domain
 	}
 

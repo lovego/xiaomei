@@ -22,11 +22,11 @@ func GetClusters(env string) map[string]*Cluster {
 	if theClusters == nil {
 		content, err := ioutil.ReadFile(configFile(env, `clusters.yml`))
 		if err != nil {
-			panic(err)
+			log.Panic(err)
 		}
 		theClusters = make(map[string]*Cluster)
 		if err := yaml.Unmarshal(content, theClusters); err != nil {
-			panic(err)
+			log.Panic(err)
 		}
 		for env, cluster := range theClusters {
 			if cluster != nil {

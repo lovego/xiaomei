@@ -17,6 +17,7 @@ func GoCmd() string {
 func GoGetByProxy(args ...string) error {
 	_, err := cmd.Run(
 		cmd.O{
+			Dir: os.TempDir(),
 			Env: []string{`GOPROXY=https://goproxy.cn,direct`, `GO111MODULE=on`},
 		},
 		GoCmd(), append([]string{`get`, `-v`}, args...)...,

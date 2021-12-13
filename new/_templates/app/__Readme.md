@@ -1,5 +1,5 @@
 {{ .ProName }}系统
-================
+==================
 
 [![pipeline status]({{ .RepoPrefix }}/{{.ProNameUrlSafe}}/badges/master/pipeline.svg)]({{ .RepoPrefix }}/{{.ProNameUrlSafe}}/commits/master)
 [![coverage report]({{ .RepoPrefix }}/{{.ProNameUrlSafe}}/badges/master/coverage.svg)]({{ .RepoPrefix }}/{{.ProNameUrlSafe}}/commits/master)
@@ -11,3 +11,5 @@
 | Preview      | https://preview-{{ .Domain }}        |
 | Production   | https://{{ .Domain }}                |
 
+### API文档
+[API文档](./src/docs/apis)

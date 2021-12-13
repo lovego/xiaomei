@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/fatih/color"
@@ -15,10 +16,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const moduleVersion = `v1.1.0`
-const fullVersion = moduleVersion + ` 20211105`
+const moduleVersion = `v1.1.1`
+const fullVersion = moduleVersion + ` 20211213`
 
 func main() {
+	log.SetFlags(log.Lshortfile | log.LstdFlags)
 	color.NoColor = false
 	cobra.EnableCommandSorting = false
 	root := &cobra.Command{

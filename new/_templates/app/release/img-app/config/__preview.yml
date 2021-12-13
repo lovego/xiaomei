@@ -3,7 +3,7 @@ timeZone: { name: China, offset: 28800 }
 # mailer://smtp.exmail.qq.com:465/?user=报警<alarm@{{ .Domain }}>&pass=123456
 mailer: "mailer://smtp.qq.com:25/?user=小美<xiaomei-go@qq.com>&pass=zjsbosjlhgugechh"
 keepers: [ "小美<xiaomei-go@qq.com>" ]
-externalURL: https://preview-{{ .Domain }}
+externalURL: https://preview-{{ .Domain }}/api
 cookie:
   name: token
   domain: preview-{{ .Domain }}

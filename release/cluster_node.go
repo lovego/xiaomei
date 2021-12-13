@@ -1,6 +1,7 @@
 package release
 
 import (
+	"log"
 	"os"
 	"os/signal"
 	"os/user"
@@ -79,7 +80,7 @@ func (n Node) Run(o cmd.O, script string) (string, error) {
 func (n Node) IsLocalHostP() bool {
 	ok, err := n.IsLocalHost()
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 	return ok
 }
