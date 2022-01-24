@@ -45,7 +45,7 @@ deploy() {
     dockerRemove $name
   fi
   docker run --name=$name -dt --restart=always $args
-  docker logs -f $name |& { sed '/ started\./q'; pkill -P $$ docker; }
+	docker logs -f $name |& { timeout ${StartTimeout:-1m} sed '/ started\./q'; pkill -P $$ docker; }
 
   test -n "$portEnvVar" && [[ $(dockerStatus $name.old) != '' ]] && dockerStop $name.old || true
 }

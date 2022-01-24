@@ -31,14 +31,22 @@ done
 }
 
 func operate(operation, svcName, env, feature string) error {
-	if operation != `start` && operation != `stop` && operation != `restart` {
+	var waitUntilStarted string
+	switch operation {
+	case "start", "restart":
+		// 只参考最近3秒的docker日志，防止重启前的日志包含了"started."
+		waitUntilStarted = `
+	docker logs --since=3s -f $name |& { timeout ${StartTimeout:-1m} sed '/ started\./q'; pkill -P $$ docker; }`
+	case "stop":
+	default:
 		return fmt.Errorf("invalid operation: %s", operation)
 	}
+
 	script := fmt.Sprintf(`
 for name in $(docker ps -af name='%s' --format '{{.Names}}'); do
-	docker %s $name
+	docker %s $name;%s
 done
-`, release.ContainerNameRegexp(svcName, env), operation)
+`, release.ContainerNameRegexp(svcName, env), operation, waitUntilStarted)
 	for _, node := range release.GetCluster(env).GetNodes(feature) {
 		if _, err := node.Run(cmd.O{}, script); err != nil {
 			return err
