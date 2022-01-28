@@ -9,9 +9,14 @@ import (
 	"github.com/lovego/xiaomei/release"
 )
 
-func Psql(env, key string, printCmd bool) error {
+const less = "'less -iFMSXx4'"
+
+func Psql(env, key string, lessPager, printCmd bool) error {
 	url := dburl.Parse(getDBUrl(env, `postgres`, key)).URL.String()
-	command := fmt.Sprintf("PAGER='less -iFMSXx4' psql '%s'", url)
+	command := fmt.Sprintf("psql '%s'", url)
+	if lessPager {
+		command = fmt.Sprintf("PAGER=%s %s", less, command)
+	}
 	if printCmd {
 		fmt.Println(command)
 		return nil
@@ -20,9 +25,12 @@ func Psql(env, key string, printCmd bool) error {
 	return err
 }
 
-func Mysql(env, key string, printCmd bool) error {
-	flags := ParseDSN(getDBUrl(env, `mysql`, key)).MysqlFlags()
-	command := `mysql --pager=less -SX ` + strings.Join(flags, ` `)
+func Mysql(env, key string, lessPager, printCmd bool) error {
+	command := `mysql `
+	if lessPager {
+		command += `--pager=` + less + " "
+	}
+	command += strings.Join(ParseDSN(getDBUrl(env, `mysql`, key)).MysqlFlags(), ` `)
 	if printCmd {
 		fmt.Println(command)
 		return nil

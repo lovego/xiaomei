@@ -7,12 +7,12 @@ import (
 )
 
 func Cmds() []*cobra.Command {
-	mysqlCmd := makeCmd(`mysql`, `Enter mysql cli.`, Mysql)
+	mysqlCmd := makeCmdWithLess(`mysql`, `Enter mysql cli.`, Mysql)
 	mysqlCmd.AddCommand(
 		makeCmd(`dump`, `mysqldump to stdout.`, MysqlDump),
 	)
 
-	postgresCmd := makeCmd(`psql`, `Enter psql cli.`, Psql)
+	postgresCmd := makeCmdWithLess(`psql`, `Enter psql cli.`, Psql)
 	postgresCmd.AddCommand(makeCreateCmd(`postgres`))
 
 	return []*cobra.Command{
@@ -35,6 +35,24 @@ func makeCmd(name, short string, fun func(env, key string, print bool) error) *c
 			return fun(env, key, print)
 		}),
 	}
+	cmd.Flags().BoolVarP(&print, `print`, `p`, false, `only print the command.`)
+	return cmd
+}
+
+func makeCmdWithLess(name, short string, fun func(env, key string, less, print bool) error) *cobra.Command {
+	var less bool
+	var print bool
+	cmd := &cobra.Command{
+		Use:   name + ` [env [key]]`,
+		Short: `[db] ` + short,
+		RunE: release.Env1Call(func(env, key string) error {
+			if key == `` {
+				key = `default`
+			}
+			return fun(env, key, less, print)
+		}),
+	}
+	cmd.Flags().BoolVarP(&less, `less`, `l`, false, `use less as the pager.`)
 	cmd.Flags().BoolVarP(&print, `print`, `p`, false, `only print the command.`)
 	return cmd
 }
