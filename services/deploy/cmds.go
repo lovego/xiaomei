@@ -46,6 +46,8 @@ func deployCmdFor(svcName string) *cobra.Command {
 
 	cmd.Flags().StringVarP(&d.filter, `filter`, `f`, ``, `Filter the node to deploy to by node addr.`)
 
+	cmd.Flags().StringVarP(&d.startTimeout, `start-timeout`, `t`, `1m`,
+		`Timeout to wait for starting (until a " started." is printed on stdout or stderr).`)
 	cmd.Flags().BoolVarP(&d.noWatch, `no-watch`, `W`, false,
 		`After deployed a node, don't watch container status until "Ctl+C".`)
 

@@ -30,13 +30,17 @@ done
 	return eachNodeRun(env, script, feature)
 }
 
-func operate(operation, svcName, env, feature string) error {
+func operate(operation, svcName, env, feature, startTimeout string) error {
 	var waitUntilStarted string
 	switch operation {
 	case "start", "restart":
 		// 只参考最近3秒的docker日志，防止重启前的日志包含了"started."
+		if startTimeout == "" {
+			startTimeout = "1m"
+		}
 		waitUntilStarted = `
-	docker logs --since=3s -f $name |& { timeout ${StartTimeout:-1m} sed '/ started\./q'; pkill -P $$ docker; }`
+	docker logs --since=3s -f $name |& { timeout ` + startTimeout +
+			` sed '/ started\./q'; pkill -P $$ docker; }`
 	case "stop":
 	default:
 		return fmt.Errorf("invalid operation: %s", operation)

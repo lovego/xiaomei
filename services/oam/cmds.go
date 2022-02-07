@@ -112,15 +112,21 @@ func operationCmdsFor(svcName string) []*cobra.Command {
 }
 
 func makeOperationCmd(operation, svcName string) *cobra.Command {
-	var filter string
+	var filter, startTimeout string
 	cmd := &cobra.Command{
 		Use:   operation + ` [env]`,
 		Short: `[oam] ` + strings.Title(operation) + ` the ` + desc(svcName) + `.`,
 		RunE: release.EnvCall(func(env string) error {
-			return operate(operation, svcName, env, filter)
+			return operate(operation, svcName, env, filter, startTimeout)
 		}),
 	}
 	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
+	switch operation {
+	case "start", "restart":
+		cmd.Flags().StringVarP(&startTimeout, `start-timeout`, `t`, `1m`,
+			`Timeout to wait for starting (until a " started." is printed on stdout or stderr).`)
+	}
+
 	return cmd
 }
 

@@ -45,7 +45,7 @@ deploy() {
     dockerRemove $name
   fi
   docker run --name=$name -dt --restart=always $args
-	docker logs -f $name |& { timeout ${StartTimeout:-1m} sed '/ started\./q'; pkill -P $$ docker; }
+	docker logs -f $name |& { timeout {{ .StartTimeout }} sed '/ started\./q'; pkill -P $$ docker; }
 
   test -n "$portEnvVar" && [[ $(dockerStatus $name.old) != '' ]] && dockerStop $name.old || true
 }
@@ -99,10 +99,10 @@ checkPort() {
 {{ end -}}
 `
 
-func getDeployScript(svcNames []string, env, timeTag string) (string, error) {
+func getDeployScript(svcNames []string, env, timeTag, startTimeout string) (string, error) {
 	tmpl := template.Must(template.New(``).Parse(deployScriptTmpl))
 	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, getDeployConfig(svcNames, env, timeTag)); err != nil {
+	if err := tmpl.Execute(&buf, getDeployConfig(svcNames, env, timeTag, startTimeout)); err != nil {
 		return ``, err
 	}
 	script := buf.String()
@@ -113,18 +113,23 @@ func getDeployScript(svcNames []string, env, timeTag string) (string, error) {
 type deployConfig struct {
 	VolumesToCreate []string
 	Services        []serviceConfig
+	StartTimeout    string
 }
 type serviceConfig struct {
 	Name, CommonArgs, PortEnvVar string
 	Ports                        []uint16
 }
 
-func getDeployConfig(svcNames []string, env, timeTag string) deployConfig {
+func getDeployConfig(svcNames []string, env, timeTag, startTimeout string) deployConfig {
 	data := deployConfig{
 		VolumesToCreate: release.GetDeploy(env).VolumesToCreate,
+		StartTimeout:    startTimeout,
 	}
 	for _, svcName := range svcNames {
 		data.Services = append(data.Services, getServiceConf(svcName, env, timeTag))
+	}
+	if data.StartTimeout == "" {
+		data.StartTimeout = "1m"
 	}
 	return data
 }

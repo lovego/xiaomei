@@ -16,7 +16,7 @@ import (
 )
 
 const moduleVersion = `v1.1.1`
-const fullVersion = moduleVersion + ` 20220128`
+const fullVersion = moduleVersion + ` 20220207`
 
 func main() {
 	// log.SetFlags(log.Lshortfile | log.LstdFlags)

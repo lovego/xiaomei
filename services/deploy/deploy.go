@@ -17,8 +17,9 @@ type Deploy struct {
 	images.Push
 	alwaysPush bool
 
-	filter  string
-	noWatch bool
+	filter       string
+	startTimeout string
+	noWatch      bool
 }
 
 func (d Deploy) start() error {
@@ -67,7 +68,7 @@ func (d Deploy) run() error {
 
 func (d Deploy) runNode(svcs []string, node release.Node, psScript string) error {
 	log.Println(color.GreenString(`deploying ` + node.SshAddr()))
-	deployScript, err := getDeployScript(svcs, d.Build.Env, d.Build.Tag)
+	deployScript, err := getDeployScript(svcs, d.Build.Env, d.Build.Tag, d.startTimeout)
 	if err != nil {
 		return err
 	}
