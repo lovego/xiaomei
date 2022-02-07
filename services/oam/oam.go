@@ -47,6 +47,7 @@ func operate(operation, svcName, env, feature, startTimeout string) error {
 	}
 
 	script := fmt.Sprintf(`
+set -e
 for name in $(docker ps -af name='%s' --format '{{.Names}}'); do
 	docker %s $name;%s
 done
