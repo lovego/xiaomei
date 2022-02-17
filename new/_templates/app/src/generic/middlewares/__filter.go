@@ -11,7 +11,7 @@ import (
 	"github.com/lovego/errs"
 	"github.com/lovego/goa"
 	"github.com/lovego/tracer"
-	"{{ .ModulePath }}/middlewares/helpers"
+	"{{ .ModulePath }}/generic/session"
 )
 
 func Filter(c *goa.Context) {
@@ -68,7 +68,7 @@ func parseTimestamp(timestamp string) (int64, error) {
 }
 
 func checkSession(c *goa.Context) error {
-	if helpers.GetSession(c).UserId <= 0 {
+	if session.Get(c).UserId <= 0 {
 		return errs.New(`token-err`, `token error, please login again`)
 	}
 	return nil

@@ -3,7 +3,7 @@ package middlewares
 import (
 	"github.com/lovego/goa"
 	"github.com/lovego/tracer"
-	"{{ .ModulePath }}/middlewares/helpers"
+	"{{ .ModulePath }}/generic/session"
 )
 
 func SessionParse(c *goa.Context) {
@@ -12,14 +12,14 @@ func SessionParse(c *goa.Context) {
 }
 
 func parseSession(c *goa.Context) {
-	ck, _ := c.Request.Cookie(helpers.Cookie.Name)
+	ck, _ := c.Request.Cookie(session.Cookie.Name)
 	if ck == nil || ck.Value == "" {
 		return
 	}
-	ck.MaxAge = helpers.Cookie.MaxAge
+	ck.MaxAge = session.Cookie.MaxAge
 
-	var data helpers.Session
-	if err := helpers.CookieStore.Get(ck, &data); err != nil {
+	var data session.Session
+	if err := session.CookieStore.Get(ck, &data); err != nil {
 		tracer.Log(c.Context(), "session: ", err)
 		return
 	}

@@ -15,7 +15,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const moduleVersion = `v1.1.2`
+const moduleVersion = `v1.1.3`
 const fullVersion = moduleVersion + ` 20220207`
 
 func main() {

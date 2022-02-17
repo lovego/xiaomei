@@ -1,4 +1,4 @@
-package helpers
+package session
 
 import (
 	"time"
@@ -18,7 +18,7 @@ type Session struct {
 	LoginTime time.Time
 }
 
-func GetSession(c *goa.Context) Session {
+func Get(c *goa.Context) Session {
 	v := c.Get("session")
 	if data, ok := v.(Session); ok {
 		return data
@@ -26,13 +26,13 @@ func GetSession(c *goa.Context) Session {
 	return Session{}
 }
 
-func SaveSession(c *goa.Context, data Session) {
+func Save(c *goa.Context, data Session) {
 	err := CookieStore.Save(c.ResponseWriter, &Cookie, data)
 	if err != nil {
 		tracer.Log(c.Context(), "save session: ", err)
 	}
 }
 
-func DeleteSession(c *goa.Context) {
+func Delete(c *goa.Context) {
 	CookieStore.Delete(c.ResponseWriter, &Cookie)
 }

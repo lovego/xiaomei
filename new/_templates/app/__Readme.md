@@ -12,4 +12,4 @@
 | Production   | https://{{ .Domain }}                |
 
 ### API文档
-[API文档](./src/docs/apis)
+[API文档](./docs/apis)
