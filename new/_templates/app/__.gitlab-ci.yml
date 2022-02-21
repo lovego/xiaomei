@@ -59,7 +59,7 @@ test:
   variables:
     branch: ""
   rules:
-    - if: [ '$CI_COMMIT_REF_NAME == $branch' ]
+    - if: '$CI_COMMIT_REF_NAME == $branch'
 
 deploy-qa:
   extends: .deploy
@@ -86,7 +86,7 @@ deploy-production:
   variables:
     branch: master
   rules:
-    - if: [ '$CI_COMMIT_REF_NAME == $branch' ]
+    - if: '$CI_COMMIT_REF_NAME == $branch'
       when: manual
   allow_failure: false
 

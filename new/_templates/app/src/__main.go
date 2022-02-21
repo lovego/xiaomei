@@ -30,7 +30,7 @@ func main() {
 	router := goa.New()
 	router.Use(middlewares.CORS.Check, middlewares.Logger.Record, middlewares.SessionParse)
 	if os.Getenv("GOA_DOC") != `` {
-		router.DocDir(filepath.Join(fs.SourceDir(), "..", "docs", "apis"))
+		router.DocDir(filepath.Join(fs.SourceDir(), "..", "doc", "api"))
 		setupRoutes(&router.RouterGroup)
 		os.Exit(0)
 	}
