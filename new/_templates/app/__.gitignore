@@ -4,6 +4,6 @@
 .idea
 *.exe
 tmp
-{{ .ProName }}
+/src/{{ .ProName }}
 /release/img-app/{{ .ProName }}
 /release/img-app/log

@@ -1,0 +1,6 @@
+.*.swp
+*.test
+.DS_Store
+.idea
+*.exe
+tmp

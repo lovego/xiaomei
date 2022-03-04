@@ -21,9 +21,10 @@ func mergeToCmd() *cobra.Command {
 }
 
 func mergeTo(targetBranch string) error {
+	// "--" after checkout ensure it checkouts a branch, instread of a file or directory.
 	_, err := cmd.Run(cmd.O{}, "bash", "-c", fmt.Sprintf(`
 set -ex
-git checkout %s
+git checkout %s --
 upstream=$(git rev-parse @{upstream} 2>/dev/null || true)
 if test -n "$upstream"; then
 	git pull --no-edit
@@ -38,7 +39,7 @@ if test -n "$upstream"; then
 else
 	git push -u origin %s
 fi
-git checkout -
+git checkout - --
 `, targetBranch, targetBranch, targetBranch, targetBranch),
 	)
 	return err
