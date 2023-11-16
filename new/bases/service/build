@@ -7,7 +7,7 @@ test nginx/nginx-start.go -nt nginx/nginx-start &&
     GOOS=linux GOARCH=amd64 go build -v -o nginx/nginx-start nginx/nginx-start.go
 
 test logc/docker-kill.go  -nt logc/docker-kill &&
-    GOOS=linux GOARCH=amd64 go build -v -o logc/docker-kill docker-kill.go
+    GOOS=linux GOARCH=amd64 go build -v -o logc/docker-kill logc/docker-kill.go
 
 if [[ $(file -b logc/logc) != 'ELF '* ]]; then
                             go get   -v -d           github.com/lovego/logc@latest
