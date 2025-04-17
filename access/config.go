@@ -37,7 +37,6 @@ type service struct {
 	*config.Config
 	svcName  string
 	downAddr string
-	addrs    []string
 }
 
 func newService(svcName, env, downAddr string) *service {
@@ -48,36 +47,37 @@ func newService(svcName, env, downAddr string) *service {
 	}
 }
 
-func (s *service) Addrs() ([]string, error) {
+func (s *service) Addrs(feature ...string) ([]string, error) {
 	if s == nil {
 		return nil, nil
 	}
-	if s.addrs == nil {
-		addrs := []string{}
-		ports := release.GetService(s.Env.String(), s.svcName).Ports
-		for _, node := range s.Nodes() {
-			for _, port := range ports {
-				upstreamAddr := node.GetServiceAddr() + `:` + strconv.FormatInt(int64(port), 10)
-				if s.downAddr != "" && s.downAddr == node.Addr {
-					upstreamAddr += " down"
-				}
-				addrs = append(addrs, upstreamAddr)
+	addrs := []string{}
+	ports := release.GetService(s.Env.String(), s.svcName).Ports
+	for _, node := range s.Nodes(feature...) {
+		for _, port := range ports {
+			upstreamAddr := node.GetServiceAddr() + `:` + strconv.FormatInt(int64(port), 10)
+			if s.downAddr != "" && s.downAddr == node.Addr {
+				upstreamAddr += " down"
 			}
-		}
-		s.addrs = addrs
-		if len(addrs) == 0 {
-			return nil, errors.New(`no instance defined for: ` + s.svcName)
+			addrs = append(addrs, upstreamAddr)
 		}
 	}
-	return s.addrs, nil
+	if len(addrs) == 0 {
+		return nil, errors.New(`no instance defined for: ` + s.svcName)
+	}
+	return addrs, nil
 }
 
-func (s *service) Nodes() (nodes []release.Node) {
+func (s *service) Nodes(feature ...string) (nodes []release.Node) {
 	if s == nil {
 		return nil
 	}
+	var f string
+	if len(feature) > 0 {
+		f = feature[0]
+	}
 	labels := release.GetService(s.Env.String(), s.svcName).Nodes
-	for _, node := range release.GetCluster(s.Env.String()).GetNodes(``) {
+	for _, node := range release.GetCluster(s.Env.String()).GetNodes(f) {
 		if node.Match(labels) {
 			nodes = append(nodes, node)
 		}

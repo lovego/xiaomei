@@ -20,6 +20,7 @@ func Cmd() *cobra.Command {
 	}
 	cmd.AddCommand(accessSetupCmd())
 	cmd.AddCommand(accessReloadCmd())
+	cmd.AddCommand(nodesCmd())
 	return cmd
 }
 
@@ -48,5 +49,17 @@ func accessReloadCmd() *cobra.Command {
 		}),
 	}
 	cmd.Flags().StringVarP(&filter, `filter`, `f`, ``, `filter by node addr.`)
+	return cmd
+}
+
+func nodesCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:                   `nodes [env]` + sudoTip,
+		Short:                 `Access config nodes for the project.`,
+		DisableFlagsInUseLine: true,
+		RunE: release.EnvCall(func(env string) error {
+			return nodes(env)
+		}),
+	}
 	return cmd
 }

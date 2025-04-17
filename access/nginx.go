@@ -89,3 +89,13 @@ func clusterRun(env, feature, input, cmdStr string) error {
 	}
 	return nil
 }
+
+func nodes(env string) error {
+	accessNodes := release.GetDeploy(env).AccessNodes
+	for _, node := range release.GetCluster(env).GetNodes("") {
+		if node.Match(accessNodes) {
+			fmt.Println(node.SshAddr())
+		}
+	}
+	return nil
+}
