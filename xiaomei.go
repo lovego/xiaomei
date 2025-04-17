@@ -15,8 +15,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const moduleVersion = `v1.1.3`
-const fullVersion = moduleVersion + ` 20220207`
+const moduleVersion = `v1.1.4`
+const fullVersion = moduleVersion + ` 20250417`
 
 func main() {
 	// log.SetFlags(log.Lshortfile | log.LstdFlags)
