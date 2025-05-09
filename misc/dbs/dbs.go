@@ -61,7 +61,7 @@ func Mongo(env, key string, printCmd bool) error {
 }
 
 func Redis(env, key string, printCmd bool) error {
-	command := `redis-cli -u ` + getDBUrl(env, `redis`, key)
+	command := `redis-cli -u ` + strings.Split(getDBUrl(env, `redis`, key), "?")[0]
 	if printCmd {
 		fmt.Println(command)
 		return nil
